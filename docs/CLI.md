@@ -56,57 +56,7 @@ export LAKEKEEPER_SCOPE=lakekeeper
 
 ---
 
-## Command Tree
-
-```mermaid
-graph TD
-    lkctl --> project
-    lkctl --> warehouse["warehouse (alias: wh)"]
-    lkctl --> role
-    lkctl --> user
-    lkctl --> server
-    lkctl --> catalog["catalog ⚠️ not implemented"]
-    lkctl --> version
-    lkctl --> whoami
-
-    project --> p-list[list]
-    project --> p-get[get PROJECT-ID]
-    project --> p-create[create NAME]
-    project --> p-rename[rename PROJECT-ID NEW-NAME]
-    project --> p-delete[delete PROJECT-ID]
-    project --> p-access[access PROJECT-ID]
-    project --> p-assignments[assignments PROJECT-ID]
-    project --> p-grant[grant PROJECT-ID]
-
-    warehouse --> w-list[list]
-    warehouse --> w-get[get WAREHOUSE-ID]
-    warehouse --> w-create[create NAME -f CONFIG.json]
-    warehouse --> w-delete[delete WAREHOUSE-ID]
-
-    role --> r-list[list]
-    role --> r-get[get ROLE-ID]
-    role --> r-create[create NAME]
-    role --> r-update[update ROLE-ID]
-    role --> r-delete[delete ROLE-ID]
-    role --> r-access[access ROLE-ID]
-    role --> r-assignments[assignments ROLE-ID]
-    role --> r-grant[grant ROLE-ID]
-
-    user --> u-list[list]
-    user --> u-get[get USER-ID]
-    user --> u-create[create]
-    user --> u-delete[delete USER-ID]
-
-    server --> s-info[info]
-    server --> s-bootstrap[bootstrap]
-    server --> s-access[access]
-    server --> s-assignments[assignments]
-    server --> s-grant[grant]
-```
-
 > **Note:** `lkctl catalog` exists as a placeholder but is not yet implemented — it exits with a fatal error. Use `client.CatalogV1()` from the Go SDK for catalog operations.
-
----
 
 ## Commands
 
