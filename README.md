@@ -1,19 +1,38 @@
 # Lakekeeper Go Client
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/baptistegh/go-lakekeeper)](https://goreportcard.com/report/github.com/baptistegh/go-lakekeeper)
-[![GoDoc](https://godoc.org/github.com/baptistegh/go-lakekeeper?status.svg)](https://godoc.org/github.com/baptistegh/go-lakekeeper)
-[![codecov](https://codecov.io/gh/baptistegh/go-lakekeeper/graph/badge.svg?token=2WF3AB10RA)](https://codecov.io/gh/baptistegh/go-lakekeeper)
-[![test](https://github.com/baptistegh/go-lakekeeper/actions/workflows/test.yml/badge.svg)](https://github.com/baptistegh/go-lakekeeper/actions/workflows/test.yml)
-[![nightly](https://github.com/baptistegh/go-lakekeeper/actions/workflows/nightly.yml/badge.svg)](https://github.com/baptistegh/go-lakekeeper/actions/workflows/nightly.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/lakekeeper/go-lakekeeper)](https://goreportcard.com/report/github.com/lakekeeper/go-lakekeeper)
+[![GoDoc](https://godoc.org/github.com/lakekeeper/go-lakekeeper?status.svg)](https://godoc.org/github.com/lakekeeper/go-lakekeeper)
+[![test](https://github.com/lakekeeper/go-lakekeeper/actions/workflows/test.yml/badge.svg)](https://github.com/lakekeeper/go-lakekeeper/actions/workflows/test.yml)
+[![nightly](https://github.com/lakekeeper/go-lakekeeper/actions/workflows/nightly.yml/badge.svg)](https://github.com/lakekeeper/go-lakekeeper/actions/workflows/nightly.yml)
 
 Go Client for [Lakekeeper API](https://docs.lakekeeper.io).
 
 It provides a convenient way to interact with Lakekeeper services from your Go applications (And a new CLI tool in preview).
 
+```mermaid
+graph LR
+    APP["Your code / lkctl CLI"]
+    CLIENT["pkg/client.Client"]
+    MGMT["Management API\n/management/v1"]
+    CAT["Iceberg REST Catalog\n/catalog"]
+
+    APP --> CLIENT
+    CLIENT -->|"ProjectV1 · WarehouseV1\nRoleV1 · UserV1 · ServerV1\nPermissionV1"| MGMT
+    CLIENT -->|"CatalogV1 via apache/iceberg-go"| CAT
+```
+
+## Documentation
+
+- [Architecture](docs/ARCHITECTURE.md) — component overview, request lifecycle, bootstrap flow
+- [Package Reference](docs/PACKAGES.md) — every `pkg/` package, its types, and dependency graph
+- [Authentication](docs/AUTHENTICATION.md) — `OAuthTokenSource`, `AccessTokenAuthSource`, `K8sServiceAccountAuthSource` with sequence diagrams
+- [CLI Reference](docs/CLI.md) — `lkctl` command tree, environment variables, examples
+
 ## Table of Contents
 
 - [Lakekeeper Go Client](#lakekeeper-go-client)
   - [Table of Contents](#table-of-contents)
+  - [Documentation](#documentation)
   - [CLI Usage](#cli-usage)
     - [Installation](#installation)
     - [Authentication](#authentication)
@@ -37,12 +56,12 @@ It provides a convenient way to interact with Lakekeeper services from your Go a
 
 ### Installation
 
-You can directly download the binaries on [Releases page](https://github.com/baptistegh/go-lakekeeper/releases/latest).
+You can directly download the binaries on [Releases page](https://github.com/lakekeeper/go-lakekeeper/releases/latest).
 
 A docker image is also available
 
 ```sh
-docker run --rm ghcr.io/baptistegh/lkctl version
+docker run --rm quay.io/lakekeeper/lkctl version
 ```
 
 ### Authentication
@@ -122,7 +141,7 @@ The Catalog part is handled by the Iceberg Go implementation : [go-iceberg](http
 To install the client library, use `go get`:
 
 ```sh
-go get github.com/baptistegh/go-lakekeeper
+go get github.com/lakekeeper/go-lakekeeper
 ```
 
 This library requires Go 1.24 or later.
@@ -142,9 +161,9 @@ import (
 
     "golang.org/x/oauth2/clientcredentials"
 
-    "github.com/baptistegh/go-lakekeeper/pkg/core"
-    lakekeeper "github.com/baptistegh/go-lakekeeper/pkg/client"
-    managementv1 "github.com/baptistegh/go-lakekeeper/pkg/apis/management/v1"
+    "github.com/lakekeeper/go-lakekeeper/pkg/core"
+    lakekeeper "github.com/lakekeeper/go-lakekeeper/pkg/client"
+    managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
 )
 
 func main() {

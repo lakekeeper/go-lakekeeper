@@ -1,5 +1,11 @@
 # Examples
 
+> For broader documentation on the SDK and CLI, see the [docs/](../docs/) directory:
+> - [Architecture](../docs/ARCHITECTURE.md)
+> - [Package Reference](../docs/PACKAGES.md) — including `storage/profile` and `storage/credential` used in warehouse creation
+> - [Authentication](../docs/AUTHENTICATION.md) — how to configure `OAuthTokenSource`, static tokens, and k8s SA auth
+> - [CLI Reference](../docs/CLI.md) — `lkctl` command reference and env variables
+
 This example follows the same principles as those used in the official Lakekeeper examples.
 
 In this case, only the [`access-control-simple`](https://github.com/lakekeeper/lakekeeper/blob/main/examples/access-control-simple) component is used.
