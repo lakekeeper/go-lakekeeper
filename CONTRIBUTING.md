@@ -37,7 +37,7 @@ Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md) to help create 
 
 ### Reporting Bugs
 
-- Use [GitHub Issues](https://github.com/baptistegh/go-lakekeeper/issues).
+- Use [GitHub Issues](https://github.com/lakekeeper/go-lakekeeper/issues).
 - Include a clear title and description.
 - Include steps to reproduce, expected behavior, and actual behavior.
 

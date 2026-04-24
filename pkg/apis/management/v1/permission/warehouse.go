@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/baptistegh/go-lakekeeper/pkg/core"
+	"github.com/lakekeeper/go-lakekeeper/pkg/core"
 )
 
 type (

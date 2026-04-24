@@ -6,8 +6,9 @@ import (
 	"os"
 	"text/tabwriter"
 
-	permissionv1 "github.com/baptistegh/go-lakekeeper/pkg/apis/management/v1/permission"
 	"github.com/spf13/cobra"
+
+	permissionv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1/permission"
 )
 
 const (

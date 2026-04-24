@@ -1,4 +1,4 @@
-module github.com/baptistegh/go-lakekeeper
+module github.com/lakekeeper/go-lakekeeper
 
 go 1.25.0
 

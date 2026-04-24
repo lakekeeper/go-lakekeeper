@@ -2,7 +2,7 @@
 
 services:
   set-up:
-    image: ghcr.io/baptistegh/lkctl:${LKCTL_VERSION:-latest-main}
+    image: quay.io/lakekeeper/lkctl:${LKCTL_VERSION:-latest-main}
     entrypoint: sh
     command: ["/init.sh"]
     environment:

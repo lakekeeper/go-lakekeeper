@@ -4,12 +4,13 @@ import (
 	"net/http"
 	"testing"
 
-	managementv1 "github.com/baptistegh/go-lakekeeper/pkg/apis/management/v1"
-	permissionv1 "github.com/baptistegh/go-lakekeeper/pkg/apis/management/v1/permission"
-	"github.com/baptistegh/go-lakekeeper/pkg/core"
-	"github.com/baptistegh/go-lakekeeper/pkg/testutil"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
+	permissionv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1/permission"
+	"github.com/lakekeeper/go-lakekeeper/pkg/core"
+	"github.com/lakekeeper/go-lakekeeper/pkg/testutil"
 )
 
 func TestProjectService_Get(t *testing.T) {

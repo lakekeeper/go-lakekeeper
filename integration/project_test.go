@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"testing"
 
-	managementv1 "github.com/baptistegh/go-lakekeeper/pkg/apis/management/v1"
+	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

@@ -8,7 +8,7 @@ formatters:
   settings:
     goimports:
       local-prefixes:
-        - github.com/baptistergh/go-lakekeeper
+        - github.com/lakekeeper/go-lakekeeper
 
 issues:
   max-issues-per-linter: 0
@@ -60,13 +60,13 @@ linters:
 
     importas:
       alias:
-        - pkg: github.com/baptistegh/go-lakekeeper/apis/management/v1
+        - pkg: github.com/lakekeeper/go-lakekeeper/apis/management/v1
           alias: managementv1
 
-        - pkg: github.com/baptistegh/go-lakekeeper/apis/management/v1/permission
+        - pkg: github.com/lakekeeper/go-lakekeeper/apis/management/v1/permission
           alias: permissionv1
 
-        - pkg: github.com/baptistegh/go-lakekeeper/apis/management/v1/storage
+        - pkg: github.com/lakekeeper/go-lakekeeper/apis/management/v1/storage
           alias: storagev1
 
         - pkg: "github.com/sirupsen/logrus"

@@ -54,11 +54,6 @@ jobs:
       - run: GOPATH=$(go env GOPATH) make test
         timeout-minutes: 10
 
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v6
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-
   integration-test:
     needs: lint
     runs-on: ubuntu-24.04

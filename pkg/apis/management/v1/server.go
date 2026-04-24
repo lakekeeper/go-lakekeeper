@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	permissionv1 "github.com/baptistegh/go-lakekeeper/pkg/apis/management/v1/permission"
-	"github.com/baptistegh/go-lakekeeper/pkg/core"
+	permissionv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1/permission"
+	"github.com/lakekeeper/go-lakekeeper/pkg/core"
 )
 
 type (

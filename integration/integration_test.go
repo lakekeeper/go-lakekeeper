@@ -10,12 +10,12 @@ import (
 	"os"
 	"testing"
 
-	managementv1 "github.com/baptistegh/go-lakekeeper/pkg/apis/management/v1"
-	credentialv1 "github.com/baptistegh/go-lakekeeper/pkg/apis/management/v1/storage/credential"
-	profilev1 "github.com/baptistegh/go-lakekeeper/pkg/apis/management/v1/storage/profile"
+	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
+	credentialv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1/storage/credential"
+	profilev1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1/storage/profile"
 
-	"github.com/baptistegh/go-lakekeeper/pkg/client"
-	"github.com/baptistegh/go-lakekeeper/pkg/core"
+	"github.com/lakekeeper/go-lakekeeper/pkg/client"
+	"github.com/lakekeeper/go-lakekeeper/pkg/core"
 	"github.com/google/uuid"
 	"github.com/joho/godotenv"
 	"golang.org/x/oauth2/clientcredentials"
