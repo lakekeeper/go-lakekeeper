@@ -14,13 +14,14 @@ import (
 	"time"
 
 	"github.com/apache/iceberg-go/catalog/rest"
-	managementv1 "github.com/baptistegh/go-lakekeeper/pkg/apis/management/v1"
-	permissionv1 "github.com/baptistegh/go-lakekeeper/pkg/apis/management/v1/permission"
-	"github.com/baptistegh/go-lakekeeper/pkg/core"
-	"github.com/baptistegh/go-lakekeeper/pkg/version"
 	"github.com/google/go-querystring/query"
 	"github.com/hashicorp/go-cleanhttp"
 	"github.com/hashicorp/go-retryablehttp"
+
+	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
+	permissionv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1/permission"
+	"github.com/lakekeeper/go-lakekeeper/pkg/core"
+	"github.com/lakekeeper/go-lakekeeper/pkg/version"
 )
 
 var userAgent = "go-lakekeeper/" + version.GetVersion().Version

@@ -4,10 +4,11 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/baptistegh/go-lakekeeper/pkg/core"
 	"github.com/hashicorp/go-retryablehttp"
 
-	managementv1 "github.com/baptistegh/go-lakekeeper/pkg/apis/management/v1"
+	"github.com/lakekeeper/go-lakekeeper/pkg/core"
+
+	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
 )
 
 // ClientOptionFunc can be used to customize a new Lakekeeper API client.

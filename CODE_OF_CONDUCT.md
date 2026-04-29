@@ -37,7 +37,7 @@ This Code of Conduct applies within all project spaces, including the codebase, 
 
 ## Enforcement
 
-Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the maintainers at baptiste.gouhoury@scalend.fr.
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the project maintainers by contacting [@Midor](https://github.com/Midor) or [@c-thiel](https://github.com/c-thiel) on GitHub, or by opening a private security advisory at https://github.com/lakekeeper/go-lakekeeper/security/advisories/new.
 
 All complaints will be reviewed and investigated promptly and fairly.
 

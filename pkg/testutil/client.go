@@ -9,8 +9,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/baptistegh/go-lakekeeper/pkg/client"
 	"github.com/hashicorp/go-retryablehttp"
+
+	"github.com/lakekeeper/go-lakekeeper/pkg/client"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

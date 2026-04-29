@@ -12,11 +12,11 @@ builds:
     flags:
       - -v
     ldflags:
-      - -X github.com/baptistegh/go-lakekeeper/pkg/version.version={{ .Version }}
-      - -X github.com/baptistegh/go-lakekeeper/pkg/version.buildDate={{ .Date }}
-      - -X github.com/baptistegh/go-lakekeeper/pkg/version.gitCommit={{ .FullCommit }}
-      - -X github.com/baptistegh/go-lakekeeper/pkg/version.gitTag={{ .Tag }}
-      - -X github.com/baptistegh/go-lakekeeper/pkg/version.gitTreeState={{ .Env.GIT_TREE_STATE }}
+      - -X github.com/lakekeeper/go-lakekeeper/pkg/version.version={{ .Version }}
+      - -X github.com/lakekeeper/go-lakekeeper/pkg/version.buildDate={{ .Date }}
+      - -X github.com/lakekeeper/go-lakekeeper/pkg/version.gitCommit={{ .FullCommit }}
+      - -X github.com/lakekeeper/go-lakekeeper/pkg/version.gitTag={{ .Tag }}
+      - -X github.com/lakekeeper/go-lakekeeper/pkg/version.gitTreeState={{ .Env.GIT_TREE_STATE }}
     goos:
       - linux
       - windows
@@ -39,10 +39,23 @@ checksum:
 
 signs:
   - artifacts: checksum
+    stdin: '{{ .Env.GPG_PASSPHRASE }}'
+    args:
+      - "--batch"
+      - "--pinentry-mode"
+      - "loopback"
+      - "--passphrase-fd"
+      - "0"
+      - "--local-user"
+      - "{{ .Env.GPG_FINGERPRINT }}"
+      - "--output"
+      - "${signature}"
+      - "--detach-sign"
+      - "${artifact}"
 
 dockers_v2:
   - images:
-      - ghcr.io/baptistegh/lkctl
+      - quay.io/lakekeeper/lkctl
     tags:
       - latest
       - v{{ .Version }}
@@ -56,14 +69,14 @@ dockers_v2:
       "org.opencontainers.image.revision": "{{.FullCommit}}"
       "org.opencontainers.image.version": "{{.Version}}"
       "org.opencontainers.image.source": "{{.GitURL}}"
-      "org.opencontainers.image.authors": "baptiste.gouhoury@scalend.fr"
+      "org.opencontainers.image.authors": "https://github.com/lakekeeper/go-lakekeeper"
     platforms:
       - linux/amd64
       - linux/arm64
 
 release:
   github:
-    owner: baptistegh
+    owner: lakekeeper
     name: go-lakekeeper
 
 snapshot:

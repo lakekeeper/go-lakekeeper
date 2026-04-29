@@ -7,13 +7,14 @@ import (
 	"os"
 	"text/tabwriter"
 
-	"github.com/baptistegh/go-lakekeeper/cmd/lkctl/errors"
-	managementv1 "github.com/baptistegh/go-lakekeeper/pkg/apis/management/v1"
-	profilev1 "github.com/baptistegh/go-lakekeeper/pkg/apis/management/v1/storage/profile"
-	"github.com/baptistegh/go-lakekeeper/pkg/core"
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+
+	"github.com/lakekeeper/go-lakekeeper/cmd/lkctl/errors"
+	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
+	profilev1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1/storage/profile"
+	"github.com/lakekeeper/go-lakekeeper/pkg/core"
 )
 
 func NewWarehouseCmd(clientOpts *clientOptions) *cobra.Command {

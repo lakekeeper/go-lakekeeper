@@ -9,8 +9,8 @@ nav:
     - Authentication: cli/get-started/authentication.md
     - Bootstrap: cli/get-started/bootstrap.md
   - Command Reference: cli/commands/lkctl.md
-- Releases ⧉: https://github.com/baptistegh/go-lakekeeper/releases
-repo_url: https://github.com/baptistegh/go-lakekeeper
+- Releases ⧉: https://github.com/lakekeeper/go-lakekeeper/releases
+repo_url: https://github.com/lakekeeper/go-lakekeeper
 site_name: go-lakekeeper
 # site_url: !ENV READTHEDOCS_CANONICAL_URL
 strict: true

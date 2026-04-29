@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/baptistegh/go-lakekeeper/cmd/lkctl/errors"
-	"github.com/baptistegh/go-lakekeeper/pkg/version"
+	"github.com/lakekeeper/go-lakekeeper/cmd/lkctl/errors"
+	"github.com/lakekeeper/go-lakekeeper/pkg/version"
 
 	"github.com/spf13/cobra"
 )

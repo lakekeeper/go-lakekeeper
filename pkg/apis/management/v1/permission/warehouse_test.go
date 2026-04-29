@@ -4,12 +4,13 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/baptistegh/go-lakekeeper/pkg/core"
-	"github.com/baptistegh/go-lakekeeper/pkg/testutil"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	permissionv1 "github.com/baptistegh/go-lakekeeper/pkg/apis/management/v1/permission"
+	"github.com/lakekeeper/go-lakekeeper/pkg/core"
+	"github.com/lakekeeper/go-lakekeeper/pkg/testutil"
+
+	permissionv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1/permission"
 )
 
 func TestWarehousePermissionService_GetAuthzProperties(t *testing.T) {

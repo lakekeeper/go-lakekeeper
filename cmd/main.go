@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/baptistegh/go-lakekeeper/cmd/lkctl/commands"
+	"github.com/lakekeeper/go-lakekeeper/cmd/lkctl/commands"
 )
 
 func main() {

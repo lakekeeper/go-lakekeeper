@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/baptistegh/go-lakekeeper/pkg/apis/management/v1/permission"
-	"github.com/baptistegh/go-lakekeeper/pkg/apis/management/v1/storage/credential"
-	"github.com/baptistegh/go-lakekeeper/pkg/apis/management/v1/storage/profile"
-	"github.com/baptistegh/go-lakekeeper/pkg/core"
+	"github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1/permission"
+	"github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1/storage/credential"
+	"github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1/storage/profile"
+	"github.com/lakekeeper/go-lakekeeper/pkg/core"
 )
 
 type (

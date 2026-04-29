@@ -6,13 +6,14 @@ import (
 	"os"
 	"text/tabwriter"
 
-	"github.com/baptistegh/go-lakekeeper/cmd/lkctl/errors"
-	managementv1 "github.com/baptistegh/go-lakekeeper/pkg/apis/management/v1"
-	permissionv1 "github.com/baptistegh/go-lakekeeper/pkg/apis/management/v1/permission"
-	"github.com/baptistegh/go-lakekeeper/pkg/core"
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+
+	"github.com/lakekeeper/go-lakekeeper/cmd/lkctl/errors"
+	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
+	permissionv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1/permission"
+	"github.com/lakekeeper/go-lakekeeper/pkg/core"
 )
 
 func NewRoleCmd(clientOptions *clientOptions) *cobra.Command {

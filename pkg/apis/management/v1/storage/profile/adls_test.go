@@ -4,9 +4,10 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/baptistegh/go-lakekeeper/pkg/core"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/lakekeeper/go-lakekeeper/pkg/core"
 )
 
 func TestADLSStorageSettings_NoOpts(t *testing.T) {

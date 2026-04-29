@@ -1,9 +1,10 @@
 package commands
 
 import (
-	"github.com/baptistegh/go-lakekeeper/cmd/lkctl/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+
+	"github.com/lakekeeper/go-lakekeeper/cmd/lkctl/errors"
 )
 
 func NewWhoamiCmd(clientOptions *clientOptions) *cobra.Command {

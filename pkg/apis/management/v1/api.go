@@ -1,6 +1,6 @@
 package v1
 
-import "github.com/baptistegh/go-lakekeeper/pkg/core"
+import "github.com/lakekeeper/go-lakekeeper/pkg/core"
 
 const (
 	APIManagementVersionPath = "/management/v1"

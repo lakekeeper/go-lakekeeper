@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/baptistegh/go-lakekeeper/pkg/common"
 	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
+
+	"github.com/lakekeeper/go-lakekeeper/pkg/common"
 
 	"github.com/spf13/cobra"
 )

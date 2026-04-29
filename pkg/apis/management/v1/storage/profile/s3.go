@@ -3,7 +3,7 @@ package profile
 import (
 	"encoding/json"
 
-	"github.com/baptistegh/go-lakekeeper/pkg/core"
+	"github.com/lakekeeper/go-lakekeeper/pkg/core"
 )
 
 // S3StorageSettings represents the storage settings for a warehouse

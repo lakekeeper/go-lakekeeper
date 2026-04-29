@@ -25,7 +25,7 @@ GOBIN=$(shell go env GOBIN)
 endif
 
 # the root go project
-GO_PROJECT=github.com/baptistegh/go-lakekeeper
+GO_PROJECT=github.com/lakekeeper/go-lakekeeper
 
 # CGO_ENABLED value
 CGO_ENABLED_VALUE=0
@@ -56,7 +56,7 @@ GIT_FULL_COMMIT := $(shell git rev-parse HEAD)
 GIT_TREE_STATE := $(shell if [ -z "`git status --porcelain`" ]; then echo "clean" ; else echo "dirty"; fi)
 
 GO_BUILDFLAGS=$(BUILDFLAGS)
-GO_LDFLAGS=-X github.com/baptistegh/go-lakekeeper/pkg/version.buildDate=$(NOW) -X github.com/baptistegh/go-lakekeeper/pkg/version.gitCommit=$(FULL_COMMIT) -X github.com/baptistegh/go-lakekeeper/pkg/version.gitTreeState=$(GIT_TREE_STATE) $(LDFLAGS)
+GO_LDFLAGS=-X github.com/lakekeeper/go-lakekeeper/pkg/version.buildDate=$(NOW) -X github.com/lakekeeper/go-lakekeeper/pkg/version.gitCommit=$(FULL_COMMIT) -X github.com/lakekeeper/go-lakekeeper/pkg/version.gitTreeState=$(GIT_TREE_STATE) $(LDFLAGS)
 GO_TAGS=$(TAGS)
 
 GO_COMMON_FLAGS = $(GO_BUILDFLAGS) -tags '$(GO_TAGS)' -ldflags '$(GO_LDFLAGS)'
