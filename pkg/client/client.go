@@ -122,7 +122,7 @@ func (c *Client) CatalogV1(ctx context.Context, projectID, warehouse string, opt
 }
 
 func (c *Client) runBootstrap(ctx context.Context, s settings) error {
-	info, _, err := c.APIClient.ServerAPI.GetServerInfo(ctx).Execute()
+	info, _, err := c.ServerAPI.GetServerInfo(ctx).Execute()
 	if err != nil {
 		return fmt.Errorf("server info: %w", err)
 	}
@@ -137,7 +137,7 @@ func (c *Client) runBootstrap(ctx context.Context, s settings) error {
 		req.SetUserType(*s.bootstrapUserType)
 	}
 
-	if _, err := c.APIClient.ServerAPI.Bootstrap(ctx).BootstrapRequest(*req).Execute(); err != nil {
+	if _, err := c.ServerAPI.Bootstrap(ctx).BootstrapRequest(*req).Execute(); err != nil {
 		return err
 	}
 	return nil

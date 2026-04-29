@@ -7,9 +7,6 @@ packageVersion: 1.0.0
 withGoMod: false
 isGoSubmodule: true
 
-# Emit one file per model so diffs after a spec bump stay readable.
-generateAliasAsModel: false
-
 # Polymorphism / oneOf handling. Lakekeeper's storage profile and credential
 # types are oneOf unions; the discriminator lookup makes them ergonomic.
 useOneOfDiscriminatorLookup: true
