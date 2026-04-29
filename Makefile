@@ -66,9 +66,14 @@ GO_PACKAGES := ./pkg/...
 BIN_DIR := $(SELF_DIR)/bin
 DIST_DIR := $(SELF_DIR)/dist
 
-CONTAINER_ENGINE ?= docker
+CONTAINER_ENGINE ?= $(shell command -v docker >/dev/null 2>&1 && echo docker || (command -v podman >/dev/null 2>&1 && echo podman || echo docker))
 CONTAINER_COMPOSE_ENGINE ?= $(shell $(CONTAINER_ENGINE) compose version >/dev/null 2>&1 && echo '$(CONTAINER_ENGINE) compose' || echo '$(CONTAINER_ENGINE)-compose')
-DOCKER ?= docker
+DOCKER ?= $(CONTAINER_ENGINE)
+
+OPENAPI_GENERATOR_VERSION ?= v7.10.0
+OPENAPI_GENERATOR_IMAGE   ?= openapitools/openapi-generator-cli:$(OPENAPI_GENERATOR_VERSION)
+OPENAPI_DIR               := $(SELF_DIR)/api/openapi
+MANAGEMENT_API_OUTPUT     := pkg/apis/management/v1
 
 ENV_FILE := $(SELF_DIR)/.env
 
@@ -142,6 +147,26 @@ lint:
 
 .PHONY: validate
 validate: vet lint
+
+.PHONY: generate
+generate: ## Regenerate Go bindings from OpenAPI specs.
+	@echo === regenerating management API from $(OPENAPI_DIR)/management-open-api.yaml
+	@test -f $(OPENAPI_DIR)/management-open-api.yaml || { echo "missing $(OPENAPI_DIR)/management-open-api.yaml"; exit 1; }
+	@rm -rf $(SELF_DIR)/$(MANAGEMENT_API_OUTPUT)
+	@mkdir -p $(SELF_DIR)/$(MANAGEMENT_API_OUTPUT)
+	@cp $(OPENAPI_DIR)/.openapi-generator-ignore $(SELF_DIR)/$(MANAGEMENT_API_OUTPUT)/
+	@$(CONTAINER_ENGINE) run --rm \
+		-v $(SELF_DIR):/local \
+		$(OPENAPI_GENERATOR_IMAGE) generate \
+		-i /local/api/openapi/management-open-api.yaml \
+		-g go \
+		-c /local/api/openapi/management-config.yaml \
+		-o /local/$(MANAGEMENT_API_OUTPUT) \
+		--global-property=apiDocs=false,apiTests=false,modelDocs=false,modelTests=false
+	@echo === goimports on generated tree
+	@$(GO) run golang.org/x/tools/cmd/goimports -w $(SELF_DIR)/$(MANAGEMENT_API_OUTPUT)
+	@$(GO) mod tidy
+	@$(MAKE) fmt
 
 .PHONY: clean
 clean:

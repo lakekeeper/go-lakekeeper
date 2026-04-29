@@ -1,120 +1,117 @@
 package client
 
 import (
-	"net/http"
 	"time"
 
 	"github.com/hashicorp/go-retryablehttp"
 
-	"github.com/lakekeeper/go-lakekeeper/pkg/core"
-
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
 )
 
-// ClientOptionFunc can be used to customize a new Lakekeeper API client.
-type ClientOptionFunc func(*Client) error
+// Option customises a Client at construction time.
+type Option func(*settings) error
 
-// WithCustomBackoff can be used to configure a custom backoff policy.
-func WithCustomBackoff(backoff retryablehttp.Backoff) ClientOptionFunc {
-	return func(c *Client) error {
-		c.client.Backoff = backoff
+// settings holds the values an Option may set. Kept unexported so that the
+// surface stays append-only — new options don't widen the public API.
+type settings struct {
+	userAgent string
+
+	// Retry behaviour, applied to the http.Client used by the generated
+	// APIClient. Zero values mean "use retryablehttp defaults".
+	disableRetries bool
+	retryMax       int
+	retryWaitMin   time.Duration
+	retryWaitMax   time.Duration
+	checkRetry     retryablehttp.CheckRetry
+	backoff        retryablehttp.Backoff
+	errorHandler   retryablehttp.ErrorHandler
+
+	// Bootstrap behaviour, applied once at construction time.
+	bootstrap           bool
+	bootstrapAsOperator bool
+	bootstrapUserType   *managementv1.UserType
+}
+
+func defaultSettings() settings {
+	return settings{}
+}
+
+// WithUserAgent overrides the default User-Agent header.
+func WithUserAgent(userAgent string) Option {
+	return func(s *settings) error {
+		s.userAgent = userAgent
 		return nil
 	}
 }
 
-// WithCustomRetry can be used to configure a custom retry policy.
-func WithCustomRetry(checkRetry retryablehttp.CheckRetry) ClientOptionFunc {
-	return func(c *Client) error {
-		c.client.CheckRetry = checkRetry
+// WithoutRetries disables the retry layer entirely.
+func WithoutRetries() Option {
+	return func(s *settings) error {
+		s.disableRetries = true
 		return nil
 	}
 }
 
-// WithCustomRetryMax can be used to configure a custom maximum number of retries.
-func WithCustomRetryMax(retryMax int) ClientOptionFunc {
-	return func(c *Client) error {
-		c.client.RetryMax = retryMax
+// WithRetryMax overrides the maximum number of retries.
+func WithRetryMax(n int) Option {
+	return func(s *settings) error {
+		s.retryMax = n
 		return nil
 	}
 }
 
-// WithErrorHandler can be used to configure a custom error handler.
-func WithErrorHandler(handler retryablehttp.ErrorHandler) ClientOptionFunc {
-	return func(c *Client) error {
-		c.client.ErrorHandler = handler
+// WithRetryWait overrides the minimum and maximum wait between retries.
+func WithRetryWait(minWait, maxWait time.Duration) Option {
+	return func(s *settings) error {
+		s.retryWaitMin = minWait
+		s.retryWaitMax = maxWait
 		return nil
 	}
 }
 
-// WithoutRetries disables the default retry logic.
-func WithoutRetries() ClientOptionFunc {
-	return func(c *Client) error {
-		c.disableRetries = true
+// WithCheckRetry overrides retryablehttp's CheckRetry callback.
+func WithCheckRetry(check retryablehttp.CheckRetry) Option {
+	return func(s *settings) error {
+		s.checkRetry = check
 		return nil
 	}
 }
 
-// WithCustomRetryWaitMinMax can be used to configure a custom minimum and
-// maximum time to wait between retries.
-func WithCustomRetryWaitMinMax(waitMin, waitMax time.Duration) ClientOptionFunc {
-	return func(c *Client) error {
-		c.client.RetryWaitMin = waitMin
-		c.client.RetryWaitMax = waitMax
+// WithBackoff overrides retryablehttp's Backoff callback.
+func WithBackoff(backoff retryablehttp.Backoff) Option {
+	return func(s *settings) error {
+		s.backoff = backoff
 		return nil
 	}
 }
 
-// WithRequestOptions can be used to configure default request options applied to every request.
-func WithRequestOptions(options ...core.RequestOptionFunc) ClientOptionFunc {
-	return func(c *Client) error {
-		c.defaultRequestOptions = append(c.defaultRequestOptions, options...)
+// WithErrorHandler overrides retryablehttp's ErrorHandler.
+func WithErrorHandler(handler retryablehttp.ErrorHandler) Option {
+	return func(s *settings) error {
+		s.errorHandler = handler
 		return nil
 	}
 }
 
-// WithUserAgent can be used to configure a custom user agent.
-func WithUserAgent(userAgent string) ClientOptionFunc {
-	return func(c *Client) error {
-		c.UserAgent = userAgent
-		return nil
-	}
-}
-
-// WithHTTPClient can be used to configure a custom HTTP client.
-func WithHTTPClient(httpClient *http.Client) ClientOptionFunc {
-	return func(c *Client) error {
-		c.client.HTTPClient = httpClient
-		return nil
-	}
-}
-
-// WithInitialBootstrapV1Enabled enables automatic server
-// bootstrap on client startup.
+// WithInitialBootstrap arranges for the server to be bootstrapped at client
+// construction time if it has not been bootstrapped yet.
 //
-// acceptTermsOfUse is here to be sure the user is aware.
-// if false, this client options will do nothing.
+// acceptTermsOfUse must be true for the bootstrap to proceed; if false, the
+// option is a no-op.
 //
-// isOperator controls wether the provisioned user will
-// have the operator role. default is false.
+// isOperator controls whether the bootstrapping user receives the operator
+// role.
 //
-// userType can be human or application, default is application.
-func WithInitialBootstrapV1Enabled(
-	acceptTermsOfUse bool,
-	isOperator bool,
-	userType *managementv1.UserType,
-) ClientOptionFunc {
-	return func(c *Client) error {
+// userType is optional. If nil, the server falls back to the type encoded in
+// the auth token.
+func WithInitialBootstrap(acceptTermsOfUse, isOperator bool, userType *managementv1.UserType) Option {
+	return func(s *settings) error {
 		if !acceptTermsOfUse {
 			return nil
 		}
-
-		c.bootstrapAsOperator = isOperator
-		c.bootstrap = true
-
-		if userType != nil {
-			c.bootstrapUserType = *userType
-		}
-
+		s.bootstrap = true
+		s.bootstrapAsOperator = isOperator
+		s.bootstrapUserType = userType
 		return nil
 	}
 }

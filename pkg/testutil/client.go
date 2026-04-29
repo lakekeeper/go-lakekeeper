@@ -2,14 +2,11 @@ package testutil
 
 import (
 	"encoding/json"
-	"errors"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"testing"
-
-	"github.com/hashicorp/go-retryablehttp"
 
 	"github.com/lakekeeper/go-lakekeeper/pkg/client"
 
@@ -29,7 +26,7 @@ func ServerMux(t *testing.T) (*http.ServeMux, *client.Client) {
 	server := httptest.NewServer(mux)
 	t.Cleanup(server.Close)
 
-	c, err := client.NewClient(t.Context(), "", server.URL)
+	c, err := client.New(t.Context(), server.URL, "", client.WithoutRetries())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -122,10 +119,6 @@ func MustWriteErrorResponse(t *testing.T, w io.Writer, err error) {
 	MustWriteJSONResponse(t, w, map[string]any{
 		"error": err.Error(),
 	})
-}
-
-func ErrorOption(*retryablehttp.Request) error {
-	return errors.New("RequestOptionFunc returns an error")
 }
 
 func LoadFixture(t *testing.T, filePath string) []byte {

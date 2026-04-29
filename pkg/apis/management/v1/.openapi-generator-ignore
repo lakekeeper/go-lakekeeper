@@ -1,0 +1,7 @@
+# Files openapi-generator emits that don't belong inside our module.
+# Copied into the output directory by `make generate` before each run.
+
+README.md
+git_push.sh
+.travis.yml
+api/openapi.yaml
