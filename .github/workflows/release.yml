@@ -45,6 +45,16 @@ jobs:
       - name: Set Git tree state
         run: |
           echo "GIT_TREE_STATE=$(if [ -z "`git status --porcelain`" ]; then echo "clean" ; else echo "dirty"; fi)" >> $GITHUB_ENV
+
+      - name: Debug GPG_PASSPHRASE presence
+        env:
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          if [ -z "${GPG_PASSPHRASE:-}" ]; then
+            echo "GPG_PASSPHRASE is EMPTY or unset"
+          else
+            echo "GPG_PASSPHRASE is set, length=${#GPG_PASSPHRASE}"
+          fi
       
       - uses: goreleaser/goreleaser-action@v7
         with:
