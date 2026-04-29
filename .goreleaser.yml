@@ -39,6 +39,16 @@ checksum:
 
 signs:
   - artifacts: checksum
+    args:
+      - "--batch"
+      - "--local-user"
+      - "{{ .Env.GPG_FINGERPRINT }}"
+      - "--output"
+      - "${signature}"
+      - "--detach-sign"
+      - "--pinentry-mode"
+      - "loopback"
+      - "${artifact}"
 
 dockers_v2:
   - images:
