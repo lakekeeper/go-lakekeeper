@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.0.23](https://github.com/lakekeeper/go-lakekeeper/releases/tag/v0.0.23) (2026-04-29)
+
+Initial release on the `lakekeeper/go-lakekeeper` repository following migration from `baptistegh/go-lakekeeper`. No source-level changes versus the prior `v0.0.23` release on the source repo — the version is held to preserve SemVer continuity. See entries below for the full release history under `baptistegh/go-lakekeeper`.
+
 ## [0.0.23](https://github.com/baptistegh/go-lakekeeper/compare/v0.0.22...v0.0.23) (2026-04-12)
 
 
