@@ -81,3 +81,24 @@ func WithS3RemoteSigningURLStyle(style S3UrlStyleDetectionMode) S3Option {
 func WithS3StorageLayout(layout StorageLayout) S3Option {
 	return func(p *managementv1.StorageProfileS3) { p.StorageLayout = &layout }
 }
+
+// WithS3PushS3DeleteDisabled controls whether the `s3.delete-enabled=false`
+// flag is pushed to clients (Spark `DROP TABLE PURGE` safety). Spec default
+// is server-side; pass false explicitly to opt out.
+func WithS3PushS3DeleteDisabled(disabled bool) S3Option {
+	return func(p *managementv1.StorageProfileS3) { p.PushS3DeleteDisabled = &disabled }
+}
+
+func WithS3LegacyMd5Behavior(enabled bool) S3Option {
+	return func(p *managementv1.StorageProfileS3) { p.LegacyMd5Behavior = &enabled }
+}
+
+// WithS3RemoteSigningEnabled toggles remote signing for S3 requests. Spec
+// default is true; pass false to disable.
+func WithS3RemoteSigningEnabled(enabled bool) S3Option {
+	return func(p *managementv1.StorageProfileS3) { p.RemoteSigningEnabled = &enabled }
+}
+
+func WithS3StsSessionTags(tags map[string]string) S3Option {
+	return func(p *managementv1.StorageProfileS3) { p.StsSessionTags = tags }
+}

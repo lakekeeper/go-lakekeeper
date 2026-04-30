@@ -32,6 +32,8 @@ func TestNewS3Profile_AllOptionsApplied(t *testing.T) {
 	flavor := managementv1.S3FLAVOR_S3_COMPAT
 	style := managementv1.S3URLSTYLEDETECTIONMODE_PATH
 
+	tags := map[string]string{"env": "prod", "team": "data"}
+
 	p := profile.NewS3Profile("bucket", "eu-central-1",
 		profile.WithS3Endpoint("https://minio:9000"),
 		profile.WithS3KeyPrefix("warehouses/foo"),
@@ -45,6 +47,10 @@ func TestNewS3Profile_AllOptionsApplied(t *testing.T) {
 		profile.WithS3STSEndpoint("https://sts.example.com"),
 		profile.WithS3STSTokenValidity(2*time.Hour),
 		profile.WithS3RemoteSigningURLStyle(style),
+		profile.WithS3PushS3DeleteDisabled(true),
+		profile.WithS3LegacyMd5Behavior(true),
+		profile.WithS3RemoteSigningEnabled(false),
+		profile.WithS3StsSessionTags(tags),
 	)
 
 	require.Equal(t, "https://minio:9000", *p.Endpoint)
@@ -59,6 +65,10 @@ func TestNewS3Profile_AllOptionsApplied(t *testing.T) {
 	assert.Equal(t, "https://sts.example.com", *p.StsEndpoint)
 	assert.Equal(t, int64((2 * time.Hour).Seconds()), *p.StsTokenValiditySeconds)
 	assert.Equal(t, style, *p.RemoteSigningUrlStyle)
+	assert.True(t, *p.PushS3DeleteDisabled)
+	assert.True(t, *p.LegacyMd5Behavior)
+	assert.False(t, *p.RemoteSigningEnabled)
+	assert.Equal(t, tags, p.StsSessionTags)
 }
 
 func TestNewS3Profile_OptionsAreOverridable(t *testing.T) {
