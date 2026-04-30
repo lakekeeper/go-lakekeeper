@@ -11,170 +11,101 @@ API version: 0.0.0
 package managementv1
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 )
 
-// checks if the NamespaceAssignmentOwnership type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &NamespaceAssignmentOwnership{}
-
-// NamespaceAssignmentOwnership struct for NamespaceAssignmentOwnership
+// NamespaceAssignmentOwnership - struct for NamespaceAssignmentOwnership
 type NamespaceAssignmentOwnership struct {
-	// Id of the user
-	User string `json:"user"`
-	// Id of the role
-	Role string `json:"role"`
-	Type string `json:"type"`
+	NamespaceAssignmentOwnershipRole *NamespaceAssignmentOwnershipRole
+	NamespaceAssignmentOwnershipUser *NamespaceAssignmentOwnershipUser
 }
 
-type _NamespaceAssignmentOwnership NamespaceAssignmentOwnership
-
-// NewNamespaceAssignmentOwnership instantiates a new NamespaceAssignmentOwnership object
-// This constructor will assign default values to properties that have it defined,
-// and makes sure properties required by API are set, but the set of arguments
-// will change when the set of required properties is changed
-func NewNamespaceAssignmentOwnership(user string, role string, type_ string) *NamespaceAssignmentOwnership {
-	this := NamespaceAssignmentOwnership{}
-	this.User = user
-	this.Role = role
-	this.Type = type_
-	return &this
-}
-
-// NewNamespaceAssignmentOwnershipWithDefaults instantiates a new NamespaceAssignmentOwnership object
-// This constructor will only assign default values to properties that have it defined,
-// but it doesn't guarantee that properties required by API are set
-func NewNamespaceAssignmentOwnershipWithDefaults() *NamespaceAssignmentOwnership {
-	this := NamespaceAssignmentOwnership{}
-	return &this
-}
-
-// GetUser returns the User field value
-func (o *NamespaceAssignmentOwnership) GetUser() string {
-	if o == nil {
-		var ret string
-		return ret
+// NamespaceAssignmentOwnershipRoleAsNamespaceAssignmentOwnership is a convenience function that returns NamespaceAssignmentOwnershipRole wrapped in NamespaceAssignmentOwnership
+func NamespaceAssignmentOwnershipRoleAsNamespaceAssignmentOwnership(v *NamespaceAssignmentOwnershipRole) NamespaceAssignmentOwnership {
+	return NamespaceAssignmentOwnership{
+		NamespaceAssignmentOwnershipRole: v,
 	}
-
-	return o.User
 }
 
-// GetUserOk returns a tuple with the User field value
-// and a boolean to check if the value has been set.
-func (o *NamespaceAssignmentOwnership) GetUserOk() (*string, bool) {
-	if o == nil {
-		return nil, false
+// NamespaceAssignmentOwnershipUserAsNamespaceAssignmentOwnership is a convenience function that returns NamespaceAssignmentOwnershipUser wrapped in NamespaceAssignmentOwnership
+func NamespaceAssignmentOwnershipUserAsNamespaceAssignmentOwnership(v *NamespaceAssignmentOwnershipUser) NamespaceAssignmentOwnership {
+	return NamespaceAssignmentOwnership{
+		NamespaceAssignmentOwnershipUser: v,
 	}
-	return &o.User, true
 }
 
-// SetUser sets field value
-func (o *NamespaceAssignmentOwnership) SetUser(v string) {
-	o.User = v
-}
-
-// GetRole returns the Role field value
-func (o *NamespaceAssignmentOwnership) GetRole() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.Role
-}
-
-// GetRoleOk returns a tuple with the Role field value
-// and a boolean to check if the value has been set.
-func (o *NamespaceAssignmentOwnership) GetRoleOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Role, true
-}
-
-// SetRole sets field value
-func (o *NamespaceAssignmentOwnership) SetRole(v string) {
-	o.Role = v
-}
-
-// GetType returns the Type field value
-func (o *NamespaceAssignmentOwnership) GetType() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.Type
-}
-
-// GetTypeOk returns a tuple with the Type field value
-// and a boolean to check if the value has been set.
-func (o *NamespaceAssignmentOwnership) GetTypeOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Type, true
-}
-
-// SetType sets field value
-func (o *NamespaceAssignmentOwnership) SetType(v string) {
-	o.Type = v
-}
-
-func (o NamespaceAssignmentOwnership) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
-func (o NamespaceAssignmentOwnership) ToMap() (map[string]interface{}, error) {
-	toSerialize := map[string]interface{}{}
-	toSerialize["user"] = o.User
-	toSerialize["role"] = o.Role
-	toSerialize["type"] = o.Type
-	return toSerialize, nil
-}
-
-func (o *NamespaceAssignmentOwnership) UnmarshalJSON(data []byte) (err error) {
-	// This validates that all required properties are included in the JSON object
-	// by unmarshalling the object into a generic map with string keys and checking
-	// that every required field exists as a key in the generic map.
-	requiredProperties := []string{
-		"user",
-		"role",
-		"type",
-	}
-
-	allProperties := make(map[string]interface{})
-
-	err = json.Unmarshal(data, &allProperties)
-
-	if err != nil {
-		return err
-	}
-
-	for _, requiredProperty := range requiredProperties {
-		if _, exists := allProperties[requiredProperty]; !exists {
-			return fmt.Errorf("no value given for required property %v", requiredProperty)
+// Unmarshal JSON data into one of the pointers in the struct
+func (dst *NamespaceAssignmentOwnership) UnmarshalJSON(data []byte) error {
+	var err error
+	match := 0
+	// try to unmarshal data into NamespaceAssignmentOwnershipRole
+	err = json.Unmarshal(data, &dst.NamespaceAssignmentOwnershipRole)
+	if err == nil {
+		jsonNamespaceAssignmentOwnershipRole, _ := json.Marshal(dst.NamespaceAssignmentOwnershipRole)
+		if string(jsonNamespaceAssignmentOwnershipRole) == "{}" { // empty struct
+			dst.NamespaceAssignmentOwnershipRole = nil
+		} else {
+			match++
 		}
+	} else {
+		dst.NamespaceAssignmentOwnershipRole = nil
 	}
 
-	varNamespaceAssignmentOwnership := _NamespaceAssignmentOwnership{}
-
-	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
-	err = decoder.Decode(&varNamespaceAssignmentOwnership)
-
-	if err != nil {
-		return err
+	// try to unmarshal data into NamespaceAssignmentOwnershipUser
+	err = json.Unmarshal(data, &dst.NamespaceAssignmentOwnershipUser)
+	if err == nil {
+		jsonNamespaceAssignmentOwnershipUser, _ := json.Marshal(dst.NamespaceAssignmentOwnershipUser)
+		if string(jsonNamespaceAssignmentOwnershipUser) == "{}" { // empty struct
+			dst.NamespaceAssignmentOwnershipUser = nil
+		} else {
+			match++
+		}
+	} else {
+		dst.NamespaceAssignmentOwnershipUser = nil
 	}
 
-	*o = NamespaceAssignmentOwnership(varNamespaceAssignmentOwnership)
+	if match > 1 { // more than 1 match
+		// reset to nil
+		dst.NamespaceAssignmentOwnershipRole = nil
+		dst.NamespaceAssignmentOwnershipUser = nil
 
-	return err
+		return fmt.Errorf("data matches more than one schema in oneOf(NamespaceAssignmentOwnership)")
+	} else if match == 1 {
+		return nil // exactly one match
+	} else { // no match
+		return fmt.Errorf("data failed to match schemas in oneOf(NamespaceAssignmentOwnership)")
+	}
+}
+
+// Marshal data from the first non-nil pointers in the struct to JSON
+func (src NamespaceAssignmentOwnership) MarshalJSON() ([]byte, error) {
+	if src.NamespaceAssignmentOwnershipRole != nil {
+		return json.Marshal(&src.NamespaceAssignmentOwnershipRole)
+	}
+
+	if src.NamespaceAssignmentOwnershipUser != nil {
+		return json.Marshal(&src.NamespaceAssignmentOwnershipUser)
+	}
+
+	return nil, nil // no data in oneOf schemas
+}
+
+// Get the actual instance
+func (obj *NamespaceAssignmentOwnership) GetActualInstance() interface{} {
+	if obj == nil {
+		return nil
+	}
+	if obj.NamespaceAssignmentOwnershipRole != nil {
+		return obj.NamespaceAssignmentOwnershipRole
+	}
+
+	if obj.NamespaceAssignmentOwnershipUser != nil {
+		return obj.NamespaceAssignmentOwnershipUser
+	}
+
+	// all schemas are nil
+	return nil
 }
 
 type NullableNamespaceAssignmentOwnership struct {

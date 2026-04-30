@@ -11,170 +11,101 @@ API version: 0.0.0
 package managementv1
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 )
 
-// checks if the TableAssignmentSelect type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &TableAssignmentSelect{}
-
-// TableAssignmentSelect struct for TableAssignmentSelect
+// TableAssignmentSelect - struct for TableAssignmentSelect
 type TableAssignmentSelect struct {
-	// Id of the user
-	User string `json:"user"`
-	// Id of the role
-	Role string `json:"role"`
-	Type string `json:"type"`
+	TableAssignmentSelectRole *TableAssignmentSelectRole
+	TableAssignmentSelectUser *TableAssignmentSelectUser
 }
 
-type _TableAssignmentSelect TableAssignmentSelect
-
-// NewTableAssignmentSelect instantiates a new TableAssignmentSelect object
-// This constructor will assign default values to properties that have it defined,
-// and makes sure properties required by API are set, but the set of arguments
-// will change when the set of required properties is changed
-func NewTableAssignmentSelect(user string, role string, type_ string) *TableAssignmentSelect {
-	this := TableAssignmentSelect{}
-	this.User = user
-	this.Role = role
-	this.Type = type_
-	return &this
-}
-
-// NewTableAssignmentSelectWithDefaults instantiates a new TableAssignmentSelect object
-// This constructor will only assign default values to properties that have it defined,
-// but it doesn't guarantee that properties required by API are set
-func NewTableAssignmentSelectWithDefaults() *TableAssignmentSelect {
-	this := TableAssignmentSelect{}
-	return &this
-}
-
-// GetUser returns the User field value
-func (o *TableAssignmentSelect) GetUser() string {
-	if o == nil {
-		var ret string
-		return ret
+// TableAssignmentSelectRoleAsTableAssignmentSelect is a convenience function that returns TableAssignmentSelectRole wrapped in TableAssignmentSelect
+func TableAssignmentSelectRoleAsTableAssignmentSelect(v *TableAssignmentSelectRole) TableAssignmentSelect {
+	return TableAssignmentSelect{
+		TableAssignmentSelectRole: v,
 	}
-
-	return o.User
 }
 
-// GetUserOk returns a tuple with the User field value
-// and a boolean to check if the value has been set.
-func (o *TableAssignmentSelect) GetUserOk() (*string, bool) {
-	if o == nil {
-		return nil, false
+// TableAssignmentSelectUserAsTableAssignmentSelect is a convenience function that returns TableAssignmentSelectUser wrapped in TableAssignmentSelect
+func TableAssignmentSelectUserAsTableAssignmentSelect(v *TableAssignmentSelectUser) TableAssignmentSelect {
+	return TableAssignmentSelect{
+		TableAssignmentSelectUser: v,
 	}
-	return &o.User, true
 }
 
-// SetUser sets field value
-func (o *TableAssignmentSelect) SetUser(v string) {
-	o.User = v
-}
-
-// GetRole returns the Role field value
-func (o *TableAssignmentSelect) GetRole() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.Role
-}
-
-// GetRoleOk returns a tuple with the Role field value
-// and a boolean to check if the value has been set.
-func (o *TableAssignmentSelect) GetRoleOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Role, true
-}
-
-// SetRole sets field value
-func (o *TableAssignmentSelect) SetRole(v string) {
-	o.Role = v
-}
-
-// GetType returns the Type field value
-func (o *TableAssignmentSelect) GetType() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.Type
-}
-
-// GetTypeOk returns a tuple with the Type field value
-// and a boolean to check if the value has been set.
-func (o *TableAssignmentSelect) GetTypeOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Type, true
-}
-
-// SetType sets field value
-func (o *TableAssignmentSelect) SetType(v string) {
-	o.Type = v
-}
-
-func (o TableAssignmentSelect) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
-func (o TableAssignmentSelect) ToMap() (map[string]interface{}, error) {
-	toSerialize := map[string]interface{}{}
-	toSerialize["user"] = o.User
-	toSerialize["role"] = o.Role
-	toSerialize["type"] = o.Type
-	return toSerialize, nil
-}
-
-func (o *TableAssignmentSelect) UnmarshalJSON(data []byte) (err error) {
-	// This validates that all required properties are included in the JSON object
-	// by unmarshalling the object into a generic map with string keys and checking
-	// that every required field exists as a key in the generic map.
-	requiredProperties := []string{
-		"user",
-		"role",
-		"type",
-	}
-
-	allProperties := make(map[string]interface{})
-
-	err = json.Unmarshal(data, &allProperties)
-
-	if err != nil {
-		return err
-	}
-
-	for _, requiredProperty := range requiredProperties {
-		if _, exists := allProperties[requiredProperty]; !exists {
-			return fmt.Errorf("no value given for required property %v", requiredProperty)
+// Unmarshal JSON data into one of the pointers in the struct
+func (dst *TableAssignmentSelect) UnmarshalJSON(data []byte) error {
+	var err error
+	match := 0
+	// try to unmarshal data into TableAssignmentSelectRole
+	err = json.Unmarshal(data, &dst.TableAssignmentSelectRole)
+	if err == nil {
+		jsonTableAssignmentSelectRole, _ := json.Marshal(dst.TableAssignmentSelectRole)
+		if string(jsonTableAssignmentSelectRole) == "{}" { // empty struct
+			dst.TableAssignmentSelectRole = nil
+		} else {
+			match++
 		}
+	} else {
+		dst.TableAssignmentSelectRole = nil
 	}
 
-	varTableAssignmentSelect := _TableAssignmentSelect{}
-
-	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
-	err = decoder.Decode(&varTableAssignmentSelect)
-
-	if err != nil {
-		return err
+	// try to unmarshal data into TableAssignmentSelectUser
+	err = json.Unmarshal(data, &dst.TableAssignmentSelectUser)
+	if err == nil {
+		jsonTableAssignmentSelectUser, _ := json.Marshal(dst.TableAssignmentSelectUser)
+		if string(jsonTableAssignmentSelectUser) == "{}" { // empty struct
+			dst.TableAssignmentSelectUser = nil
+		} else {
+			match++
+		}
+	} else {
+		dst.TableAssignmentSelectUser = nil
 	}
 
-	*o = TableAssignmentSelect(varTableAssignmentSelect)
+	if match > 1 { // more than 1 match
+		// reset to nil
+		dst.TableAssignmentSelectRole = nil
+		dst.TableAssignmentSelectUser = nil
 
-	return err
+		return fmt.Errorf("data matches more than one schema in oneOf(TableAssignmentSelect)")
+	} else if match == 1 {
+		return nil // exactly one match
+	} else { // no match
+		return fmt.Errorf("data failed to match schemas in oneOf(TableAssignmentSelect)")
+	}
+}
+
+// Marshal data from the first non-nil pointers in the struct to JSON
+func (src TableAssignmentSelect) MarshalJSON() ([]byte, error) {
+	if src.TableAssignmentSelectRole != nil {
+		return json.Marshal(&src.TableAssignmentSelectRole)
+	}
+
+	if src.TableAssignmentSelectUser != nil {
+		return json.Marshal(&src.TableAssignmentSelectUser)
+	}
+
+	return nil, nil // no data in oneOf schemas
+}
+
+// Get the actual instance
+func (obj *TableAssignmentSelect) GetActualInstance() interface{} {
+	if obj == nil {
+		return nil
+	}
+	if obj.TableAssignmentSelectRole != nil {
+		return obj.TableAssignmentSelectRole
+	}
+
+	if obj.TableAssignmentSelectUser != nil {
+		return obj.TableAssignmentSelectUser
+	}
+
+	// all schemas are nil
+	return nil
 }
 
 type NullableTableAssignmentSelect struct {

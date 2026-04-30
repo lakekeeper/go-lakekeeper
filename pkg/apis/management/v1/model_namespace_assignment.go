@@ -78,114 +78,182 @@ func NamespaceAssignmentSelectAsNamespaceAssignment(v *NamespaceAssignmentSelect
 // Unmarshal JSON data into one of the pointers in the struct
 func (dst *NamespaceAssignment) UnmarshalJSON(data []byte) error {
 	var err error
-	match := 0
-	// try to unmarshal data into NamespaceAssignmentCreate
-	err = json.Unmarshal(data, &dst.NamespaceAssignmentCreate)
-	if err == nil {
-		jsonNamespaceAssignmentCreate, _ := json.Marshal(dst.NamespaceAssignmentCreate)
-		if string(jsonNamespaceAssignmentCreate) == "{}" { // empty struct
+	// use discriminator value to speed up the lookup
+	var jsonDict map[string]interface{}
+	err = newStrictDecoder(data).Decode(&jsonDict)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal JSON into map for the discriminator lookup")
+	}
+
+	// check if the discriminator value is 'create'
+	if jsonDict["type"] == "create" {
+		// try to unmarshal JSON data into NamespaceAssignmentCreate
+		err = json.Unmarshal(data, &dst.NamespaceAssignmentCreate)
+		if err == nil {
+			return nil // data stored in dst.NamespaceAssignmentCreate, return on the first match
+		} else {
 			dst.NamespaceAssignmentCreate = nil
-		} else {
-			match++
+			return fmt.Errorf("failed to unmarshal NamespaceAssignment as NamespaceAssignmentCreate: %s", err.Error())
 		}
-	} else {
-		dst.NamespaceAssignmentCreate = nil
 	}
 
-	// try to unmarshal data into NamespaceAssignmentDescribe
-	err = json.Unmarshal(data, &dst.NamespaceAssignmentDescribe)
-	if err == nil {
-		jsonNamespaceAssignmentDescribe, _ := json.Marshal(dst.NamespaceAssignmentDescribe)
-		if string(jsonNamespaceAssignmentDescribe) == "{}" { // empty struct
+	// check if the discriminator value is 'describe'
+	if jsonDict["type"] == "describe" {
+		// try to unmarshal JSON data into NamespaceAssignmentDescribe
+		err = json.Unmarshal(data, &dst.NamespaceAssignmentDescribe)
+		if err == nil {
+			return nil // data stored in dst.NamespaceAssignmentDescribe, return on the first match
+		} else {
 			dst.NamespaceAssignmentDescribe = nil
-		} else {
-			match++
+			return fmt.Errorf("failed to unmarshal NamespaceAssignment as NamespaceAssignmentDescribe: %s", err.Error())
 		}
-	} else {
-		dst.NamespaceAssignmentDescribe = nil
 	}
 
-	// try to unmarshal data into NamespaceAssignmentManageGrants
-	err = json.Unmarshal(data, &dst.NamespaceAssignmentManageGrants)
-	if err == nil {
-		jsonNamespaceAssignmentManageGrants, _ := json.Marshal(dst.NamespaceAssignmentManageGrants)
-		if string(jsonNamespaceAssignmentManageGrants) == "{}" { // empty struct
+	// check if the discriminator value is 'manage_grants'
+	if jsonDict["type"] == "manage_grants" {
+		// try to unmarshal JSON data into NamespaceAssignmentManageGrants
+		err = json.Unmarshal(data, &dst.NamespaceAssignmentManageGrants)
+		if err == nil {
+			return nil // data stored in dst.NamespaceAssignmentManageGrants, return on the first match
+		} else {
 			dst.NamespaceAssignmentManageGrants = nil
-		} else {
-			match++
+			return fmt.Errorf("failed to unmarshal NamespaceAssignment as NamespaceAssignmentManageGrants: %s", err.Error())
 		}
-	} else {
-		dst.NamespaceAssignmentManageGrants = nil
 	}
 
-	// try to unmarshal data into NamespaceAssignmentModify
-	err = json.Unmarshal(data, &dst.NamespaceAssignmentModify)
-	if err == nil {
-		jsonNamespaceAssignmentModify, _ := json.Marshal(dst.NamespaceAssignmentModify)
-		if string(jsonNamespaceAssignmentModify) == "{}" { // empty struct
+	// check if the discriminator value is 'modify'
+	if jsonDict["type"] == "modify" {
+		// try to unmarshal JSON data into NamespaceAssignmentModify
+		err = json.Unmarshal(data, &dst.NamespaceAssignmentModify)
+		if err == nil {
+			return nil // data stored in dst.NamespaceAssignmentModify, return on the first match
+		} else {
 			dst.NamespaceAssignmentModify = nil
-		} else {
-			match++
+			return fmt.Errorf("failed to unmarshal NamespaceAssignment as NamespaceAssignmentModify: %s", err.Error())
 		}
-	} else {
-		dst.NamespaceAssignmentModify = nil
 	}
 
-	// try to unmarshal data into NamespaceAssignmentOwnership
-	err = json.Unmarshal(data, &dst.NamespaceAssignmentOwnership)
-	if err == nil {
-		jsonNamespaceAssignmentOwnership, _ := json.Marshal(dst.NamespaceAssignmentOwnership)
-		if string(jsonNamespaceAssignmentOwnership) == "{}" { // empty struct
+	// check if the discriminator value is 'ownership'
+	if jsonDict["type"] == "ownership" {
+		// try to unmarshal JSON data into NamespaceAssignmentOwnership
+		err = json.Unmarshal(data, &dst.NamespaceAssignmentOwnership)
+		if err == nil {
+			return nil // data stored in dst.NamespaceAssignmentOwnership, return on the first match
+		} else {
 			dst.NamespaceAssignmentOwnership = nil
-		} else {
-			match++
+			return fmt.Errorf("failed to unmarshal NamespaceAssignment as NamespaceAssignmentOwnership: %s", err.Error())
 		}
-	} else {
-		dst.NamespaceAssignmentOwnership = nil
 	}
 
-	// try to unmarshal data into NamespaceAssignmentPassGrants
-	err = json.Unmarshal(data, &dst.NamespaceAssignmentPassGrants)
-	if err == nil {
-		jsonNamespaceAssignmentPassGrants, _ := json.Marshal(dst.NamespaceAssignmentPassGrants)
-		if string(jsonNamespaceAssignmentPassGrants) == "{}" { // empty struct
+	// check if the discriminator value is 'pass_grants'
+	if jsonDict["type"] == "pass_grants" {
+		// try to unmarshal JSON data into NamespaceAssignmentPassGrants
+		err = json.Unmarshal(data, &dst.NamespaceAssignmentPassGrants)
+		if err == nil {
+			return nil // data stored in dst.NamespaceAssignmentPassGrants, return on the first match
+		} else {
 			dst.NamespaceAssignmentPassGrants = nil
-		} else {
-			match++
+			return fmt.Errorf("failed to unmarshal NamespaceAssignment as NamespaceAssignmentPassGrants: %s", err.Error())
 		}
-	} else {
-		dst.NamespaceAssignmentPassGrants = nil
 	}
 
-	// try to unmarshal data into NamespaceAssignmentSelect
-	err = json.Unmarshal(data, &dst.NamespaceAssignmentSelect)
-	if err == nil {
-		jsonNamespaceAssignmentSelect, _ := json.Marshal(dst.NamespaceAssignmentSelect)
-		if string(jsonNamespaceAssignmentSelect) == "{}" { // empty struct
+	// check if the discriminator value is 'select'
+	if jsonDict["type"] == "select" {
+		// try to unmarshal JSON data into NamespaceAssignmentSelect
+		err = json.Unmarshal(data, &dst.NamespaceAssignmentSelect)
+		if err == nil {
+			return nil // data stored in dst.NamespaceAssignmentSelect, return on the first match
+		} else {
 			dst.NamespaceAssignmentSelect = nil
-		} else {
-			match++
+			return fmt.Errorf("failed to unmarshal NamespaceAssignment as NamespaceAssignmentSelect: %s", err.Error())
 		}
-	} else {
-		dst.NamespaceAssignmentSelect = nil
 	}
 
-	if match > 1 { // more than 1 match
-		// reset to nil
-		dst.NamespaceAssignmentCreate = nil
-		dst.NamespaceAssignmentDescribe = nil
-		dst.NamespaceAssignmentManageGrants = nil
-		dst.NamespaceAssignmentModify = nil
-		dst.NamespaceAssignmentOwnership = nil
-		dst.NamespaceAssignmentPassGrants = nil
-		dst.NamespaceAssignmentSelect = nil
-
-		return fmt.Errorf("data matches more than one schema in oneOf(NamespaceAssignment)")
-	} else if match == 1 {
-		return nil // exactly one match
-	} else { // no match
-		return fmt.Errorf("data failed to match schemas in oneOf(NamespaceAssignment)")
+	// check if the discriminator value is 'NamespaceAssignmentCreate'
+	if jsonDict["type"] == "NamespaceAssignmentCreate" {
+		// try to unmarshal JSON data into NamespaceAssignmentCreate
+		err = json.Unmarshal(data, &dst.NamespaceAssignmentCreate)
+		if err == nil {
+			return nil // data stored in dst.NamespaceAssignmentCreate, return on the first match
+		} else {
+			dst.NamespaceAssignmentCreate = nil
+			return fmt.Errorf("failed to unmarshal NamespaceAssignment as NamespaceAssignmentCreate: %s", err.Error())
+		}
 	}
+
+	// check if the discriminator value is 'NamespaceAssignmentDescribe'
+	if jsonDict["type"] == "NamespaceAssignmentDescribe" {
+		// try to unmarshal JSON data into NamespaceAssignmentDescribe
+		err = json.Unmarshal(data, &dst.NamespaceAssignmentDescribe)
+		if err == nil {
+			return nil // data stored in dst.NamespaceAssignmentDescribe, return on the first match
+		} else {
+			dst.NamespaceAssignmentDescribe = nil
+			return fmt.Errorf("failed to unmarshal NamespaceAssignment as NamespaceAssignmentDescribe: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'NamespaceAssignmentManageGrants'
+	if jsonDict["type"] == "NamespaceAssignmentManageGrants" {
+		// try to unmarshal JSON data into NamespaceAssignmentManageGrants
+		err = json.Unmarshal(data, &dst.NamespaceAssignmentManageGrants)
+		if err == nil {
+			return nil // data stored in dst.NamespaceAssignmentManageGrants, return on the first match
+		} else {
+			dst.NamespaceAssignmentManageGrants = nil
+			return fmt.Errorf("failed to unmarshal NamespaceAssignment as NamespaceAssignmentManageGrants: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'NamespaceAssignmentModify'
+	if jsonDict["type"] == "NamespaceAssignmentModify" {
+		// try to unmarshal JSON data into NamespaceAssignmentModify
+		err = json.Unmarshal(data, &dst.NamespaceAssignmentModify)
+		if err == nil {
+			return nil // data stored in dst.NamespaceAssignmentModify, return on the first match
+		} else {
+			dst.NamespaceAssignmentModify = nil
+			return fmt.Errorf("failed to unmarshal NamespaceAssignment as NamespaceAssignmentModify: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'NamespaceAssignmentOwnership'
+	if jsonDict["type"] == "NamespaceAssignmentOwnership" {
+		// try to unmarshal JSON data into NamespaceAssignmentOwnership
+		err = json.Unmarshal(data, &dst.NamespaceAssignmentOwnership)
+		if err == nil {
+			return nil // data stored in dst.NamespaceAssignmentOwnership, return on the first match
+		} else {
+			dst.NamespaceAssignmentOwnership = nil
+			return fmt.Errorf("failed to unmarshal NamespaceAssignment as NamespaceAssignmentOwnership: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'NamespaceAssignmentPassGrants'
+	if jsonDict["type"] == "NamespaceAssignmentPassGrants" {
+		// try to unmarshal JSON data into NamespaceAssignmentPassGrants
+		err = json.Unmarshal(data, &dst.NamespaceAssignmentPassGrants)
+		if err == nil {
+			return nil // data stored in dst.NamespaceAssignmentPassGrants, return on the first match
+		} else {
+			dst.NamespaceAssignmentPassGrants = nil
+			return fmt.Errorf("failed to unmarshal NamespaceAssignment as NamespaceAssignmentPassGrants: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'NamespaceAssignmentSelect'
+	if jsonDict["type"] == "NamespaceAssignmentSelect" {
+		// try to unmarshal JSON data into NamespaceAssignmentSelect
+		err = json.Unmarshal(data, &dst.NamespaceAssignmentSelect)
+		if err == nil {
+			return nil // data stored in dst.NamespaceAssignmentSelect, return on the first match
+		} else {
+			dst.NamespaceAssignmentSelect = nil
+			return fmt.Errorf("failed to unmarshal NamespaceAssignment as NamespaceAssignmentSelect: %s", err.Error())
+		}
+	}
+
+	return nil
 }
 
 // Marshal data from the first non-nil pointers in the struct to JSON

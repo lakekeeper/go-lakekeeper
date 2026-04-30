@@ -11,170 +11,101 @@ API version: 0.0.0
 package managementv1
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 )
 
-// checks if the ViewAssignmentDescribe type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &ViewAssignmentDescribe{}
-
-// ViewAssignmentDescribe struct for ViewAssignmentDescribe
+// ViewAssignmentDescribe - struct for ViewAssignmentDescribe
 type ViewAssignmentDescribe struct {
-	// Id of the user
-	User string `json:"user"`
-	// Id of the role
-	Role string `json:"role"`
-	Type string `json:"type"`
+	ViewAssignmentDescribeRole *ViewAssignmentDescribeRole
+	ViewAssignmentDescribeUser *ViewAssignmentDescribeUser
 }
 
-type _ViewAssignmentDescribe ViewAssignmentDescribe
-
-// NewViewAssignmentDescribe instantiates a new ViewAssignmentDescribe object
-// This constructor will assign default values to properties that have it defined,
-// and makes sure properties required by API are set, but the set of arguments
-// will change when the set of required properties is changed
-func NewViewAssignmentDescribe(user string, role string, type_ string) *ViewAssignmentDescribe {
-	this := ViewAssignmentDescribe{}
-	this.User = user
-	this.Role = role
-	this.Type = type_
-	return &this
-}
-
-// NewViewAssignmentDescribeWithDefaults instantiates a new ViewAssignmentDescribe object
-// This constructor will only assign default values to properties that have it defined,
-// but it doesn't guarantee that properties required by API are set
-func NewViewAssignmentDescribeWithDefaults() *ViewAssignmentDescribe {
-	this := ViewAssignmentDescribe{}
-	return &this
-}
-
-// GetUser returns the User field value
-func (o *ViewAssignmentDescribe) GetUser() string {
-	if o == nil {
-		var ret string
-		return ret
+// ViewAssignmentDescribeRoleAsViewAssignmentDescribe is a convenience function that returns ViewAssignmentDescribeRole wrapped in ViewAssignmentDescribe
+func ViewAssignmentDescribeRoleAsViewAssignmentDescribe(v *ViewAssignmentDescribeRole) ViewAssignmentDescribe {
+	return ViewAssignmentDescribe{
+		ViewAssignmentDescribeRole: v,
 	}
-
-	return o.User
 }
 
-// GetUserOk returns a tuple with the User field value
-// and a boolean to check if the value has been set.
-func (o *ViewAssignmentDescribe) GetUserOk() (*string, bool) {
-	if o == nil {
-		return nil, false
+// ViewAssignmentDescribeUserAsViewAssignmentDescribe is a convenience function that returns ViewAssignmentDescribeUser wrapped in ViewAssignmentDescribe
+func ViewAssignmentDescribeUserAsViewAssignmentDescribe(v *ViewAssignmentDescribeUser) ViewAssignmentDescribe {
+	return ViewAssignmentDescribe{
+		ViewAssignmentDescribeUser: v,
 	}
-	return &o.User, true
 }
 
-// SetUser sets field value
-func (o *ViewAssignmentDescribe) SetUser(v string) {
-	o.User = v
-}
-
-// GetRole returns the Role field value
-func (o *ViewAssignmentDescribe) GetRole() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.Role
-}
-
-// GetRoleOk returns a tuple with the Role field value
-// and a boolean to check if the value has been set.
-func (o *ViewAssignmentDescribe) GetRoleOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Role, true
-}
-
-// SetRole sets field value
-func (o *ViewAssignmentDescribe) SetRole(v string) {
-	o.Role = v
-}
-
-// GetType returns the Type field value
-func (o *ViewAssignmentDescribe) GetType() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.Type
-}
-
-// GetTypeOk returns a tuple with the Type field value
-// and a boolean to check if the value has been set.
-func (o *ViewAssignmentDescribe) GetTypeOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Type, true
-}
-
-// SetType sets field value
-func (o *ViewAssignmentDescribe) SetType(v string) {
-	o.Type = v
-}
-
-func (o ViewAssignmentDescribe) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
-func (o ViewAssignmentDescribe) ToMap() (map[string]interface{}, error) {
-	toSerialize := map[string]interface{}{}
-	toSerialize["user"] = o.User
-	toSerialize["role"] = o.Role
-	toSerialize["type"] = o.Type
-	return toSerialize, nil
-}
-
-func (o *ViewAssignmentDescribe) UnmarshalJSON(data []byte) (err error) {
-	// This validates that all required properties are included in the JSON object
-	// by unmarshalling the object into a generic map with string keys and checking
-	// that every required field exists as a key in the generic map.
-	requiredProperties := []string{
-		"user",
-		"role",
-		"type",
-	}
-
-	allProperties := make(map[string]interface{})
-
-	err = json.Unmarshal(data, &allProperties)
-
-	if err != nil {
-		return err
-	}
-
-	for _, requiredProperty := range requiredProperties {
-		if _, exists := allProperties[requiredProperty]; !exists {
-			return fmt.Errorf("no value given for required property %v", requiredProperty)
+// Unmarshal JSON data into one of the pointers in the struct
+func (dst *ViewAssignmentDescribe) UnmarshalJSON(data []byte) error {
+	var err error
+	match := 0
+	// try to unmarshal data into ViewAssignmentDescribeRole
+	err = json.Unmarshal(data, &dst.ViewAssignmentDescribeRole)
+	if err == nil {
+		jsonViewAssignmentDescribeRole, _ := json.Marshal(dst.ViewAssignmentDescribeRole)
+		if string(jsonViewAssignmentDescribeRole) == "{}" { // empty struct
+			dst.ViewAssignmentDescribeRole = nil
+		} else {
+			match++
 		}
+	} else {
+		dst.ViewAssignmentDescribeRole = nil
 	}
 
-	varViewAssignmentDescribe := _ViewAssignmentDescribe{}
-
-	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
-	err = decoder.Decode(&varViewAssignmentDescribe)
-
-	if err != nil {
-		return err
+	// try to unmarshal data into ViewAssignmentDescribeUser
+	err = json.Unmarshal(data, &dst.ViewAssignmentDescribeUser)
+	if err == nil {
+		jsonViewAssignmentDescribeUser, _ := json.Marshal(dst.ViewAssignmentDescribeUser)
+		if string(jsonViewAssignmentDescribeUser) == "{}" { // empty struct
+			dst.ViewAssignmentDescribeUser = nil
+		} else {
+			match++
+		}
+	} else {
+		dst.ViewAssignmentDescribeUser = nil
 	}
 
-	*o = ViewAssignmentDescribe(varViewAssignmentDescribe)
+	if match > 1 { // more than 1 match
+		// reset to nil
+		dst.ViewAssignmentDescribeRole = nil
+		dst.ViewAssignmentDescribeUser = nil
 
-	return err
+		return fmt.Errorf("data matches more than one schema in oneOf(ViewAssignmentDescribe)")
+	} else if match == 1 {
+		return nil // exactly one match
+	} else { // no match
+		return fmt.Errorf("data failed to match schemas in oneOf(ViewAssignmentDescribe)")
+	}
+}
+
+// Marshal data from the first non-nil pointers in the struct to JSON
+func (src ViewAssignmentDescribe) MarshalJSON() ([]byte, error) {
+	if src.ViewAssignmentDescribeRole != nil {
+		return json.Marshal(&src.ViewAssignmentDescribeRole)
+	}
+
+	if src.ViewAssignmentDescribeUser != nil {
+		return json.Marshal(&src.ViewAssignmentDescribeUser)
+	}
+
+	return nil, nil // no data in oneOf schemas
+}
+
+// Get the actual instance
+func (obj *ViewAssignmentDescribe) GetActualInstance() interface{} {
+	if obj == nil {
+		return nil
+	}
+	if obj.ViewAssignmentDescribeRole != nil {
+		return obj.ViewAssignmentDescribeRole
+	}
+
+	if obj.ViewAssignmentDescribeUser != nil {
+		return obj.ViewAssignmentDescribeUser
+	}
+
+	// all schemas are nil
+	return nil
 }
 
 type NullableViewAssignmentDescribe struct {

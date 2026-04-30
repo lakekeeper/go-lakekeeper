@@ -11,170 +11,101 @@ API version: 0.0.0
 package managementv1
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 )
 
-// checks if the ServerAssignmentAdmin type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &ServerAssignmentAdmin{}
-
-// ServerAssignmentAdmin struct for ServerAssignmentAdmin
+// ServerAssignmentAdmin - struct for ServerAssignmentAdmin
 type ServerAssignmentAdmin struct {
-	// Id of the user
-	User string `json:"user"`
-	// Id of the role
-	Role string `json:"role"`
-	Type string `json:"type"`
+	ServerAssignmentAdminRole *ServerAssignmentAdminRole
+	ServerAssignmentAdminUser *ServerAssignmentAdminUser
 }
 
-type _ServerAssignmentAdmin ServerAssignmentAdmin
-
-// NewServerAssignmentAdmin instantiates a new ServerAssignmentAdmin object
-// This constructor will assign default values to properties that have it defined,
-// and makes sure properties required by API are set, but the set of arguments
-// will change when the set of required properties is changed
-func NewServerAssignmentAdmin(user string, role string, type_ string) *ServerAssignmentAdmin {
-	this := ServerAssignmentAdmin{}
-	this.User = user
-	this.Role = role
-	this.Type = type_
-	return &this
-}
-
-// NewServerAssignmentAdminWithDefaults instantiates a new ServerAssignmentAdmin object
-// This constructor will only assign default values to properties that have it defined,
-// but it doesn't guarantee that properties required by API are set
-func NewServerAssignmentAdminWithDefaults() *ServerAssignmentAdmin {
-	this := ServerAssignmentAdmin{}
-	return &this
-}
-
-// GetUser returns the User field value
-func (o *ServerAssignmentAdmin) GetUser() string {
-	if o == nil {
-		var ret string
-		return ret
+// ServerAssignmentAdminRoleAsServerAssignmentAdmin is a convenience function that returns ServerAssignmentAdminRole wrapped in ServerAssignmentAdmin
+func ServerAssignmentAdminRoleAsServerAssignmentAdmin(v *ServerAssignmentAdminRole) ServerAssignmentAdmin {
+	return ServerAssignmentAdmin{
+		ServerAssignmentAdminRole: v,
 	}
-
-	return o.User
 }
 
-// GetUserOk returns a tuple with the User field value
-// and a boolean to check if the value has been set.
-func (o *ServerAssignmentAdmin) GetUserOk() (*string, bool) {
-	if o == nil {
-		return nil, false
+// ServerAssignmentAdminUserAsServerAssignmentAdmin is a convenience function that returns ServerAssignmentAdminUser wrapped in ServerAssignmentAdmin
+func ServerAssignmentAdminUserAsServerAssignmentAdmin(v *ServerAssignmentAdminUser) ServerAssignmentAdmin {
+	return ServerAssignmentAdmin{
+		ServerAssignmentAdminUser: v,
 	}
-	return &o.User, true
 }
 
-// SetUser sets field value
-func (o *ServerAssignmentAdmin) SetUser(v string) {
-	o.User = v
-}
-
-// GetRole returns the Role field value
-func (o *ServerAssignmentAdmin) GetRole() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.Role
-}
-
-// GetRoleOk returns a tuple with the Role field value
-// and a boolean to check if the value has been set.
-func (o *ServerAssignmentAdmin) GetRoleOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Role, true
-}
-
-// SetRole sets field value
-func (o *ServerAssignmentAdmin) SetRole(v string) {
-	o.Role = v
-}
-
-// GetType returns the Type field value
-func (o *ServerAssignmentAdmin) GetType() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.Type
-}
-
-// GetTypeOk returns a tuple with the Type field value
-// and a boolean to check if the value has been set.
-func (o *ServerAssignmentAdmin) GetTypeOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Type, true
-}
-
-// SetType sets field value
-func (o *ServerAssignmentAdmin) SetType(v string) {
-	o.Type = v
-}
-
-func (o ServerAssignmentAdmin) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
-func (o ServerAssignmentAdmin) ToMap() (map[string]interface{}, error) {
-	toSerialize := map[string]interface{}{}
-	toSerialize["user"] = o.User
-	toSerialize["role"] = o.Role
-	toSerialize["type"] = o.Type
-	return toSerialize, nil
-}
-
-func (o *ServerAssignmentAdmin) UnmarshalJSON(data []byte) (err error) {
-	// This validates that all required properties are included in the JSON object
-	// by unmarshalling the object into a generic map with string keys and checking
-	// that every required field exists as a key in the generic map.
-	requiredProperties := []string{
-		"user",
-		"role",
-		"type",
-	}
-
-	allProperties := make(map[string]interface{})
-
-	err = json.Unmarshal(data, &allProperties)
-
-	if err != nil {
-		return err
-	}
-
-	for _, requiredProperty := range requiredProperties {
-		if _, exists := allProperties[requiredProperty]; !exists {
-			return fmt.Errorf("no value given for required property %v", requiredProperty)
+// Unmarshal JSON data into one of the pointers in the struct
+func (dst *ServerAssignmentAdmin) UnmarshalJSON(data []byte) error {
+	var err error
+	match := 0
+	// try to unmarshal data into ServerAssignmentAdminRole
+	err = json.Unmarshal(data, &dst.ServerAssignmentAdminRole)
+	if err == nil {
+		jsonServerAssignmentAdminRole, _ := json.Marshal(dst.ServerAssignmentAdminRole)
+		if string(jsonServerAssignmentAdminRole) == "{}" { // empty struct
+			dst.ServerAssignmentAdminRole = nil
+		} else {
+			match++
 		}
+	} else {
+		dst.ServerAssignmentAdminRole = nil
 	}
 
-	varServerAssignmentAdmin := _ServerAssignmentAdmin{}
-
-	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
-	err = decoder.Decode(&varServerAssignmentAdmin)
-
-	if err != nil {
-		return err
+	// try to unmarshal data into ServerAssignmentAdminUser
+	err = json.Unmarshal(data, &dst.ServerAssignmentAdminUser)
+	if err == nil {
+		jsonServerAssignmentAdminUser, _ := json.Marshal(dst.ServerAssignmentAdminUser)
+		if string(jsonServerAssignmentAdminUser) == "{}" { // empty struct
+			dst.ServerAssignmentAdminUser = nil
+		} else {
+			match++
+		}
+	} else {
+		dst.ServerAssignmentAdminUser = nil
 	}
 
-	*o = ServerAssignmentAdmin(varServerAssignmentAdmin)
+	if match > 1 { // more than 1 match
+		// reset to nil
+		dst.ServerAssignmentAdminRole = nil
+		dst.ServerAssignmentAdminUser = nil
 
-	return err
+		return fmt.Errorf("data matches more than one schema in oneOf(ServerAssignmentAdmin)")
+	} else if match == 1 {
+		return nil // exactly one match
+	} else { // no match
+		return fmt.Errorf("data failed to match schemas in oneOf(ServerAssignmentAdmin)")
+	}
+}
+
+// Marshal data from the first non-nil pointers in the struct to JSON
+func (src ServerAssignmentAdmin) MarshalJSON() ([]byte, error) {
+	if src.ServerAssignmentAdminRole != nil {
+		return json.Marshal(&src.ServerAssignmentAdminRole)
+	}
+
+	if src.ServerAssignmentAdminUser != nil {
+		return json.Marshal(&src.ServerAssignmentAdminUser)
+	}
+
+	return nil, nil // no data in oneOf schemas
+}
+
+// Get the actual instance
+func (obj *ServerAssignmentAdmin) GetActualInstance() interface{} {
+	if obj == nil {
+		return nil
+	}
+	if obj.ServerAssignmentAdminRole != nil {
+		return obj.ServerAssignmentAdminRole
+	}
+
+	if obj.ServerAssignmentAdminUser != nil {
+		return obj.ServerAssignmentAdminUser
+	}
+
+	// all schemas are nil
+	return nil
 }
 
 type NullableServerAssignmentAdmin struct {

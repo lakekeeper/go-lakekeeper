@@ -78,114 +78,182 @@ func WarehouseAssignmentSelectAsWarehouseAssignment(v *WarehouseAssignmentSelect
 // Unmarshal JSON data into one of the pointers in the struct
 func (dst *WarehouseAssignment) UnmarshalJSON(data []byte) error {
 	var err error
-	match := 0
-	// try to unmarshal data into WarehouseAssignmentCreate
-	err = json.Unmarshal(data, &dst.WarehouseAssignmentCreate)
-	if err == nil {
-		jsonWarehouseAssignmentCreate, _ := json.Marshal(dst.WarehouseAssignmentCreate)
-		if string(jsonWarehouseAssignmentCreate) == "{}" { // empty struct
+	// use discriminator value to speed up the lookup
+	var jsonDict map[string]interface{}
+	err = newStrictDecoder(data).Decode(&jsonDict)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal JSON into map for the discriminator lookup")
+	}
+
+	// check if the discriminator value is 'create'
+	if jsonDict["type"] == "create" {
+		// try to unmarshal JSON data into WarehouseAssignmentCreate
+		err = json.Unmarshal(data, &dst.WarehouseAssignmentCreate)
+		if err == nil {
+			return nil // data stored in dst.WarehouseAssignmentCreate, return on the first match
+		} else {
 			dst.WarehouseAssignmentCreate = nil
-		} else {
-			match++
+			return fmt.Errorf("failed to unmarshal WarehouseAssignment as WarehouseAssignmentCreate: %s", err.Error())
 		}
-	} else {
-		dst.WarehouseAssignmentCreate = nil
 	}
 
-	// try to unmarshal data into WarehouseAssignmentDescribe
-	err = json.Unmarshal(data, &dst.WarehouseAssignmentDescribe)
-	if err == nil {
-		jsonWarehouseAssignmentDescribe, _ := json.Marshal(dst.WarehouseAssignmentDescribe)
-		if string(jsonWarehouseAssignmentDescribe) == "{}" { // empty struct
+	// check if the discriminator value is 'describe'
+	if jsonDict["type"] == "describe" {
+		// try to unmarshal JSON data into WarehouseAssignmentDescribe
+		err = json.Unmarshal(data, &dst.WarehouseAssignmentDescribe)
+		if err == nil {
+			return nil // data stored in dst.WarehouseAssignmentDescribe, return on the first match
+		} else {
 			dst.WarehouseAssignmentDescribe = nil
-		} else {
-			match++
+			return fmt.Errorf("failed to unmarshal WarehouseAssignment as WarehouseAssignmentDescribe: %s", err.Error())
 		}
-	} else {
-		dst.WarehouseAssignmentDescribe = nil
 	}
 
-	// try to unmarshal data into WarehouseAssignmentManageGrants
-	err = json.Unmarshal(data, &dst.WarehouseAssignmentManageGrants)
-	if err == nil {
-		jsonWarehouseAssignmentManageGrants, _ := json.Marshal(dst.WarehouseAssignmentManageGrants)
-		if string(jsonWarehouseAssignmentManageGrants) == "{}" { // empty struct
+	// check if the discriminator value is 'manage_grants'
+	if jsonDict["type"] == "manage_grants" {
+		// try to unmarshal JSON data into WarehouseAssignmentManageGrants
+		err = json.Unmarshal(data, &dst.WarehouseAssignmentManageGrants)
+		if err == nil {
+			return nil // data stored in dst.WarehouseAssignmentManageGrants, return on the first match
+		} else {
 			dst.WarehouseAssignmentManageGrants = nil
-		} else {
-			match++
+			return fmt.Errorf("failed to unmarshal WarehouseAssignment as WarehouseAssignmentManageGrants: %s", err.Error())
 		}
-	} else {
-		dst.WarehouseAssignmentManageGrants = nil
 	}
 
-	// try to unmarshal data into WarehouseAssignmentModify
-	err = json.Unmarshal(data, &dst.WarehouseAssignmentModify)
-	if err == nil {
-		jsonWarehouseAssignmentModify, _ := json.Marshal(dst.WarehouseAssignmentModify)
-		if string(jsonWarehouseAssignmentModify) == "{}" { // empty struct
+	// check if the discriminator value is 'modify'
+	if jsonDict["type"] == "modify" {
+		// try to unmarshal JSON data into WarehouseAssignmentModify
+		err = json.Unmarshal(data, &dst.WarehouseAssignmentModify)
+		if err == nil {
+			return nil // data stored in dst.WarehouseAssignmentModify, return on the first match
+		} else {
 			dst.WarehouseAssignmentModify = nil
-		} else {
-			match++
+			return fmt.Errorf("failed to unmarshal WarehouseAssignment as WarehouseAssignmentModify: %s", err.Error())
 		}
-	} else {
-		dst.WarehouseAssignmentModify = nil
 	}
 
-	// try to unmarshal data into WarehouseAssignmentOwnership
-	err = json.Unmarshal(data, &dst.WarehouseAssignmentOwnership)
-	if err == nil {
-		jsonWarehouseAssignmentOwnership, _ := json.Marshal(dst.WarehouseAssignmentOwnership)
-		if string(jsonWarehouseAssignmentOwnership) == "{}" { // empty struct
+	// check if the discriminator value is 'ownership'
+	if jsonDict["type"] == "ownership" {
+		// try to unmarshal JSON data into WarehouseAssignmentOwnership
+		err = json.Unmarshal(data, &dst.WarehouseAssignmentOwnership)
+		if err == nil {
+			return nil // data stored in dst.WarehouseAssignmentOwnership, return on the first match
+		} else {
 			dst.WarehouseAssignmentOwnership = nil
-		} else {
-			match++
+			return fmt.Errorf("failed to unmarshal WarehouseAssignment as WarehouseAssignmentOwnership: %s", err.Error())
 		}
-	} else {
-		dst.WarehouseAssignmentOwnership = nil
 	}
 
-	// try to unmarshal data into WarehouseAssignmentPassGrants
-	err = json.Unmarshal(data, &dst.WarehouseAssignmentPassGrants)
-	if err == nil {
-		jsonWarehouseAssignmentPassGrants, _ := json.Marshal(dst.WarehouseAssignmentPassGrants)
-		if string(jsonWarehouseAssignmentPassGrants) == "{}" { // empty struct
+	// check if the discriminator value is 'pass_grants'
+	if jsonDict["type"] == "pass_grants" {
+		// try to unmarshal JSON data into WarehouseAssignmentPassGrants
+		err = json.Unmarshal(data, &dst.WarehouseAssignmentPassGrants)
+		if err == nil {
+			return nil // data stored in dst.WarehouseAssignmentPassGrants, return on the first match
+		} else {
 			dst.WarehouseAssignmentPassGrants = nil
-		} else {
-			match++
+			return fmt.Errorf("failed to unmarshal WarehouseAssignment as WarehouseAssignmentPassGrants: %s", err.Error())
 		}
-	} else {
-		dst.WarehouseAssignmentPassGrants = nil
 	}
 
-	// try to unmarshal data into WarehouseAssignmentSelect
-	err = json.Unmarshal(data, &dst.WarehouseAssignmentSelect)
-	if err == nil {
-		jsonWarehouseAssignmentSelect, _ := json.Marshal(dst.WarehouseAssignmentSelect)
-		if string(jsonWarehouseAssignmentSelect) == "{}" { // empty struct
+	// check if the discriminator value is 'select'
+	if jsonDict["type"] == "select" {
+		// try to unmarshal JSON data into WarehouseAssignmentSelect
+		err = json.Unmarshal(data, &dst.WarehouseAssignmentSelect)
+		if err == nil {
+			return nil // data stored in dst.WarehouseAssignmentSelect, return on the first match
+		} else {
 			dst.WarehouseAssignmentSelect = nil
-		} else {
-			match++
+			return fmt.Errorf("failed to unmarshal WarehouseAssignment as WarehouseAssignmentSelect: %s", err.Error())
 		}
-	} else {
-		dst.WarehouseAssignmentSelect = nil
 	}
 
-	if match > 1 { // more than 1 match
-		// reset to nil
-		dst.WarehouseAssignmentCreate = nil
-		dst.WarehouseAssignmentDescribe = nil
-		dst.WarehouseAssignmentManageGrants = nil
-		dst.WarehouseAssignmentModify = nil
-		dst.WarehouseAssignmentOwnership = nil
-		dst.WarehouseAssignmentPassGrants = nil
-		dst.WarehouseAssignmentSelect = nil
-
-		return fmt.Errorf("data matches more than one schema in oneOf(WarehouseAssignment)")
-	} else if match == 1 {
-		return nil // exactly one match
-	} else { // no match
-		return fmt.Errorf("data failed to match schemas in oneOf(WarehouseAssignment)")
+	// check if the discriminator value is 'WarehouseAssignmentCreate'
+	if jsonDict["type"] == "WarehouseAssignmentCreate" {
+		// try to unmarshal JSON data into WarehouseAssignmentCreate
+		err = json.Unmarshal(data, &dst.WarehouseAssignmentCreate)
+		if err == nil {
+			return nil // data stored in dst.WarehouseAssignmentCreate, return on the first match
+		} else {
+			dst.WarehouseAssignmentCreate = nil
+			return fmt.Errorf("failed to unmarshal WarehouseAssignment as WarehouseAssignmentCreate: %s", err.Error())
+		}
 	}
+
+	// check if the discriminator value is 'WarehouseAssignmentDescribe'
+	if jsonDict["type"] == "WarehouseAssignmentDescribe" {
+		// try to unmarshal JSON data into WarehouseAssignmentDescribe
+		err = json.Unmarshal(data, &dst.WarehouseAssignmentDescribe)
+		if err == nil {
+			return nil // data stored in dst.WarehouseAssignmentDescribe, return on the first match
+		} else {
+			dst.WarehouseAssignmentDescribe = nil
+			return fmt.Errorf("failed to unmarshal WarehouseAssignment as WarehouseAssignmentDescribe: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'WarehouseAssignmentManageGrants'
+	if jsonDict["type"] == "WarehouseAssignmentManageGrants" {
+		// try to unmarshal JSON data into WarehouseAssignmentManageGrants
+		err = json.Unmarshal(data, &dst.WarehouseAssignmentManageGrants)
+		if err == nil {
+			return nil // data stored in dst.WarehouseAssignmentManageGrants, return on the first match
+		} else {
+			dst.WarehouseAssignmentManageGrants = nil
+			return fmt.Errorf("failed to unmarshal WarehouseAssignment as WarehouseAssignmentManageGrants: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'WarehouseAssignmentModify'
+	if jsonDict["type"] == "WarehouseAssignmentModify" {
+		// try to unmarshal JSON data into WarehouseAssignmentModify
+		err = json.Unmarshal(data, &dst.WarehouseAssignmentModify)
+		if err == nil {
+			return nil // data stored in dst.WarehouseAssignmentModify, return on the first match
+		} else {
+			dst.WarehouseAssignmentModify = nil
+			return fmt.Errorf("failed to unmarshal WarehouseAssignment as WarehouseAssignmentModify: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'WarehouseAssignmentOwnership'
+	if jsonDict["type"] == "WarehouseAssignmentOwnership" {
+		// try to unmarshal JSON data into WarehouseAssignmentOwnership
+		err = json.Unmarshal(data, &dst.WarehouseAssignmentOwnership)
+		if err == nil {
+			return nil // data stored in dst.WarehouseAssignmentOwnership, return on the first match
+		} else {
+			dst.WarehouseAssignmentOwnership = nil
+			return fmt.Errorf("failed to unmarshal WarehouseAssignment as WarehouseAssignmentOwnership: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'WarehouseAssignmentPassGrants'
+	if jsonDict["type"] == "WarehouseAssignmentPassGrants" {
+		// try to unmarshal JSON data into WarehouseAssignmentPassGrants
+		err = json.Unmarshal(data, &dst.WarehouseAssignmentPassGrants)
+		if err == nil {
+			return nil // data stored in dst.WarehouseAssignmentPassGrants, return on the first match
+		} else {
+			dst.WarehouseAssignmentPassGrants = nil
+			return fmt.Errorf("failed to unmarshal WarehouseAssignment as WarehouseAssignmentPassGrants: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'WarehouseAssignmentSelect'
+	if jsonDict["type"] == "WarehouseAssignmentSelect" {
+		// try to unmarshal JSON data into WarehouseAssignmentSelect
+		err = json.Unmarshal(data, &dst.WarehouseAssignmentSelect)
+		if err == nil {
+			return nil // data stored in dst.WarehouseAssignmentSelect, return on the first match
+		} else {
+			dst.WarehouseAssignmentSelect = nil
+			return fmt.Errorf("failed to unmarshal WarehouseAssignment as WarehouseAssignmentSelect: %s", err.Error())
+		}
+	}
+
+	return nil
 }
 
 // Marshal data from the first non-nil pointers in the struct to JSON

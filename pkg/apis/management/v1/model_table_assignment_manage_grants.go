@@ -11,170 +11,101 @@ API version: 0.0.0
 package managementv1
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 )
 
-// checks if the TableAssignmentManageGrants type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &TableAssignmentManageGrants{}
-
-// TableAssignmentManageGrants struct for TableAssignmentManageGrants
+// TableAssignmentManageGrants - struct for TableAssignmentManageGrants
 type TableAssignmentManageGrants struct {
-	// Id of the user
-	User string `json:"user"`
-	// Id of the role
-	Role string `json:"role"`
-	Type string `json:"type"`
+	TableAssignmentManageGrantsRole *TableAssignmentManageGrantsRole
+	TableAssignmentManageGrantsUser *TableAssignmentManageGrantsUser
 }
 
-type _TableAssignmentManageGrants TableAssignmentManageGrants
-
-// NewTableAssignmentManageGrants instantiates a new TableAssignmentManageGrants object
-// This constructor will assign default values to properties that have it defined,
-// and makes sure properties required by API are set, but the set of arguments
-// will change when the set of required properties is changed
-func NewTableAssignmentManageGrants(user string, role string, type_ string) *TableAssignmentManageGrants {
-	this := TableAssignmentManageGrants{}
-	this.User = user
-	this.Role = role
-	this.Type = type_
-	return &this
-}
-
-// NewTableAssignmentManageGrantsWithDefaults instantiates a new TableAssignmentManageGrants object
-// This constructor will only assign default values to properties that have it defined,
-// but it doesn't guarantee that properties required by API are set
-func NewTableAssignmentManageGrantsWithDefaults() *TableAssignmentManageGrants {
-	this := TableAssignmentManageGrants{}
-	return &this
-}
-
-// GetUser returns the User field value
-func (o *TableAssignmentManageGrants) GetUser() string {
-	if o == nil {
-		var ret string
-		return ret
+// TableAssignmentManageGrantsRoleAsTableAssignmentManageGrants is a convenience function that returns TableAssignmentManageGrantsRole wrapped in TableAssignmentManageGrants
+func TableAssignmentManageGrantsRoleAsTableAssignmentManageGrants(v *TableAssignmentManageGrantsRole) TableAssignmentManageGrants {
+	return TableAssignmentManageGrants{
+		TableAssignmentManageGrantsRole: v,
 	}
-
-	return o.User
 }
 
-// GetUserOk returns a tuple with the User field value
-// and a boolean to check if the value has been set.
-func (o *TableAssignmentManageGrants) GetUserOk() (*string, bool) {
-	if o == nil {
-		return nil, false
+// TableAssignmentManageGrantsUserAsTableAssignmentManageGrants is a convenience function that returns TableAssignmentManageGrantsUser wrapped in TableAssignmentManageGrants
+func TableAssignmentManageGrantsUserAsTableAssignmentManageGrants(v *TableAssignmentManageGrantsUser) TableAssignmentManageGrants {
+	return TableAssignmentManageGrants{
+		TableAssignmentManageGrantsUser: v,
 	}
-	return &o.User, true
 }
 
-// SetUser sets field value
-func (o *TableAssignmentManageGrants) SetUser(v string) {
-	o.User = v
-}
-
-// GetRole returns the Role field value
-func (o *TableAssignmentManageGrants) GetRole() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.Role
-}
-
-// GetRoleOk returns a tuple with the Role field value
-// and a boolean to check if the value has been set.
-func (o *TableAssignmentManageGrants) GetRoleOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Role, true
-}
-
-// SetRole sets field value
-func (o *TableAssignmentManageGrants) SetRole(v string) {
-	o.Role = v
-}
-
-// GetType returns the Type field value
-func (o *TableAssignmentManageGrants) GetType() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.Type
-}
-
-// GetTypeOk returns a tuple with the Type field value
-// and a boolean to check if the value has been set.
-func (o *TableAssignmentManageGrants) GetTypeOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Type, true
-}
-
-// SetType sets field value
-func (o *TableAssignmentManageGrants) SetType(v string) {
-	o.Type = v
-}
-
-func (o TableAssignmentManageGrants) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
-func (o TableAssignmentManageGrants) ToMap() (map[string]interface{}, error) {
-	toSerialize := map[string]interface{}{}
-	toSerialize["user"] = o.User
-	toSerialize["role"] = o.Role
-	toSerialize["type"] = o.Type
-	return toSerialize, nil
-}
-
-func (o *TableAssignmentManageGrants) UnmarshalJSON(data []byte) (err error) {
-	// This validates that all required properties are included in the JSON object
-	// by unmarshalling the object into a generic map with string keys and checking
-	// that every required field exists as a key in the generic map.
-	requiredProperties := []string{
-		"user",
-		"role",
-		"type",
-	}
-
-	allProperties := make(map[string]interface{})
-
-	err = json.Unmarshal(data, &allProperties)
-
-	if err != nil {
-		return err
-	}
-
-	for _, requiredProperty := range requiredProperties {
-		if _, exists := allProperties[requiredProperty]; !exists {
-			return fmt.Errorf("no value given for required property %v", requiredProperty)
+// Unmarshal JSON data into one of the pointers in the struct
+func (dst *TableAssignmentManageGrants) UnmarshalJSON(data []byte) error {
+	var err error
+	match := 0
+	// try to unmarshal data into TableAssignmentManageGrantsRole
+	err = json.Unmarshal(data, &dst.TableAssignmentManageGrantsRole)
+	if err == nil {
+		jsonTableAssignmentManageGrantsRole, _ := json.Marshal(dst.TableAssignmentManageGrantsRole)
+		if string(jsonTableAssignmentManageGrantsRole) == "{}" { // empty struct
+			dst.TableAssignmentManageGrantsRole = nil
+		} else {
+			match++
 		}
+	} else {
+		dst.TableAssignmentManageGrantsRole = nil
 	}
 
-	varTableAssignmentManageGrants := _TableAssignmentManageGrants{}
-
-	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
-	err = decoder.Decode(&varTableAssignmentManageGrants)
-
-	if err != nil {
-		return err
+	// try to unmarshal data into TableAssignmentManageGrantsUser
+	err = json.Unmarshal(data, &dst.TableAssignmentManageGrantsUser)
+	if err == nil {
+		jsonTableAssignmentManageGrantsUser, _ := json.Marshal(dst.TableAssignmentManageGrantsUser)
+		if string(jsonTableAssignmentManageGrantsUser) == "{}" { // empty struct
+			dst.TableAssignmentManageGrantsUser = nil
+		} else {
+			match++
+		}
+	} else {
+		dst.TableAssignmentManageGrantsUser = nil
 	}
 
-	*o = TableAssignmentManageGrants(varTableAssignmentManageGrants)
+	if match > 1 { // more than 1 match
+		// reset to nil
+		dst.TableAssignmentManageGrantsRole = nil
+		dst.TableAssignmentManageGrantsUser = nil
 
-	return err
+		return fmt.Errorf("data matches more than one schema in oneOf(TableAssignmentManageGrants)")
+	} else if match == 1 {
+		return nil // exactly one match
+	} else { // no match
+		return fmt.Errorf("data failed to match schemas in oneOf(TableAssignmentManageGrants)")
+	}
+}
+
+// Marshal data from the first non-nil pointers in the struct to JSON
+func (src TableAssignmentManageGrants) MarshalJSON() ([]byte, error) {
+	if src.TableAssignmentManageGrantsRole != nil {
+		return json.Marshal(&src.TableAssignmentManageGrantsRole)
+	}
+
+	if src.TableAssignmentManageGrantsUser != nil {
+		return json.Marshal(&src.TableAssignmentManageGrantsUser)
+	}
+
+	return nil, nil // no data in oneOf schemas
+}
+
+// Get the actual instance
+func (obj *TableAssignmentManageGrants) GetActualInstance() interface{} {
+	if obj == nil {
+		return nil
+	}
+	if obj.TableAssignmentManageGrantsRole != nil {
+		return obj.TableAssignmentManageGrantsRole
+	}
+
+	if obj.TableAssignmentManageGrantsUser != nil {
+		return obj.TableAssignmentManageGrantsUser
+	}
+
+	// all schemas are nil
+	return nil
 }
 
 type NullableTableAssignmentManageGrants struct {

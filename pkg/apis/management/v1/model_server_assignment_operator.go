@@ -11,170 +11,101 @@ API version: 0.0.0
 package managementv1
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 )
 
-// checks if the ServerAssignmentOperator type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &ServerAssignmentOperator{}
-
-// ServerAssignmentOperator struct for ServerAssignmentOperator
+// ServerAssignmentOperator - struct for ServerAssignmentOperator
 type ServerAssignmentOperator struct {
-	// Id of the user
-	User string `json:"user"`
-	// Id of the role
-	Role string `json:"role"`
-	Type string `json:"type"`
+	ServerAssignmentOperatorRole *ServerAssignmentOperatorRole
+	ServerAssignmentOperatorUser *ServerAssignmentOperatorUser
 }
 
-type _ServerAssignmentOperator ServerAssignmentOperator
-
-// NewServerAssignmentOperator instantiates a new ServerAssignmentOperator object
-// This constructor will assign default values to properties that have it defined,
-// and makes sure properties required by API are set, but the set of arguments
-// will change when the set of required properties is changed
-func NewServerAssignmentOperator(user string, role string, type_ string) *ServerAssignmentOperator {
-	this := ServerAssignmentOperator{}
-	this.User = user
-	this.Role = role
-	this.Type = type_
-	return &this
-}
-
-// NewServerAssignmentOperatorWithDefaults instantiates a new ServerAssignmentOperator object
-// This constructor will only assign default values to properties that have it defined,
-// but it doesn't guarantee that properties required by API are set
-func NewServerAssignmentOperatorWithDefaults() *ServerAssignmentOperator {
-	this := ServerAssignmentOperator{}
-	return &this
-}
-
-// GetUser returns the User field value
-func (o *ServerAssignmentOperator) GetUser() string {
-	if o == nil {
-		var ret string
-		return ret
+// ServerAssignmentOperatorRoleAsServerAssignmentOperator is a convenience function that returns ServerAssignmentOperatorRole wrapped in ServerAssignmentOperator
+func ServerAssignmentOperatorRoleAsServerAssignmentOperator(v *ServerAssignmentOperatorRole) ServerAssignmentOperator {
+	return ServerAssignmentOperator{
+		ServerAssignmentOperatorRole: v,
 	}
-
-	return o.User
 }
 
-// GetUserOk returns a tuple with the User field value
-// and a boolean to check if the value has been set.
-func (o *ServerAssignmentOperator) GetUserOk() (*string, bool) {
-	if o == nil {
-		return nil, false
+// ServerAssignmentOperatorUserAsServerAssignmentOperator is a convenience function that returns ServerAssignmentOperatorUser wrapped in ServerAssignmentOperator
+func ServerAssignmentOperatorUserAsServerAssignmentOperator(v *ServerAssignmentOperatorUser) ServerAssignmentOperator {
+	return ServerAssignmentOperator{
+		ServerAssignmentOperatorUser: v,
 	}
-	return &o.User, true
 }
 
-// SetUser sets field value
-func (o *ServerAssignmentOperator) SetUser(v string) {
-	o.User = v
-}
-
-// GetRole returns the Role field value
-func (o *ServerAssignmentOperator) GetRole() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.Role
-}
-
-// GetRoleOk returns a tuple with the Role field value
-// and a boolean to check if the value has been set.
-func (o *ServerAssignmentOperator) GetRoleOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Role, true
-}
-
-// SetRole sets field value
-func (o *ServerAssignmentOperator) SetRole(v string) {
-	o.Role = v
-}
-
-// GetType returns the Type field value
-func (o *ServerAssignmentOperator) GetType() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.Type
-}
-
-// GetTypeOk returns a tuple with the Type field value
-// and a boolean to check if the value has been set.
-func (o *ServerAssignmentOperator) GetTypeOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Type, true
-}
-
-// SetType sets field value
-func (o *ServerAssignmentOperator) SetType(v string) {
-	o.Type = v
-}
-
-func (o ServerAssignmentOperator) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
-func (o ServerAssignmentOperator) ToMap() (map[string]interface{}, error) {
-	toSerialize := map[string]interface{}{}
-	toSerialize["user"] = o.User
-	toSerialize["role"] = o.Role
-	toSerialize["type"] = o.Type
-	return toSerialize, nil
-}
-
-func (o *ServerAssignmentOperator) UnmarshalJSON(data []byte) (err error) {
-	// This validates that all required properties are included in the JSON object
-	// by unmarshalling the object into a generic map with string keys and checking
-	// that every required field exists as a key in the generic map.
-	requiredProperties := []string{
-		"user",
-		"role",
-		"type",
-	}
-
-	allProperties := make(map[string]interface{})
-
-	err = json.Unmarshal(data, &allProperties)
-
-	if err != nil {
-		return err
-	}
-
-	for _, requiredProperty := range requiredProperties {
-		if _, exists := allProperties[requiredProperty]; !exists {
-			return fmt.Errorf("no value given for required property %v", requiredProperty)
+// Unmarshal JSON data into one of the pointers in the struct
+func (dst *ServerAssignmentOperator) UnmarshalJSON(data []byte) error {
+	var err error
+	match := 0
+	// try to unmarshal data into ServerAssignmentOperatorRole
+	err = json.Unmarshal(data, &dst.ServerAssignmentOperatorRole)
+	if err == nil {
+		jsonServerAssignmentOperatorRole, _ := json.Marshal(dst.ServerAssignmentOperatorRole)
+		if string(jsonServerAssignmentOperatorRole) == "{}" { // empty struct
+			dst.ServerAssignmentOperatorRole = nil
+		} else {
+			match++
 		}
+	} else {
+		dst.ServerAssignmentOperatorRole = nil
 	}
 
-	varServerAssignmentOperator := _ServerAssignmentOperator{}
-
-	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
-	err = decoder.Decode(&varServerAssignmentOperator)
-
-	if err != nil {
-		return err
+	// try to unmarshal data into ServerAssignmentOperatorUser
+	err = json.Unmarshal(data, &dst.ServerAssignmentOperatorUser)
+	if err == nil {
+		jsonServerAssignmentOperatorUser, _ := json.Marshal(dst.ServerAssignmentOperatorUser)
+		if string(jsonServerAssignmentOperatorUser) == "{}" { // empty struct
+			dst.ServerAssignmentOperatorUser = nil
+		} else {
+			match++
+		}
+	} else {
+		dst.ServerAssignmentOperatorUser = nil
 	}
 
-	*o = ServerAssignmentOperator(varServerAssignmentOperator)
+	if match > 1 { // more than 1 match
+		// reset to nil
+		dst.ServerAssignmentOperatorRole = nil
+		dst.ServerAssignmentOperatorUser = nil
 
-	return err
+		return fmt.Errorf("data matches more than one schema in oneOf(ServerAssignmentOperator)")
+	} else if match == 1 {
+		return nil // exactly one match
+	} else { // no match
+		return fmt.Errorf("data failed to match schemas in oneOf(ServerAssignmentOperator)")
+	}
+}
+
+// Marshal data from the first non-nil pointers in the struct to JSON
+func (src ServerAssignmentOperator) MarshalJSON() ([]byte, error) {
+	if src.ServerAssignmentOperatorRole != nil {
+		return json.Marshal(&src.ServerAssignmentOperatorRole)
+	}
+
+	if src.ServerAssignmentOperatorUser != nil {
+		return json.Marshal(&src.ServerAssignmentOperatorUser)
+	}
+
+	return nil, nil // no data in oneOf schemas
+}
+
+// Get the actual instance
+func (obj *ServerAssignmentOperator) GetActualInstance() interface{} {
+	if obj == nil {
+		return nil
+	}
+	if obj.ServerAssignmentOperatorRole != nil {
+		return obj.ServerAssignmentOperatorRole
+	}
+
+	if obj.ServerAssignmentOperatorUser != nil {
+		return obj.ServerAssignmentOperatorUser
+	}
+
+	// all schemas are nil
+	return nil
 }
 
 type NullableServerAssignmentOperator struct {

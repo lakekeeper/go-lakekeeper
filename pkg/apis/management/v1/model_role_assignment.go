@@ -38,44 +38,62 @@ func RoleAssignmentOwnershipAsRoleAssignment(v *RoleAssignmentOwnership) RoleAss
 // Unmarshal JSON data into one of the pointers in the struct
 func (dst *RoleAssignment) UnmarshalJSON(data []byte) error {
 	var err error
-	match := 0
-	// try to unmarshal data into RoleAssignmentAssignee
-	err = json.Unmarshal(data, &dst.RoleAssignmentAssignee)
-	if err == nil {
-		jsonRoleAssignmentAssignee, _ := json.Marshal(dst.RoleAssignmentAssignee)
-		if string(jsonRoleAssignmentAssignee) == "{}" { // empty struct
+	// use discriminator value to speed up the lookup
+	var jsonDict map[string]interface{}
+	err = newStrictDecoder(data).Decode(&jsonDict)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal JSON into map for the discriminator lookup")
+	}
+
+	// check if the discriminator value is 'assignee'
+	if jsonDict["type"] == "assignee" {
+		// try to unmarshal JSON data into RoleAssignmentAssignee
+		err = json.Unmarshal(data, &dst.RoleAssignmentAssignee)
+		if err == nil {
+			return nil // data stored in dst.RoleAssignmentAssignee, return on the first match
+		} else {
 			dst.RoleAssignmentAssignee = nil
-		} else {
-			match++
+			return fmt.Errorf("failed to unmarshal RoleAssignment as RoleAssignmentAssignee: %s", err.Error())
 		}
-	} else {
-		dst.RoleAssignmentAssignee = nil
 	}
 
-	// try to unmarshal data into RoleAssignmentOwnership
-	err = json.Unmarshal(data, &dst.RoleAssignmentOwnership)
-	if err == nil {
-		jsonRoleAssignmentOwnership, _ := json.Marshal(dst.RoleAssignmentOwnership)
-		if string(jsonRoleAssignmentOwnership) == "{}" { // empty struct
+	// check if the discriminator value is 'ownership'
+	if jsonDict["type"] == "ownership" {
+		// try to unmarshal JSON data into RoleAssignmentOwnership
+		err = json.Unmarshal(data, &dst.RoleAssignmentOwnership)
+		if err == nil {
+			return nil // data stored in dst.RoleAssignmentOwnership, return on the first match
+		} else {
 			dst.RoleAssignmentOwnership = nil
-		} else {
-			match++
+			return fmt.Errorf("failed to unmarshal RoleAssignment as RoleAssignmentOwnership: %s", err.Error())
 		}
-	} else {
-		dst.RoleAssignmentOwnership = nil
 	}
 
-	if match > 1 { // more than 1 match
-		// reset to nil
-		dst.RoleAssignmentAssignee = nil
-		dst.RoleAssignmentOwnership = nil
-
-		return fmt.Errorf("data matches more than one schema in oneOf(RoleAssignment)")
-	} else if match == 1 {
-		return nil // exactly one match
-	} else { // no match
-		return fmt.Errorf("data failed to match schemas in oneOf(RoleAssignment)")
+	// check if the discriminator value is 'RoleAssignmentAssignee'
+	if jsonDict["type"] == "RoleAssignmentAssignee" {
+		// try to unmarshal JSON data into RoleAssignmentAssignee
+		err = json.Unmarshal(data, &dst.RoleAssignmentAssignee)
+		if err == nil {
+			return nil // data stored in dst.RoleAssignmentAssignee, return on the first match
+		} else {
+			dst.RoleAssignmentAssignee = nil
+			return fmt.Errorf("failed to unmarshal RoleAssignment as RoleAssignmentAssignee: %s", err.Error())
+		}
 	}
+
+	// check if the discriminator value is 'RoleAssignmentOwnership'
+	if jsonDict["type"] == "RoleAssignmentOwnership" {
+		// try to unmarshal JSON data into RoleAssignmentOwnership
+		err = json.Unmarshal(data, &dst.RoleAssignmentOwnership)
+		if err == nil {
+			return nil // data stored in dst.RoleAssignmentOwnership, return on the first match
+		} else {
+			dst.RoleAssignmentOwnership = nil
+			return fmt.Errorf("failed to unmarshal RoleAssignment as RoleAssignmentOwnership: %s", err.Error())
+		}
+	}
+
+	return nil
 }
 
 // Marshal data from the first non-nil pointers in the struct to JSON

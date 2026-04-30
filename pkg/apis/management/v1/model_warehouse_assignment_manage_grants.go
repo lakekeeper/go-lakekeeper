@@ -11,170 +11,101 @@ API version: 0.0.0
 package managementv1
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 )
 
-// checks if the WarehouseAssignmentManageGrants type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &WarehouseAssignmentManageGrants{}
-
-// WarehouseAssignmentManageGrants struct for WarehouseAssignmentManageGrants
+// WarehouseAssignmentManageGrants - struct for WarehouseAssignmentManageGrants
 type WarehouseAssignmentManageGrants struct {
-	// Id of the user
-	User string `json:"user"`
-	// Id of the role
-	Role string `json:"role"`
-	Type string `json:"type"`
+	WarehouseAssignmentManageGrantsRole *WarehouseAssignmentManageGrantsRole
+	WarehouseAssignmentManageGrantsUser *WarehouseAssignmentManageGrantsUser
 }
 
-type _WarehouseAssignmentManageGrants WarehouseAssignmentManageGrants
-
-// NewWarehouseAssignmentManageGrants instantiates a new WarehouseAssignmentManageGrants object
-// This constructor will assign default values to properties that have it defined,
-// and makes sure properties required by API are set, but the set of arguments
-// will change when the set of required properties is changed
-func NewWarehouseAssignmentManageGrants(user string, role string, type_ string) *WarehouseAssignmentManageGrants {
-	this := WarehouseAssignmentManageGrants{}
-	this.User = user
-	this.Role = role
-	this.Type = type_
-	return &this
-}
-
-// NewWarehouseAssignmentManageGrantsWithDefaults instantiates a new WarehouseAssignmentManageGrants object
-// This constructor will only assign default values to properties that have it defined,
-// but it doesn't guarantee that properties required by API are set
-func NewWarehouseAssignmentManageGrantsWithDefaults() *WarehouseAssignmentManageGrants {
-	this := WarehouseAssignmentManageGrants{}
-	return &this
-}
-
-// GetUser returns the User field value
-func (o *WarehouseAssignmentManageGrants) GetUser() string {
-	if o == nil {
-		var ret string
-		return ret
+// WarehouseAssignmentManageGrantsRoleAsWarehouseAssignmentManageGrants is a convenience function that returns WarehouseAssignmentManageGrantsRole wrapped in WarehouseAssignmentManageGrants
+func WarehouseAssignmentManageGrantsRoleAsWarehouseAssignmentManageGrants(v *WarehouseAssignmentManageGrantsRole) WarehouseAssignmentManageGrants {
+	return WarehouseAssignmentManageGrants{
+		WarehouseAssignmentManageGrantsRole: v,
 	}
-
-	return o.User
 }
 
-// GetUserOk returns a tuple with the User field value
-// and a boolean to check if the value has been set.
-func (o *WarehouseAssignmentManageGrants) GetUserOk() (*string, bool) {
-	if o == nil {
-		return nil, false
+// WarehouseAssignmentManageGrantsUserAsWarehouseAssignmentManageGrants is a convenience function that returns WarehouseAssignmentManageGrantsUser wrapped in WarehouseAssignmentManageGrants
+func WarehouseAssignmentManageGrantsUserAsWarehouseAssignmentManageGrants(v *WarehouseAssignmentManageGrantsUser) WarehouseAssignmentManageGrants {
+	return WarehouseAssignmentManageGrants{
+		WarehouseAssignmentManageGrantsUser: v,
 	}
-	return &o.User, true
 }
 
-// SetUser sets field value
-func (o *WarehouseAssignmentManageGrants) SetUser(v string) {
-	o.User = v
-}
-
-// GetRole returns the Role field value
-func (o *WarehouseAssignmentManageGrants) GetRole() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.Role
-}
-
-// GetRoleOk returns a tuple with the Role field value
-// and a boolean to check if the value has been set.
-func (o *WarehouseAssignmentManageGrants) GetRoleOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Role, true
-}
-
-// SetRole sets field value
-func (o *WarehouseAssignmentManageGrants) SetRole(v string) {
-	o.Role = v
-}
-
-// GetType returns the Type field value
-func (o *WarehouseAssignmentManageGrants) GetType() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.Type
-}
-
-// GetTypeOk returns a tuple with the Type field value
-// and a boolean to check if the value has been set.
-func (o *WarehouseAssignmentManageGrants) GetTypeOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Type, true
-}
-
-// SetType sets field value
-func (o *WarehouseAssignmentManageGrants) SetType(v string) {
-	o.Type = v
-}
-
-func (o WarehouseAssignmentManageGrants) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
-func (o WarehouseAssignmentManageGrants) ToMap() (map[string]interface{}, error) {
-	toSerialize := map[string]interface{}{}
-	toSerialize["user"] = o.User
-	toSerialize["role"] = o.Role
-	toSerialize["type"] = o.Type
-	return toSerialize, nil
-}
-
-func (o *WarehouseAssignmentManageGrants) UnmarshalJSON(data []byte) (err error) {
-	// This validates that all required properties are included in the JSON object
-	// by unmarshalling the object into a generic map with string keys and checking
-	// that every required field exists as a key in the generic map.
-	requiredProperties := []string{
-		"user",
-		"role",
-		"type",
-	}
-
-	allProperties := make(map[string]interface{})
-
-	err = json.Unmarshal(data, &allProperties)
-
-	if err != nil {
-		return err
-	}
-
-	for _, requiredProperty := range requiredProperties {
-		if _, exists := allProperties[requiredProperty]; !exists {
-			return fmt.Errorf("no value given for required property %v", requiredProperty)
+// Unmarshal JSON data into one of the pointers in the struct
+func (dst *WarehouseAssignmentManageGrants) UnmarshalJSON(data []byte) error {
+	var err error
+	match := 0
+	// try to unmarshal data into WarehouseAssignmentManageGrantsRole
+	err = json.Unmarshal(data, &dst.WarehouseAssignmentManageGrantsRole)
+	if err == nil {
+		jsonWarehouseAssignmentManageGrantsRole, _ := json.Marshal(dst.WarehouseAssignmentManageGrantsRole)
+		if string(jsonWarehouseAssignmentManageGrantsRole) == "{}" { // empty struct
+			dst.WarehouseAssignmentManageGrantsRole = nil
+		} else {
+			match++
 		}
+	} else {
+		dst.WarehouseAssignmentManageGrantsRole = nil
 	}
 
-	varWarehouseAssignmentManageGrants := _WarehouseAssignmentManageGrants{}
-
-	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
-	err = decoder.Decode(&varWarehouseAssignmentManageGrants)
-
-	if err != nil {
-		return err
+	// try to unmarshal data into WarehouseAssignmentManageGrantsUser
+	err = json.Unmarshal(data, &dst.WarehouseAssignmentManageGrantsUser)
+	if err == nil {
+		jsonWarehouseAssignmentManageGrantsUser, _ := json.Marshal(dst.WarehouseAssignmentManageGrantsUser)
+		if string(jsonWarehouseAssignmentManageGrantsUser) == "{}" { // empty struct
+			dst.WarehouseAssignmentManageGrantsUser = nil
+		} else {
+			match++
+		}
+	} else {
+		dst.WarehouseAssignmentManageGrantsUser = nil
 	}
 
-	*o = WarehouseAssignmentManageGrants(varWarehouseAssignmentManageGrants)
+	if match > 1 { // more than 1 match
+		// reset to nil
+		dst.WarehouseAssignmentManageGrantsRole = nil
+		dst.WarehouseAssignmentManageGrantsUser = nil
 
-	return err
+		return fmt.Errorf("data matches more than one schema in oneOf(WarehouseAssignmentManageGrants)")
+	} else if match == 1 {
+		return nil // exactly one match
+	} else { // no match
+		return fmt.Errorf("data failed to match schemas in oneOf(WarehouseAssignmentManageGrants)")
+	}
+}
+
+// Marshal data from the first non-nil pointers in the struct to JSON
+func (src WarehouseAssignmentManageGrants) MarshalJSON() ([]byte, error) {
+	if src.WarehouseAssignmentManageGrantsRole != nil {
+		return json.Marshal(&src.WarehouseAssignmentManageGrantsRole)
+	}
+
+	if src.WarehouseAssignmentManageGrantsUser != nil {
+		return json.Marshal(&src.WarehouseAssignmentManageGrantsUser)
+	}
+
+	return nil, nil // no data in oneOf schemas
+}
+
+// Get the actual instance
+func (obj *WarehouseAssignmentManageGrants) GetActualInstance() interface{} {
+	if obj == nil {
+		return nil
+	}
+	if obj.WarehouseAssignmentManageGrantsRole != nil {
+		return obj.WarehouseAssignmentManageGrantsRole
+	}
+
+	if obj.WarehouseAssignmentManageGrantsUser != nil {
+		return obj.WarehouseAssignmentManageGrantsUser
+	}
+
+	// all schemas are nil
+	return nil
 }
 
 type NullableWarehouseAssignmentManageGrants struct {

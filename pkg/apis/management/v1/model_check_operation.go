@@ -17,53 +17,53 @@ import (
 
 // CheckOperation - Represents an action on an object
 type CheckOperation struct {
-	CheckOperationOneOf  *CheckOperationOneOf
-	CheckOperationOneOf1 *CheckOperationOneOf1
-	CheckOperationOneOf2 *CheckOperationOneOf2
-	CheckOperationOneOf3 *CheckOperationOneOf3
-	CheckOperationOneOf4 *CheckOperationOneOf4
-	CheckOperationOneOf5 *CheckOperationOneOf5
+	CheckOperationNamespace *CheckOperationNamespace
+	CheckOperationProject   *CheckOperationProject
+	CheckOperationServer    *CheckOperationServer
+	CheckOperationTable     *CheckOperationTable
+	CheckOperationView      *CheckOperationView
+	CheckOperationWarehouse *CheckOperationWarehouse
 }
 
-// CheckOperationOneOfAsCheckOperation is a convenience function that returns CheckOperationOneOf wrapped in CheckOperation
-func CheckOperationOneOfAsCheckOperation(v *CheckOperationOneOf) CheckOperation {
+// CheckOperationNamespaceAsCheckOperation is a convenience function that returns CheckOperationNamespace wrapped in CheckOperation
+func CheckOperationNamespaceAsCheckOperation(v *CheckOperationNamespace) CheckOperation {
 	return CheckOperation{
-		CheckOperationOneOf: v,
+		CheckOperationNamespace: v,
 	}
 }
 
-// CheckOperationOneOf1AsCheckOperation is a convenience function that returns CheckOperationOneOf1 wrapped in CheckOperation
-func CheckOperationOneOf1AsCheckOperation(v *CheckOperationOneOf1) CheckOperation {
+// CheckOperationProjectAsCheckOperation is a convenience function that returns CheckOperationProject wrapped in CheckOperation
+func CheckOperationProjectAsCheckOperation(v *CheckOperationProject) CheckOperation {
 	return CheckOperation{
-		CheckOperationOneOf1: v,
+		CheckOperationProject: v,
 	}
 }
 
-// CheckOperationOneOf2AsCheckOperation is a convenience function that returns CheckOperationOneOf2 wrapped in CheckOperation
-func CheckOperationOneOf2AsCheckOperation(v *CheckOperationOneOf2) CheckOperation {
+// CheckOperationServerAsCheckOperation is a convenience function that returns CheckOperationServer wrapped in CheckOperation
+func CheckOperationServerAsCheckOperation(v *CheckOperationServer) CheckOperation {
 	return CheckOperation{
-		CheckOperationOneOf2: v,
+		CheckOperationServer: v,
 	}
 }
 
-// CheckOperationOneOf3AsCheckOperation is a convenience function that returns CheckOperationOneOf3 wrapped in CheckOperation
-func CheckOperationOneOf3AsCheckOperation(v *CheckOperationOneOf3) CheckOperation {
+// CheckOperationTableAsCheckOperation is a convenience function that returns CheckOperationTable wrapped in CheckOperation
+func CheckOperationTableAsCheckOperation(v *CheckOperationTable) CheckOperation {
 	return CheckOperation{
-		CheckOperationOneOf3: v,
+		CheckOperationTable: v,
 	}
 }
 
-// CheckOperationOneOf4AsCheckOperation is a convenience function that returns CheckOperationOneOf4 wrapped in CheckOperation
-func CheckOperationOneOf4AsCheckOperation(v *CheckOperationOneOf4) CheckOperation {
+// CheckOperationViewAsCheckOperation is a convenience function that returns CheckOperationView wrapped in CheckOperation
+func CheckOperationViewAsCheckOperation(v *CheckOperationView) CheckOperation {
 	return CheckOperation{
-		CheckOperationOneOf4: v,
+		CheckOperationView: v,
 	}
 }
 
-// CheckOperationOneOf5AsCheckOperation is a convenience function that returns CheckOperationOneOf5 wrapped in CheckOperation
-func CheckOperationOneOf5AsCheckOperation(v *CheckOperationOneOf5) CheckOperation {
+// CheckOperationWarehouseAsCheckOperation is a convenience function that returns CheckOperationWarehouse wrapped in CheckOperation
+func CheckOperationWarehouseAsCheckOperation(v *CheckOperationWarehouse) CheckOperation {
 	return CheckOperation{
-		CheckOperationOneOf5: v,
+		CheckOperationWarehouse: v,
 	}
 }
 
@@ -71,92 +71,92 @@ func CheckOperationOneOf5AsCheckOperation(v *CheckOperationOneOf5) CheckOperatio
 func (dst *CheckOperation) UnmarshalJSON(data []byte) error {
 	var err error
 	match := 0
-	// try to unmarshal data into CheckOperationOneOf
-	err = json.Unmarshal(data, &dst.CheckOperationOneOf)
+	// try to unmarshal data into CheckOperationNamespace
+	err = json.Unmarshal(data, &dst.CheckOperationNamespace)
 	if err == nil {
-		jsonCheckOperationOneOf, _ := json.Marshal(dst.CheckOperationOneOf)
-		if string(jsonCheckOperationOneOf) == "{}" { // empty struct
-			dst.CheckOperationOneOf = nil
+		jsonCheckOperationNamespace, _ := json.Marshal(dst.CheckOperationNamespace)
+		if string(jsonCheckOperationNamespace) == "{}" { // empty struct
+			dst.CheckOperationNamespace = nil
 		} else {
 			match++
 		}
 	} else {
-		dst.CheckOperationOneOf = nil
+		dst.CheckOperationNamespace = nil
 	}
 
-	// try to unmarshal data into CheckOperationOneOf1
-	err = json.Unmarshal(data, &dst.CheckOperationOneOf1)
+	// try to unmarshal data into CheckOperationProject
+	err = json.Unmarshal(data, &dst.CheckOperationProject)
 	if err == nil {
-		jsonCheckOperationOneOf1, _ := json.Marshal(dst.CheckOperationOneOf1)
-		if string(jsonCheckOperationOneOf1) == "{}" { // empty struct
-			dst.CheckOperationOneOf1 = nil
+		jsonCheckOperationProject, _ := json.Marshal(dst.CheckOperationProject)
+		if string(jsonCheckOperationProject) == "{}" { // empty struct
+			dst.CheckOperationProject = nil
 		} else {
 			match++
 		}
 	} else {
-		dst.CheckOperationOneOf1 = nil
+		dst.CheckOperationProject = nil
 	}
 
-	// try to unmarshal data into CheckOperationOneOf2
-	err = json.Unmarshal(data, &dst.CheckOperationOneOf2)
+	// try to unmarshal data into CheckOperationServer
+	err = json.Unmarshal(data, &dst.CheckOperationServer)
 	if err == nil {
-		jsonCheckOperationOneOf2, _ := json.Marshal(dst.CheckOperationOneOf2)
-		if string(jsonCheckOperationOneOf2) == "{}" { // empty struct
-			dst.CheckOperationOneOf2 = nil
+		jsonCheckOperationServer, _ := json.Marshal(dst.CheckOperationServer)
+		if string(jsonCheckOperationServer) == "{}" { // empty struct
+			dst.CheckOperationServer = nil
 		} else {
 			match++
 		}
 	} else {
-		dst.CheckOperationOneOf2 = nil
+		dst.CheckOperationServer = nil
 	}
 
-	// try to unmarshal data into CheckOperationOneOf3
-	err = json.Unmarshal(data, &dst.CheckOperationOneOf3)
+	// try to unmarshal data into CheckOperationTable
+	err = json.Unmarshal(data, &dst.CheckOperationTable)
 	if err == nil {
-		jsonCheckOperationOneOf3, _ := json.Marshal(dst.CheckOperationOneOf3)
-		if string(jsonCheckOperationOneOf3) == "{}" { // empty struct
-			dst.CheckOperationOneOf3 = nil
+		jsonCheckOperationTable, _ := json.Marshal(dst.CheckOperationTable)
+		if string(jsonCheckOperationTable) == "{}" { // empty struct
+			dst.CheckOperationTable = nil
 		} else {
 			match++
 		}
 	} else {
-		dst.CheckOperationOneOf3 = nil
+		dst.CheckOperationTable = nil
 	}
 
-	// try to unmarshal data into CheckOperationOneOf4
-	err = json.Unmarshal(data, &dst.CheckOperationOneOf4)
+	// try to unmarshal data into CheckOperationView
+	err = json.Unmarshal(data, &dst.CheckOperationView)
 	if err == nil {
-		jsonCheckOperationOneOf4, _ := json.Marshal(dst.CheckOperationOneOf4)
-		if string(jsonCheckOperationOneOf4) == "{}" { // empty struct
-			dst.CheckOperationOneOf4 = nil
+		jsonCheckOperationView, _ := json.Marshal(dst.CheckOperationView)
+		if string(jsonCheckOperationView) == "{}" { // empty struct
+			dst.CheckOperationView = nil
 		} else {
 			match++
 		}
 	} else {
-		dst.CheckOperationOneOf4 = nil
+		dst.CheckOperationView = nil
 	}
 
-	// try to unmarshal data into CheckOperationOneOf5
-	err = json.Unmarshal(data, &dst.CheckOperationOneOf5)
+	// try to unmarshal data into CheckOperationWarehouse
+	err = json.Unmarshal(data, &dst.CheckOperationWarehouse)
 	if err == nil {
-		jsonCheckOperationOneOf5, _ := json.Marshal(dst.CheckOperationOneOf5)
-		if string(jsonCheckOperationOneOf5) == "{}" { // empty struct
-			dst.CheckOperationOneOf5 = nil
+		jsonCheckOperationWarehouse, _ := json.Marshal(dst.CheckOperationWarehouse)
+		if string(jsonCheckOperationWarehouse) == "{}" { // empty struct
+			dst.CheckOperationWarehouse = nil
 		} else {
 			match++
 		}
 	} else {
-		dst.CheckOperationOneOf5 = nil
+		dst.CheckOperationWarehouse = nil
 	}
 
 	if match > 1 { // more than 1 match
 		// reset to nil
-		dst.CheckOperationOneOf = nil
-		dst.CheckOperationOneOf1 = nil
-		dst.CheckOperationOneOf2 = nil
-		dst.CheckOperationOneOf3 = nil
-		dst.CheckOperationOneOf4 = nil
-		dst.CheckOperationOneOf5 = nil
+		dst.CheckOperationNamespace = nil
+		dst.CheckOperationProject = nil
+		dst.CheckOperationServer = nil
+		dst.CheckOperationTable = nil
+		dst.CheckOperationView = nil
+		dst.CheckOperationWarehouse = nil
 
 		return fmt.Errorf("data matches more than one schema in oneOf(CheckOperation)")
 	} else if match == 1 {
@@ -168,28 +168,28 @@ func (dst *CheckOperation) UnmarshalJSON(data []byte) error {
 
 // Marshal data from the first non-nil pointers in the struct to JSON
 func (src CheckOperation) MarshalJSON() ([]byte, error) {
-	if src.CheckOperationOneOf != nil {
-		return json.Marshal(&src.CheckOperationOneOf)
+	if src.CheckOperationNamespace != nil {
+		return json.Marshal(&src.CheckOperationNamespace)
 	}
 
-	if src.CheckOperationOneOf1 != nil {
-		return json.Marshal(&src.CheckOperationOneOf1)
+	if src.CheckOperationProject != nil {
+		return json.Marshal(&src.CheckOperationProject)
 	}
 
-	if src.CheckOperationOneOf2 != nil {
-		return json.Marshal(&src.CheckOperationOneOf2)
+	if src.CheckOperationServer != nil {
+		return json.Marshal(&src.CheckOperationServer)
 	}
 
-	if src.CheckOperationOneOf3 != nil {
-		return json.Marshal(&src.CheckOperationOneOf3)
+	if src.CheckOperationTable != nil {
+		return json.Marshal(&src.CheckOperationTable)
 	}
 
-	if src.CheckOperationOneOf4 != nil {
-		return json.Marshal(&src.CheckOperationOneOf4)
+	if src.CheckOperationView != nil {
+		return json.Marshal(&src.CheckOperationView)
 	}
 
-	if src.CheckOperationOneOf5 != nil {
-		return json.Marshal(&src.CheckOperationOneOf5)
+	if src.CheckOperationWarehouse != nil {
+		return json.Marshal(&src.CheckOperationWarehouse)
 	}
 
 	return nil, nil // no data in oneOf schemas
@@ -200,28 +200,28 @@ func (obj *CheckOperation) GetActualInstance() interface{} {
 	if obj == nil {
 		return nil
 	}
-	if obj.CheckOperationOneOf != nil {
-		return obj.CheckOperationOneOf
+	if obj.CheckOperationNamespace != nil {
+		return obj.CheckOperationNamespace
 	}
 
-	if obj.CheckOperationOneOf1 != nil {
-		return obj.CheckOperationOneOf1
+	if obj.CheckOperationProject != nil {
+		return obj.CheckOperationProject
 	}
 
-	if obj.CheckOperationOneOf2 != nil {
-		return obj.CheckOperationOneOf2
+	if obj.CheckOperationServer != nil {
+		return obj.CheckOperationServer
 	}
 
-	if obj.CheckOperationOneOf3 != nil {
-		return obj.CheckOperationOneOf3
+	if obj.CheckOperationTable != nil {
+		return obj.CheckOperationTable
 	}
 
-	if obj.CheckOperationOneOf4 != nil {
-		return obj.CheckOperationOneOf4
+	if obj.CheckOperationView != nil {
+		return obj.CheckOperationView
 	}
 
-	if obj.CheckOperationOneOf5 != nil {
-		return obj.CheckOperationOneOf5
+	if obj.CheckOperationWarehouse != nil {
+		return obj.CheckOperationWarehouse
 	}
 
 	// all schemas are nil

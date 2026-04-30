@@ -11,170 +11,101 @@ API version: 0.0.0
 package managementv1
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 )
 
-// checks if the WarehouseAssignmentCreate type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &WarehouseAssignmentCreate{}
-
-// WarehouseAssignmentCreate struct for WarehouseAssignmentCreate
+// WarehouseAssignmentCreate - struct for WarehouseAssignmentCreate
 type WarehouseAssignmentCreate struct {
-	// Id of the user
-	User string `json:"user"`
-	// Id of the role
-	Role string `json:"role"`
-	Type string `json:"type"`
+	WarehouseAssignmentCreateRole *WarehouseAssignmentCreateRole
+	WarehouseAssignmentCreateUser *WarehouseAssignmentCreateUser
 }
 
-type _WarehouseAssignmentCreate WarehouseAssignmentCreate
-
-// NewWarehouseAssignmentCreate instantiates a new WarehouseAssignmentCreate object
-// This constructor will assign default values to properties that have it defined,
-// and makes sure properties required by API are set, but the set of arguments
-// will change when the set of required properties is changed
-func NewWarehouseAssignmentCreate(user string, role string, type_ string) *WarehouseAssignmentCreate {
-	this := WarehouseAssignmentCreate{}
-	this.User = user
-	this.Role = role
-	this.Type = type_
-	return &this
-}
-
-// NewWarehouseAssignmentCreateWithDefaults instantiates a new WarehouseAssignmentCreate object
-// This constructor will only assign default values to properties that have it defined,
-// but it doesn't guarantee that properties required by API are set
-func NewWarehouseAssignmentCreateWithDefaults() *WarehouseAssignmentCreate {
-	this := WarehouseAssignmentCreate{}
-	return &this
-}
-
-// GetUser returns the User field value
-func (o *WarehouseAssignmentCreate) GetUser() string {
-	if o == nil {
-		var ret string
-		return ret
+// WarehouseAssignmentCreateRoleAsWarehouseAssignmentCreate is a convenience function that returns WarehouseAssignmentCreateRole wrapped in WarehouseAssignmentCreate
+func WarehouseAssignmentCreateRoleAsWarehouseAssignmentCreate(v *WarehouseAssignmentCreateRole) WarehouseAssignmentCreate {
+	return WarehouseAssignmentCreate{
+		WarehouseAssignmentCreateRole: v,
 	}
-
-	return o.User
 }
 
-// GetUserOk returns a tuple with the User field value
-// and a boolean to check if the value has been set.
-func (o *WarehouseAssignmentCreate) GetUserOk() (*string, bool) {
-	if o == nil {
-		return nil, false
+// WarehouseAssignmentCreateUserAsWarehouseAssignmentCreate is a convenience function that returns WarehouseAssignmentCreateUser wrapped in WarehouseAssignmentCreate
+func WarehouseAssignmentCreateUserAsWarehouseAssignmentCreate(v *WarehouseAssignmentCreateUser) WarehouseAssignmentCreate {
+	return WarehouseAssignmentCreate{
+		WarehouseAssignmentCreateUser: v,
 	}
-	return &o.User, true
 }
 
-// SetUser sets field value
-func (o *WarehouseAssignmentCreate) SetUser(v string) {
-	o.User = v
-}
-
-// GetRole returns the Role field value
-func (o *WarehouseAssignmentCreate) GetRole() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.Role
-}
-
-// GetRoleOk returns a tuple with the Role field value
-// and a boolean to check if the value has been set.
-func (o *WarehouseAssignmentCreate) GetRoleOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Role, true
-}
-
-// SetRole sets field value
-func (o *WarehouseAssignmentCreate) SetRole(v string) {
-	o.Role = v
-}
-
-// GetType returns the Type field value
-func (o *WarehouseAssignmentCreate) GetType() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.Type
-}
-
-// GetTypeOk returns a tuple with the Type field value
-// and a boolean to check if the value has been set.
-func (o *WarehouseAssignmentCreate) GetTypeOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Type, true
-}
-
-// SetType sets field value
-func (o *WarehouseAssignmentCreate) SetType(v string) {
-	o.Type = v
-}
-
-func (o WarehouseAssignmentCreate) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
-func (o WarehouseAssignmentCreate) ToMap() (map[string]interface{}, error) {
-	toSerialize := map[string]interface{}{}
-	toSerialize["user"] = o.User
-	toSerialize["role"] = o.Role
-	toSerialize["type"] = o.Type
-	return toSerialize, nil
-}
-
-func (o *WarehouseAssignmentCreate) UnmarshalJSON(data []byte) (err error) {
-	// This validates that all required properties are included in the JSON object
-	// by unmarshalling the object into a generic map with string keys and checking
-	// that every required field exists as a key in the generic map.
-	requiredProperties := []string{
-		"user",
-		"role",
-		"type",
-	}
-
-	allProperties := make(map[string]interface{})
-
-	err = json.Unmarshal(data, &allProperties)
-
-	if err != nil {
-		return err
-	}
-
-	for _, requiredProperty := range requiredProperties {
-		if _, exists := allProperties[requiredProperty]; !exists {
-			return fmt.Errorf("no value given for required property %v", requiredProperty)
+// Unmarshal JSON data into one of the pointers in the struct
+func (dst *WarehouseAssignmentCreate) UnmarshalJSON(data []byte) error {
+	var err error
+	match := 0
+	// try to unmarshal data into WarehouseAssignmentCreateRole
+	err = json.Unmarshal(data, &dst.WarehouseAssignmentCreateRole)
+	if err == nil {
+		jsonWarehouseAssignmentCreateRole, _ := json.Marshal(dst.WarehouseAssignmentCreateRole)
+		if string(jsonWarehouseAssignmentCreateRole) == "{}" { // empty struct
+			dst.WarehouseAssignmentCreateRole = nil
+		} else {
+			match++
 		}
+	} else {
+		dst.WarehouseAssignmentCreateRole = nil
 	}
 
-	varWarehouseAssignmentCreate := _WarehouseAssignmentCreate{}
-
-	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
-	err = decoder.Decode(&varWarehouseAssignmentCreate)
-
-	if err != nil {
-		return err
+	// try to unmarshal data into WarehouseAssignmentCreateUser
+	err = json.Unmarshal(data, &dst.WarehouseAssignmentCreateUser)
+	if err == nil {
+		jsonWarehouseAssignmentCreateUser, _ := json.Marshal(dst.WarehouseAssignmentCreateUser)
+		if string(jsonWarehouseAssignmentCreateUser) == "{}" { // empty struct
+			dst.WarehouseAssignmentCreateUser = nil
+		} else {
+			match++
+		}
+	} else {
+		dst.WarehouseAssignmentCreateUser = nil
 	}
 
-	*o = WarehouseAssignmentCreate(varWarehouseAssignmentCreate)
+	if match > 1 { // more than 1 match
+		// reset to nil
+		dst.WarehouseAssignmentCreateRole = nil
+		dst.WarehouseAssignmentCreateUser = nil
 
-	return err
+		return fmt.Errorf("data matches more than one schema in oneOf(WarehouseAssignmentCreate)")
+	} else if match == 1 {
+		return nil // exactly one match
+	} else { // no match
+		return fmt.Errorf("data failed to match schemas in oneOf(WarehouseAssignmentCreate)")
+	}
+}
+
+// Marshal data from the first non-nil pointers in the struct to JSON
+func (src WarehouseAssignmentCreate) MarshalJSON() ([]byte, error) {
+	if src.WarehouseAssignmentCreateRole != nil {
+		return json.Marshal(&src.WarehouseAssignmentCreateRole)
+	}
+
+	if src.WarehouseAssignmentCreateUser != nil {
+		return json.Marshal(&src.WarehouseAssignmentCreateUser)
+	}
+
+	return nil, nil // no data in oneOf schemas
+}
+
+// Get the actual instance
+func (obj *WarehouseAssignmentCreate) GetActualInstance() interface{} {
+	if obj == nil {
+		return nil
+	}
+	if obj.WarehouseAssignmentCreateRole != nil {
+		return obj.WarehouseAssignmentCreateRole
+	}
+
+	if obj.WarehouseAssignmentCreateUser != nil {
+		return obj.WarehouseAssignmentCreateUser
+	}
+
+	// all schemas are nil
+	return nil
 }
 
 type NullableWarehouseAssignmentCreate struct {

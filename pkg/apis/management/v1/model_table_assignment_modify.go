@@ -11,170 +11,101 @@ API version: 0.0.0
 package managementv1
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 )
 
-// checks if the TableAssignmentModify type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &TableAssignmentModify{}
-
-// TableAssignmentModify struct for TableAssignmentModify
+// TableAssignmentModify - struct for TableAssignmentModify
 type TableAssignmentModify struct {
-	// Id of the user
-	User string `json:"user"`
-	// Id of the role
-	Role string `json:"role"`
-	Type string `json:"type"`
+	TableAssignmentModifyRole *TableAssignmentModifyRole
+	TableAssignmentModifyUser *TableAssignmentModifyUser
 }
 
-type _TableAssignmentModify TableAssignmentModify
-
-// NewTableAssignmentModify instantiates a new TableAssignmentModify object
-// This constructor will assign default values to properties that have it defined,
-// and makes sure properties required by API are set, but the set of arguments
-// will change when the set of required properties is changed
-func NewTableAssignmentModify(user string, role string, type_ string) *TableAssignmentModify {
-	this := TableAssignmentModify{}
-	this.User = user
-	this.Role = role
-	this.Type = type_
-	return &this
-}
-
-// NewTableAssignmentModifyWithDefaults instantiates a new TableAssignmentModify object
-// This constructor will only assign default values to properties that have it defined,
-// but it doesn't guarantee that properties required by API are set
-func NewTableAssignmentModifyWithDefaults() *TableAssignmentModify {
-	this := TableAssignmentModify{}
-	return &this
-}
-
-// GetUser returns the User field value
-func (o *TableAssignmentModify) GetUser() string {
-	if o == nil {
-		var ret string
-		return ret
+// TableAssignmentModifyRoleAsTableAssignmentModify is a convenience function that returns TableAssignmentModifyRole wrapped in TableAssignmentModify
+func TableAssignmentModifyRoleAsTableAssignmentModify(v *TableAssignmentModifyRole) TableAssignmentModify {
+	return TableAssignmentModify{
+		TableAssignmentModifyRole: v,
 	}
-
-	return o.User
 }
 
-// GetUserOk returns a tuple with the User field value
-// and a boolean to check if the value has been set.
-func (o *TableAssignmentModify) GetUserOk() (*string, bool) {
-	if o == nil {
-		return nil, false
+// TableAssignmentModifyUserAsTableAssignmentModify is a convenience function that returns TableAssignmentModifyUser wrapped in TableAssignmentModify
+func TableAssignmentModifyUserAsTableAssignmentModify(v *TableAssignmentModifyUser) TableAssignmentModify {
+	return TableAssignmentModify{
+		TableAssignmentModifyUser: v,
 	}
-	return &o.User, true
 }
 
-// SetUser sets field value
-func (o *TableAssignmentModify) SetUser(v string) {
-	o.User = v
-}
-
-// GetRole returns the Role field value
-func (o *TableAssignmentModify) GetRole() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.Role
-}
-
-// GetRoleOk returns a tuple with the Role field value
-// and a boolean to check if the value has been set.
-func (o *TableAssignmentModify) GetRoleOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Role, true
-}
-
-// SetRole sets field value
-func (o *TableAssignmentModify) SetRole(v string) {
-	o.Role = v
-}
-
-// GetType returns the Type field value
-func (o *TableAssignmentModify) GetType() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.Type
-}
-
-// GetTypeOk returns a tuple with the Type field value
-// and a boolean to check if the value has been set.
-func (o *TableAssignmentModify) GetTypeOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Type, true
-}
-
-// SetType sets field value
-func (o *TableAssignmentModify) SetType(v string) {
-	o.Type = v
-}
-
-func (o TableAssignmentModify) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
-func (o TableAssignmentModify) ToMap() (map[string]interface{}, error) {
-	toSerialize := map[string]interface{}{}
-	toSerialize["user"] = o.User
-	toSerialize["role"] = o.Role
-	toSerialize["type"] = o.Type
-	return toSerialize, nil
-}
-
-func (o *TableAssignmentModify) UnmarshalJSON(data []byte) (err error) {
-	// This validates that all required properties are included in the JSON object
-	// by unmarshalling the object into a generic map with string keys and checking
-	// that every required field exists as a key in the generic map.
-	requiredProperties := []string{
-		"user",
-		"role",
-		"type",
-	}
-
-	allProperties := make(map[string]interface{})
-
-	err = json.Unmarshal(data, &allProperties)
-
-	if err != nil {
-		return err
-	}
-
-	for _, requiredProperty := range requiredProperties {
-		if _, exists := allProperties[requiredProperty]; !exists {
-			return fmt.Errorf("no value given for required property %v", requiredProperty)
+// Unmarshal JSON data into one of the pointers in the struct
+func (dst *TableAssignmentModify) UnmarshalJSON(data []byte) error {
+	var err error
+	match := 0
+	// try to unmarshal data into TableAssignmentModifyRole
+	err = json.Unmarshal(data, &dst.TableAssignmentModifyRole)
+	if err == nil {
+		jsonTableAssignmentModifyRole, _ := json.Marshal(dst.TableAssignmentModifyRole)
+		if string(jsonTableAssignmentModifyRole) == "{}" { // empty struct
+			dst.TableAssignmentModifyRole = nil
+		} else {
+			match++
 		}
+	} else {
+		dst.TableAssignmentModifyRole = nil
 	}
 
-	varTableAssignmentModify := _TableAssignmentModify{}
-
-	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
-	err = decoder.Decode(&varTableAssignmentModify)
-
-	if err != nil {
-		return err
+	// try to unmarshal data into TableAssignmentModifyUser
+	err = json.Unmarshal(data, &dst.TableAssignmentModifyUser)
+	if err == nil {
+		jsonTableAssignmentModifyUser, _ := json.Marshal(dst.TableAssignmentModifyUser)
+		if string(jsonTableAssignmentModifyUser) == "{}" { // empty struct
+			dst.TableAssignmentModifyUser = nil
+		} else {
+			match++
+		}
+	} else {
+		dst.TableAssignmentModifyUser = nil
 	}
 
-	*o = TableAssignmentModify(varTableAssignmentModify)
+	if match > 1 { // more than 1 match
+		// reset to nil
+		dst.TableAssignmentModifyRole = nil
+		dst.TableAssignmentModifyUser = nil
 
-	return err
+		return fmt.Errorf("data matches more than one schema in oneOf(TableAssignmentModify)")
+	} else if match == 1 {
+		return nil // exactly one match
+	} else { // no match
+		return fmt.Errorf("data failed to match schemas in oneOf(TableAssignmentModify)")
+	}
+}
+
+// Marshal data from the first non-nil pointers in the struct to JSON
+func (src TableAssignmentModify) MarshalJSON() ([]byte, error) {
+	if src.TableAssignmentModifyRole != nil {
+		return json.Marshal(&src.TableAssignmentModifyRole)
+	}
+
+	if src.TableAssignmentModifyUser != nil {
+		return json.Marshal(&src.TableAssignmentModifyUser)
+	}
+
+	return nil, nil // no data in oneOf schemas
+}
+
+// Get the actual instance
+func (obj *TableAssignmentModify) GetActualInstance() interface{} {
+	if obj == nil {
+		return nil
+	}
+	if obj.TableAssignmentModifyRole != nil {
+		return obj.TableAssignmentModifyRole
+	}
+
+	if obj.TableAssignmentModifyUser != nil {
+		return obj.TableAssignmentModifyUser
+	}
+
+	// all schemas are nil
+	return nil
 }
 
 type NullableTableAssignmentModify struct {

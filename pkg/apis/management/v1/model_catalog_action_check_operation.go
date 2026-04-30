@@ -17,53 +17,53 @@ import (
 
 // CatalogActionCheckOperation - Represents an action on an object
 type CatalogActionCheckOperation struct {
-	CatalogActionCheckOperationOneOf  *CatalogActionCheckOperationOneOf
-	CatalogActionCheckOperationOneOf1 *CatalogActionCheckOperationOneOf1
-	CatalogActionCheckOperationOneOf2 *CatalogActionCheckOperationOneOf2
-	CatalogActionCheckOperationOneOf3 *CatalogActionCheckOperationOneOf3
-	CatalogActionCheckOperationOneOf4 *CatalogActionCheckOperationOneOf4
-	CatalogActionCheckOperationOneOf5 *CatalogActionCheckOperationOneOf5
+	CatalogActionCheckOperationNamespace *CatalogActionCheckOperationNamespace
+	CatalogActionCheckOperationProject   *CatalogActionCheckOperationProject
+	CatalogActionCheckOperationServer    *CatalogActionCheckOperationServer
+	CatalogActionCheckOperationTable     *CatalogActionCheckOperationTable
+	CatalogActionCheckOperationView      *CatalogActionCheckOperationView
+	CatalogActionCheckOperationWarehouse *CatalogActionCheckOperationWarehouse
 }
 
-// CatalogActionCheckOperationOneOfAsCatalogActionCheckOperation is a convenience function that returns CatalogActionCheckOperationOneOf wrapped in CatalogActionCheckOperation
-func CatalogActionCheckOperationOneOfAsCatalogActionCheckOperation(v *CatalogActionCheckOperationOneOf) CatalogActionCheckOperation {
+// CatalogActionCheckOperationNamespaceAsCatalogActionCheckOperation is a convenience function that returns CatalogActionCheckOperationNamespace wrapped in CatalogActionCheckOperation
+func CatalogActionCheckOperationNamespaceAsCatalogActionCheckOperation(v *CatalogActionCheckOperationNamespace) CatalogActionCheckOperation {
 	return CatalogActionCheckOperation{
-		CatalogActionCheckOperationOneOf: v,
+		CatalogActionCheckOperationNamespace: v,
 	}
 }
 
-// CatalogActionCheckOperationOneOf1AsCatalogActionCheckOperation is a convenience function that returns CatalogActionCheckOperationOneOf1 wrapped in CatalogActionCheckOperation
-func CatalogActionCheckOperationOneOf1AsCatalogActionCheckOperation(v *CatalogActionCheckOperationOneOf1) CatalogActionCheckOperation {
+// CatalogActionCheckOperationProjectAsCatalogActionCheckOperation is a convenience function that returns CatalogActionCheckOperationProject wrapped in CatalogActionCheckOperation
+func CatalogActionCheckOperationProjectAsCatalogActionCheckOperation(v *CatalogActionCheckOperationProject) CatalogActionCheckOperation {
 	return CatalogActionCheckOperation{
-		CatalogActionCheckOperationOneOf1: v,
+		CatalogActionCheckOperationProject: v,
 	}
 }
 
-// CatalogActionCheckOperationOneOf2AsCatalogActionCheckOperation is a convenience function that returns CatalogActionCheckOperationOneOf2 wrapped in CatalogActionCheckOperation
-func CatalogActionCheckOperationOneOf2AsCatalogActionCheckOperation(v *CatalogActionCheckOperationOneOf2) CatalogActionCheckOperation {
+// CatalogActionCheckOperationServerAsCatalogActionCheckOperation is a convenience function that returns CatalogActionCheckOperationServer wrapped in CatalogActionCheckOperation
+func CatalogActionCheckOperationServerAsCatalogActionCheckOperation(v *CatalogActionCheckOperationServer) CatalogActionCheckOperation {
 	return CatalogActionCheckOperation{
-		CatalogActionCheckOperationOneOf2: v,
+		CatalogActionCheckOperationServer: v,
 	}
 }
 
-// CatalogActionCheckOperationOneOf3AsCatalogActionCheckOperation is a convenience function that returns CatalogActionCheckOperationOneOf3 wrapped in CatalogActionCheckOperation
-func CatalogActionCheckOperationOneOf3AsCatalogActionCheckOperation(v *CatalogActionCheckOperationOneOf3) CatalogActionCheckOperation {
+// CatalogActionCheckOperationTableAsCatalogActionCheckOperation is a convenience function that returns CatalogActionCheckOperationTable wrapped in CatalogActionCheckOperation
+func CatalogActionCheckOperationTableAsCatalogActionCheckOperation(v *CatalogActionCheckOperationTable) CatalogActionCheckOperation {
 	return CatalogActionCheckOperation{
-		CatalogActionCheckOperationOneOf3: v,
+		CatalogActionCheckOperationTable: v,
 	}
 }
 
-// CatalogActionCheckOperationOneOf4AsCatalogActionCheckOperation is a convenience function that returns CatalogActionCheckOperationOneOf4 wrapped in CatalogActionCheckOperation
-func CatalogActionCheckOperationOneOf4AsCatalogActionCheckOperation(v *CatalogActionCheckOperationOneOf4) CatalogActionCheckOperation {
+// CatalogActionCheckOperationViewAsCatalogActionCheckOperation is a convenience function that returns CatalogActionCheckOperationView wrapped in CatalogActionCheckOperation
+func CatalogActionCheckOperationViewAsCatalogActionCheckOperation(v *CatalogActionCheckOperationView) CatalogActionCheckOperation {
 	return CatalogActionCheckOperation{
-		CatalogActionCheckOperationOneOf4: v,
+		CatalogActionCheckOperationView: v,
 	}
 }
 
-// CatalogActionCheckOperationOneOf5AsCatalogActionCheckOperation is a convenience function that returns CatalogActionCheckOperationOneOf5 wrapped in CatalogActionCheckOperation
-func CatalogActionCheckOperationOneOf5AsCatalogActionCheckOperation(v *CatalogActionCheckOperationOneOf5) CatalogActionCheckOperation {
+// CatalogActionCheckOperationWarehouseAsCatalogActionCheckOperation is a convenience function that returns CatalogActionCheckOperationWarehouse wrapped in CatalogActionCheckOperation
+func CatalogActionCheckOperationWarehouseAsCatalogActionCheckOperation(v *CatalogActionCheckOperationWarehouse) CatalogActionCheckOperation {
 	return CatalogActionCheckOperation{
-		CatalogActionCheckOperationOneOf5: v,
+		CatalogActionCheckOperationWarehouse: v,
 	}
 }
 
@@ -71,92 +71,92 @@ func CatalogActionCheckOperationOneOf5AsCatalogActionCheckOperation(v *CatalogAc
 func (dst *CatalogActionCheckOperation) UnmarshalJSON(data []byte) error {
 	var err error
 	match := 0
-	// try to unmarshal data into CatalogActionCheckOperationOneOf
-	err = json.Unmarshal(data, &dst.CatalogActionCheckOperationOneOf)
+	// try to unmarshal data into CatalogActionCheckOperationNamespace
+	err = json.Unmarshal(data, &dst.CatalogActionCheckOperationNamespace)
 	if err == nil {
-		jsonCatalogActionCheckOperationOneOf, _ := json.Marshal(dst.CatalogActionCheckOperationOneOf)
-		if string(jsonCatalogActionCheckOperationOneOf) == "{}" { // empty struct
-			dst.CatalogActionCheckOperationOneOf = nil
+		jsonCatalogActionCheckOperationNamespace, _ := json.Marshal(dst.CatalogActionCheckOperationNamespace)
+		if string(jsonCatalogActionCheckOperationNamespace) == "{}" { // empty struct
+			dst.CatalogActionCheckOperationNamespace = nil
 		} else {
 			match++
 		}
 	} else {
-		dst.CatalogActionCheckOperationOneOf = nil
+		dst.CatalogActionCheckOperationNamespace = nil
 	}
 
-	// try to unmarshal data into CatalogActionCheckOperationOneOf1
-	err = json.Unmarshal(data, &dst.CatalogActionCheckOperationOneOf1)
+	// try to unmarshal data into CatalogActionCheckOperationProject
+	err = json.Unmarshal(data, &dst.CatalogActionCheckOperationProject)
 	if err == nil {
-		jsonCatalogActionCheckOperationOneOf1, _ := json.Marshal(dst.CatalogActionCheckOperationOneOf1)
-		if string(jsonCatalogActionCheckOperationOneOf1) == "{}" { // empty struct
-			dst.CatalogActionCheckOperationOneOf1 = nil
+		jsonCatalogActionCheckOperationProject, _ := json.Marshal(dst.CatalogActionCheckOperationProject)
+		if string(jsonCatalogActionCheckOperationProject) == "{}" { // empty struct
+			dst.CatalogActionCheckOperationProject = nil
 		} else {
 			match++
 		}
 	} else {
-		dst.CatalogActionCheckOperationOneOf1 = nil
+		dst.CatalogActionCheckOperationProject = nil
 	}
 
-	// try to unmarshal data into CatalogActionCheckOperationOneOf2
-	err = json.Unmarshal(data, &dst.CatalogActionCheckOperationOneOf2)
+	// try to unmarshal data into CatalogActionCheckOperationServer
+	err = json.Unmarshal(data, &dst.CatalogActionCheckOperationServer)
 	if err == nil {
-		jsonCatalogActionCheckOperationOneOf2, _ := json.Marshal(dst.CatalogActionCheckOperationOneOf2)
-		if string(jsonCatalogActionCheckOperationOneOf2) == "{}" { // empty struct
-			dst.CatalogActionCheckOperationOneOf2 = nil
+		jsonCatalogActionCheckOperationServer, _ := json.Marshal(dst.CatalogActionCheckOperationServer)
+		if string(jsonCatalogActionCheckOperationServer) == "{}" { // empty struct
+			dst.CatalogActionCheckOperationServer = nil
 		} else {
 			match++
 		}
 	} else {
-		dst.CatalogActionCheckOperationOneOf2 = nil
+		dst.CatalogActionCheckOperationServer = nil
 	}
 
-	// try to unmarshal data into CatalogActionCheckOperationOneOf3
-	err = json.Unmarshal(data, &dst.CatalogActionCheckOperationOneOf3)
+	// try to unmarshal data into CatalogActionCheckOperationTable
+	err = json.Unmarshal(data, &dst.CatalogActionCheckOperationTable)
 	if err == nil {
-		jsonCatalogActionCheckOperationOneOf3, _ := json.Marshal(dst.CatalogActionCheckOperationOneOf3)
-		if string(jsonCatalogActionCheckOperationOneOf3) == "{}" { // empty struct
-			dst.CatalogActionCheckOperationOneOf3 = nil
+		jsonCatalogActionCheckOperationTable, _ := json.Marshal(dst.CatalogActionCheckOperationTable)
+		if string(jsonCatalogActionCheckOperationTable) == "{}" { // empty struct
+			dst.CatalogActionCheckOperationTable = nil
 		} else {
 			match++
 		}
 	} else {
-		dst.CatalogActionCheckOperationOneOf3 = nil
+		dst.CatalogActionCheckOperationTable = nil
 	}
 
-	// try to unmarshal data into CatalogActionCheckOperationOneOf4
-	err = json.Unmarshal(data, &dst.CatalogActionCheckOperationOneOf4)
+	// try to unmarshal data into CatalogActionCheckOperationView
+	err = json.Unmarshal(data, &dst.CatalogActionCheckOperationView)
 	if err == nil {
-		jsonCatalogActionCheckOperationOneOf4, _ := json.Marshal(dst.CatalogActionCheckOperationOneOf4)
-		if string(jsonCatalogActionCheckOperationOneOf4) == "{}" { // empty struct
-			dst.CatalogActionCheckOperationOneOf4 = nil
+		jsonCatalogActionCheckOperationView, _ := json.Marshal(dst.CatalogActionCheckOperationView)
+		if string(jsonCatalogActionCheckOperationView) == "{}" { // empty struct
+			dst.CatalogActionCheckOperationView = nil
 		} else {
 			match++
 		}
 	} else {
-		dst.CatalogActionCheckOperationOneOf4 = nil
+		dst.CatalogActionCheckOperationView = nil
 	}
 
-	// try to unmarshal data into CatalogActionCheckOperationOneOf5
-	err = json.Unmarshal(data, &dst.CatalogActionCheckOperationOneOf5)
+	// try to unmarshal data into CatalogActionCheckOperationWarehouse
+	err = json.Unmarshal(data, &dst.CatalogActionCheckOperationWarehouse)
 	if err == nil {
-		jsonCatalogActionCheckOperationOneOf5, _ := json.Marshal(dst.CatalogActionCheckOperationOneOf5)
-		if string(jsonCatalogActionCheckOperationOneOf5) == "{}" { // empty struct
-			dst.CatalogActionCheckOperationOneOf5 = nil
+		jsonCatalogActionCheckOperationWarehouse, _ := json.Marshal(dst.CatalogActionCheckOperationWarehouse)
+		if string(jsonCatalogActionCheckOperationWarehouse) == "{}" { // empty struct
+			dst.CatalogActionCheckOperationWarehouse = nil
 		} else {
 			match++
 		}
 	} else {
-		dst.CatalogActionCheckOperationOneOf5 = nil
+		dst.CatalogActionCheckOperationWarehouse = nil
 	}
 
 	if match > 1 { // more than 1 match
 		// reset to nil
-		dst.CatalogActionCheckOperationOneOf = nil
-		dst.CatalogActionCheckOperationOneOf1 = nil
-		dst.CatalogActionCheckOperationOneOf2 = nil
-		dst.CatalogActionCheckOperationOneOf3 = nil
-		dst.CatalogActionCheckOperationOneOf4 = nil
-		dst.CatalogActionCheckOperationOneOf5 = nil
+		dst.CatalogActionCheckOperationNamespace = nil
+		dst.CatalogActionCheckOperationProject = nil
+		dst.CatalogActionCheckOperationServer = nil
+		dst.CatalogActionCheckOperationTable = nil
+		dst.CatalogActionCheckOperationView = nil
+		dst.CatalogActionCheckOperationWarehouse = nil
 
 		return fmt.Errorf("data matches more than one schema in oneOf(CatalogActionCheckOperation)")
 	} else if match == 1 {
@@ -168,28 +168,28 @@ func (dst *CatalogActionCheckOperation) UnmarshalJSON(data []byte) error {
 
 // Marshal data from the first non-nil pointers in the struct to JSON
 func (src CatalogActionCheckOperation) MarshalJSON() ([]byte, error) {
-	if src.CatalogActionCheckOperationOneOf != nil {
-		return json.Marshal(&src.CatalogActionCheckOperationOneOf)
+	if src.CatalogActionCheckOperationNamespace != nil {
+		return json.Marshal(&src.CatalogActionCheckOperationNamespace)
 	}
 
-	if src.CatalogActionCheckOperationOneOf1 != nil {
-		return json.Marshal(&src.CatalogActionCheckOperationOneOf1)
+	if src.CatalogActionCheckOperationProject != nil {
+		return json.Marshal(&src.CatalogActionCheckOperationProject)
 	}
 
-	if src.CatalogActionCheckOperationOneOf2 != nil {
-		return json.Marshal(&src.CatalogActionCheckOperationOneOf2)
+	if src.CatalogActionCheckOperationServer != nil {
+		return json.Marshal(&src.CatalogActionCheckOperationServer)
 	}
 
-	if src.CatalogActionCheckOperationOneOf3 != nil {
-		return json.Marshal(&src.CatalogActionCheckOperationOneOf3)
+	if src.CatalogActionCheckOperationTable != nil {
+		return json.Marshal(&src.CatalogActionCheckOperationTable)
 	}
 
-	if src.CatalogActionCheckOperationOneOf4 != nil {
-		return json.Marshal(&src.CatalogActionCheckOperationOneOf4)
+	if src.CatalogActionCheckOperationView != nil {
+		return json.Marshal(&src.CatalogActionCheckOperationView)
 	}
 
-	if src.CatalogActionCheckOperationOneOf5 != nil {
-		return json.Marshal(&src.CatalogActionCheckOperationOneOf5)
+	if src.CatalogActionCheckOperationWarehouse != nil {
+		return json.Marshal(&src.CatalogActionCheckOperationWarehouse)
 	}
 
 	return nil, nil // no data in oneOf schemas
@@ -200,28 +200,28 @@ func (obj *CatalogActionCheckOperation) GetActualInstance() interface{} {
 	if obj == nil {
 		return nil
 	}
-	if obj.CatalogActionCheckOperationOneOf != nil {
-		return obj.CatalogActionCheckOperationOneOf
+	if obj.CatalogActionCheckOperationNamespace != nil {
+		return obj.CatalogActionCheckOperationNamespace
 	}
 
-	if obj.CatalogActionCheckOperationOneOf1 != nil {
-		return obj.CatalogActionCheckOperationOneOf1
+	if obj.CatalogActionCheckOperationProject != nil {
+		return obj.CatalogActionCheckOperationProject
 	}
 
-	if obj.CatalogActionCheckOperationOneOf2 != nil {
-		return obj.CatalogActionCheckOperationOneOf2
+	if obj.CatalogActionCheckOperationServer != nil {
+		return obj.CatalogActionCheckOperationServer
 	}
 
-	if obj.CatalogActionCheckOperationOneOf3 != nil {
-		return obj.CatalogActionCheckOperationOneOf3
+	if obj.CatalogActionCheckOperationTable != nil {
+		return obj.CatalogActionCheckOperationTable
 	}
 
-	if obj.CatalogActionCheckOperationOneOf4 != nil {
-		return obj.CatalogActionCheckOperationOneOf4
+	if obj.CatalogActionCheckOperationView != nil {
+		return obj.CatalogActionCheckOperationView
 	}
 
-	if obj.CatalogActionCheckOperationOneOf5 != nil {
-		return obj.CatalogActionCheckOperationOneOf5
+	if obj.CatalogActionCheckOperationWarehouse != nil {
+		return obj.CatalogActionCheckOperationWarehouse
 	}
 
 	// all schemas are nil

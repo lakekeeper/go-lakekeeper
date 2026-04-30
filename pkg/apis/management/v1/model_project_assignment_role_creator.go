@@ -11,170 +11,101 @@ API version: 0.0.0
 package managementv1
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 )
 
-// checks if the ProjectAssignmentRoleCreator type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &ProjectAssignmentRoleCreator{}
-
-// ProjectAssignmentRoleCreator struct for ProjectAssignmentRoleCreator
+// ProjectAssignmentRoleCreator - struct for ProjectAssignmentRoleCreator
 type ProjectAssignmentRoleCreator struct {
-	// Id of the user
-	User string `json:"user"`
-	// Id of the role
-	Role string `json:"role"`
-	Type string `json:"type"`
+	ProjectAssignmentRoleCreatorRole *ProjectAssignmentRoleCreatorRole
+	ProjectAssignmentRoleCreatorUser *ProjectAssignmentRoleCreatorUser
 }
 
-type _ProjectAssignmentRoleCreator ProjectAssignmentRoleCreator
-
-// NewProjectAssignmentRoleCreator instantiates a new ProjectAssignmentRoleCreator object
-// This constructor will assign default values to properties that have it defined,
-// and makes sure properties required by API are set, but the set of arguments
-// will change when the set of required properties is changed
-func NewProjectAssignmentRoleCreator(user string, role string, type_ string) *ProjectAssignmentRoleCreator {
-	this := ProjectAssignmentRoleCreator{}
-	this.User = user
-	this.Role = role
-	this.Type = type_
-	return &this
-}
-
-// NewProjectAssignmentRoleCreatorWithDefaults instantiates a new ProjectAssignmentRoleCreator object
-// This constructor will only assign default values to properties that have it defined,
-// but it doesn't guarantee that properties required by API are set
-func NewProjectAssignmentRoleCreatorWithDefaults() *ProjectAssignmentRoleCreator {
-	this := ProjectAssignmentRoleCreator{}
-	return &this
-}
-
-// GetUser returns the User field value
-func (o *ProjectAssignmentRoleCreator) GetUser() string {
-	if o == nil {
-		var ret string
-		return ret
+// ProjectAssignmentRoleCreatorRoleAsProjectAssignmentRoleCreator is a convenience function that returns ProjectAssignmentRoleCreatorRole wrapped in ProjectAssignmentRoleCreator
+func ProjectAssignmentRoleCreatorRoleAsProjectAssignmentRoleCreator(v *ProjectAssignmentRoleCreatorRole) ProjectAssignmentRoleCreator {
+	return ProjectAssignmentRoleCreator{
+		ProjectAssignmentRoleCreatorRole: v,
 	}
-
-	return o.User
 }
 
-// GetUserOk returns a tuple with the User field value
-// and a boolean to check if the value has been set.
-func (o *ProjectAssignmentRoleCreator) GetUserOk() (*string, bool) {
-	if o == nil {
-		return nil, false
+// ProjectAssignmentRoleCreatorUserAsProjectAssignmentRoleCreator is a convenience function that returns ProjectAssignmentRoleCreatorUser wrapped in ProjectAssignmentRoleCreator
+func ProjectAssignmentRoleCreatorUserAsProjectAssignmentRoleCreator(v *ProjectAssignmentRoleCreatorUser) ProjectAssignmentRoleCreator {
+	return ProjectAssignmentRoleCreator{
+		ProjectAssignmentRoleCreatorUser: v,
 	}
-	return &o.User, true
 }
 
-// SetUser sets field value
-func (o *ProjectAssignmentRoleCreator) SetUser(v string) {
-	o.User = v
-}
-
-// GetRole returns the Role field value
-func (o *ProjectAssignmentRoleCreator) GetRole() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.Role
-}
-
-// GetRoleOk returns a tuple with the Role field value
-// and a boolean to check if the value has been set.
-func (o *ProjectAssignmentRoleCreator) GetRoleOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Role, true
-}
-
-// SetRole sets field value
-func (o *ProjectAssignmentRoleCreator) SetRole(v string) {
-	o.Role = v
-}
-
-// GetType returns the Type field value
-func (o *ProjectAssignmentRoleCreator) GetType() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.Type
-}
-
-// GetTypeOk returns a tuple with the Type field value
-// and a boolean to check if the value has been set.
-func (o *ProjectAssignmentRoleCreator) GetTypeOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Type, true
-}
-
-// SetType sets field value
-func (o *ProjectAssignmentRoleCreator) SetType(v string) {
-	o.Type = v
-}
-
-func (o ProjectAssignmentRoleCreator) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
-func (o ProjectAssignmentRoleCreator) ToMap() (map[string]interface{}, error) {
-	toSerialize := map[string]interface{}{}
-	toSerialize["user"] = o.User
-	toSerialize["role"] = o.Role
-	toSerialize["type"] = o.Type
-	return toSerialize, nil
-}
-
-func (o *ProjectAssignmentRoleCreator) UnmarshalJSON(data []byte) (err error) {
-	// This validates that all required properties are included in the JSON object
-	// by unmarshalling the object into a generic map with string keys and checking
-	// that every required field exists as a key in the generic map.
-	requiredProperties := []string{
-		"user",
-		"role",
-		"type",
-	}
-
-	allProperties := make(map[string]interface{})
-
-	err = json.Unmarshal(data, &allProperties)
-
-	if err != nil {
-		return err
-	}
-
-	for _, requiredProperty := range requiredProperties {
-		if _, exists := allProperties[requiredProperty]; !exists {
-			return fmt.Errorf("no value given for required property %v", requiredProperty)
+// Unmarshal JSON data into one of the pointers in the struct
+func (dst *ProjectAssignmentRoleCreator) UnmarshalJSON(data []byte) error {
+	var err error
+	match := 0
+	// try to unmarshal data into ProjectAssignmentRoleCreatorRole
+	err = json.Unmarshal(data, &dst.ProjectAssignmentRoleCreatorRole)
+	if err == nil {
+		jsonProjectAssignmentRoleCreatorRole, _ := json.Marshal(dst.ProjectAssignmentRoleCreatorRole)
+		if string(jsonProjectAssignmentRoleCreatorRole) == "{}" { // empty struct
+			dst.ProjectAssignmentRoleCreatorRole = nil
+		} else {
+			match++
 		}
+	} else {
+		dst.ProjectAssignmentRoleCreatorRole = nil
 	}
 
-	varProjectAssignmentRoleCreator := _ProjectAssignmentRoleCreator{}
-
-	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
-	err = decoder.Decode(&varProjectAssignmentRoleCreator)
-
-	if err != nil {
-		return err
+	// try to unmarshal data into ProjectAssignmentRoleCreatorUser
+	err = json.Unmarshal(data, &dst.ProjectAssignmentRoleCreatorUser)
+	if err == nil {
+		jsonProjectAssignmentRoleCreatorUser, _ := json.Marshal(dst.ProjectAssignmentRoleCreatorUser)
+		if string(jsonProjectAssignmentRoleCreatorUser) == "{}" { // empty struct
+			dst.ProjectAssignmentRoleCreatorUser = nil
+		} else {
+			match++
+		}
+	} else {
+		dst.ProjectAssignmentRoleCreatorUser = nil
 	}
 
-	*o = ProjectAssignmentRoleCreator(varProjectAssignmentRoleCreator)
+	if match > 1 { // more than 1 match
+		// reset to nil
+		dst.ProjectAssignmentRoleCreatorRole = nil
+		dst.ProjectAssignmentRoleCreatorUser = nil
 
-	return err
+		return fmt.Errorf("data matches more than one schema in oneOf(ProjectAssignmentRoleCreator)")
+	} else if match == 1 {
+		return nil // exactly one match
+	} else { // no match
+		return fmt.Errorf("data failed to match schemas in oneOf(ProjectAssignmentRoleCreator)")
+	}
+}
+
+// Marshal data from the first non-nil pointers in the struct to JSON
+func (src ProjectAssignmentRoleCreator) MarshalJSON() ([]byte, error) {
+	if src.ProjectAssignmentRoleCreatorRole != nil {
+		return json.Marshal(&src.ProjectAssignmentRoleCreatorRole)
+	}
+
+	if src.ProjectAssignmentRoleCreatorUser != nil {
+		return json.Marshal(&src.ProjectAssignmentRoleCreatorUser)
+	}
+
+	return nil, nil // no data in oneOf schemas
+}
+
+// Get the actual instance
+func (obj *ProjectAssignmentRoleCreator) GetActualInstance() interface{} {
+	if obj == nil {
+		return nil
+	}
+	if obj.ProjectAssignmentRoleCreatorRole != nil {
+		return obj.ProjectAssignmentRoleCreatorRole
+	}
+
+	if obj.ProjectAssignmentRoleCreatorUser != nil {
+		return obj.ProjectAssignmentRoleCreatorUser
+	}
+
+	// all schemas are nil
+	return nil
 }
 
 type NullableProjectAssignmentRoleCreator struct {

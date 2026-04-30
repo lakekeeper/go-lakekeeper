@@ -70,100 +70,158 @@ func TableAssignmentSelectAsTableAssignment(v *TableAssignmentSelect) TableAssig
 // Unmarshal JSON data into one of the pointers in the struct
 func (dst *TableAssignment) UnmarshalJSON(data []byte) error {
 	var err error
-	match := 0
-	// try to unmarshal data into TableAssignmentDescribe
-	err = json.Unmarshal(data, &dst.TableAssignmentDescribe)
-	if err == nil {
-		jsonTableAssignmentDescribe, _ := json.Marshal(dst.TableAssignmentDescribe)
-		if string(jsonTableAssignmentDescribe) == "{}" { // empty struct
+	// use discriminator value to speed up the lookup
+	var jsonDict map[string]interface{}
+	err = newStrictDecoder(data).Decode(&jsonDict)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal JSON into map for the discriminator lookup")
+	}
+
+	// check if the discriminator value is 'describe'
+	if jsonDict["type"] == "describe" {
+		// try to unmarshal JSON data into TableAssignmentDescribe
+		err = json.Unmarshal(data, &dst.TableAssignmentDescribe)
+		if err == nil {
+			return nil // data stored in dst.TableAssignmentDescribe, return on the first match
+		} else {
 			dst.TableAssignmentDescribe = nil
-		} else {
-			match++
+			return fmt.Errorf("failed to unmarshal TableAssignment as TableAssignmentDescribe: %s", err.Error())
 		}
-	} else {
-		dst.TableAssignmentDescribe = nil
 	}
 
-	// try to unmarshal data into TableAssignmentManageGrants
-	err = json.Unmarshal(data, &dst.TableAssignmentManageGrants)
-	if err == nil {
-		jsonTableAssignmentManageGrants, _ := json.Marshal(dst.TableAssignmentManageGrants)
-		if string(jsonTableAssignmentManageGrants) == "{}" { // empty struct
+	// check if the discriminator value is 'manage_grants'
+	if jsonDict["type"] == "manage_grants" {
+		// try to unmarshal JSON data into TableAssignmentManageGrants
+		err = json.Unmarshal(data, &dst.TableAssignmentManageGrants)
+		if err == nil {
+			return nil // data stored in dst.TableAssignmentManageGrants, return on the first match
+		} else {
 			dst.TableAssignmentManageGrants = nil
-		} else {
-			match++
+			return fmt.Errorf("failed to unmarshal TableAssignment as TableAssignmentManageGrants: %s", err.Error())
 		}
-	} else {
-		dst.TableAssignmentManageGrants = nil
 	}
 
-	// try to unmarshal data into TableAssignmentModify
-	err = json.Unmarshal(data, &dst.TableAssignmentModify)
-	if err == nil {
-		jsonTableAssignmentModify, _ := json.Marshal(dst.TableAssignmentModify)
-		if string(jsonTableAssignmentModify) == "{}" { // empty struct
+	// check if the discriminator value is 'modify'
+	if jsonDict["type"] == "modify" {
+		// try to unmarshal JSON data into TableAssignmentModify
+		err = json.Unmarshal(data, &dst.TableAssignmentModify)
+		if err == nil {
+			return nil // data stored in dst.TableAssignmentModify, return on the first match
+		} else {
 			dst.TableAssignmentModify = nil
-		} else {
-			match++
+			return fmt.Errorf("failed to unmarshal TableAssignment as TableAssignmentModify: %s", err.Error())
 		}
-	} else {
-		dst.TableAssignmentModify = nil
 	}
 
-	// try to unmarshal data into TableAssignmentOwnership
-	err = json.Unmarshal(data, &dst.TableAssignmentOwnership)
-	if err == nil {
-		jsonTableAssignmentOwnership, _ := json.Marshal(dst.TableAssignmentOwnership)
-		if string(jsonTableAssignmentOwnership) == "{}" { // empty struct
+	// check if the discriminator value is 'ownership'
+	if jsonDict["type"] == "ownership" {
+		// try to unmarshal JSON data into TableAssignmentOwnership
+		err = json.Unmarshal(data, &dst.TableAssignmentOwnership)
+		if err == nil {
+			return nil // data stored in dst.TableAssignmentOwnership, return on the first match
+		} else {
 			dst.TableAssignmentOwnership = nil
-		} else {
-			match++
+			return fmt.Errorf("failed to unmarshal TableAssignment as TableAssignmentOwnership: %s", err.Error())
 		}
-	} else {
-		dst.TableAssignmentOwnership = nil
 	}
 
-	// try to unmarshal data into TableAssignmentPassGrants
-	err = json.Unmarshal(data, &dst.TableAssignmentPassGrants)
-	if err == nil {
-		jsonTableAssignmentPassGrants, _ := json.Marshal(dst.TableAssignmentPassGrants)
-		if string(jsonTableAssignmentPassGrants) == "{}" { // empty struct
+	// check if the discriminator value is 'pass_grants'
+	if jsonDict["type"] == "pass_grants" {
+		// try to unmarshal JSON data into TableAssignmentPassGrants
+		err = json.Unmarshal(data, &dst.TableAssignmentPassGrants)
+		if err == nil {
+			return nil // data stored in dst.TableAssignmentPassGrants, return on the first match
+		} else {
 			dst.TableAssignmentPassGrants = nil
-		} else {
-			match++
+			return fmt.Errorf("failed to unmarshal TableAssignment as TableAssignmentPassGrants: %s", err.Error())
 		}
-	} else {
-		dst.TableAssignmentPassGrants = nil
 	}
 
-	// try to unmarshal data into TableAssignmentSelect
-	err = json.Unmarshal(data, &dst.TableAssignmentSelect)
-	if err == nil {
-		jsonTableAssignmentSelect, _ := json.Marshal(dst.TableAssignmentSelect)
-		if string(jsonTableAssignmentSelect) == "{}" { // empty struct
+	// check if the discriminator value is 'select'
+	if jsonDict["type"] == "select" {
+		// try to unmarshal JSON data into TableAssignmentSelect
+		err = json.Unmarshal(data, &dst.TableAssignmentSelect)
+		if err == nil {
+			return nil // data stored in dst.TableAssignmentSelect, return on the first match
+		} else {
 			dst.TableAssignmentSelect = nil
-		} else {
-			match++
+			return fmt.Errorf("failed to unmarshal TableAssignment as TableAssignmentSelect: %s", err.Error())
 		}
-	} else {
-		dst.TableAssignmentSelect = nil
 	}
 
-	if match > 1 { // more than 1 match
-		// reset to nil
-		dst.TableAssignmentDescribe = nil
-		dst.TableAssignmentManageGrants = nil
-		dst.TableAssignmentModify = nil
-		dst.TableAssignmentOwnership = nil
-		dst.TableAssignmentPassGrants = nil
-		dst.TableAssignmentSelect = nil
-
-		return fmt.Errorf("data matches more than one schema in oneOf(TableAssignment)")
-	} else if match == 1 {
-		return nil // exactly one match
-	} else { // no match
-		return fmt.Errorf("data failed to match schemas in oneOf(TableAssignment)")
+	// check if the discriminator value is 'TableAssignmentDescribe'
+	if jsonDict["type"] == "TableAssignmentDescribe" {
+		// try to unmarshal JSON data into TableAssignmentDescribe
+		err = json.Unmarshal(data, &dst.TableAssignmentDescribe)
+		if err == nil {
+			return nil // data stored in dst.TableAssignmentDescribe, return on the first match
+		} else {
+			dst.TableAssignmentDescribe = nil
+			return fmt.Errorf("failed to unmarshal TableAssignment as TableAssignmentDescribe: %s", err.Error())
+		}
 	}
+
+	// check if the discriminator value is 'TableAssignmentManageGrants'
+	if jsonDict["type"] == "TableAssignmentManageGrants" {
+		// try to unmarshal JSON data into TableAssignmentManageGrants
+		err = json.Unmarshal(data, &dst.TableAssignmentManageGrants)
+		if err == nil {
+			return nil // data stored in dst.TableAssignmentManageGrants, return on the first match
+		} else {
+			dst.TableAssignmentManageGrants = nil
+			return fmt.Errorf("failed to unmarshal TableAssignment as TableAssignmentManageGrants: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'TableAssignmentModify'
+	if jsonDict["type"] == "TableAssignmentModify" {
+		// try to unmarshal JSON data into TableAssignmentModify
+		err = json.Unmarshal(data, &dst.TableAssignmentModify)
+		if err == nil {
+			return nil // data stored in dst.TableAssignmentModify, return on the first match
+		} else {
+			dst.TableAssignmentModify = nil
+			return fmt.Errorf("failed to unmarshal TableAssignment as TableAssignmentModify: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'TableAssignmentOwnership'
+	if jsonDict["type"] == "TableAssignmentOwnership" {
+		// try to unmarshal JSON data into TableAssignmentOwnership
+		err = json.Unmarshal(data, &dst.TableAssignmentOwnership)
+		if err == nil {
+			return nil // data stored in dst.TableAssignmentOwnership, return on the first match
+		} else {
+			dst.TableAssignmentOwnership = nil
+			return fmt.Errorf("failed to unmarshal TableAssignment as TableAssignmentOwnership: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'TableAssignmentPassGrants'
+	if jsonDict["type"] == "TableAssignmentPassGrants" {
+		// try to unmarshal JSON data into TableAssignmentPassGrants
+		err = json.Unmarshal(data, &dst.TableAssignmentPassGrants)
+		if err == nil {
+			return nil // data stored in dst.TableAssignmentPassGrants, return on the first match
+		} else {
+			dst.TableAssignmentPassGrants = nil
+			return fmt.Errorf("failed to unmarshal TableAssignment as TableAssignmentPassGrants: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'TableAssignmentSelect'
+	if jsonDict["type"] == "TableAssignmentSelect" {
+		// try to unmarshal JSON data into TableAssignmentSelect
+		err = json.Unmarshal(data, &dst.TableAssignmentSelect)
+		if err == nil {
+			return nil // data stored in dst.TableAssignmentSelect, return on the first match
+		} else {
+			dst.TableAssignmentSelect = nil
+			return fmt.Errorf("failed to unmarshal TableAssignment as TableAssignmentSelect: %s", err.Error())
+		}
+	}
+
+	return nil
 }
 
 // Marshal data from the first non-nil pointers in the struct to JSON

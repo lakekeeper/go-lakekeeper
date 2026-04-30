@@ -8,6 +8,12 @@
 //
 // The preprocessor walks `components.schemas` and:
 //
+//  0. Extracts presence-discriminated inner oneOfs (e.g. `UserOrRole`,
+//     whose members are `{required: [user]}` xor `{required: [role]}` with
+//     no enum) into named leaf schemas. Detection is purely structural so
+//     the rule is generic — any schema where every member is an object
+//     with exactly one required field name and no single-value enum is
+//     a candidate.
 //  1. For every `oneOf` member shaped as `allOf([{$ref: X}, extras])` where
 //     `X` is itself a `oneOf`, replaces that single member with the
 //     cartesian product of `X`'s inner members combined with `extras`.
@@ -19,6 +25,12 @@
 //     this lets the generator emit unambiguous unmarshal logic — important
 //     when two leaf shapes are otherwise identical (e.g. Az managed-identity
 //     and GCS system-identity, both `{type, credential-type}`).
+//  4. Hierarchical-expansion fallback: when no single property has unique
+//     enum values (e.g. `*Assignment` schemas, where the outer enum repeats
+//     across user-variant and role-variant members) the preprocessor groups
+//     members by the shared enum and emits a middle-schema layer per group.
+//     The inner level relies on disjoint required-field sets — exactly what
+//     Phase 0 guarantees by extracting the presence-discriminated inner.
 //
 // This transformation does not change any wire-format payload. It only
 // changes how the spec is expressed to the generator.
@@ -62,6 +74,13 @@ func run(inPath, outPath string) error {
 	schemas := lookup(lookup(root, "components"), "schemas")
 	if schemas == nil || schemas.Kind != yaml.MappingNode {
 		return errors.New("components.schemas not found")
+	}
+
+	// Phase 0: extract presence-discriminated inner variants (e.g. UserOrRole)
+	// into named leaf schemas so cartesian expansion produces clean $ref
+	// members instead of duplicated inline shapes.
+	if err := extractPresenceVariants(schemas); err != nil {
+		return fmt.Errorf("extract presence variants: %w", err)
 	}
 
 	// For each named schema with a oneOf, attempt the full transformation
@@ -231,7 +250,7 @@ func extractAndDiscriminate(parentName string, parent, schemas *yaml.Node) error
 
 	discProp := pickDiscriminator(infos)
 	if discProp == "" {
-		return errors.New("no viable discriminator property")
+		return extractHierarchical(parentName, parent, schemas, infos)
 	}
 
 	// Build new named schemas and ref-replacements.
@@ -437,4 +456,232 @@ func refNameFromPointer(ptr string) (string, bool) {
 		return "", false
 	}
 	return strings.TrimPrefix(ptr, refPrefix), true
+}
+
+// refNode constructs a `{$ref: '#/components/schemas/<name>'}` mapping.
+func refNode(name string) *yaml.Node {
+	return &yaml.Node{
+		Kind: yaml.MappingNode,
+		Content: []*yaml.Node{
+			{Kind: yaml.ScalarNode, Value: "$ref"},
+			{Kind: yaml.ScalarNode, Value: refPrefix + name},
+		},
+	}
+}
+
+// extractPresenceVariants walks `components.schemas` and, for every named
+// `oneOf` whose members are presence-discriminated objects (each member is
+// `{required: [<single-prop>]}` with no single-value enum on any property),
+// extracts each member into a named leaf and replaces the inline definition
+// with a `$ref`. The leaf name is `<parent><PascalCase(requiredProp)>`.
+//
+// The detection rule is purely structural — no schema names are hardcoded.
+// Any future inner-oneOf with the same shape is picked up automatically.
+func extractPresenceVariants(schemas *yaml.Node) error {
+	// schemaNames returns a snapshot; newly-appended leaf schemas are
+	// intentionally not revisited in this loop.
+	for _, name := range schemaNames(schemas) {
+		schema := lookupSchema(schemas, name)
+		if schema == nil {
+			continue
+		}
+		oneOf := lookup(schema, "oneOf")
+		if oneOf == nil || oneOf.Kind != yaml.SequenceNode {
+			continue
+		}
+		if !isPresenceDiscriminated(oneOf.Content) {
+			continue
+		}
+		newMembers := make([]*yaml.Node, 0, len(oneOf.Content))
+		for _, member := range oneOf.Content {
+			req := getSingleRequired(member)
+			leafName := name + toPascalCase(req)
+			if lookupSchema(schemas, leafName) != nil {
+				return fmt.Errorf("synthesized presence leaf %q already exists in components.schemas", leafName)
+			}
+			appendSchema(schemas, leafName, member)
+			newMembers = append(newMembers, refNode(leafName))
+		}
+		oneOf.Content = newMembers
+	}
+	return nil
+}
+
+// isPresenceDiscriminated reports whether every member of a oneOf is a plain
+// object with exactly one `required` field name and no single-value enum
+// constraint on any property — i.e. variants distinguished only by which
+// field is set.
+func isPresenceDiscriminated(members []*yaml.Node) bool {
+	if len(members) < 2 {
+		return false
+	}
+	seenReq := make(map[string]bool)
+	for _, m := range members {
+		if m == nil || m.Kind != yaml.MappingNode {
+			return false
+		}
+		if lookup(m, "oneOf") != nil || lookup(m, "allOf") != nil || lookup(m, "$ref") != nil {
+			return false
+		}
+		if len(collectSingleEnums(m)) > 0 {
+			return false
+		}
+		req := getSingleRequired(m)
+		if req == "" {
+			return false
+		}
+		if seenReq[req] {
+			return false
+		}
+		seenReq[req] = true
+	}
+	return true
+}
+
+// getSingleRequired returns the sole required-field name of an object schema,
+// or "" if the schema has zero or multiple required fields.
+func getSingleRequired(n *yaml.Node) string {
+	req := lookup(n, "required")
+	if req == nil || req.Kind != yaml.SequenceNode || len(req.Content) != 1 {
+		return ""
+	}
+	v := req.Content[0]
+	if v.Kind != yaml.ScalarNode {
+		return ""
+	}
+	return v.Value
+}
+
+// extractHierarchical handles the case where flat single-property
+// discrimination is impossible because the outer enum repeats across members
+// (e.g. *Assignment schemas after cartesian expansion: `type=ownership` for
+// both the user-variant and the role-variant). It groups members by the
+// shared enum value, builds one middle schema per group whose `oneOf`
+// trial-and-error matches the disjoint required-sets of the inner leaves,
+// and rewrites the parent as a discriminator-keyed oneOf over the middles.
+func extractHierarchical(parentName string, parent, schemas *yaml.Node, infos []memberInfo) error {
+	if len(infos) == 0 {
+		return errors.New("hierarchical: no members")
+	}
+	oneOf := lookup(parent, "oneOf")
+	if oneOf == nil || oneOf.Kind != yaml.SequenceNode {
+		return errors.New("hierarchical: parent has no oneOf")
+	}
+
+	// Find a grouping property: present (single-enum) on every member.
+	candidates := make(map[string]bool)
+	for k := range infos[0].props {
+		candidates[k] = true
+	}
+	for _, info := range infos[1:] {
+		for k := range candidates {
+			if _, ok := info.props[k]; !ok {
+				delete(candidates, k)
+			}
+		}
+	}
+	if len(candidates) == 0 {
+		return errors.New("no grouping property")
+	}
+
+	type score struct {
+		name     string
+		distinct int
+	}
+	var scored []score
+	for k := range candidates {
+		seen := make(map[string]bool)
+		for _, info := range infos {
+			seen[info.props[k]] = true
+		}
+		scored = append(scored, score{name: k, distinct: len(seen)})
+	}
+	sort.Slice(scored, func(i, j int) bool {
+		if scored[i].distinct != scored[j].distinct {
+			return scored[i].distinct > scored[j].distinct
+		}
+		return scored[i].name < scored[j].name
+	})
+	discProp := scored[0].name
+
+	groupOrder := make([]string, 0)
+	groups := make(map[string][]int)
+	for i, info := range infos {
+		v := info.props[discProp]
+		if _, exists := groups[v]; !exists {
+			groupOrder = append(groupOrder, v)
+		}
+		groups[v] = append(groups[v], i)
+	}
+
+	mapping := make(map[string]string, len(groupOrder))
+	newParentMembers := make([]*yaml.Node, 0, len(groupOrder))
+
+	for _, value := range groupOrder {
+		middleName := parentName + toPascalCase(value)
+		if lookupSchema(schemas, middleName) != nil {
+			return fmt.Errorf("synthesized middle name %q already exists in components.schemas", middleName)
+		}
+		middleMembers := make([]*yaml.Node, 0, len(groups[value]))
+		seenSuffix := make(map[string]bool)
+		for _, idx := range groups[value] {
+			member := oneOf.Content[idx]
+			suffix, err := leafSuffix(member, schemas)
+			if err != nil {
+				return err
+			}
+			if seenSuffix[suffix] {
+				return fmt.Errorf("hierarchical: duplicate leaf suffix %q in group %q of %s", suffix, value, parentName)
+			}
+			seenSuffix[suffix] = true
+			leafName := middleName + suffix
+			if lookupSchema(schemas, leafName) != nil {
+				return fmt.Errorf("synthesized leaf name %q already exists in components.schemas", leafName)
+			}
+			appendSchema(schemas, leafName, member)
+			middleMembers = append(middleMembers, refNode(leafName))
+		}
+		middleSchema := &yaml.Node{
+			Kind: yaml.MappingNode,
+			Content: []*yaml.Node{
+				{Kind: yaml.ScalarNode, Value: "oneOf"},
+				{Kind: yaml.SequenceNode, Content: middleMembers},
+			},
+		}
+		appendSchema(schemas, middleName, middleSchema)
+		newParentMembers = append(newParentMembers, refNode(middleName))
+		mapping[value] = refPrefix + middleName
+	}
+
+	oneOf.Content = newParentMembers
+	setDiscriminator(parent, discProp, mapping)
+	return nil
+}
+
+// leafSuffix derives a name suffix for a hierarchical-fallback leaf. The
+// member is expected to be `allOf [{$ref: <presenceLeaf>}, extras...]`; the
+// suffix is PascalCase of the presenceLeaf's single required-field name
+// (e.g. ref `UserOrRoleUser` with required `[user]` -> suffix `User`).
+func leafSuffix(member, schemas *yaml.Node) (string, error) {
+	allOf := lookup(member, "allOf")
+	if allOf == nil || allOf.Kind != yaml.SequenceNode || len(allOf.Content) == 0 {
+		return "", errors.New("hierarchical: member has no allOf")
+	}
+	ref := lookup(allOf.Content[0], "$ref")
+	if ref == nil {
+		return "", errors.New("hierarchical: first allOf element is not a $ref")
+	}
+	refName, ok := refNameFromPointer(ref.Value)
+	if !ok {
+		return "", fmt.Errorf("hierarchical: invalid $ref %q", ref.Value)
+	}
+	target := lookupSchema(schemas, refName)
+	if target == nil {
+		return "", fmt.Errorf("hierarchical: ref target %q not found", refName)
+	}
+	req := getSingleRequired(target)
+	if req == "" {
+		return "", fmt.Errorf("hierarchical: ref target %q is not presence-discriminated", refName)
+	}
+	return toPascalCase(req), nil
 }

@@ -11,170 +11,101 @@ API version: 0.0.0
 package managementv1
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 )
 
-// checks if the ProjectAssignmentDataAdmin type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &ProjectAssignmentDataAdmin{}
-
-// ProjectAssignmentDataAdmin struct for ProjectAssignmentDataAdmin
+// ProjectAssignmentDataAdmin - struct for ProjectAssignmentDataAdmin
 type ProjectAssignmentDataAdmin struct {
-	// Id of the user
-	User string `json:"user"`
-	// Id of the role
-	Role string `json:"role"`
-	Type string `json:"type"`
+	ProjectAssignmentDataAdminRole *ProjectAssignmentDataAdminRole
+	ProjectAssignmentDataAdminUser *ProjectAssignmentDataAdminUser
 }
 
-type _ProjectAssignmentDataAdmin ProjectAssignmentDataAdmin
-
-// NewProjectAssignmentDataAdmin instantiates a new ProjectAssignmentDataAdmin object
-// This constructor will assign default values to properties that have it defined,
-// and makes sure properties required by API are set, but the set of arguments
-// will change when the set of required properties is changed
-func NewProjectAssignmentDataAdmin(user string, role string, type_ string) *ProjectAssignmentDataAdmin {
-	this := ProjectAssignmentDataAdmin{}
-	this.User = user
-	this.Role = role
-	this.Type = type_
-	return &this
-}
-
-// NewProjectAssignmentDataAdminWithDefaults instantiates a new ProjectAssignmentDataAdmin object
-// This constructor will only assign default values to properties that have it defined,
-// but it doesn't guarantee that properties required by API are set
-func NewProjectAssignmentDataAdminWithDefaults() *ProjectAssignmentDataAdmin {
-	this := ProjectAssignmentDataAdmin{}
-	return &this
-}
-
-// GetUser returns the User field value
-func (o *ProjectAssignmentDataAdmin) GetUser() string {
-	if o == nil {
-		var ret string
-		return ret
+// ProjectAssignmentDataAdminRoleAsProjectAssignmentDataAdmin is a convenience function that returns ProjectAssignmentDataAdminRole wrapped in ProjectAssignmentDataAdmin
+func ProjectAssignmentDataAdminRoleAsProjectAssignmentDataAdmin(v *ProjectAssignmentDataAdminRole) ProjectAssignmentDataAdmin {
+	return ProjectAssignmentDataAdmin{
+		ProjectAssignmentDataAdminRole: v,
 	}
-
-	return o.User
 }
 
-// GetUserOk returns a tuple with the User field value
-// and a boolean to check if the value has been set.
-func (o *ProjectAssignmentDataAdmin) GetUserOk() (*string, bool) {
-	if o == nil {
-		return nil, false
+// ProjectAssignmentDataAdminUserAsProjectAssignmentDataAdmin is a convenience function that returns ProjectAssignmentDataAdminUser wrapped in ProjectAssignmentDataAdmin
+func ProjectAssignmentDataAdminUserAsProjectAssignmentDataAdmin(v *ProjectAssignmentDataAdminUser) ProjectAssignmentDataAdmin {
+	return ProjectAssignmentDataAdmin{
+		ProjectAssignmentDataAdminUser: v,
 	}
-	return &o.User, true
 }
 
-// SetUser sets field value
-func (o *ProjectAssignmentDataAdmin) SetUser(v string) {
-	o.User = v
-}
-
-// GetRole returns the Role field value
-func (o *ProjectAssignmentDataAdmin) GetRole() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.Role
-}
-
-// GetRoleOk returns a tuple with the Role field value
-// and a boolean to check if the value has been set.
-func (o *ProjectAssignmentDataAdmin) GetRoleOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Role, true
-}
-
-// SetRole sets field value
-func (o *ProjectAssignmentDataAdmin) SetRole(v string) {
-	o.Role = v
-}
-
-// GetType returns the Type field value
-func (o *ProjectAssignmentDataAdmin) GetType() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.Type
-}
-
-// GetTypeOk returns a tuple with the Type field value
-// and a boolean to check if the value has been set.
-func (o *ProjectAssignmentDataAdmin) GetTypeOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Type, true
-}
-
-// SetType sets field value
-func (o *ProjectAssignmentDataAdmin) SetType(v string) {
-	o.Type = v
-}
-
-func (o ProjectAssignmentDataAdmin) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
-func (o ProjectAssignmentDataAdmin) ToMap() (map[string]interface{}, error) {
-	toSerialize := map[string]interface{}{}
-	toSerialize["user"] = o.User
-	toSerialize["role"] = o.Role
-	toSerialize["type"] = o.Type
-	return toSerialize, nil
-}
-
-func (o *ProjectAssignmentDataAdmin) UnmarshalJSON(data []byte) (err error) {
-	// This validates that all required properties are included in the JSON object
-	// by unmarshalling the object into a generic map with string keys and checking
-	// that every required field exists as a key in the generic map.
-	requiredProperties := []string{
-		"user",
-		"role",
-		"type",
-	}
-
-	allProperties := make(map[string]interface{})
-
-	err = json.Unmarshal(data, &allProperties)
-
-	if err != nil {
-		return err
-	}
-
-	for _, requiredProperty := range requiredProperties {
-		if _, exists := allProperties[requiredProperty]; !exists {
-			return fmt.Errorf("no value given for required property %v", requiredProperty)
+// Unmarshal JSON data into one of the pointers in the struct
+func (dst *ProjectAssignmentDataAdmin) UnmarshalJSON(data []byte) error {
+	var err error
+	match := 0
+	// try to unmarshal data into ProjectAssignmentDataAdminRole
+	err = json.Unmarshal(data, &dst.ProjectAssignmentDataAdminRole)
+	if err == nil {
+		jsonProjectAssignmentDataAdminRole, _ := json.Marshal(dst.ProjectAssignmentDataAdminRole)
+		if string(jsonProjectAssignmentDataAdminRole) == "{}" { // empty struct
+			dst.ProjectAssignmentDataAdminRole = nil
+		} else {
+			match++
 		}
+	} else {
+		dst.ProjectAssignmentDataAdminRole = nil
 	}
 
-	varProjectAssignmentDataAdmin := _ProjectAssignmentDataAdmin{}
-
-	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
-	err = decoder.Decode(&varProjectAssignmentDataAdmin)
-
-	if err != nil {
-		return err
+	// try to unmarshal data into ProjectAssignmentDataAdminUser
+	err = json.Unmarshal(data, &dst.ProjectAssignmentDataAdminUser)
+	if err == nil {
+		jsonProjectAssignmentDataAdminUser, _ := json.Marshal(dst.ProjectAssignmentDataAdminUser)
+		if string(jsonProjectAssignmentDataAdminUser) == "{}" { // empty struct
+			dst.ProjectAssignmentDataAdminUser = nil
+		} else {
+			match++
+		}
+	} else {
+		dst.ProjectAssignmentDataAdminUser = nil
 	}
 
-	*o = ProjectAssignmentDataAdmin(varProjectAssignmentDataAdmin)
+	if match > 1 { // more than 1 match
+		// reset to nil
+		dst.ProjectAssignmentDataAdminRole = nil
+		dst.ProjectAssignmentDataAdminUser = nil
 
-	return err
+		return fmt.Errorf("data matches more than one schema in oneOf(ProjectAssignmentDataAdmin)")
+	} else if match == 1 {
+		return nil // exactly one match
+	} else { // no match
+		return fmt.Errorf("data failed to match schemas in oneOf(ProjectAssignmentDataAdmin)")
+	}
+}
+
+// Marshal data from the first non-nil pointers in the struct to JSON
+func (src ProjectAssignmentDataAdmin) MarshalJSON() ([]byte, error) {
+	if src.ProjectAssignmentDataAdminRole != nil {
+		return json.Marshal(&src.ProjectAssignmentDataAdminRole)
+	}
+
+	if src.ProjectAssignmentDataAdminUser != nil {
+		return json.Marshal(&src.ProjectAssignmentDataAdminUser)
+	}
+
+	return nil, nil // no data in oneOf schemas
+}
+
+// Get the actual instance
+func (obj *ProjectAssignmentDataAdmin) GetActualInstance() interface{} {
+	if obj == nil {
+		return nil
+	}
+	if obj.ProjectAssignmentDataAdminRole != nil {
+		return obj.ProjectAssignmentDataAdminRole
+	}
+
+	if obj.ProjectAssignmentDataAdminUser != nil {
+		return obj.ProjectAssignmentDataAdminUser
+	}
+
+	// all schemas are nil
+	return nil
 }
 
 type NullableProjectAssignmentDataAdmin struct {

@@ -70,100 +70,158 @@ func ViewAssignmentSelectAsViewAssignment(v *ViewAssignmentSelect) ViewAssignmen
 // Unmarshal JSON data into one of the pointers in the struct
 func (dst *ViewAssignment) UnmarshalJSON(data []byte) error {
 	var err error
-	match := 0
-	// try to unmarshal data into ViewAssignmentDescribe
-	err = json.Unmarshal(data, &dst.ViewAssignmentDescribe)
-	if err == nil {
-		jsonViewAssignmentDescribe, _ := json.Marshal(dst.ViewAssignmentDescribe)
-		if string(jsonViewAssignmentDescribe) == "{}" { // empty struct
+	// use discriminator value to speed up the lookup
+	var jsonDict map[string]interface{}
+	err = newStrictDecoder(data).Decode(&jsonDict)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal JSON into map for the discriminator lookup")
+	}
+
+	// check if the discriminator value is 'describe'
+	if jsonDict["type"] == "describe" {
+		// try to unmarshal JSON data into ViewAssignmentDescribe
+		err = json.Unmarshal(data, &dst.ViewAssignmentDescribe)
+		if err == nil {
+			return nil // data stored in dst.ViewAssignmentDescribe, return on the first match
+		} else {
 			dst.ViewAssignmentDescribe = nil
-		} else {
-			match++
+			return fmt.Errorf("failed to unmarshal ViewAssignment as ViewAssignmentDescribe: %s", err.Error())
 		}
-	} else {
-		dst.ViewAssignmentDescribe = nil
 	}
 
-	// try to unmarshal data into ViewAssignmentManageGrants
-	err = json.Unmarshal(data, &dst.ViewAssignmentManageGrants)
-	if err == nil {
-		jsonViewAssignmentManageGrants, _ := json.Marshal(dst.ViewAssignmentManageGrants)
-		if string(jsonViewAssignmentManageGrants) == "{}" { // empty struct
+	// check if the discriminator value is 'manage_grants'
+	if jsonDict["type"] == "manage_grants" {
+		// try to unmarshal JSON data into ViewAssignmentManageGrants
+		err = json.Unmarshal(data, &dst.ViewAssignmentManageGrants)
+		if err == nil {
+			return nil // data stored in dst.ViewAssignmentManageGrants, return on the first match
+		} else {
 			dst.ViewAssignmentManageGrants = nil
-		} else {
-			match++
+			return fmt.Errorf("failed to unmarshal ViewAssignment as ViewAssignmentManageGrants: %s", err.Error())
 		}
-	} else {
-		dst.ViewAssignmentManageGrants = nil
 	}
 
-	// try to unmarshal data into ViewAssignmentModify
-	err = json.Unmarshal(data, &dst.ViewAssignmentModify)
-	if err == nil {
-		jsonViewAssignmentModify, _ := json.Marshal(dst.ViewAssignmentModify)
-		if string(jsonViewAssignmentModify) == "{}" { // empty struct
+	// check if the discriminator value is 'modify'
+	if jsonDict["type"] == "modify" {
+		// try to unmarshal JSON data into ViewAssignmentModify
+		err = json.Unmarshal(data, &dst.ViewAssignmentModify)
+		if err == nil {
+			return nil // data stored in dst.ViewAssignmentModify, return on the first match
+		} else {
 			dst.ViewAssignmentModify = nil
-		} else {
-			match++
+			return fmt.Errorf("failed to unmarshal ViewAssignment as ViewAssignmentModify: %s", err.Error())
 		}
-	} else {
-		dst.ViewAssignmentModify = nil
 	}
 
-	// try to unmarshal data into ViewAssignmentOwnership
-	err = json.Unmarshal(data, &dst.ViewAssignmentOwnership)
-	if err == nil {
-		jsonViewAssignmentOwnership, _ := json.Marshal(dst.ViewAssignmentOwnership)
-		if string(jsonViewAssignmentOwnership) == "{}" { // empty struct
+	// check if the discriminator value is 'ownership'
+	if jsonDict["type"] == "ownership" {
+		// try to unmarshal JSON data into ViewAssignmentOwnership
+		err = json.Unmarshal(data, &dst.ViewAssignmentOwnership)
+		if err == nil {
+			return nil // data stored in dst.ViewAssignmentOwnership, return on the first match
+		} else {
 			dst.ViewAssignmentOwnership = nil
-		} else {
-			match++
+			return fmt.Errorf("failed to unmarshal ViewAssignment as ViewAssignmentOwnership: %s", err.Error())
 		}
-	} else {
-		dst.ViewAssignmentOwnership = nil
 	}
 
-	// try to unmarshal data into ViewAssignmentPassGrants
-	err = json.Unmarshal(data, &dst.ViewAssignmentPassGrants)
-	if err == nil {
-		jsonViewAssignmentPassGrants, _ := json.Marshal(dst.ViewAssignmentPassGrants)
-		if string(jsonViewAssignmentPassGrants) == "{}" { // empty struct
+	// check if the discriminator value is 'pass_grants'
+	if jsonDict["type"] == "pass_grants" {
+		// try to unmarshal JSON data into ViewAssignmentPassGrants
+		err = json.Unmarshal(data, &dst.ViewAssignmentPassGrants)
+		if err == nil {
+			return nil // data stored in dst.ViewAssignmentPassGrants, return on the first match
+		} else {
 			dst.ViewAssignmentPassGrants = nil
-		} else {
-			match++
+			return fmt.Errorf("failed to unmarshal ViewAssignment as ViewAssignmentPassGrants: %s", err.Error())
 		}
-	} else {
-		dst.ViewAssignmentPassGrants = nil
 	}
 
-	// try to unmarshal data into ViewAssignmentSelect
-	err = json.Unmarshal(data, &dst.ViewAssignmentSelect)
-	if err == nil {
-		jsonViewAssignmentSelect, _ := json.Marshal(dst.ViewAssignmentSelect)
-		if string(jsonViewAssignmentSelect) == "{}" { // empty struct
+	// check if the discriminator value is 'select'
+	if jsonDict["type"] == "select" {
+		// try to unmarshal JSON data into ViewAssignmentSelect
+		err = json.Unmarshal(data, &dst.ViewAssignmentSelect)
+		if err == nil {
+			return nil // data stored in dst.ViewAssignmentSelect, return on the first match
+		} else {
 			dst.ViewAssignmentSelect = nil
-		} else {
-			match++
+			return fmt.Errorf("failed to unmarshal ViewAssignment as ViewAssignmentSelect: %s", err.Error())
 		}
-	} else {
-		dst.ViewAssignmentSelect = nil
 	}
 
-	if match > 1 { // more than 1 match
-		// reset to nil
-		dst.ViewAssignmentDescribe = nil
-		dst.ViewAssignmentManageGrants = nil
-		dst.ViewAssignmentModify = nil
-		dst.ViewAssignmentOwnership = nil
-		dst.ViewAssignmentPassGrants = nil
-		dst.ViewAssignmentSelect = nil
-
-		return fmt.Errorf("data matches more than one schema in oneOf(ViewAssignment)")
-	} else if match == 1 {
-		return nil // exactly one match
-	} else { // no match
-		return fmt.Errorf("data failed to match schemas in oneOf(ViewAssignment)")
+	// check if the discriminator value is 'ViewAssignmentDescribe'
+	if jsonDict["type"] == "ViewAssignmentDescribe" {
+		// try to unmarshal JSON data into ViewAssignmentDescribe
+		err = json.Unmarshal(data, &dst.ViewAssignmentDescribe)
+		if err == nil {
+			return nil // data stored in dst.ViewAssignmentDescribe, return on the first match
+		} else {
+			dst.ViewAssignmentDescribe = nil
+			return fmt.Errorf("failed to unmarshal ViewAssignment as ViewAssignmentDescribe: %s", err.Error())
+		}
 	}
+
+	// check if the discriminator value is 'ViewAssignmentManageGrants'
+	if jsonDict["type"] == "ViewAssignmentManageGrants" {
+		// try to unmarshal JSON data into ViewAssignmentManageGrants
+		err = json.Unmarshal(data, &dst.ViewAssignmentManageGrants)
+		if err == nil {
+			return nil // data stored in dst.ViewAssignmentManageGrants, return on the first match
+		} else {
+			dst.ViewAssignmentManageGrants = nil
+			return fmt.Errorf("failed to unmarshal ViewAssignment as ViewAssignmentManageGrants: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'ViewAssignmentModify'
+	if jsonDict["type"] == "ViewAssignmentModify" {
+		// try to unmarshal JSON data into ViewAssignmentModify
+		err = json.Unmarshal(data, &dst.ViewAssignmentModify)
+		if err == nil {
+			return nil // data stored in dst.ViewAssignmentModify, return on the first match
+		} else {
+			dst.ViewAssignmentModify = nil
+			return fmt.Errorf("failed to unmarshal ViewAssignment as ViewAssignmentModify: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'ViewAssignmentOwnership'
+	if jsonDict["type"] == "ViewAssignmentOwnership" {
+		// try to unmarshal JSON data into ViewAssignmentOwnership
+		err = json.Unmarshal(data, &dst.ViewAssignmentOwnership)
+		if err == nil {
+			return nil // data stored in dst.ViewAssignmentOwnership, return on the first match
+		} else {
+			dst.ViewAssignmentOwnership = nil
+			return fmt.Errorf("failed to unmarshal ViewAssignment as ViewAssignmentOwnership: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'ViewAssignmentPassGrants'
+	if jsonDict["type"] == "ViewAssignmentPassGrants" {
+		// try to unmarshal JSON data into ViewAssignmentPassGrants
+		err = json.Unmarshal(data, &dst.ViewAssignmentPassGrants)
+		if err == nil {
+			return nil // data stored in dst.ViewAssignmentPassGrants, return on the first match
+		} else {
+			dst.ViewAssignmentPassGrants = nil
+			return fmt.Errorf("failed to unmarshal ViewAssignment as ViewAssignmentPassGrants: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'ViewAssignmentSelect'
+	if jsonDict["type"] == "ViewAssignmentSelect" {
+		// try to unmarshal JSON data into ViewAssignmentSelect
+		err = json.Unmarshal(data, &dst.ViewAssignmentSelect)
+		if err == nil {
+			return nil // data stored in dst.ViewAssignmentSelect, return on the first match
+		} else {
+			dst.ViewAssignmentSelect = nil
+			return fmt.Errorf("failed to unmarshal ViewAssignment as ViewAssignmentSelect: %s", err.Error())
+		}
+	}
+
+	return nil
 }
 
 // Marshal data from the first non-nil pointers in the struct to JSON

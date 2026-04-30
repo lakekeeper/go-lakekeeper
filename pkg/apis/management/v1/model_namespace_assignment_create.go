@@ -11,170 +11,101 @@ API version: 0.0.0
 package managementv1
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 )
 
-// checks if the NamespaceAssignmentCreate type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &NamespaceAssignmentCreate{}
-
-// NamespaceAssignmentCreate struct for NamespaceAssignmentCreate
+// NamespaceAssignmentCreate - struct for NamespaceAssignmentCreate
 type NamespaceAssignmentCreate struct {
-	// Id of the user
-	User string `json:"user"`
-	// Id of the role
-	Role string `json:"role"`
-	Type string `json:"type"`
+	NamespaceAssignmentCreateRole *NamespaceAssignmentCreateRole
+	NamespaceAssignmentCreateUser *NamespaceAssignmentCreateUser
 }
 
-type _NamespaceAssignmentCreate NamespaceAssignmentCreate
-
-// NewNamespaceAssignmentCreate instantiates a new NamespaceAssignmentCreate object
-// This constructor will assign default values to properties that have it defined,
-// and makes sure properties required by API are set, but the set of arguments
-// will change when the set of required properties is changed
-func NewNamespaceAssignmentCreate(user string, role string, type_ string) *NamespaceAssignmentCreate {
-	this := NamespaceAssignmentCreate{}
-	this.User = user
-	this.Role = role
-	this.Type = type_
-	return &this
-}
-
-// NewNamespaceAssignmentCreateWithDefaults instantiates a new NamespaceAssignmentCreate object
-// This constructor will only assign default values to properties that have it defined,
-// but it doesn't guarantee that properties required by API are set
-func NewNamespaceAssignmentCreateWithDefaults() *NamespaceAssignmentCreate {
-	this := NamespaceAssignmentCreate{}
-	return &this
-}
-
-// GetUser returns the User field value
-func (o *NamespaceAssignmentCreate) GetUser() string {
-	if o == nil {
-		var ret string
-		return ret
+// NamespaceAssignmentCreateRoleAsNamespaceAssignmentCreate is a convenience function that returns NamespaceAssignmentCreateRole wrapped in NamespaceAssignmentCreate
+func NamespaceAssignmentCreateRoleAsNamespaceAssignmentCreate(v *NamespaceAssignmentCreateRole) NamespaceAssignmentCreate {
+	return NamespaceAssignmentCreate{
+		NamespaceAssignmentCreateRole: v,
 	}
-
-	return o.User
 }
 
-// GetUserOk returns a tuple with the User field value
-// and a boolean to check if the value has been set.
-func (o *NamespaceAssignmentCreate) GetUserOk() (*string, bool) {
-	if o == nil {
-		return nil, false
+// NamespaceAssignmentCreateUserAsNamespaceAssignmentCreate is a convenience function that returns NamespaceAssignmentCreateUser wrapped in NamespaceAssignmentCreate
+func NamespaceAssignmentCreateUserAsNamespaceAssignmentCreate(v *NamespaceAssignmentCreateUser) NamespaceAssignmentCreate {
+	return NamespaceAssignmentCreate{
+		NamespaceAssignmentCreateUser: v,
 	}
-	return &o.User, true
 }
 
-// SetUser sets field value
-func (o *NamespaceAssignmentCreate) SetUser(v string) {
-	o.User = v
-}
-
-// GetRole returns the Role field value
-func (o *NamespaceAssignmentCreate) GetRole() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.Role
-}
-
-// GetRoleOk returns a tuple with the Role field value
-// and a boolean to check if the value has been set.
-func (o *NamespaceAssignmentCreate) GetRoleOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Role, true
-}
-
-// SetRole sets field value
-func (o *NamespaceAssignmentCreate) SetRole(v string) {
-	o.Role = v
-}
-
-// GetType returns the Type field value
-func (o *NamespaceAssignmentCreate) GetType() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.Type
-}
-
-// GetTypeOk returns a tuple with the Type field value
-// and a boolean to check if the value has been set.
-func (o *NamespaceAssignmentCreate) GetTypeOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Type, true
-}
-
-// SetType sets field value
-func (o *NamespaceAssignmentCreate) SetType(v string) {
-	o.Type = v
-}
-
-func (o NamespaceAssignmentCreate) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
-func (o NamespaceAssignmentCreate) ToMap() (map[string]interface{}, error) {
-	toSerialize := map[string]interface{}{}
-	toSerialize["user"] = o.User
-	toSerialize["role"] = o.Role
-	toSerialize["type"] = o.Type
-	return toSerialize, nil
-}
-
-func (o *NamespaceAssignmentCreate) UnmarshalJSON(data []byte) (err error) {
-	// This validates that all required properties are included in the JSON object
-	// by unmarshalling the object into a generic map with string keys and checking
-	// that every required field exists as a key in the generic map.
-	requiredProperties := []string{
-		"user",
-		"role",
-		"type",
-	}
-
-	allProperties := make(map[string]interface{})
-
-	err = json.Unmarshal(data, &allProperties)
-
-	if err != nil {
-		return err
-	}
-
-	for _, requiredProperty := range requiredProperties {
-		if _, exists := allProperties[requiredProperty]; !exists {
-			return fmt.Errorf("no value given for required property %v", requiredProperty)
+// Unmarshal JSON data into one of the pointers in the struct
+func (dst *NamespaceAssignmentCreate) UnmarshalJSON(data []byte) error {
+	var err error
+	match := 0
+	// try to unmarshal data into NamespaceAssignmentCreateRole
+	err = json.Unmarshal(data, &dst.NamespaceAssignmentCreateRole)
+	if err == nil {
+		jsonNamespaceAssignmentCreateRole, _ := json.Marshal(dst.NamespaceAssignmentCreateRole)
+		if string(jsonNamespaceAssignmentCreateRole) == "{}" { // empty struct
+			dst.NamespaceAssignmentCreateRole = nil
+		} else {
+			match++
 		}
+	} else {
+		dst.NamespaceAssignmentCreateRole = nil
 	}
 
-	varNamespaceAssignmentCreate := _NamespaceAssignmentCreate{}
-
-	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
-	err = decoder.Decode(&varNamespaceAssignmentCreate)
-
-	if err != nil {
-		return err
+	// try to unmarshal data into NamespaceAssignmentCreateUser
+	err = json.Unmarshal(data, &dst.NamespaceAssignmentCreateUser)
+	if err == nil {
+		jsonNamespaceAssignmentCreateUser, _ := json.Marshal(dst.NamespaceAssignmentCreateUser)
+		if string(jsonNamespaceAssignmentCreateUser) == "{}" { // empty struct
+			dst.NamespaceAssignmentCreateUser = nil
+		} else {
+			match++
+		}
+	} else {
+		dst.NamespaceAssignmentCreateUser = nil
 	}
 
-	*o = NamespaceAssignmentCreate(varNamespaceAssignmentCreate)
+	if match > 1 { // more than 1 match
+		// reset to nil
+		dst.NamespaceAssignmentCreateRole = nil
+		dst.NamespaceAssignmentCreateUser = nil
 
-	return err
+		return fmt.Errorf("data matches more than one schema in oneOf(NamespaceAssignmentCreate)")
+	} else if match == 1 {
+		return nil // exactly one match
+	} else { // no match
+		return fmt.Errorf("data failed to match schemas in oneOf(NamespaceAssignmentCreate)")
+	}
+}
+
+// Marshal data from the first non-nil pointers in the struct to JSON
+func (src NamespaceAssignmentCreate) MarshalJSON() ([]byte, error) {
+	if src.NamespaceAssignmentCreateRole != nil {
+		return json.Marshal(&src.NamespaceAssignmentCreateRole)
+	}
+
+	if src.NamespaceAssignmentCreateUser != nil {
+		return json.Marshal(&src.NamespaceAssignmentCreateUser)
+	}
+
+	return nil, nil // no data in oneOf schemas
+}
+
+// Get the actual instance
+func (obj *NamespaceAssignmentCreate) GetActualInstance() interface{} {
+	if obj == nil {
+		return nil
+	}
+	if obj.NamespaceAssignmentCreateRole != nil {
+		return obj.NamespaceAssignmentCreateRole
+	}
+
+	if obj.NamespaceAssignmentCreateUser != nil {
+		return obj.NamespaceAssignmentCreateUser
+	}
+
+	// all schemas are nil
+	return nil
 }
 
 type NullableNamespaceAssignmentCreate struct {
