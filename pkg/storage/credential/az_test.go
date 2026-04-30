@@ -15,12 +15,18 @@ func TestNewAZClientCredentials(t *testing.T) {
 
 	c := credential.NewAZClientCredentials("tenant", "client", "secret")
 
-	require.NotNil(t, c)
-	assert.Equal(t, "tenant", c.TenantId)
-	assert.Equal(t, "client", c.ClientId)
-	assert.Equal(t, "secret", c.ClientSecret)
-	assert.Equal(t, "client-credentials", c.CredentialType)
-	assert.Equal(t, "az", c.Type)
+	data, err := json.Marshal(c)
+	require.NoError(t, err)
+
+	var got map[string]any
+	require.NoError(t, json.Unmarshal(data, &got))
+
+	assert.Equal(t, "az", got["type"])
+	assert.Equal(t, "client-credentials", got["credential-type"])
+	assert.Equal(t, "tenant", got["tenant-id"])
+	assert.Equal(t, "client", got["client-id"])
+	assert.Equal(t, "secret", got["client-secret"])
+	assert.NotContains(t, got, "key")
 }
 
 func TestNewAZSharedAccessKey(t *testing.T) {
@@ -28,25 +34,21 @@ func TestNewAZSharedAccessKey(t *testing.T) {
 
 	c := credential.NewAZSharedAccessKey("base64key")
 
-	require.NotNil(t, c)
-	assert.Equal(t, "base64key", c.Key)
-	assert.Equal(t, "shared-access-key", c.CredentialType)
-	assert.Equal(t, "az", c.Type)
+	data, err := json.Marshal(c)
+	require.NoError(t, err)
+
+	var got map[string]any
+	require.NoError(t, json.Unmarshal(data, &got))
+
+	assert.Equal(t, "az", got["type"])
+	assert.Equal(t, "shared-access-key", got["credential-type"])
+	assert.Equal(t, "base64key", got["key"])
+	assert.NotContains(t, got, "client-id")
+	assert.NotContains(t, got, "client-secret")
+	assert.NotContains(t, got, "tenant-id")
 }
 
 func TestNewAZManagedIdentity(t *testing.T) {
-	t.Parallel()
-
-	c := credential.NewAZManagedIdentity()
-
-	require.NotNil(t, c)
-	assert.Equal(t, "azure-system-identity", c.CredentialType)
-	assert.Equal(t, "az", c.Type)
-}
-
-// TestNewAZManagedIdentity_WireFormat documents the flattened-struct quirk for
-// managed-identity AZ credentials. See s3_test.go for the same pattern.
-func TestNewAZManagedIdentity_WireFormat(t *testing.T) {
 	t.Parallel()
 
 	c := credential.NewAZManagedIdentity()
@@ -59,4 +61,8 @@ func TestNewAZManagedIdentity_WireFormat(t *testing.T) {
 
 	assert.Equal(t, "az", got["type"])
 	assert.Equal(t, "azure-system-identity", got["credential-type"])
+	assert.NotContains(t, got, "client-id")
+	assert.NotContains(t, got, "client-secret")
+	assert.NotContains(t, got, "tenant-id")
+	assert.NotContains(t, got, "key")
 }

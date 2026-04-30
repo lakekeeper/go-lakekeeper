@@ -1,25 +1,23 @@
-// Package credential holds ergonomic builders for the StorageCredential*
-// variants emitted by the OpenAPI generator under managementv1.
+// Package credential holds ergonomic builders for storage credentials.
 //
 // Each provider has one constructor per credential variant (S3 access-key /
 // AWS system-identity / Cloudflare R2; GCS service-account-key / GCP
 // system-identity; Azure client-credentials / shared-access-key /
 // managed-identity). Constructors take only the spec-required fields; rare
-// optional fields like S3 ExternalId can be set on the returned struct.
+// optional fields like S3 external-id have their own _WithExternalID
+// variants.
 //
-// Builders return the typed concrete struct (e.g. *managementv1.StorageCredentialS3).
-// Wrap into the union with the generator-emitted helpers when handing off:
+// Builders return a managementv1.StorageCredential umbrella value — the
+// shape API methods accept directly:
 //
 //	c := credential.NewS3AccessKey("AKIA...", "secret")
-//	req.SetStorageCredential(managementv1.StorageCredentialS3AsStorageCredential(c))
+//	req.SetStorageCredential(c)
 //
-// Wire-format note: the generator collapses each provider's oneOf credential
-// variants into a single flattened struct (e.g. StorageCredentialS3 holds the
-// union of access-key, system-identity, and Cloudflare R2 fields). Builders
-// populate only the fields relevant to the chosen variant — the rest serialize
-// as zero values. If Lakekeeper rejects the resulting payload during
-// integration testing, the workaround is to add a custom MarshalJSON on a
-// thin wrapper type returned from these constructors.
+// Internally each builder constructs the correct generated leaf type and
+// wraps it via the generator-emitted *AsStorageCredential helper. The wire
+// format contains only the variant's own fields plus the discriminators —
+// no zero-valued fields from sibling variants leak through, and inbound
+// payloads from the server round-trip cleanly.
 package credential
 
 const (

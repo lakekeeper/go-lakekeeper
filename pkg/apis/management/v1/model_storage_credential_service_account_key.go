@@ -16,40 +16,40 @@ import (
 	"fmt"
 )
 
-// checks if the StorageCredentialGcs type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &StorageCredentialGcs{}
+// checks if the StorageCredentialServiceAccountKey type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &StorageCredentialServiceAccountKey{}
 
-// StorageCredentialGcs Credentials for GCS storage  Example payload in the code-snippet below:  ``` use lakekeeper::service::storage::StorageCredential; let cred: StorageCredential = serde_json::from_str(r#\"{     \"type\": \"gcs\",     \"credential-type\": \"service-account-key\",     \"key\": {       \"type\": \"service_account\",       \"project_id\": \"example-project-1234\",       \"private_key_id\": \"....\",       \"private_key\": \"-----BEGIN PRIVATE KEY-----\\n.....\\n-----END PRIVATE KEY-----\\n\",       \"client_email\": \"abc@example-project-1234.iam.gserviceaccount.com\",       \"client_id\": \"123456789012345678901\",       \"auth_uri\": \"https://accounts.google.com/o/oauth2/auth\",       \"token_uri\": \"https://oauth2.googleapis.com/token\",       \"auth_provider_x509_cert_url\": \"https://www.googleapis.com/oauth2/v1/certs\",       \"client_x509_cert_url\": \"https://www.googleapis.com/robot/v1/metadata/x509/abc%example-project-1234.iam.gserviceaccount.com\",       \"universe_domain\": \"googleapis.com\"     } }\"#).unwrap(); ```
-type StorageCredentialGcs struct {
+// StorageCredentialServiceAccountKey struct for StorageCredentialServiceAccountKey
+type StorageCredentialServiceAccountKey struct {
 	CredentialType string        `json:"credential-type"`
 	Key            GcsServiceKey `json:"key"`
 	Type           string        `json:"type"`
 }
 
-type _StorageCredentialGcs StorageCredentialGcs
+type _StorageCredentialServiceAccountKey StorageCredentialServiceAccountKey
 
-// NewStorageCredentialGcs instantiates a new StorageCredentialGcs object
+// NewStorageCredentialServiceAccountKey instantiates a new StorageCredentialServiceAccountKey object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewStorageCredentialGcs(credentialType string, key GcsServiceKey, type_ string) *StorageCredentialGcs {
-	this := StorageCredentialGcs{}
+func NewStorageCredentialServiceAccountKey(credentialType string, key GcsServiceKey, type_ string) *StorageCredentialServiceAccountKey {
+	this := StorageCredentialServiceAccountKey{}
 	this.CredentialType = credentialType
 	this.Key = key
 	this.Type = type_
 	return &this
 }
 
-// NewStorageCredentialGcsWithDefaults instantiates a new StorageCredentialGcs object
+// NewStorageCredentialServiceAccountKeyWithDefaults instantiates a new StorageCredentialServiceAccountKey object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewStorageCredentialGcsWithDefaults() *StorageCredentialGcs {
-	this := StorageCredentialGcs{}
+func NewStorageCredentialServiceAccountKeyWithDefaults() *StorageCredentialServiceAccountKey {
+	this := StorageCredentialServiceAccountKey{}
 	return &this
 }
 
 // GetCredentialType returns the CredentialType field value
-func (o *StorageCredentialGcs) GetCredentialType() string {
+func (o *StorageCredentialServiceAccountKey) GetCredentialType() string {
 	if o == nil {
 		var ret string
 		return ret
@@ -60,7 +60,7 @@ func (o *StorageCredentialGcs) GetCredentialType() string {
 
 // GetCredentialTypeOk returns a tuple with the CredentialType field value
 // and a boolean to check if the value has been set.
-func (o *StorageCredentialGcs) GetCredentialTypeOk() (*string, bool) {
+func (o *StorageCredentialServiceAccountKey) GetCredentialTypeOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -68,12 +68,12 @@ func (o *StorageCredentialGcs) GetCredentialTypeOk() (*string, bool) {
 }
 
 // SetCredentialType sets field value
-func (o *StorageCredentialGcs) SetCredentialType(v string) {
+func (o *StorageCredentialServiceAccountKey) SetCredentialType(v string) {
 	o.CredentialType = v
 }
 
 // GetKey returns the Key field value
-func (o *StorageCredentialGcs) GetKey() GcsServiceKey {
+func (o *StorageCredentialServiceAccountKey) GetKey() GcsServiceKey {
 	if o == nil {
 		var ret GcsServiceKey
 		return ret
@@ -84,7 +84,7 @@ func (o *StorageCredentialGcs) GetKey() GcsServiceKey {
 
 // GetKeyOk returns a tuple with the Key field value
 // and a boolean to check if the value has been set.
-func (o *StorageCredentialGcs) GetKeyOk() (*GcsServiceKey, bool) {
+func (o *StorageCredentialServiceAccountKey) GetKeyOk() (*GcsServiceKey, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -92,12 +92,12 @@ func (o *StorageCredentialGcs) GetKeyOk() (*GcsServiceKey, bool) {
 }
 
 // SetKey sets field value
-func (o *StorageCredentialGcs) SetKey(v GcsServiceKey) {
+func (o *StorageCredentialServiceAccountKey) SetKey(v GcsServiceKey) {
 	o.Key = v
 }
 
 // GetType returns the Type field value
-func (o *StorageCredentialGcs) GetType() string {
+func (o *StorageCredentialServiceAccountKey) GetType() string {
 	if o == nil {
 		var ret string
 		return ret
@@ -108,7 +108,7 @@ func (o *StorageCredentialGcs) GetType() string {
 
 // GetTypeOk returns a tuple with the Type field value
 // and a boolean to check if the value has been set.
-func (o *StorageCredentialGcs) GetTypeOk() (*string, bool) {
+func (o *StorageCredentialServiceAccountKey) GetTypeOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -116,11 +116,11 @@ func (o *StorageCredentialGcs) GetTypeOk() (*string, bool) {
 }
 
 // SetType sets field value
-func (o *StorageCredentialGcs) SetType(v string) {
+func (o *StorageCredentialServiceAccountKey) SetType(v string) {
 	o.Type = v
 }
 
-func (o StorageCredentialGcs) MarshalJSON() ([]byte, error) {
+func (o StorageCredentialServiceAccountKey) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
@@ -128,7 +128,7 @@ func (o StorageCredentialGcs) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-func (o StorageCredentialGcs) ToMap() (map[string]interface{}, error) {
+func (o StorageCredentialServiceAccountKey) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["credential-type"] = o.CredentialType
 	toSerialize["key"] = o.Key
@@ -136,7 +136,7 @@ func (o StorageCredentialGcs) ToMap() (map[string]interface{}, error) {
 	return toSerialize, nil
 }
 
-func (o *StorageCredentialGcs) UnmarshalJSON(data []byte) (err error) {
+func (o *StorageCredentialServiceAccountKey) UnmarshalJSON(data []byte) (err error) {
 	// This validates that all required properties are included in the JSON object
 	// by unmarshalling the object into a generic map with string keys and checking
 	// that every required field exists as a key in the generic map.
@@ -160,53 +160,53 @@ func (o *StorageCredentialGcs) UnmarshalJSON(data []byte) (err error) {
 		}
 	}
 
-	varStorageCredentialGcs := _StorageCredentialGcs{}
+	varStorageCredentialServiceAccountKey := _StorageCredentialServiceAccountKey{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
 	decoder.DisallowUnknownFields()
-	err = decoder.Decode(&varStorageCredentialGcs)
+	err = decoder.Decode(&varStorageCredentialServiceAccountKey)
 
 	if err != nil {
 		return err
 	}
 
-	*o = StorageCredentialGcs(varStorageCredentialGcs)
+	*o = StorageCredentialServiceAccountKey(varStorageCredentialServiceAccountKey)
 
 	return err
 }
 
-type NullableStorageCredentialGcs struct {
-	value *StorageCredentialGcs
+type NullableStorageCredentialServiceAccountKey struct {
+	value *StorageCredentialServiceAccountKey
 	isSet bool
 }
 
-func (v NullableStorageCredentialGcs) Get() *StorageCredentialGcs {
+func (v NullableStorageCredentialServiceAccountKey) Get() *StorageCredentialServiceAccountKey {
 	return v.value
 }
 
-func (v *NullableStorageCredentialGcs) Set(val *StorageCredentialGcs) {
+func (v *NullableStorageCredentialServiceAccountKey) Set(val *StorageCredentialServiceAccountKey) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableStorageCredentialGcs) IsSet() bool {
+func (v NullableStorageCredentialServiceAccountKey) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableStorageCredentialGcs) Unset() {
+func (v *NullableStorageCredentialServiceAccountKey) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableStorageCredentialGcs(val *StorageCredentialGcs) *NullableStorageCredentialGcs {
-	return &NullableStorageCredentialGcs{value: val, isSet: true}
+func NewNullableStorageCredentialServiceAccountKey(val *StorageCredentialServiceAccountKey) *NullableStorageCredentialServiceAccountKey {
+	return &NullableStorageCredentialServiceAccountKey{value: val, isSet: true}
 }
 
-func (v NullableStorageCredentialGcs) MarshalJSON() ([]byte, error) {
+func (v NullableStorageCredentialServiceAccountKey) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableStorageCredentialGcs) UnmarshalJSON(src []byte) error {
+func (v *NullableStorageCredentialServiceAccountKey) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

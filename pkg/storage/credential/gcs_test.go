@@ -30,26 +30,21 @@ func TestNewGCSServiceAccountKey(t *testing.T) {
 
 	c := credential.NewGCSServiceAccountKey(key)
 
-	require.NotNil(t, c)
-	assert.Equal(t, "service-account-key", c.CredentialType)
-	assert.Equal(t, "gcs", c.Type)
-	assert.Equal(t, key, c.Key)
+	data, err := json.Marshal(c)
+	require.NoError(t, err)
+
+	var got map[string]any
+	require.NoError(t, json.Unmarshal(data, &got))
+
+	assert.Equal(t, "gcs", got["type"])
+	assert.Equal(t, "service-account-key", got["credential-type"])
+	assert.NotNil(t, got["key"])
+	gotKey, ok := got["key"].(map[string]any)
+	require.True(t, ok)
+	assert.Equal(t, "my-project", gotKey["project_id"])
 }
 
 func TestNewGCSSystemIdentity(t *testing.T) {
-	t.Parallel()
-
-	c := credential.NewGCSSystemIdentity()
-
-	require.NotNil(t, c)
-	assert.Equal(t, "gcp-system-identity", c.CredentialType)
-	assert.Equal(t, "gcs", c.Type)
-}
-
-// TestNewGCSSystemIdentity_WireFormat documents the flattened-struct wire
-// quirk for system-identity GCS credentials. See s3_test.go for the same
-// pattern.
-func TestNewGCSSystemIdentity_WireFormat(t *testing.T) {
 	t.Parallel()
 
 	c := credential.NewGCSSystemIdentity()
@@ -62,4 +57,5 @@ func TestNewGCSSystemIdentity_WireFormat(t *testing.T) {
 
 	assert.Equal(t, "gcs", got["type"])
 	assert.Equal(t, "gcp-system-identity", got["credential-type"])
+	assert.NotContains(t, got, "key")
 }

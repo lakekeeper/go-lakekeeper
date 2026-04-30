@@ -41,3 +41,6 @@ target/
 
 # MacOS
 .DS_Store
+
+# OpenAPI spec preprocessing artefacts (regenerated each `make generate`)
+*.processed.yaml

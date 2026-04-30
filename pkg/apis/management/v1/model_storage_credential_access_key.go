@@ -16,51 +16,43 @@ import (
 	"fmt"
 )
 
-// checks if the StorageCredentialS3 type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &StorageCredentialS3{}
+// checks if the StorageCredentialAccessKey type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &StorageCredentialAccessKey{}
 
-// StorageCredentialS3 Credentials for S3 storage  Example payload in the code-snippet below:  ``` use lakekeeper::service::storage::StorageCredential; let cred: StorageCredential = serde_json::from_str(r#\"{     \"type\": \"s3\",     \"credential-type\": \"access-key\",     \"access-key-id\": \"minio-root-user\",     \"secret-access-key\": \"minio-root-password\"   }\"#).unwrap(); ```
-type StorageCredentialS3 struct {
-	// Access key ID used for IO operations of Lakekeeper
-	AccessKeyId string  `json:"access-key-id"`
-	ExternalId  *string `json:"external-id,omitempty"`
-	// Secret key associated with the access key ID.
-	SecretAccessKey string `json:"secret-access-key"`
-	CredentialType  string `json:"credential-type"`
-	// Cloudflare account ID, used to determine the temporary credentials endpoint.
-	AccountId string `json:"account-id"`
-	// Token associated with the access key ID. This is used to fetch downscoped temporary credentials for vended credentials.
-	Token string `json:"token"`
-	Type  string `json:"type"`
+// StorageCredentialAccessKey struct for StorageCredentialAccessKey
+type StorageCredentialAccessKey struct {
+	AccessKeyId     string  `json:"access-key-id"`
+	ExternalId      *string `json:"external-id,omitempty"`
+	SecretAccessKey string  `json:"secret-access-key"`
+	CredentialType  string  `json:"credential-type"`
+	Type            string  `json:"type"`
 }
 
-type _StorageCredentialS3 StorageCredentialS3
+type _StorageCredentialAccessKey StorageCredentialAccessKey
 
-// NewStorageCredentialS3 instantiates a new StorageCredentialS3 object
+// NewStorageCredentialAccessKey instantiates a new StorageCredentialAccessKey object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewStorageCredentialS3(accessKeyId string, secretAccessKey string, credentialType string, accountId string, token string, type_ string) *StorageCredentialS3 {
-	this := StorageCredentialS3{}
+func NewStorageCredentialAccessKey(accessKeyId string, secretAccessKey string, credentialType string, type_ string) *StorageCredentialAccessKey {
+	this := StorageCredentialAccessKey{}
 	this.AccessKeyId = accessKeyId
 	this.SecretAccessKey = secretAccessKey
 	this.CredentialType = credentialType
-	this.AccountId = accountId
-	this.Token = token
 	this.Type = type_
 	return &this
 }
 
-// NewStorageCredentialS3WithDefaults instantiates a new StorageCredentialS3 object
+// NewStorageCredentialAccessKeyWithDefaults instantiates a new StorageCredentialAccessKey object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewStorageCredentialS3WithDefaults() *StorageCredentialS3 {
-	this := StorageCredentialS3{}
+func NewStorageCredentialAccessKeyWithDefaults() *StorageCredentialAccessKey {
+	this := StorageCredentialAccessKey{}
 	return &this
 }
 
 // GetAccessKeyId returns the AccessKeyId field value
-func (o *StorageCredentialS3) GetAccessKeyId() string {
+func (o *StorageCredentialAccessKey) GetAccessKeyId() string {
 	if o == nil {
 		var ret string
 		return ret
@@ -71,7 +63,7 @@ func (o *StorageCredentialS3) GetAccessKeyId() string {
 
 // GetAccessKeyIdOk returns a tuple with the AccessKeyId field value
 // and a boolean to check if the value has been set.
-func (o *StorageCredentialS3) GetAccessKeyIdOk() (*string, bool) {
+func (o *StorageCredentialAccessKey) GetAccessKeyIdOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -79,12 +71,12 @@ func (o *StorageCredentialS3) GetAccessKeyIdOk() (*string, bool) {
 }
 
 // SetAccessKeyId sets field value
-func (o *StorageCredentialS3) SetAccessKeyId(v string) {
+func (o *StorageCredentialAccessKey) SetAccessKeyId(v string) {
 	o.AccessKeyId = v
 }
 
 // GetExternalId returns the ExternalId field value if set, zero value otherwise.
-func (o *StorageCredentialS3) GetExternalId() string {
+func (o *StorageCredentialAccessKey) GetExternalId() string {
 	if o == nil || IsNil(o.ExternalId) {
 		var ret string
 		return ret
@@ -94,7 +86,7 @@ func (o *StorageCredentialS3) GetExternalId() string {
 
 // GetExternalIdOk returns a tuple with the ExternalId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *StorageCredentialS3) GetExternalIdOk() (*string, bool) {
+func (o *StorageCredentialAccessKey) GetExternalIdOk() (*string, bool) {
 	if o == nil || IsNil(o.ExternalId) {
 		return nil, false
 	}
@@ -102,7 +94,7 @@ func (o *StorageCredentialS3) GetExternalIdOk() (*string, bool) {
 }
 
 // HasExternalId returns a boolean if a field has been set.
-func (o *StorageCredentialS3) HasExternalId() bool {
+func (o *StorageCredentialAccessKey) HasExternalId() bool {
 	if o != nil && !IsNil(o.ExternalId) {
 		return true
 	}
@@ -111,12 +103,12 @@ func (o *StorageCredentialS3) HasExternalId() bool {
 }
 
 // SetExternalId gets a reference to the given string and assigns it to the ExternalId field.
-func (o *StorageCredentialS3) SetExternalId(v string) {
+func (o *StorageCredentialAccessKey) SetExternalId(v string) {
 	o.ExternalId = &v
 }
 
 // GetSecretAccessKey returns the SecretAccessKey field value
-func (o *StorageCredentialS3) GetSecretAccessKey() string {
+func (o *StorageCredentialAccessKey) GetSecretAccessKey() string {
 	if o == nil {
 		var ret string
 		return ret
@@ -127,7 +119,7 @@ func (o *StorageCredentialS3) GetSecretAccessKey() string {
 
 // GetSecretAccessKeyOk returns a tuple with the SecretAccessKey field value
 // and a boolean to check if the value has been set.
-func (o *StorageCredentialS3) GetSecretAccessKeyOk() (*string, bool) {
+func (o *StorageCredentialAccessKey) GetSecretAccessKeyOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -135,12 +127,12 @@ func (o *StorageCredentialS3) GetSecretAccessKeyOk() (*string, bool) {
 }
 
 // SetSecretAccessKey sets field value
-func (o *StorageCredentialS3) SetSecretAccessKey(v string) {
+func (o *StorageCredentialAccessKey) SetSecretAccessKey(v string) {
 	o.SecretAccessKey = v
 }
 
 // GetCredentialType returns the CredentialType field value
-func (o *StorageCredentialS3) GetCredentialType() string {
+func (o *StorageCredentialAccessKey) GetCredentialType() string {
 	if o == nil {
 		var ret string
 		return ret
@@ -151,7 +143,7 @@ func (o *StorageCredentialS3) GetCredentialType() string {
 
 // GetCredentialTypeOk returns a tuple with the CredentialType field value
 // and a boolean to check if the value has been set.
-func (o *StorageCredentialS3) GetCredentialTypeOk() (*string, bool) {
+func (o *StorageCredentialAccessKey) GetCredentialTypeOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -159,60 +151,12 @@ func (o *StorageCredentialS3) GetCredentialTypeOk() (*string, bool) {
 }
 
 // SetCredentialType sets field value
-func (o *StorageCredentialS3) SetCredentialType(v string) {
+func (o *StorageCredentialAccessKey) SetCredentialType(v string) {
 	o.CredentialType = v
 }
 
-// GetAccountId returns the AccountId field value
-func (o *StorageCredentialS3) GetAccountId() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.AccountId
-}
-
-// GetAccountIdOk returns a tuple with the AccountId field value
-// and a boolean to check if the value has been set.
-func (o *StorageCredentialS3) GetAccountIdOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.AccountId, true
-}
-
-// SetAccountId sets field value
-func (o *StorageCredentialS3) SetAccountId(v string) {
-	o.AccountId = v
-}
-
-// GetToken returns the Token field value
-func (o *StorageCredentialS3) GetToken() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.Token
-}
-
-// GetTokenOk returns a tuple with the Token field value
-// and a boolean to check if the value has been set.
-func (o *StorageCredentialS3) GetTokenOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Token, true
-}
-
-// SetToken sets field value
-func (o *StorageCredentialS3) SetToken(v string) {
-	o.Token = v
-}
-
 // GetType returns the Type field value
-func (o *StorageCredentialS3) GetType() string {
+func (o *StorageCredentialAccessKey) GetType() string {
 	if o == nil {
 		var ret string
 		return ret
@@ -223,7 +167,7 @@ func (o *StorageCredentialS3) GetType() string {
 
 // GetTypeOk returns a tuple with the Type field value
 // and a boolean to check if the value has been set.
-func (o *StorageCredentialS3) GetTypeOk() (*string, bool) {
+func (o *StorageCredentialAccessKey) GetTypeOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -231,11 +175,11 @@ func (o *StorageCredentialS3) GetTypeOk() (*string, bool) {
 }
 
 // SetType sets field value
-func (o *StorageCredentialS3) SetType(v string) {
+func (o *StorageCredentialAccessKey) SetType(v string) {
 	o.Type = v
 }
 
-func (o StorageCredentialS3) MarshalJSON() ([]byte, error) {
+func (o StorageCredentialAccessKey) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
@@ -243,7 +187,7 @@ func (o StorageCredentialS3) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-func (o StorageCredentialS3) ToMap() (map[string]interface{}, error) {
+func (o StorageCredentialAccessKey) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["access-key-id"] = o.AccessKeyId
 	if !IsNil(o.ExternalId) {
@@ -251,13 +195,11 @@ func (o StorageCredentialS3) ToMap() (map[string]interface{}, error) {
 	}
 	toSerialize["secret-access-key"] = o.SecretAccessKey
 	toSerialize["credential-type"] = o.CredentialType
-	toSerialize["account-id"] = o.AccountId
-	toSerialize["token"] = o.Token
 	toSerialize["type"] = o.Type
 	return toSerialize, nil
 }
 
-func (o *StorageCredentialS3) UnmarshalJSON(data []byte) (err error) {
+func (o *StorageCredentialAccessKey) UnmarshalJSON(data []byte) (err error) {
 	// This validates that all required properties are included in the JSON object
 	// by unmarshalling the object into a generic map with string keys and checking
 	// that every required field exists as a key in the generic map.
@@ -265,8 +207,6 @@ func (o *StorageCredentialS3) UnmarshalJSON(data []byte) (err error) {
 		"access-key-id",
 		"secret-access-key",
 		"credential-type",
-		"account-id",
-		"token",
 		"type",
 	}
 
@@ -284,53 +224,53 @@ func (o *StorageCredentialS3) UnmarshalJSON(data []byte) (err error) {
 		}
 	}
 
-	varStorageCredentialS3 := _StorageCredentialS3{}
+	varStorageCredentialAccessKey := _StorageCredentialAccessKey{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
 	decoder.DisallowUnknownFields()
-	err = decoder.Decode(&varStorageCredentialS3)
+	err = decoder.Decode(&varStorageCredentialAccessKey)
 
 	if err != nil {
 		return err
 	}
 
-	*o = StorageCredentialS3(varStorageCredentialS3)
+	*o = StorageCredentialAccessKey(varStorageCredentialAccessKey)
 
 	return err
 }
 
-type NullableStorageCredentialS3 struct {
-	value *StorageCredentialS3
+type NullableStorageCredentialAccessKey struct {
+	value *StorageCredentialAccessKey
 	isSet bool
 }
 
-func (v NullableStorageCredentialS3) Get() *StorageCredentialS3 {
+func (v NullableStorageCredentialAccessKey) Get() *StorageCredentialAccessKey {
 	return v.value
 }
 
-func (v *NullableStorageCredentialS3) Set(val *StorageCredentialS3) {
+func (v *NullableStorageCredentialAccessKey) Set(val *StorageCredentialAccessKey) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableStorageCredentialS3) IsSet() bool {
+func (v NullableStorageCredentialAccessKey) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableStorageCredentialS3) Unset() {
+func (v *NullableStorageCredentialAccessKey) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableStorageCredentialS3(val *StorageCredentialS3) *NullableStorageCredentialS3 {
-	return &NullableStorageCredentialS3{value: val, isSet: true}
+func NewNullableStorageCredentialAccessKey(val *StorageCredentialAccessKey) *NullableStorageCredentialAccessKey {
+	return &NullableStorageCredentialAccessKey{value: val, isSet: true}
 }
 
-func (v NullableStorageCredentialS3) MarshalJSON() ([]byte, error) {
+func (v NullableStorageCredentialAccessKey) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableStorageCredentialS3) UnmarshalJSON(src []byte) error {
+func (v *NullableStorageCredentialAccessKey) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

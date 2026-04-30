@@ -17,101 +17,309 @@ import (
 
 // StorageCredential - Storage secret for a warehouse.
 type StorageCredential struct {
-	StorageCredentialAz  *StorageCredentialAz
-	StorageCredentialGcs *StorageCredentialGcs
-	StorageCredentialS3  *StorageCredentialS3
+	StorageCredentialAccessKey           *StorageCredentialAccessKey
+	StorageCredentialAwsSystemIdentity   *StorageCredentialAwsSystemIdentity
+	StorageCredentialAzureSystemIdentity *StorageCredentialAzureSystemIdentity
+	StorageCredentialClientCredentials   *StorageCredentialClientCredentials
+	StorageCredentialCloudflareR2        *StorageCredentialCloudflareR2
+	StorageCredentialGcpSystemIdentity   *StorageCredentialGcpSystemIdentity
+	StorageCredentialServiceAccountKey   *StorageCredentialServiceAccountKey
+	StorageCredentialSharedAccessKey     *StorageCredentialSharedAccessKey
 }
 
-// StorageCredentialAzAsStorageCredential is a convenience function that returns StorageCredentialAz wrapped in StorageCredential
-func StorageCredentialAzAsStorageCredential(v *StorageCredentialAz) StorageCredential {
+// StorageCredentialAccessKeyAsStorageCredential is a convenience function that returns StorageCredentialAccessKey wrapped in StorageCredential
+func StorageCredentialAccessKeyAsStorageCredential(v *StorageCredentialAccessKey) StorageCredential {
 	return StorageCredential{
-		StorageCredentialAz: v,
+		StorageCredentialAccessKey: v,
 	}
 }
 
-// StorageCredentialGcsAsStorageCredential is a convenience function that returns StorageCredentialGcs wrapped in StorageCredential
-func StorageCredentialGcsAsStorageCredential(v *StorageCredentialGcs) StorageCredential {
+// StorageCredentialAwsSystemIdentityAsStorageCredential is a convenience function that returns StorageCredentialAwsSystemIdentity wrapped in StorageCredential
+func StorageCredentialAwsSystemIdentityAsStorageCredential(v *StorageCredentialAwsSystemIdentity) StorageCredential {
 	return StorageCredential{
-		StorageCredentialGcs: v,
+		StorageCredentialAwsSystemIdentity: v,
 	}
 }
 
-// StorageCredentialS3AsStorageCredential is a convenience function that returns StorageCredentialS3 wrapped in StorageCredential
-func StorageCredentialS3AsStorageCredential(v *StorageCredentialS3) StorageCredential {
+// StorageCredentialAzureSystemIdentityAsStorageCredential is a convenience function that returns StorageCredentialAzureSystemIdentity wrapped in StorageCredential
+func StorageCredentialAzureSystemIdentityAsStorageCredential(v *StorageCredentialAzureSystemIdentity) StorageCredential {
 	return StorageCredential{
-		StorageCredentialS3: v,
+		StorageCredentialAzureSystemIdentity: v,
+	}
+}
+
+// StorageCredentialClientCredentialsAsStorageCredential is a convenience function that returns StorageCredentialClientCredentials wrapped in StorageCredential
+func StorageCredentialClientCredentialsAsStorageCredential(v *StorageCredentialClientCredentials) StorageCredential {
+	return StorageCredential{
+		StorageCredentialClientCredentials: v,
+	}
+}
+
+// StorageCredentialCloudflareR2AsStorageCredential is a convenience function that returns StorageCredentialCloudflareR2 wrapped in StorageCredential
+func StorageCredentialCloudflareR2AsStorageCredential(v *StorageCredentialCloudflareR2) StorageCredential {
+	return StorageCredential{
+		StorageCredentialCloudflareR2: v,
+	}
+}
+
+// StorageCredentialGcpSystemIdentityAsStorageCredential is a convenience function that returns StorageCredentialGcpSystemIdentity wrapped in StorageCredential
+func StorageCredentialGcpSystemIdentityAsStorageCredential(v *StorageCredentialGcpSystemIdentity) StorageCredential {
+	return StorageCredential{
+		StorageCredentialGcpSystemIdentity: v,
+	}
+}
+
+// StorageCredentialServiceAccountKeyAsStorageCredential is a convenience function that returns StorageCredentialServiceAccountKey wrapped in StorageCredential
+func StorageCredentialServiceAccountKeyAsStorageCredential(v *StorageCredentialServiceAccountKey) StorageCredential {
+	return StorageCredential{
+		StorageCredentialServiceAccountKey: v,
+	}
+}
+
+// StorageCredentialSharedAccessKeyAsStorageCredential is a convenience function that returns StorageCredentialSharedAccessKey wrapped in StorageCredential
+func StorageCredentialSharedAccessKeyAsStorageCredential(v *StorageCredentialSharedAccessKey) StorageCredential {
+	return StorageCredential{
+		StorageCredentialSharedAccessKey: v,
 	}
 }
 
 // Unmarshal JSON data into one of the pointers in the struct
 func (dst *StorageCredential) UnmarshalJSON(data []byte) error {
 	var err error
-	match := 0
-	// try to unmarshal data into StorageCredentialAz
-	err = json.Unmarshal(data, &dst.StorageCredentialAz)
-	if err == nil {
-		jsonStorageCredentialAz, _ := json.Marshal(dst.StorageCredentialAz)
-		if string(jsonStorageCredentialAz) == "{}" { // empty struct
-			dst.StorageCredentialAz = nil
+	// use discriminator value to speed up the lookup
+	var jsonDict map[string]interface{}
+	err = newStrictDecoder(data).Decode(&jsonDict)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal JSON into map for the discriminator lookup")
+	}
+
+	// check if the discriminator value is 'access-key'
+	if jsonDict["credential-type"] == "access-key" {
+		// try to unmarshal JSON data into StorageCredentialAccessKey
+		err = json.Unmarshal(data, &dst.StorageCredentialAccessKey)
+		if err == nil {
+			return nil // data stored in dst.StorageCredentialAccessKey, return on the first match
 		} else {
-			match++
+			dst.StorageCredentialAccessKey = nil
+			return fmt.Errorf("failed to unmarshal StorageCredential as StorageCredentialAccessKey: %s", err.Error())
 		}
-	} else {
-		dst.StorageCredentialAz = nil
 	}
 
-	// try to unmarshal data into StorageCredentialGcs
-	err = json.Unmarshal(data, &dst.StorageCredentialGcs)
-	if err == nil {
-		jsonStorageCredentialGcs, _ := json.Marshal(dst.StorageCredentialGcs)
-		if string(jsonStorageCredentialGcs) == "{}" { // empty struct
-			dst.StorageCredentialGcs = nil
+	// check if the discriminator value is 'aws-system-identity'
+	if jsonDict["credential-type"] == "aws-system-identity" {
+		// try to unmarshal JSON data into StorageCredentialAwsSystemIdentity
+		err = json.Unmarshal(data, &dst.StorageCredentialAwsSystemIdentity)
+		if err == nil {
+			return nil // data stored in dst.StorageCredentialAwsSystemIdentity, return on the first match
 		} else {
-			match++
+			dst.StorageCredentialAwsSystemIdentity = nil
+			return fmt.Errorf("failed to unmarshal StorageCredential as StorageCredentialAwsSystemIdentity: %s", err.Error())
 		}
-	} else {
-		dst.StorageCredentialGcs = nil
 	}
 
-	// try to unmarshal data into StorageCredentialS3
-	err = json.Unmarshal(data, &dst.StorageCredentialS3)
-	if err == nil {
-		jsonStorageCredentialS3, _ := json.Marshal(dst.StorageCredentialS3)
-		if string(jsonStorageCredentialS3) == "{}" { // empty struct
-			dst.StorageCredentialS3 = nil
+	// check if the discriminator value is 'azure-system-identity'
+	if jsonDict["credential-type"] == "azure-system-identity" {
+		// try to unmarshal JSON data into StorageCredentialAzureSystemIdentity
+		err = json.Unmarshal(data, &dst.StorageCredentialAzureSystemIdentity)
+		if err == nil {
+			return nil // data stored in dst.StorageCredentialAzureSystemIdentity, return on the first match
 		} else {
-			match++
+			dst.StorageCredentialAzureSystemIdentity = nil
+			return fmt.Errorf("failed to unmarshal StorageCredential as StorageCredentialAzureSystemIdentity: %s", err.Error())
 		}
-	} else {
-		dst.StorageCredentialS3 = nil
 	}
 
-	if match > 1 { // more than 1 match
-		// reset to nil
-		dst.StorageCredentialAz = nil
-		dst.StorageCredentialGcs = nil
-		dst.StorageCredentialS3 = nil
-
-		return fmt.Errorf("data matches more than one schema in oneOf(StorageCredential)")
-	} else if match == 1 {
-		return nil // exactly one match
-	} else { // no match
-		return fmt.Errorf("data failed to match schemas in oneOf(StorageCredential)")
+	// check if the discriminator value is 'client-credentials'
+	if jsonDict["credential-type"] == "client-credentials" {
+		// try to unmarshal JSON data into StorageCredentialClientCredentials
+		err = json.Unmarshal(data, &dst.StorageCredentialClientCredentials)
+		if err == nil {
+			return nil // data stored in dst.StorageCredentialClientCredentials, return on the first match
+		} else {
+			dst.StorageCredentialClientCredentials = nil
+			return fmt.Errorf("failed to unmarshal StorageCredential as StorageCredentialClientCredentials: %s", err.Error())
+		}
 	}
+
+	// check if the discriminator value is 'cloudflare-r2'
+	if jsonDict["credential-type"] == "cloudflare-r2" {
+		// try to unmarshal JSON data into StorageCredentialCloudflareR2
+		err = json.Unmarshal(data, &dst.StorageCredentialCloudflareR2)
+		if err == nil {
+			return nil // data stored in dst.StorageCredentialCloudflareR2, return on the first match
+		} else {
+			dst.StorageCredentialCloudflareR2 = nil
+			return fmt.Errorf("failed to unmarshal StorageCredential as StorageCredentialCloudflareR2: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'gcp-system-identity'
+	if jsonDict["credential-type"] == "gcp-system-identity" {
+		// try to unmarshal JSON data into StorageCredentialGcpSystemIdentity
+		err = json.Unmarshal(data, &dst.StorageCredentialGcpSystemIdentity)
+		if err == nil {
+			return nil // data stored in dst.StorageCredentialGcpSystemIdentity, return on the first match
+		} else {
+			dst.StorageCredentialGcpSystemIdentity = nil
+			return fmt.Errorf("failed to unmarshal StorageCredential as StorageCredentialGcpSystemIdentity: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'service-account-key'
+	if jsonDict["credential-type"] == "service-account-key" {
+		// try to unmarshal JSON data into StorageCredentialServiceAccountKey
+		err = json.Unmarshal(data, &dst.StorageCredentialServiceAccountKey)
+		if err == nil {
+			return nil // data stored in dst.StorageCredentialServiceAccountKey, return on the first match
+		} else {
+			dst.StorageCredentialServiceAccountKey = nil
+			return fmt.Errorf("failed to unmarshal StorageCredential as StorageCredentialServiceAccountKey: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'shared-access-key'
+	if jsonDict["credential-type"] == "shared-access-key" {
+		// try to unmarshal JSON data into StorageCredentialSharedAccessKey
+		err = json.Unmarshal(data, &dst.StorageCredentialSharedAccessKey)
+		if err == nil {
+			return nil // data stored in dst.StorageCredentialSharedAccessKey, return on the first match
+		} else {
+			dst.StorageCredentialSharedAccessKey = nil
+			return fmt.Errorf("failed to unmarshal StorageCredential as StorageCredentialSharedAccessKey: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'StorageCredentialAccessKey'
+	if jsonDict["credential-type"] == "StorageCredentialAccessKey" {
+		// try to unmarshal JSON data into StorageCredentialAccessKey
+		err = json.Unmarshal(data, &dst.StorageCredentialAccessKey)
+		if err == nil {
+			return nil // data stored in dst.StorageCredentialAccessKey, return on the first match
+		} else {
+			dst.StorageCredentialAccessKey = nil
+			return fmt.Errorf("failed to unmarshal StorageCredential as StorageCredentialAccessKey: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'StorageCredentialAwsSystemIdentity'
+	if jsonDict["credential-type"] == "StorageCredentialAwsSystemIdentity" {
+		// try to unmarshal JSON data into StorageCredentialAwsSystemIdentity
+		err = json.Unmarshal(data, &dst.StorageCredentialAwsSystemIdentity)
+		if err == nil {
+			return nil // data stored in dst.StorageCredentialAwsSystemIdentity, return on the first match
+		} else {
+			dst.StorageCredentialAwsSystemIdentity = nil
+			return fmt.Errorf("failed to unmarshal StorageCredential as StorageCredentialAwsSystemIdentity: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'StorageCredentialAzureSystemIdentity'
+	if jsonDict["credential-type"] == "StorageCredentialAzureSystemIdentity" {
+		// try to unmarshal JSON data into StorageCredentialAzureSystemIdentity
+		err = json.Unmarshal(data, &dst.StorageCredentialAzureSystemIdentity)
+		if err == nil {
+			return nil // data stored in dst.StorageCredentialAzureSystemIdentity, return on the first match
+		} else {
+			dst.StorageCredentialAzureSystemIdentity = nil
+			return fmt.Errorf("failed to unmarshal StorageCredential as StorageCredentialAzureSystemIdentity: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'StorageCredentialClientCredentials'
+	if jsonDict["credential-type"] == "StorageCredentialClientCredentials" {
+		// try to unmarshal JSON data into StorageCredentialClientCredentials
+		err = json.Unmarshal(data, &dst.StorageCredentialClientCredentials)
+		if err == nil {
+			return nil // data stored in dst.StorageCredentialClientCredentials, return on the first match
+		} else {
+			dst.StorageCredentialClientCredentials = nil
+			return fmt.Errorf("failed to unmarshal StorageCredential as StorageCredentialClientCredentials: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'StorageCredentialCloudflareR2'
+	if jsonDict["credential-type"] == "StorageCredentialCloudflareR2" {
+		// try to unmarshal JSON data into StorageCredentialCloudflareR2
+		err = json.Unmarshal(data, &dst.StorageCredentialCloudflareR2)
+		if err == nil {
+			return nil // data stored in dst.StorageCredentialCloudflareR2, return on the first match
+		} else {
+			dst.StorageCredentialCloudflareR2 = nil
+			return fmt.Errorf("failed to unmarshal StorageCredential as StorageCredentialCloudflareR2: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'StorageCredentialGcpSystemIdentity'
+	if jsonDict["credential-type"] == "StorageCredentialGcpSystemIdentity" {
+		// try to unmarshal JSON data into StorageCredentialGcpSystemIdentity
+		err = json.Unmarshal(data, &dst.StorageCredentialGcpSystemIdentity)
+		if err == nil {
+			return nil // data stored in dst.StorageCredentialGcpSystemIdentity, return on the first match
+		} else {
+			dst.StorageCredentialGcpSystemIdentity = nil
+			return fmt.Errorf("failed to unmarshal StorageCredential as StorageCredentialGcpSystemIdentity: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'StorageCredentialServiceAccountKey'
+	if jsonDict["credential-type"] == "StorageCredentialServiceAccountKey" {
+		// try to unmarshal JSON data into StorageCredentialServiceAccountKey
+		err = json.Unmarshal(data, &dst.StorageCredentialServiceAccountKey)
+		if err == nil {
+			return nil // data stored in dst.StorageCredentialServiceAccountKey, return on the first match
+		} else {
+			dst.StorageCredentialServiceAccountKey = nil
+			return fmt.Errorf("failed to unmarshal StorageCredential as StorageCredentialServiceAccountKey: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'StorageCredentialSharedAccessKey'
+	if jsonDict["credential-type"] == "StorageCredentialSharedAccessKey" {
+		// try to unmarshal JSON data into StorageCredentialSharedAccessKey
+		err = json.Unmarshal(data, &dst.StorageCredentialSharedAccessKey)
+		if err == nil {
+			return nil // data stored in dst.StorageCredentialSharedAccessKey, return on the first match
+		} else {
+			dst.StorageCredentialSharedAccessKey = nil
+			return fmt.Errorf("failed to unmarshal StorageCredential as StorageCredentialSharedAccessKey: %s", err.Error())
+		}
+	}
+
+	return nil
 }
 
 // Marshal data from the first non-nil pointers in the struct to JSON
 func (src StorageCredential) MarshalJSON() ([]byte, error) {
-	if src.StorageCredentialAz != nil {
-		return json.Marshal(&src.StorageCredentialAz)
+	if src.StorageCredentialAccessKey != nil {
+		return json.Marshal(&src.StorageCredentialAccessKey)
 	}
 
-	if src.StorageCredentialGcs != nil {
-		return json.Marshal(&src.StorageCredentialGcs)
+	if src.StorageCredentialAwsSystemIdentity != nil {
+		return json.Marshal(&src.StorageCredentialAwsSystemIdentity)
 	}
 
-	if src.StorageCredentialS3 != nil {
-		return json.Marshal(&src.StorageCredentialS3)
+	if src.StorageCredentialAzureSystemIdentity != nil {
+		return json.Marshal(&src.StorageCredentialAzureSystemIdentity)
+	}
+
+	if src.StorageCredentialClientCredentials != nil {
+		return json.Marshal(&src.StorageCredentialClientCredentials)
+	}
+
+	if src.StorageCredentialCloudflareR2 != nil {
+		return json.Marshal(&src.StorageCredentialCloudflareR2)
+	}
+
+	if src.StorageCredentialGcpSystemIdentity != nil {
+		return json.Marshal(&src.StorageCredentialGcpSystemIdentity)
+	}
+
+	if src.StorageCredentialServiceAccountKey != nil {
+		return json.Marshal(&src.StorageCredentialServiceAccountKey)
+	}
+
+	if src.StorageCredentialSharedAccessKey != nil {
+		return json.Marshal(&src.StorageCredentialSharedAccessKey)
 	}
 
 	return nil, nil // no data in oneOf schemas
@@ -122,16 +330,36 @@ func (obj *StorageCredential) GetActualInstance() interface{} {
 	if obj == nil {
 		return nil
 	}
-	if obj.StorageCredentialAz != nil {
-		return obj.StorageCredentialAz
+	if obj.StorageCredentialAccessKey != nil {
+		return obj.StorageCredentialAccessKey
 	}
 
-	if obj.StorageCredentialGcs != nil {
-		return obj.StorageCredentialGcs
+	if obj.StorageCredentialAwsSystemIdentity != nil {
+		return obj.StorageCredentialAwsSystemIdentity
 	}
 
-	if obj.StorageCredentialS3 != nil {
-		return obj.StorageCredentialS3
+	if obj.StorageCredentialAzureSystemIdentity != nil {
+		return obj.StorageCredentialAzureSystemIdentity
+	}
+
+	if obj.StorageCredentialClientCredentials != nil {
+		return obj.StorageCredentialClientCredentials
+	}
+
+	if obj.StorageCredentialCloudflareR2 != nil {
+		return obj.StorageCredentialCloudflareR2
+	}
+
+	if obj.StorageCredentialGcpSystemIdentity != nil {
+		return obj.StorageCredentialGcpSystemIdentity
+	}
+
+	if obj.StorageCredentialServiceAccountKey != nil {
+		return obj.StorageCredentialServiceAccountKey
+	}
+
+	if obj.StorageCredentialSharedAccessKey != nil {
+		return obj.StorageCredentialSharedAccessKey
 	}
 
 	// all schemas are nil
