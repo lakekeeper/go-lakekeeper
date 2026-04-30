@@ -30,6 +30,22 @@ golangci-lint is invoked via `go run github.com/golangci/golangci-lint/v2/cmd/go
 
   Do not introduce alternative aliases.
 
+## Discipline
+
+These skills are loaded in this environment and should be **actively invoked**
+when their domain comes up — not just consulted by their description line.
+
+- **`dev-discipline:tdd-bdd`** — implementation work follows Red-Green-Refactor:
+  write the failing test first, observe failure, write the impl, observe green.
+  Do not bundle "add code + add test" as a single operation.
+- **`go-dev:go-idioms`** — settled Go-idiom questions (e.g. *accept interfaces,
+  return structs*, error wrapping style, package layout) are not user choices.
+  State the canonical answer directly; do not surface them for selection.
+- **`lakekeeper-knowledge:lakekeeper-concepts`** — apply when reasoning about
+  Server / Project / Warehouse / Namespace / Role entities, the Management API
+  surface, or relationships to Postgres / Vault / OpenFGA / external IdPs.
+  Prefer the skill's vocabulary over guessing from the code.
+
 ## Commits and branches
 
 - **Conventional Commits are required.** `release-please` parses messages to compute versions and generate `CHANGELOG.md` (`feat:`, `fix:`, `chore:`, `docs:`, etc.).
