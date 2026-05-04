@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Go client library plus `lkctl` CLI for the Lakekeeper Iceberg catalog. Single-module project; requires Go 1.24+.
 
+Keep this `.claude/` tree small. Most colleagues are new to Claude Code; prefer notes here and on-demand skills over hooks or `settings.json` automation.
+
 ## Commands
 
 Everything goes through `make`:
@@ -29,6 +31,12 @@ golangci-lint is invoked via `go run github.com/golangci/golangci-lint/v2/cmd/go
   - management / permission / storage API packages → `managementv1` / `permissionv1` / `storagev1`
 
   Do not introduce alternative aliases.
+
+## Generation
+
+`make generate` regenerates `pkg/apis/management/v1/` from `api/openapi/management-open-api.yaml` via a preprocessor + `openapi-generator-cli`. See [docs/GENERATION.md](../docs/GENERATION.md) for the full pipeline.
+
+**`api/openapi/*-config.yaml` convention:** only set options whose value differs from the generator default. Don't pin defaults explicitly — these files document deviations, not the full surface.
 
 ## Discipline
 
@@ -55,3 +63,7 @@ when their domain comes up — not just consulted by their description line.
 ## Integration-test environment
 
 `make test-integration` creates `.env` (if missing) with test credentials, then runs `./run-tests.sh`, which brings up `docker-compose.yml` and waits via `./scripts/await-healthy.sh`. Requires a running Docker daemon plus `docker compose` (or `docker-compose`).
+
+## Personal vs team rules
+
+Anything in this `CLAUDE.md` is team-shared and committed. Personal/session-level learnings live in `~/.claude/projects/-<repo-slug>/memory/` — not checked in, not propagated to teammates. If a personal rule turns out to be broadly applicable, propose adding it here.
