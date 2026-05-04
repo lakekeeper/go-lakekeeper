@@ -5,6 +5,7 @@ import (
 	"sort"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -23,7 +24,74 @@ func TestNewWarehouseCmdSubcommands(t *testing.T) {
 		got = append(got, sub.Name())
 	}
 	sort.Strings(got)
-	assert.Equal(t, []string{"create", "delete", "get", "list"}, got)
+	assert.Equal(t, []string{"access", "activate", "assignments", "create", "deactivate", "delete", "get", "grant", "list", "rename", "revoke", "set-protection", "statistics"}, got)
+}
+
+// TestWarehouseSetProtectionRequiresFlag verifies that `lkctl warehouse
+// set-protection WAREHOUSEID` rejects a missing --protected flag before
+// newClient is called: cobra's MarkFlagRequired surfaces the error.
+func TestWarehouseSetProtectionRequiresFlag(t *testing.T) {
+	t.Parallel()
+
+	root := newWarehouseCmd(&clientOptions{})
+	var buf bytes.Buffer
+	root.SetOut(&buf)
+	root.SetErr(&buf)
+	root.SetArgs([]string{"set-protection", "wh-1"})
+
+	err := root.Execute()
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "protected")
+}
+
+// TestWarehouseAccessUserRoleMutex verifies the pre-network guard: passing
+// both --user and --role to `lkctl warehouse access` fails before newClient
+// is called.
+func TestWarehouseAccessUserRoleMutex(t *testing.T) {
+	t.Parallel()
+
+	root := newWarehouseCmd(&clientOptions{})
+	var buf bytes.Buffer
+	root.SetOut(&buf)
+	root.SetErr(&buf)
+	root.SetArgs([]string{"access", "wh-1", "--user", "alice", "--role", "role-1"})
+
+	err := root.Execute()
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "mutually exclusive")
+}
+
+// TestWarehouseGrantNoUsersOrRoles verifies the pre-network guard: `lkctl
+// warehouse grant <id> --assignments ownership` (without any --users or
+// --roles) fails before newClient is called.
+func TestWarehouseGrantNoUsersOrRoles(t *testing.T) {
+	t.Parallel()
+
+	root := newWarehouseCmd(&clientOptions{})
+	var buf bytes.Buffer
+	root.SetOut(&buf)
+	root.SetErr(&buf)
+	root.SetArgs([]string{"grant", "wh-1", "--assignments", "ownership"})
+
+	err := root.Execute()
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "at least one --users or --roles")
+}
+
+// TestWarehouseRevokeNoUsersOrRoles is the revoke-side counterpart to
+// TestWarehouseGrantNoUsersOrRoles: same pre-network guard, same error.
+func TestWarehouseRevokeNoUsersOrRoles(t *testing.T) {
+	t.Parallel()
+
+	root := newWarehouseCmd(&clientOptions{})
+	var buf bytes.Buffer
+	root.SetOut(&buf)
+	root.SetErr(&buf)
+	root.SetArgs([]string{"revoke", "wh-1", "--assignments", "ownership"})
+
+	err := root.Execute()
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "at least one --users or --roles")
 }
 
 func TestPrintWarehousesText(t *testing.T) {
@@ -94,6 +162,35 @@ func TestPrintWarehousesEmpty(t *testing.T) {
 	var buf bytes.Buffer
 	require.NoError(t, printWarehouses(&buf, "text"))
 	assert.Equal(t, "No warehouses available\n", buf.String())
+}
+
+func TestPrintWarehouseStatistics(t *testing.T) {
+	t.Parallel()
+
+	ts := time.Date(2026, 5, 4, 10, 0, 0, 0, time.UTC)
+	stats := []managementv1.WarehouseStatistics{
+		{NumberOfTables: 7, NumberOfViews: 3, Timestamp: ts, UpdatedAt: ts},
+	}
+
+	var buf bytes.Buffer
+	require.NoError(t, printWarehouseStatistics(&buf, stats...))
+	out := buf.String()
+
+	assert.Contains(t, out, "TIMESTAMP")
+	assert.Contains(t, out, "TABLES")
+	assert.Contains(t, out, "VIEWS")
+	assert.Contains(t, out, "UPDATED AT")
+	assert.Contains(t, out, "2026-05-04T10:00:00Z")
+	assert.Contains(t, out, "7")
+	assert.Contains(t, out, "3")
+}
+
+func TestPrintWarehouseStatisticsEmpty(t *testing.T) {
+	t.Parallel()
+
+	var buf bytes.Buffer
+	require.NoError(t, printWarehouseStatistics(&buf))
+	assert.Equal(t, "No statistics available\n", buf.String())
 }
 
 // TestWarehouseCreateRejectsNameMismatch covers the pre-network validation

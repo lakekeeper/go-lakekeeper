@@ -7,11 +7,13 @@ import (
 	"io"
 	"os"
 	"text/tabwriter"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
+	"github.com/lakekeeper/go-lakekeeper/pkg/permissions"
 )
 
 func newWarehouseCmd(opts *clientOptions) *cobra.Command {
@@ -31,7 +33,16 @@ func newWarehouseCmd(opts *clientOptions) *cobra.Command {
 	cmd.AddCommand(newWarehouseListCmd(opts, &project))
 	cmd.AddCommand(newWarehouseGetCmd(opts))
 	cmd.AddCommand(newWarehouseCreateCmd(opts, &project))
+	cmd.AddCommand(newWarehouseRenameCmd(opts))
+	cmd.AddCommand(newWarehouseActivateCmd(opts))
+	cmd.AddCommand(newWarehouseDeactivateCmd(opts))
+	cmd.AddCommand(newWarehouseSetProtectionCmd(opts))
+	cmd.AddCommand(newWarehouseStatisticsCmd(opts))
 	cmd.AddCommand(newWarehouseDeleteCmd(opts))
+	cmd.AddCommand(newWarehouseAccessCmd(opts))
+	cmd.AddCommand(newWarehouseAssignmentsCmd(opts))
+	cmd.AddCommand(newWarehouseGrantCmd(opts))
+	cmd.AddCommand(newWarehouseRevokeCmd(opts))
 
 	return cmd
 }
@@ -99,6 +110,9 @@ func newWarehouseGetCmd(opts *clientOptions) *cobra.Command {
 			wh, _, err := c.WarehouseAPI.GetWarehouse(ctx, args[0]).Execute()
 			if err != nil {
 				return fmt.Errorf("get warehouse: %w", err)
+			}
+			if wh == nil {
+				return errors.New("get warehouse: empty response")
 			}
 			switch output {
 			case "json":
@@ -174,6 +188,171 @@ func newWarehouseCreateCmd(opts *clientOptions, project *string) *cobra.Command 
 	return cmd
 }
 
+func newWarehouseRenameCmd(opts *clientOptions) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "rename WAREHOUSEID NEW-NAME",
+		Short: "Rename a warehouse",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := cmd.Context()
+			c, err := newClient(ctx, opts)
+			if err != nil {
+				return err
+			}
+
+			req := managementv1.NewRenameWarehouseRequest(args[1])
+			if _, _, err := c.WarehouseAPI.RenameWarehouse(ctx, args[0]).RenameWarehouseRequest(*req).Execute(); err != nil {
+				return fmt.Errorf("rename warehouse: %w", err)
+			}
+			fmt.Fprintf(cmd.OutOrStdout(), "Warehouse %s renamed to %s\n", args[0], args[1])
+			return nil
+		},
+	}
+	return cmd
+}
+
+func newWarehouseActivateCmd(opts *clientOptions) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "activate WAREHOUSEID",
+		Short: "Activate a warehouse",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := cmd.Context()
+			c, err := newClient(ctx, opts)
+			if err != nil {
+				return err
+			}
+			if _, err := c.WarehouseAPI.ActivateWarehouse(ctx, args[0]).Execute(); err != nil {
+				return fmt.Errorf("activate warehouse: %w", err)
+			}
+			fmt.Fprintf(cmd.OutOrStdout(), "Warehouse %s activated\n", args[0])
+			return nil
+		},
+	}
+	return cmd
+}
+
+func newWarehouseDeactivateCmd(opts *clientOptions) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "deactivate WAREHOUSEID",
+		Short: "Deactivate a warehouse",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := cmd.Context()
+			c, err := newClient(ctx, opts)
+			if err != nil {
+				return err
+			}
+			if _, err := c.WarehouseAPI.DeactivateWarehouse(ctx, args[0]).Execute(); err != nil {
+				return fmt.Errorf("deactivate warehouse: %w", err)
+			}
+			fmt.Fprintf(cmd.OutOrStdout(), "Warehouse %s deactivated\n", args[0])
+			return nil
+		},
+	}
+	return cmd
+}
+
+func newWarehouseSetProtectionCmd(opts *clientOptions) *cobra.Command {
+	var (
+		protected bool
+		output    string
+	)
+
+	cmd := &cobra.Command{
+		Use:   "set-protection WAREHOUSEID --protected=true|false",
+		Short: "Set protection on a warehouse",
+		Long:  "Set protection on a warehouse. A protected warehouse cannot be deleted unless force is used.",
+		Example: `  # Protect a warehouse
+  lkctl warehouse set-protection 0198618c-5be8-7a82-a0b9-1076c9dd12f0 --protected=true
+
+  # Unprotect a warehouse
+  lkctl warehouse set-protection 0198618c-5be8-7a82-a0b9-1076c9dd12f0 --protected=false`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := cmd.Context()
+			c, err := newClient(ctx, opts)
+			if err != nil {
+				return err
+			}
+
+			req := managementv1.NewSetProtectionRequest(protected)
+			resp, _, err := c.WarehouseAPI.SetWarehouseProtection(ctx, args[0]).SetProtectionRequest(*req).Execute()
+			if err != nil {
+				return fmt.Errorf("set warehouse protection: %w", err)
+			}
+
+			switch output {
+			case "json":
+				return printJSON(cmd.OutOrStdout(), resp)
+			case "text":
+				fmt.Fprintf(cmd.OutOrStdout(), "Warehouse %s protection set to %t\n", args[0], resp.Protected)
+				return nil
+			default:
+				return fmt.Errorf("unknown output format: %s", output)
+			}
+		},
+	}
+
+	cmd.Flags().BoolVar(&protected, "protected", false, "Whether the warehouse is protected from deletion")
+	if err := cmd.MarkFlagRequired("protected"); err != nil {
+		panic(err) // unreachable: the flag was just registered.
+	}
+	cmd.Flags().StringVarP(&output, "output", "o", "text", "Output format. One of: json|text")
+	return cmd
+}
+
+func newWarehouseStatisticsCmd(opts *clientOptions) *cobra.Command {
+	var (
+		pageSize  int64
+		pageToken string
+		output    string
+	)
+
+	cmd := &cobra.Command{
+		Use:   "statistics WAREHOUSEID",
+		Short: "Get warehouse statistics",
+		Long:  "Get warehouse statistics. Returns ordered statistics entries with table and view counts at each sample timestamp.",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := cmd.Context()
+			c, err := newClient(ctx, opts)
+			if err != nil {
+				return err
+			}
+
+			req := c.WarehouseAPI.GetWarehouseStatistics(ctx, args[0]).PageSize(pageSize)
+			if pageToken != "" {
+				req = req.PageToken(pageToken)
+			}
+			resp, _, err := req.Execute()
+			if err != nil {
+				return fmt.Errorf("get warehouse statistics: %w", err)
+			}
+
+			switch output {
+			case "json":
+				return printJSON(cmd.OutOrStdout(), resp)
+			case "text":
+				if err := printWarehouseStatistics(cmd.OutOrStdout(), resp.Stats...); err != nil {
+					return err
+				}
+				if resp.NextPageToken.IsSet() {
+					fmt.Fprintf(cmd.OutOrStdout(), "\nNext page token: %s\n", *resp.NextPageToken.Get())
+				}
+				return nil
+			default:
+				return fmt.Errorf("unknown output format: %s", output)
+			}
+		},
+	}
+
+	cmd.Flags().Int64Var(&pageSize, "page-size", 100, "Upper bound on the number of results returned to the client")
+	cmd.Flags().StringVar(&pageToken, "page-token", "", "Pagination token")
+	cmd.Flags().StringVarP(&output, "output", "o", "text", "Output format. One of: json|text")
+	return cmd
+}
+
 func newWarehouseDeleteCmd(opts *clientOptions) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "delete WAREHOUSEID",
@@ -192,6 +371,226 @@ func newWarehouseDeleteCmd(opts *clientOptions) *cobra.Command {
 			fmt.Fprintf(cmd.OutOrStdout(), "Warehouse %s deleted\n", args[0])
 			return nil
 		},
+	}
+	return cmd
+}
+
+func newWarehouseAccessCmd(opts *clientOptions) *cobra.Command {
+	var (
+		access accessOpts
+		output string
+	)
+
+	cmd := &cobra.Command{
+		Use:   "access WAREHOUSEID",
+		Short: "Get warehouse access",
+		Long:  "Get warehouse access. By default, the current user's access on the warehouse is returned.",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if access.user != "" && access.role != "" {
+				return errors.New("--user and --role are mutually exclusive")
+			}
+
+			ctx := cmd.Context()
+			c, err := newClient(ctx, opts)
+			if err != nil {
+				return err
+			}
+
+			req := c.PermissionsOpenfgaAPI.GetWarehouseAccessById(ctx, args[0])
+			if access.user != "" {
+				req = req.PrincipalUser(access.user)
+			}
+			if access.role != "" {
+				req = req.PrincipalRole(access.role)
+			}
+			resp, _, err := req.Execute()
+			if err != nil {
+				return fmt.Errorf("get warehouse access: %w", err)
+			}
+
+			switch output {
+			case "json":
+				return printJSON(cmd.OutOrStdout(), resp)
+			case "text":
+				return printAllowedActions(cmd.OutOrStdout(), resp.AllowedActions)
+			default:
+				return fmt.Errorf("unknown output format: %s", output)
+			}
+		},
+	}
+
+	addAccessFlags(cmd, &access)
+	cmd.Flags().StringVarP(&output, "output", "o", "text", "Output format. One of: json|text")
+	return cmd
+}
+
+func newWarehouseAssignmentsCmd(opts *clientOptions) *cobra.Command {
+	var (
+		assignments assignmentsOpts
+		output      string
+	)
+
+	cmd := &cobra.Command{
+		Use:   "assignments WAREHOUSEID",
+		Short: "Get warehouse assignments",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := cmd.Context()
+			c, err := newClient(ctx, opts)
+			if err != nil {
+				return err
+			}
+
+			req := c.PermissionsOpenfgaAPI.GetWarehouseAssignmentsById(ctx, args[0])
+			if len(assignments.relations) > 0 {
+				rels := make([]managementv1.WarehouseRelation, 0, len(assignments.relations))
+				for _, r := range assignments.relations {
+					rels = append(rels, managementv1.WarehouseRelation(r))
+				}
+				req = req.Relations(rels)
+			}
+			resp, _, err := req.Execute()
+			if err != nil {
+				return fmt.Errorf("get warehouse assignments: %w", err)
+			}
+
+			switch output {
+			case "json":
+				return printJSON(cmd.OutOrStdout(), resp)
+			case "text":
+				return printAssignments(cmd.OutOrStdout(), resp.Assignments...)
+			default:
+				return fmt.Errorf("unknown output format: %s", output)
+			}
+		},
+	}
+
+	addAssignmentsFlags(cmd, &assignments)
+	cmd.Flags().StringVarP(&output, "output", "o", "text", "Output format. One of: json|text")
+	return cmd
+}
+
+func newWarehouseGrantCmd(opts *clientOptions) *cobra.Command {
+	var (
+		users       []string
+		roles       []string
+		assignments []string
+	)
+
+	cmd := &cobra.Command{
+		Use:     "grant WAREHOUSEID",
+		Aliases: []string{"assign"},
+		Short:   "Add warehouse assignments",
+		Example: `  # Grant ownership to a user
+  lkctl warehouse grant 0198618c-5be8-7a82-a0b9-1076c9dd12f0 --users 11111111-2222-3333-4444-555555555555 --assignments ownership
+
+  # Grant describe to a role
+  lkctl warehouse grant 0198618c-5be8-7a82-a0b9-1076c9dd12f0 --roles 11111111-2222-3333-4444-555555555555 --assignments describe`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(users) == 0 && len(roles) == 0 {
+				return errors.New("at least one --users or --roles value is required")
+			}
+
+			req := managementv1.NewUpdateWarehouseAssignmentsRequest()
+			for _, rel := range assignments {
+				for _, u := range users {
+					a, err := permissions.BuildAssignment[managementv1.WarehouseAssignment](rel, permissions.PrincipalUser, u)
+					if err != nil {
+						return err
+					}
+					req.Writes = append(req.Writes, a)
+				}
+				for _, r := range roles {
+					a, err := permissions.BuildAssignment[managementv1.WarehouseAssignment](rel, permissions.PrincipalRole, r)
+					if err != nil {
+						return err
+					}
+					req.Writes = append(req.Writes, a)
+				}
+			}
+
+			ctx := cmd.Context()
+			c, err := newClient(ctx, opts)
+			if err != nil {
+				return err
+			}
+			if _, err := c.PermissionsOpenfgaAPI.UpdateWarehouseAssignmentsById(ctx, args[0]).UpdateWarehouseAssignmentsRequest(*req).Execute(); err != nil {
+				return fmt.Errorf("update warehouse assignments: %w", err)
+			}
+			fmt.Fprintln(cmd.OutOrStdout(), "Warehouse permissions updated")
+			return nil
+		},
+	}
+
+	cmd.Flags().StringSliceVar(&users, "users", nil, "Grant access to users; repeat or comma-separate for multiple")
+	cmd.Flags().StringSliceVar(&roles, "roles", nil, "Grant access to roles; repeat or comma-separate for multiple")
+	cmd.Flags().StringSliceVar(&assignments, "assignments", nil, "Assignment relations to apply; repeat or comma-separate for multiple")
+	if err := cmd.MarkFlagRequired("assignments"); err != nil {
+		panic(err) // unreachable: the flag was just registered.
+	}
+	return cmd
+}
+
+func newWarehouseRevokeCmd(opts *clientOptions) *cobra.Command {
+	var (
+		users       []string
+		roles       []string
+		assignments []string
+	)
+
+	cmd := &cobra.Command{
+		Use:     "revoke WAREHOUSEID",
+		Aliases: []string{"unassign"},
+		Short:   "Remove warehouse assignments",
+		Example: `  # Revoke ownership from a user
+  lkctl warehouse revoke 0198618c-5be8-7a82-a0b9-1076c9dd12f0 --users 11111111-2222-3333-4444-555555555555 --assignments ownership
+
+  # Revoke describe from a role
+  lkctl warehouse revoke 0198618c-5be8-7a82-a0b9-1076c9dd12f0 --roles 11111111-2222-3333-4444-555555555555 --assignments describe`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(users) == 0 && len(roles) == 0 {
+				return errors.New("at least one --users or --roles value is required")
+			}
+
+			req := managementv1.NewUpdateWarehouseAssignmentsRequest()
+			for _, rel := range assignments {
+				for _, u := range users {
+					a, err := permissions.BuildAssignment[managementv1.WarehouseAssignment](rel, permissions.PrincipalUser, u)
+					if err != nil {
+						return err
+					}
+					req.Deletes = append(req.Deletes, a)
+				}
+				for _, r := range roles {
+					a, err := permissions.BuildAssignment[managementv1.WarehouseAssignment](rel, permissions.PrincipalRole, r)
+					if err != nil {
+						return err
+					}
+					req.Deletes = append(req.Deletes, a)
+				}
+			}
+
+			ctx := cmd.Context()
+			c, err := newClient(ctx, opts)
+			if err != nil {
+				return err
+			}
+			if _, err := c.PermissionsOpenfgaAPI.UpdateWarehouseAssignmentsById(ctx, args[0]).UpdateWarehouseAssignmentsRequest(*req).Execute(); err != nil {
+				return fmt.Errorf("update warehouse assignments: %w", err)
+			}
+			fmt.Fprintln(cmd.OutOrStdout(), "Warehouse permissions updated")
+			return nil
+		},
+	}
+
+	cmd.Flags().StringSliceVar(&users, "users", nil, "Revoke access from users; repeat or comma-separate for multiple")
+	cmd.Flags().StringSliceVar(&roles, "roles", nil, "Revoke access from roles; repeat or comma-separate for multiple")
+	cmd.Flags().StringSliceVar(&assignments, "assignments", nil, "Assignment relations to remove; repeat or comma-separate for multiple")
+	if err := cmd.MarkFlagRequired("assignments"); err != nil {
+		panic(err) // unreachable: the flag was just registered.
 	}
 	return cmd
 }
@@ -215,6 +614,21 @@ func printWarehouses(w io.Writer, output string, warehouses ...managementv1.GetW
 	default:
 		return fmt.Errorf("unknown output format: %s", output)
 	}
+}
+
+func printWarehouseStatistics(w io.Writer, stats ...managementv1.WarehouseStatistics) error {
+	if len(stats) == 0 {
+		_, err := fmt.Fprintln(w, "No statistics available")
+		return err
+	}
+
+	tw := tabwriter.NewWriter(w, 0, 0, 2, ' ', 0)
+	fmt.Fprintln(tw, "TIMESTAMP\tTABLES\tVIEWS\tUPDATED AT")
+	for _, s := range stats {
+		fmt.Fprintf(tw, "%s\t%d\t%d\t%s\n",
+			s.Timestamp.Format(time.RFC3339), s.NumberOfTables, s.NumberOfViews, s.UpdatedAt.Format(time.RFC3339))
+	}
+	return tw.Flush()
 }
 
 // storageFamily returns "s3", "gcs", or "adls" depending on which variant of

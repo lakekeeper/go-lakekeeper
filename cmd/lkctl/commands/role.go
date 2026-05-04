@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/cobra"
 
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
+	"github.com/lakekeeper/go-lakekeeper/pkg/permissions"
 )
 
 func newRoleCmd(opts *clientOptions) *cobra.Command {
@@ -34,6 +35,7 @@ func newRoleCmd(opts *clientOptions) *cobra.Command {
 	cmd.AddCommand(newRoleAccessCmd(opts))
 	cmd.AddCommand(newRoleAssignmentsCmd(opts))
 	cmd.AddCommand(newRoleGrantCmd(opts))
+	cmd.AddCommand(newRoleRevokeCmd(opts))
 
 	return cmd
 }
@@ -367,14 +369,14 @@ func newRoleGrantCmd(opts *clientOptions) *cobra.Command {
 			req := managementv1.NewUpdateRoleAssignmentsRequest()
 			for _, rel := range assignments {
 				for _, u := range users {
-					a, err := buildAssignment[managementv1.RoleAssignment](rel, principalUser, u)
+					a, err := permissions.BuildAssignment[managementv1.RoleAssignment](rel, permissions.PrincipalUser, u)
 					if err != nil {
 						return err
 					}
 					req.Writes = append(req.Writes, a)
 				}
 				for _, r := range roles {
-					a, err := buildAssignment[managementv1.RoleAssignment](rel, principalRole, r)
+					a, err := permissions.BuildAssignment[managementv1.RoleAssignment](rel, permissions.PrincipalRole, r)
 					if err != nil {
 						return err
 					}
@@ -398,6 +400,68 @@ func newRoleGrantCmd(opts *clientOptions) *cobra.Command {
 	cmd.Flags().StringSliceVar(&users, "users", nil, "Grant access to users; repeat or comma-separate for multiple")
 	cmd.Flags().StringSliceVar(&roles, "roles", nil, "Grant access to roles; repeat or comma-separate for multiple")
 	cmd.Flags().StringSliceVar(&assignments, "assignments", nil, "Assignment relations to apply; repeat or comma-separate for multiple")
+	if err := cmd.MarkFlagRequired("assignments"); err != nil {
+		panic(err) // unreachable: the flag was just registered.
+	}
+	return cmd
+}
+
+func newRoleRevokeCmd(opts *clientOptions) *cobra.Command {
+	var (
+		users       []string
+		roles       []string
+		assignments []string
+	)
+
+	cmd := &cobra.Command{
+		Use:     "revoke ROLEID",
+		Aliases: []string{"unassign"},
+		Short:   "Remove role assignments",
+		Example: `  # Revoke ownership from a user
+  lkctl role revoke 0198618c-5be8-7a82-a0b9-1076c9dd12f0 --users 11111111-2222-3333-4444-555555555555 --assignments ownership
+
+  # Revoke assignee from a role
+  lkctl role revoke 0198618c-5be8-7a82-a0b9-1076c9dd12f0 --roles 11111111-2222-3333-4444-555555555555 --assignments assignee`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(users) == 0 && len(roles) == 0 {
+				return errors.New("at least one --users or --roles value is required")
+			}
+
+			req := managementv1.NewUpdateRoleAssignmentsRequest()
+			for _, rel := range assignments {
+				for _, u := range users {
+					a, err := permissions.BuildAssignment[managementv1.RoleAssignment](rel, permissions.PrincipalUser, u)
+					if err != nil {
+						return err
+					}
+					req.Deletes = append(req.Deletes, a)
+				}
+				for _, r := range roles {
+					a, err := permissions.BuildAssignment[managementv1.RoleAssignment](rel, permissions.PrincipalRole, r)
+					if err != nil {
+						return err
+					}
+					req.Deletes = append(req.Deletes, a)
+				}
+			}
+
+			ctx := cmd.Context()
+			c, err := newClient(ctx, opts)
+			if err != nil {
+				return err
+			}
+			if _, err := c.PermissionsOpenfgaAPI.UpdateRoleAssignmentsById(ctx, args[0]).UpdateRoleAssignmentsRequest(*req).Execute(); err != nil {
+				return fmt.Errorf("update role assignments: %w", err)
+			}
+			fmt.Fprintln(cmd.OutOrStdout(), "Role permissions updated")
+			return nil
+		},
+	}
+
+	cmd.Flags().StringSliceVar(&users, "users", nil, "Revoke access from users; repeat or comma-separate for multiple")
+	cmd.Flags().StringSliceVar(&roles, "roles", nil, "Revoke access from roles; repeat or comma-separate for multiple")
+	cmd.Flags().StringSliceVar(&assignments, "assignments", nil, "Assignment relations to remove; repeat or comma-separate for multiple")
 	if err := cmd.MarkFlagRequired("assignments"); err != nil {
 		panic(err) // unreachable: the flag was just registered.
 	}

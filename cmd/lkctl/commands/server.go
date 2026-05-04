@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
+	"github.com/lakekeeper/go-lakekeeper/pkg/permissions"
 )
 
 func newServerCmd(opts *clientOptions) *cobra.Command {
@@ -26,6 +27,7 @@ func newServerCmd(opts *clientOptions) *cobra.Command {
 	cmd.AddCommand(newServerAccessCmd(opts))
 	cmd.AddCommand(newServerAssignmentsCmd(opts))
 	cmd.AddCommand(newServerGrantCmd(opts))
+	cmd.AddCommand(newServerRevokeCmd(opts))
 
 	return cmd
 }
@@ -233,14 +235,14 @@ func newServerGrantCmd(opts *clientOptions) *cobra.Command {
 			req := managementv1.NewUpdateServerAssignmentsRequest()
 			for _, rel := range assignments {
 				for _, u := range users {
-					a, err := buildAssignment[managementv1.ServerAssignment](rel, principalUser, u)
+					a, err := permissions.BuildAssignment[managementv1.ServerAssignment](rel, permissions.PrincipalUser, u)
 					if err != nil {
 						return err
 					}
 					req.Writes = append(req.Writes, a)
 				}
 				for _, r := range roles {
-					a, err := buildAssignment[managementv1.ServerAssignment](rel, principalRole, r)
+					a, err := permissions.BuildAssignment[managementv1.ServerAssignment](rel, permissions.PrincipalRole, r)
 					if err != nil {
 						return err
 					}
@@ -264,6 +266,68 @@ func newServerGrantCmd(opts *clientOptions) *cobra.Command {
 	cmd.Flags().StringSliceVar(&users, "users", nil, "Grant access to users; repeat or comma-separate for multiple")
 	cmd.Flags().StringSliceVar(&roles, "roles", nil, "Grant access to roles; repeat or comma-separate for multiple")
 	cmd.Flags().StringSliceVar(&assignments, "assignments", nil, "Assignment relations to apply; repeat or comma-separate for multiple")
+	if err := cmd.MarkFlagRequired("assignments"); err != nil {
+		panic(err) // unreachable: the flag was just registered.
+	}
+	return cmd
+}
+
+func newServerRevokeCmd(opts *clientOptions) *cobra.Command {
+	var (
+		users       []string
+		roles       []string
+		assignments []string
+	)
+
+	cmd := &cobra.Command{
+		Use:     "revoke",
+		Aliases: []string{"unassign"},
+		Short:   "Remove server assignments",
+		Example: `  # Revoke admin from a user
+  lkctl server revoke --users 0198618c-5be8-7a82-a0b9-1076c9dd12f0 --assignments admin
+
+  # Revoke operator from a role
+  lkctl server revoke --roles 0198618c-5be8-7a82-a0b9-1076c9dd12f0 --assignments operator`,
+		Args: cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, _ []string) error {
+			if len(users) == 0 && len(roles) == 0 {
+				return errors.New("at least one --users or --roles value is required")
+			}
+
+			req := managementv1.NewUpdateServerAssignmentsRequest()
+			for _, rel := range assignments {
+				for _, u := range users {
+					a, err := permissions.BuildAssignment[managementv1.ServerAssignment](rel, permissions.PrincipalUser, u)
+					if err != nil {
+						return err
+					}
+					req.Deletes = append(req.Deletes, a)
+				}
+				for _, r := range roles {
+					a, err := permissions.BuildAssignment[managementv1.ServerAssignment](rel, permissions.PrincipalRole, r)
+					if err != nil {
+						return err
+					}
+					req.Deletes = append(req.Deletes, a)
+				}
+			}
+
+			ctx := cmd.Context()
+			c, err := newClient(ctx, opts)
+			if err != nil {
+				return err
+			}
+			if _, err := c.PermissionsOpenfgaAPI.UpdateServerAssignments(ctx).UpdateServerAssignmentsRequest(*req).Execute(); err != nil {
+				return fmt.Errorf("update server assignments: %w", err)
+			}
+			fmt.Fprintln(cmd.OutOrStdout(), "Server permissions updated")
+			return nil
+		},
+	}
+
+	cmd.Flags().StringSliceVar(&users, "users", nil, "Revoke access from users; repeat or comma-separate for multiple")
+	cmd.Flags().StringSliceVar(&roles, "roles", nil, "Revoke access from roles; repeat or comma-separate for multiple")
+	cmd.Flags().StringSliceVar(&assignments, "assignments", nil, "Assignment relations to remove; repeat or comma-separate for multiple")
 	if err := cmd.MarkFlagRequired("assignments"); err != nil {
 		panic(err) // unreachable: the flag was just registered.
 	}

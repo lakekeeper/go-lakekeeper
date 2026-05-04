@@ -22,7 +22,24 @@ func TestNewServerCmdHasSubcommands(t *testing.T) {
 		got = append(got, sub.Name())
 	}
 	sort.Strings(got)
-	assert.Equal(t, []string{"access", "assignments", "bootstrap", "grant", "info"}, got)
+	assert.Equal(t, []string{"access", "assignments", "bootstrap", "grant", "info", "revoke"}, got)
+}
+
+// TestServerRevokeNoUsersOrRoles verifies the pre-network guard: `lkctl
+// server revoke --assignments admin` (without any --users or --roles) fails
+// before newClient is called.
+func TestServerRevokeNoUsersOrRoles(t *testing.T) {
+	t.Parallel()
+
+	root := newServerCmd(&clientOptions{})
+	var buf bytes.Buffer
+	root.SetOut(&buf)
+	root.SetErr(&buf)
+	root.SetArgs([]string{"revoke", "--assignments", "admin"})
+
+	err := root.Execute()
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "at least one --users or --roles")
 }
 
 func TestPrintServerInfoText(t *testing.T) {

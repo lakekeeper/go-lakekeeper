@@ -10,34 +10,6 @@ import (
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
 )
 
-func TestDescribeAssignmentUser(t *testing.T) {
-	t.Parallel()
-
-	a := managementv1.ServerAssignmentAdminAsServerAssignment(&managementv1.ServerAssignmentAdmin{
-		ServerAssignmentAdminUser: managementv1.NewServerAssignmentAdminUser("alice", "admin"),
-	})
-
-	got, ok := describeAssignment(a)
-	require.True(t, ok)
-	assert.Equal(t, "User", got.PrincipalType)
-	assert.Equal(t, "alice", got.PrincipalID)
-	assert.Equal(t, "admin", got.Relation)
-}
-
-func TestDescribeAssignmentRole(t *testing.T) {
-	t.Parallel()
-
-	a := managementv1.ServerAssignmentOperatorAsServerAssignment(&managementv1.ServerAssignmentOperator{
-		ServerAssignmentOperatorRole: managementv1.NewServerAssignmentOperatorRole("role-id", "operator"),
-	})
-
-	got, ok := describeAssignment(a)
-	require.True(t, ok)
-	assert.Equal(t, "Role", got.PrincipalType)
-	assert.Equal(t, "role-id", got.PrincipalID)
-	assert.Equal(t, "operator", got.Relation)
-}
-
 func TestPrintAssignmentsEmpty(t *testing.T) {
 	t.Parallel()
 
@@ -49,7 +21,7 @@ func TestPrintAssignmentsEmpty(t *testing.T) {
 func TestPrintAssignmentsDroppedWarning(t *testing.T) {
 	t.Parallel()
 
-	// Empty union value — describeAssignment returns ok=false, so the row drops.
+	// Empty union value — DescribeAssignment returns ok=false, so the row drops.
 	var empty managementv1.ServerAssignment
 
 	var buf bytes.Buffer
@@ -70,5 +42,6 @@ func TestPrintAssignmentsTable(t *testing.T) {
 	assert.Contains(t, out, "PRINCIPAL TYPE")
 	assert.Contains(t, out, "alice")
 	assert.Contains(t, out, "admin")
+	// Wire format is "user"; the table title-cases for display.
 	assert.Contains(t, out, "User")
 }

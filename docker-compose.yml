@@ -20,7 +20,6 @@ services:
       - LAKEKEEPER__OPENID_AUDIENCE=lakekeeper
       - LAKEKEEPER__UI__OPENID_PROVIDER_URI=http://localhost:30080/realms/iceberg
       - LAKEKEEPER__UI__OPENID_CLIENT_ID=lakekeeper
-      - LAKEKEEPER__SKIP_STORAGE_VALIDATION=true
       - RUST_LOG=INFO
     command: ["serve"]
     healthcheck:
@@ -32,6 +31,8 @@ services:
     depends_on:
       migrate:
         condition: service_completed_successfully
+      minio:
+        condition: service_healthy
     ports:
       - "8181:8181"
     networks:
@@ -126,6 +127,31 @@ services:
       timeout: 30s
       retries: 3
   
+  # MinIO is the in-stack S3 backend the warehouse / catalog / wire-format
+  # tests point at via http://minio:9000/. MINIO_DEFAULT_BUCKETS provisions
+  # the `testacc` bucket at startup so Lakekeeper's storage validation
+  # succeeds without a separate init container.
+  #
+  # Pinned to the bitnamilegacy registry: Bitnami stopped publishing free
+  # tags under `bitnami/minio` in August 2025, so `bitnami/minio:latest` is
+  # not pullable anonymously anymore. `2025.7.23-debian-12-r5` is the last
+  # public rebuild before the freeze and preserves the MINIO_DEFAULT_BUCKETS
+  # bootstrap behaviour we rely on.
+  minio:
+    image: bitnamilegacy/minio:2025.7.23-debian-12-r5
+    environment:
+      - MINIO_ROOT_USER=minio-root-user
+      - MINIO_ROOT_PASSWORD=minio-root-password
+      - MINIO_DEFAULT_BUCKETS=testacc
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:9000/minio/health/live" ]
+      interval: 2s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    networks:
+      iceberg_net:
+
   keycloak:
     image: quay.io/keycloak/keycloak:26.6.0
     environment:

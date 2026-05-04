@@ -22,7 +22,24 @@ func TestNewProjectCmdSubcommands(t *testing.T) {
 		got = append(got, sub.Name())
 	}
 	sort.Strings(got)
-	assert.Equal(t, []string{"access", "assignments", "create", "delete", "get", "grant", "list", "rename"}, got)
+	assert.Equal(t, []string{"access", "assignments", "create", "delete", "get", "grant", "list", "rename", "revoke"}, got)
+}
+
+// TestProjectRevokeNoUsersOrRoles verifies the pre-network guard: `lkctl
+// project revoke --assignments project_admin` (without any --users or
+// --roles) fails before newClient is called.
+func TestProjectRevokeNoUsersOrRoles(t *testing.T) {
+	t.Parallel()
+
+	root := newProjectCmd(&clientOptions{})
+	var buf bytes.Buffer
+	root.SetOut(&buf)
+	root.SetErr(&buf)
+	root.SetArgs([]string{"revoke", "--assignments", "project_admin"})
+
+	err := root.Execute()
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "at least one --users or --roles")
 }
 
 func TestPrintProjects(t *testing.T) {

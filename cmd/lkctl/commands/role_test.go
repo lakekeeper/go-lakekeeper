@@ -23,7 +23,24 @@ func TestNewRoleCmdSubcommands(t *testing.T) {
 		got = append(got, sub.Name())
 	}
 	sort.Strings(got)
-	assert.Equal(t, []string{"access", "assignments", "create", "delete", "get", "grant", "list", "update"}, got)
+	assert.Equal(t, []string{"access", "assignments", "create", "delete", "get", "grant", "list", "revoke", "update"}, got)
+}
+
+// TestRoleRevokeNoUsersOrRoles verifies the pre-network guard: `lkctl role
+// revoke <role-id> --assignments assignee` (without any --users or --roles)
+// fails before newClient is called.
+func TestRoleRevokeNoUsersOrRoles(t *testing.T) {
+	t.Parallel()
+
+	root := newRoleCmd(&clientOptions{})
+	var buf bytes.Buffer
+	root.SetOut(&buf)
+	root.SetErr(&buf)
+	root.SetArgs([]string{"revoke", "role-1", "--assignments", "assignee"})
+
+	err := root.Execute()
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "at least one --users or --roles")
 }
 
 func TestPrintRolesText(t *testing.T) {
