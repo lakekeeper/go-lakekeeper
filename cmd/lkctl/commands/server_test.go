@@ -48,7 +48,7 @@ func TestPrintServerInfoText(t *testing.T) {
 	info := &managementv1.ServerInfo{
 		ServerId:                     "srv-1",
 		Version:                      "0.9.1",
-		LakekeeperVersion:            "0.9.1",
+		LakekeeperVersion:            managementv1.PtrString("0.9.1"),
 		DefaultProjectId:             *managementv1.NewNullableString(managementv1.PtrString("default-proj")),
 		Bootstrapped:                 true,
 		AuthzBackend:                 "openfga",

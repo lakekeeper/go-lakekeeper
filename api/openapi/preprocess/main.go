@@ -83,6 +83,12 @@ func run(inPath, outPath string) error {
 		return fmt.Errorf("extract presence variants: %w", err)
 	}
 
+	// Phase 1: drop fields from `required:` lists where Lakekeeper retains a
+	// deprecated alias of a renamed field, so the SDK accepts older servers
+	// that emit only the original name. See loosenRequiredFields for the
+	// table of (schema, field) pairs.
+	loosenRequired(schemas)
+
 	// For each named schema with a oneOf, attempt the full transformation
 	// (expand → extract → discriminate). If discrimination fails (e.g. no
 	// single property has unique enum values across all expanded members),
@@ -154,6 +160,36 @@ func lookupSchema(schemas *yaml.Node, name string) *yaml.Node {
 		}
 	}
 	return nil
+}
+
+// loosenRequiredFields lists (schema, field) pairs to remove from `required:`
+// arrays. Used when Lakekeeper retains a deprecated alias of a renamed field
+// but the SDK must accept older servers that emit only the original name.
+var loosenRequiredFields = []struct{ schema, field string }{
+	{"ServerInfo", "lakekeeper-version"}, // v0.10.4 sends only "version"
+}
+
+// loosenRequired removes the configured fields from each schema's `required:`
+// list. Idempotent: missing schemas or already-absent fields are no-ops, so
+// re-runs and partial spec updates stay safe.
+func loosenRequired(schemas *yaml.Node) {
+	for _, m := range loosenRequiredFields {
+		s := lookupSchema(schemas, m.schema)
+		if s == nil {
+			continue
+		}
+		req := lookup(s, "required")
+		if req == nil || req.Kind != yaml.SequenceNode {
+			continue
+		}
+		kept := req.Content[:0]
+		for _, n := range req.Content {
+			if n.Value != m.field {
+				kept = append(kept, n)
+			}
+		}
+		req.Content = kept
+	}
 }
 
 // expandOneOf rewrites `schema.oneOf` members that are

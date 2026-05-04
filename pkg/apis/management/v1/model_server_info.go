@@ -42,7 +42,7 @@ type ServerInfo struct {
 	// SemVer of the enterprise binary (e.g. `lakekeeper-plus`) when this server is an enterprise build. `None` on OSS builds.
 	LakekeeperEnterpriseVersion NullableString `json:"lakekeeper-enterprise-version,omitempty"`
 	// SemVer of the upstream `lakekeeper` crate the server was built against.
-	LakekeeperVersion string `json:"lakekeeper-version"`
+	LakekeeperVersion *string `json:"lakekeeper-version,omitempty"`
 	// License status information
 	LicenseStatus LicenseStatus `json:"license-status"`
 	// List of queues that are registered for the server.
@@ -60,14 +60,13 @@ type _ServerInfo ServerInfo
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewServerInfo(authzBackend string, awsSystemIdentitiesEnabled bool, azureSystemIdentitiesEnabled bool, bootstrapped bool, gcpSystemIdentitiesEnabled bool, lakekeeperVersion string, licenseStatus LicenseStatus, queues []string, serverId string, version string) *ServerInfo {
+func NewServerInfo(authzBackend string, awsSystemIdentitiesEnabled bool, azureSystemIdentitiesEnabled bool, bootstrapped bool, gcpSystemIdentitiesEnabled bool, licenseStatus LicenseStatus, queues []string, serverId string, version string) *ServerInfo {
 	this := ServerInfo{}
 	this.AuthzBackend = authzBackend
 	this.AwsSystemIdentitiesEnabled = awsSystemIdentitiesEnabled
 	this.AzureSystemIdentitiesEnabled = azureSystemIdentitiesEnabled
 	this.Bootstrapped = bootstrapped
 	this.GcpSystemIdentitiesEnabled = gcpSystemIdentitiesEnabled
-	this.LakekeeperVersion = lakekeeperVersion
 	this.LicenseStatus = licenseStatus
 	this.Queues = queues
 	this.ServerId = serverId
@@ -418,28 +417,36 @@ func (o *ServerInfo) UnsetLakekeeperEnterpriseVersion() {
 	o.LakekeeperEnterpriseVersion.Unset()
 }
 
-// GetLakekeeperVersion returns the LakekeeperVersion field value
+// GetLakekeeperVersion returns the LakekeeperVersion field value if set, zero value otherwise.
 func (o *ServerInfo) GetLakekeeperVersion() string {
-	if o == nil {
+	if o == nil || IsNil(o.LakekeeperVersion) {
 		var ret string
 		return ret
 	}
-
-	return o.LakekeeperVersion
+	return *o.LakekeeperVersion
 }
 
-// GetLakekeeperVersionOk returns a tuple with the LakekeeperVersion field value
+// GetLakekeeperVersionOk returns a tuple with the LakekeeperVersion field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *ServerInfo) GetLakekeeperVersionOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.LakekeeperVersion) {
 		return nil, false
 	}
-	return &o.LakekeeperVersion, true
+	return o.LakekeeperVersion, true
 }
 
-// SetLakekeeperVersion sets field value
+// HasLakekeeperVersion returns a boolean if a field has been set.
+func (o *ServerInfo) HasLakekeeperVersion() bool {
+	if o != nil && !IsNil(o.LakekeeperVersion) {
+		return true
+	}
+
+	return false
+}
+
+// SetLakekeeperVersion gets a reference to the given string and assigns it to the LakekeeperVersion field.
 func (o *ServerInfo) SetLakekeeperVersion(v string) {
-	o.LakekeeperVersion = v
+	o.LakekeeperVersion = &v
 }
 
 // GetLicenseStatus returns the LicenseStatus field value
@@ -571,7 +578,9 @@ func (o ServerInfo) ToMap() (map[string]interface{}, error) {
 	if o.LakekeeperEnterpriseVersion.IsSet() {
 		toSerialize["lakekeeper-enterprise-version"] = o.LakekeeperEnterpriseVersion.Get()
 	}
-	toSerialize["lakekeeper-version"] = o.LakekeeperVersion
+	if !IsNil(o.LakekeeperVersion) {
+		toSerialize["lakekeeper-version"] = o.LakekeeperVersion
+	}
 	toSerialize["license-status"] = o.LicenseStatus
 	toSerialize["queues"] = o.Queues
 	toSerialize["server-id"] = o.ServerId
@@ -589,7 +598,6 @@ func (o *ServerInfo) UnmarshalJSON(data []byte) (err error) {
 		"azure-system-identities-enabled",
 		"bootstrapped",
 		"gcp-system-identities-enabled",
-		"lakekeeper-version",
 		"license-status",
 		"queues",
 		"server-id",

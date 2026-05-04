@@ -337,7 +337,7 @@ func newServerRevokeCmd(opts *clientOptions) *cobra.Command {
 func printServerInfo(w io.Writer, info *managementv1.ServerInfo) error {
 	fmt.Fprintf(w, "ID: %s\n", info.ServerId)
 	fmt.Fprintf(w, "Version: %s\n", info.Version)
-	fmt.Fprintf(w, "Lakekeeper Version: %s\n", info.LakekeeperVersion)
+	fmt.Fprintf(w, "Lakekeeper Version: %s\n", info.GetLakekeeperVersion())
 	fmt.Fprintf(w, "Default Project ID: %s\n", formatNullableString(info.DefaultProjectId))
 	fmt.Fprintf(w, "Bootstrapped: %t\n", info.Bootstrapped)
 	fmt.Fprintf(w, "Authorization Backend: %s\n", info.AuthzBackend)
