@@ -29,6 +29,23 @@ graph LR
 - [Generated client](docs/GENERATION.md) — what's generated, how to regenerate, why a YAML preprocessor is involved
 - [CLI Reference](docs/CLI.md) — `lkctl` command tree, environment variables, examples
 
+## Compatibility
+
+The Management API client is generated from Lakekeeper's OpenAPI spec, so
+each client release is pinned to a minimum Lakekeeper version that the
+integration suite exercises end-to-end. Newer Lakekeeper releases on the
+same major/minor line are expected to remain compatible; mixing a client
+with an older Lakekeeper than the row below is unsupported.
+
+<!-- BEGIN compatibility-matrix -->
+| Client version | Minimum Lakekeeper version |
+| -------------- | -------------------------- |
+| `0.1.x`        | `v0.12.0`                  |
+<!-- END compatibility-matrix -->
+
+The minimum version is the lowest entry in the `lakekeeper_version` matrix
+of [`.github/workflows/test.yml`](.github/workflows/test.yml).
+
 ## Quick start — CLI
 
 Pre-built binaries on the [Releases page](https://github.com/lakekeeper/go-lakekeeper/releases/latest),
