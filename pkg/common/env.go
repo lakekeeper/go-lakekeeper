@@ -6,8 +6,8 @@ import (
 )
 
 const (
-	EnvServer       = "LAKEKEEPER_SERVER"
-	EnvAuthURL      = "LAKEKEEPER_AUTH_URL"
+	EnvBaseURL      = "LAKEKEEPER_BASE_URL"
+	EnvTokenURL     = "LAKEKEEPER_TOKEN_URL"
 	EnvClientID     = "LAKEKEEPER_CLIENT_ID"
 	EnvClientSecret = "LAKEKEEPER_CLIENT_SECRET"
 	EnvScope        = "LAKEKEEPER_SCOPE"

@@ -43,12 +43,12 @@ func NewCommand() *cobra.Command {
 		},
 	}
 
-	cmd.PersistentFlags().StringVar(&opts.server, "server",
-		common.GetEnvOr(common.EnvServer, common.DefaultServer),
-		"Lakekeeper base URL; or set "+common.EnvServer)
-	cmd.PersistentFlags().StringVar(&opts.authURL, "auth-url",
-		common.GetEnvOr(common.EnvAuthURL, ""),
-		"OAuth2 token endpoint; or set "+common.EnvAuthURL)
+	cmd.PersistentFlags().StringVar(&opts.baseURL, "base-url",
+		common.GetEnvOr(common.EnvBaseURL, common.DefaultBaseURL),
+		"Lakekeeper base URL; or set "+common.EnvBaseURL)
+	cmd.PersistentFlags().StringVar(&opts.tokenURL, "token-url",
+		common.GetEnvOr(common.EnvTokenURL, ""),
+		"OAuth2 token endpoint; or set "+common.EnvTokenURL)
 	cmd.PersistentFlags().StringVar(&opts.clientID, "client-id",
 		common.GetEnvOr(common.EnvClientID, ""),
 		"OAuth2 client_id; or set "+common.EnvClientID)

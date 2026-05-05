@@ -360,13 +360,13 @@ embedding code.
 
 | Symbol | Value |
 |---|---|
-| `EnvServer` | `LAKEKEEPER_SERVER` |
-| `EnvAuthURL` | `LAKEKEEPER_AUTH_URL` |
+| `EnvBaseURL` | `LAKEKEEPER_BASE_URL` |
+| `EnvTokenURL` | `LAKEKEEPER_TOKEN_URL` |
 | `EnvClientID` | `LAKEKEEPER_CLIENT_ID` |
 | `EnvClientSecret` | `LAKEKEEPER_CLIENT_SECRET` |
 | `EnvScope` | `LAKEKEEPER_SCOPE` |
 | `EnvBootstrap` | `LAKEKEEPER_BOOTSTRAP` |
-| `DefaultServer` | `http://localhost:8181` |
+| `DefaultBaseURL` | `http://localhost:8181` |
 | `DefaultScope` | `["lakekeeper"]` |
 
 ---

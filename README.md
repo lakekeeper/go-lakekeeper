@@ -59,8 +59,8 @@ Authenticate via flags or environment variables (`.env` files are loaded
 automatically):
 
 ```sh
-export LAKEKEEPER_SERVER=http://localhost:8181
-export LAKEKEEPER_AUTH_URL=http://localhost:30080/realms/iceberg/protocol/openid-connect/token
+export LAKEKEEPER_BASE_URL=http://localhost:8181
+export LAKEKEEPER_TOKEN_URL=http://localhost:30080/realms/iceberg/protocol/openid-connect/token
 export LAKEKEEPER_CLIENT_ID=<your-client-id>
 export LAKEKEEPER_CLIENT_SECRET=<your-client-secret>
 export LAKEKEEPER_SCOPE=lakekeeper

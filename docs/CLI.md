@@ -41,8 +41,8 @@ variables or a `.env` file in the working directory replace any flag.
 
 | Flag | Env variable | Default | Description |
 |---|---|---|---|
-| `--server` | `LAKEKEEPER_SERVER` | `http://localhost:8181` | Lakekeeper base URL |
-| `--auth-url` | `LAKEKEEPER_AUTH_URL` | _(none)_ | OAuth2 token endpoint |
+| `--base-url` | `LAKEKEEPER_BASE_URL` | `http://localhost:8181` | Lakekeeper base URL |
+| `--token-url` | `LAKEKEEPER_TOKEN_URL` | _(none)_ | OAuth2 token endpoint |
 | `--client-id` | `LAKEKEEPER_CLIENT_ID` | _(none)_ | OAuth2 `client_id` |
 | `--client-secret` | `LAKEKEEPER_CLIENT_SECRET` | _(none)_ | OAuth2 `client_secret` |
 | `--scopes` | `LAKEKEEPER_SCOPE` | `lakekeeper` | Space-separated OAuth2 scopes |
@@ -52,8 +52,8 @@ variables or a `.env` file in the working directory replace any flag.
 Example with environment variables:
 
 ```sh
-export LAKEKEEPER_SERVER=http://localhost:8181
-export LAKEKEEPER_AUTH_URL=http://localhost:30080/realms/iceberg/protocol/openid-connect/token
+export LAKEKEEPER_BASE_URL=http://localhost:8181
+export LAKEKEEPER_TOKEN_URL=http://localhost:30080/realms/iceberg/protocol/openid-connect/token
 export LAKEKEEPER_CLIENT_ID=<your-client-id>
 export LAKEKEEPER_CLIENT_SECRET=<your-client-secret>
 export LAKEKEEPER_SCOPE=lakekeeper

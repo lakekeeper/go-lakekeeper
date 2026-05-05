@@ -15,8 +15,8 @@ import (
 // clientOptions captures the global flags that control how lkctl talks to the
 // Lakekeeper server. Populated by the persistent flags on the root command.
 type clientOptions struct {
-	server       string
-	authURL      string
+	baseURL      string
+	tokenURL     string
 	clientID     string
 	clientSecret string
 	scope        []string
@@ -28,10 +28,10 @@ type clientOptions struct {
 // missing. Optional flags (bootstrap, debug) are not checked.
 func (o *clientOptions) validate() error {
 	switch {
-	case o.server == "":
-		return errors.New("server URL is required")
-	case o.authURL == "":
-		return errors.New("auth url is required")
+	case o.baseURL == "":
+		return errors.New("base url is required")
+	case o.tokenURL == "":
+		return errors.New("token url is required")
 	case o.clientID == "":
 		return errors.New("client id is required")
 	case o.clientSecret == "":
@@ -53,7 +53,7 @@ func newClient(ctx context.Context, opts *clientOptions) (*client.Client, error)
 	oauthCfg := clientcredentials.Config{
 		ClientID:     opts.clientID,
 		ClientSecret: opts.clientSecret,
-		TokenURL:     opts.authURL,
+		TokenURL:     opts.tokenURL,
 		Scopes:       opts.scope,
 	}
 
@@ -69,5 +69,5 @@ func newClient(ctx context.Context, opts *clientOptions) (*client.Client, error)
 		clientOpts = append(clientOpts, client.WithInitialBootstrap(true, true, core.Ptr(managementv1.USERTYPE_APPLICATION)))
 	}
 
-	return client.NewWithAuthSource(ctx, opts.server, authSource, clientOpts...)
+	return client.NewWithAuthSource(ctx, opts.baseURL, authSource, clientOpts...)
 }

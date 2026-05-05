@@ -13,15 +13,15 @@ func TestNewClientReturnsValidationError(t *testing.T) {
 
 	_, err := newClient(context.Background(), &clientOptions{})
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "server URL is required")
+	assert.Contains(t, err.Error(), "base url is required")
 }
 
 func TestClientOptionsValidate(t *testing.T) {
 	t.Parallel()
 
 	full := clientOptions{
-		server:       "http://localhost:8181",
-		authURL:      "http://localhost:8080/realms/iceberg/protocol/openid-connect/token",
+		baseURL:      "http://localhost:8181",
+		tokenURL:     "http://localhost:8080/realms/iceberg/protocol/openid-connect/token",
 		clientID:     "id",
 		clientSecret: "secret",
 		scope:        []string{"lakekeeper"},
@@ -34,8 +34,8 @@ func TestClientOptionsValidate(t *testing.T) {
 		mutate  func(*clientOptions)
 		wantMsg string
 	}{
-		{"server missing", func(o *clientOptions) { o.server = "" }, "server"},
-		{"auth url missing", func(o *clientOptions) { o.authURL = "" }, "auth url"},
+		{"base url missing", func(o *clientOptions) { o.baseURL = "" }, "base url"},
+		{"token url missing", func(o *clientOptions) { o.tokenURL = "" }, "token url"},
 		{"client id missing", func(o *clientOptions) { o.clientID = "" }, "client id"},
 		{"client secret missing", func(o *clientOptions) { o.clientSecret = "" }, "client secret"},
 		{"scope missing", func(o *clientOptions) { o.scope = nil }, "scope"},
