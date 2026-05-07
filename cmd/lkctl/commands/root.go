@@ -52,16 +52,16 @@ func NewCommand() *cobra.Command {
 		"Authentication mode: oauth2 | token | k8s; or set "+common.EnvAuthMode)
 	cmd.PersistentFlags().StringVar(&opts.tokenURL, "token-url",
 		common.GetEnvOr(common.EnvTokenURL, ""),
-		"OAuth2 token endpoint; or set "+common.EnvTokenURL)
+		"OAuth2 token endpoint (auth-mode=oauth2); or set "+common.EnvTokenURL)
 	cmd.PersistentFlags().StringVar(&opts.clientID, "client-id",
 		common.GetEnvOr(common.EnvClientID, ""),
-		"OAuth2 client_id; or set "+common.EnvClientID)
+		"OAuth2 client_id (auth-mode=oauth2); or set "+common.EnvClientID)
 	cmd.PersistentFlags().StringVar(&opts.clientSecret, "client-secret",
 		common.GetEnvOr(common.EnvClientSecret, ""),
-		"OAuth2 client_secret; or set "+common.EnvClientSecret)
+		"OAuth2 client_secret (auth-mode=oauth2); or set "+common.EnvClientSecret)
 	cmd.PersistentFlags().StringSliceVar(&opts.scope, "scopes",
 		common.GetEnvSlice(common.EnvScope, " ", common.DefaultScope),
-		"OAuth2 scopes; or set "+common.EnvScope)
+		"OAuth2 scopes (auth-mode=oauth2); or set "+common.EnvScope)
 	cmd.PersistentFlags().StringVar(&opts.accessToken, "access-token",
 		common.GetEnvOr(common.EnvAccessToken, ""),
 		"Static bearer token (auth-mode=token); or set "+common.EnvAccessToken)

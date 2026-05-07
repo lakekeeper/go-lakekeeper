@@ -11,6 +11,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/google/uuid"
@@ -49,7 +50,7 @@ func freshKeycloakToken(t *testing.T) string {
 		ClientID:     os.Getenv("LAKEKEEPER_CLIENT_ID"),
 		ClientSecret: os.Getenv("LAKEKEEPER_CLIENT_SECRET"),
 		TokenURL:     os.Getenv("LAKEKEEPER_TOKEN_URL"),
-		Scopes:       []string{os.Getenv("LAKEKEEPER_SCOPE")},
+		Scopes:       strings.Fields(os.Getenv("LAKEKEEPER_SCOPE")),
 	}
 	tok, err := cfg.TokenSource(t.Context()).Token()
 	if err != nil {
@@ -77,7 +78,7 @@ func TestMain(m *testing.M) {
 		ClientID:     os.Getenv("LAKEKEEPER_CLIENT_ID"),
 		ClientSecret: os.Getenv("LAKEKEEPER_CLIENT_SECRET"),
 		TokenURL:     os.Getenv("LAKEKEEPER_TOKEN_URL"),
-		Scopes:       []string{os.Getenv("LAKEKEEPER_SCOPE")},
+		Scopes:       strings.Fields(os.Getenv("LAKEKEEPER_SCOPE")),
 	}
 	tokenSource := oauthCfg.TokenSource(context.Background())
 	if _, err := tokenSource.Token(); err != nil {
