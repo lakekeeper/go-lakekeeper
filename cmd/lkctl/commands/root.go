@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/lakekeeper/go-lakekeeper/pkg/common"
+	"github.com/lakekeeper/go-lakekeeper/pkg/core"
 	"github.com/lakekeeper/go-lakekeeper/pkg/version"
 )
 
@@ -65,8 +66,8 @@ func NewCommand() *cobra.Command {
 		common.GetEnvOr(common.EnvAccessToken, ""),
 		"Static bearer token (auth-mode=token); or set "+common.EnvAccessToken)
 	cmd.PersistentFlags().StringVar(&opts.k8sTokenPath, "k8s-token-path",
-		common.GetEnvOr(common.EnvK8sTokenPath, ""),
-		"Override path to the Kubernetes service-account token (auth-mode=k8s); or set "+common.EnvK8sTokenPath)
+		common.GetEnvOr(common.EnvK8sTokenPath, core.DefaultK8sServiceAccountTokenPath),
+		"Path to the Kubernetes service-account token (auth-mode=k8s); or set "+common.EnvK8sTokenPath)
 	cmd.PersistentFlags().BoolVar(&opts.bootstrap, "bootstrap",
 		common.GetBoolEnv(common.EnvBootstrap),
 		"Bootstrap the server with the current user; or set "+common.EnvBootstrap)

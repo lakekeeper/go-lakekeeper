@@ -57,8 +57,9 @@ func (o *clientOptions) validate() error {
 			return errors.New("access token is required")
 		}
 	case authModeK8s:
-		// Service-account token path is optional; the in-pod default
-		// applies when k8sTokenPath is empty.
+		// k8sTokenPath always carries a value here: the cobra flag
+		// defaults to core.DefaultK8sServiceAccountTokenPath. File
+		// existence is checked lazily by the AuthSource on first use.
 	default:
 		return fmt.Errorf("unknown auth mode %q", o.authMode)
 	}
@@ -103,11 +104,7 @@ func buildAuthSource(ctx context.Context, opts *clientOptions) (core.AuthSource,
 	case authModeToken:
 		return &core.AccessTokenAuthSource{Token: opts.accessToken}, nil
 	case authModeK8s:
-		as := &core.K8sServiceAccountAuthSource{}
-		if opts.k8sTokenPath != "" {
-			as.ServiceAccountTokenPath = &opts.k8sTokenPath
-		}
-		return as, nil
+		return &core.K8sServiceAccountAuthSource{ServiceAccountTokenPath: &opts.k8sTokenPath}, nil
 	default:
 		return nil, fmt.Errorf("unknown auth mode %q", opts.authMode)
 	}

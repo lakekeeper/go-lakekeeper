@@ -43,9 +43,6 @@ func randomName(prefix string) string {
 // client-credentials flow TestMain uses. Used by the per-mode auth tests
 // (auth_test.go, cli_test.go) which need the raw bearer string to feed into
 // AccessTokenAuthSource or to write to a fake service-account-token file.
-//
-// The underlying TokenSource caches, so repeated calls within a token's
-// lifetime are cheap.
 func freshKeycloakToken(t *testing.T) string {
 	t.Helper()
 	cfg := clientcredentials.Config{
@@ -102,7 +99,11 @@ func TestMain(m *testing.M) {
 	}
 	sharedClient = c
 
-	os.Exit(m.Run())
+	code := m.Run()
+	if lkctlBuildDir != "" {
+		_ = os.RemoveAll(lkctlBuildDir)
+	}
+	os.Exit(code)
 }
 
 // MustProvisionUser creates a fresh randomly-named user and registers a

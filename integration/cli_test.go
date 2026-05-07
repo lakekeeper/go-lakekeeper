@@ -25,12 +25,14 @@ import (
 var (
 	lkctlBinaryOnce sync.Once
 	lkctlBinaryPath string
+	lkctlBuildDir   string
 	lkctlBuildErr   error
 )
 
 // lkctlBinary builds cmd/lkctl once per test run and returns the resulting
-// binary path. Subsequent calls reuse the same artefact — go test runs are
-// short enough that the OS cleans up the temp dir for us.
+// binary path. The temp dir is captured in lkctlBuildDir so TestMain can
+// remove it after m.Run() — sync.Once rules out t.TempDir, which would tie
+// the build artefact to whichever test called lkctlBinary first.
 func lkctlBinary(t *testing.T) string {
 	t.Helper()
 	lkctlBinaryOnce.Do(func() {
@@ -39,6 +41,7 @@ func lkctlBinary(t *testing.T) string {
 			lkctlBuildErr = err
 			return
 		}
+		lkctlBuildDir = dir
 		bin := filepath.Join(dir, "lkctl")
 		out, err := exec.Command("go", "build", "-o", bin, "../cmd").CombinedOutput()
 		if err != nil {
@@ -70,7 +73,19 @@ func runLkctl(t *testing.T, args ...string) []byte {
 	cmd := exec.CommandContext(t.Context(), lkctlBinary(t), args...)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		t.Fatalf("lkctl %v failed: %v\n%s", args, err, out)
+		t.Fatalf("lkctl %v failed: %v\n%s", redactArgs(args), err, out)
+	}
+	return out
+}
+
+// redactArgs scrubs values following sensitive flags so bearer tokens don't
+// leak into CI test logs on failure.
+func redactArgs(args []string) []string {
+	out := append([]string(nil), args...)
+	for i := 0; i < len(out)-1; i++ {
+		if out[i] == "--access-token" {
+			out[i+1] = "<redacted>"
+		}
 	}
 	return out
 }
