@@ -39,6 +39,28 @@ func randomName(prefix string) string {
 	return fmt.Sprintf("%s-%s", prefix, uuid.NewString()[:8])
 }
 
+// freshKeycloakToken mints a fresh Keycloak access token via the same
+// client-credentials flow TestMain uses. Used by the per-mode auth tests
+// (auth_test.go, cli_test.go) which need the raw bearer string to feed into
+// AccessTokenAuthSource or to write to a fake service-account-token file.
+//
+// The underlying TokenSource caches, so repeated calls within a token's
+// lifetime are cheap.
+func freshKeycloakToken(t *testing.T) string {
+	t.Helper()
+	cfg := clientcredentials.Config{
+		ClientID:     os.Getenv("LAKEKEEPER_CLIENT_ID"),
+		ClientSecret: os.Getenv("LAKEKEEPER_CLIENT_SECRET"),
+		TokenURL:     os.Getenv("LAKEKEEPER_TOKEN_URL"),
+		Scopes:       []string{os.Getenv("LAKEKEEPER_SCOPE")},
+	}
+	tok, err := cfg.TokenSource(t.Context()).Token()
+	if err != nil {
+		t.Fatalf("mint keycloak token: %v", err)
+	}
+	return tok.AccessToken
+}
+
 // defaultProjectID is the all-zeros UUID that the server returns as the
 // default project after bootstrap.
 var defaultProjectID = uuid.Nil.String()
