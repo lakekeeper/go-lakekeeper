@@ -46,6 +46,6 @@ func TestK8sAuthSource(t *testing.T) {
 		err := as.Init(context.Background())
 		require.Error(t, err, "failed to read service account token")
 
-		assert.Equal(t, Ptr("/var/run/secrets/kubernetes.io/serviceaccount/token"), as.ServiceAccountTokenPath)
+		assert.Equal(t, Ptr(DefaultK8sServiceAccountTokenPath), as.ServiceAccountTokenPath)
 	})
 }

@@ -11,6 +11,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/google/uuid"
@@ -39,6 +40,25 @@ func randomName(prefix string) string {
 	return fmt.Sprintf("%s-%s", prefix, uuid.NewString()[:8])
 }
 
+// freshKeycloakToken mints a fresh Keycloak access token via the same
+// client-credentials flow TestMain uses. Used by the per-mode auth tests
+// (auth_test.go, cli_test.go) which need the raw bearer string to feed into
+// AccessTokenAuthSource or to write to a fake service-account-token file.
+func freshKeycloakToken(t *testing.T) string {
+	t.Helper()
+	cfg := clientcredentials.Config{
+		ClientID:     os.Getenv("LAKEKEEPER_CLIENT_ID"),
+		ClientSecret: os.Getenv("LAKEKEEPER_CLIENT_SECRET"),
+		TokenURL:     os.Getenv("LAKEKEEPER_TOKEN_URL"),
+		Scopes:       strings.Fields(os.Getenv("LAKEKEEPER_SCOPE")),
+	}
+	tok, err := cfg.TokenSource(t.Context()).Token()
+	if err != nil {
+		t.Fatalf("mint keycloak token: %v", err)
+	}
+	return tok.AccessToken
+}
+
 // defaultProjectID is the all-zeros UUID that the server returns as the
 // default project after bootstrap.
 var defaultProjectID = uuid.Nil.String()
@@ -58,7 +78,7 @@ func TestMain(m *testing.M) {
 		ClientID:     os.Getenv("LAKEKEEPER_CLIENT_ID"),
 		ClientSecret: os.Getenv("LAKEKEEPER_CLIENT_SECRET"),
 		TokenURL:     os.Getenv("LAKEKEEPER_TOKEN_URL"),
-		Scopes:       []string{os.Getenv("LAKEKEEPER_SCOPE")},
+		Scopes:       strings.Fields(os.Getenv("LAKEKEEPER_SCOPE")),
 	}
 	tokenSource := oauthCfg.TokenSource(context.Background())
 	if _, err := tokenSource.Token(); err != nil {
@@ -80,7 +100,11 @@ func TestMain(m *testing.M) {
 	}
 	sharedClient = c
 
-	os.Exit(m.Run())
+	code := m.Run()
+	if lkctlBuildDir != "" {
+		_ = os.RemoveAll(lkctlBuildDir)
+	}
+	os.Exit(code)
 }
 
 // MustProvisionUser creates a fresh randomly-named user and registers a

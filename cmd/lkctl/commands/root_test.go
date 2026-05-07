@@ -25,7 +25,7 @@ func TestNewCommandRegistersPersistentClientFlags(t *testing.T) {
 	t.Parallel()
 
 	root := NewCommand()
-	for _, name := range []string{"base-url", "token-url", "client-id", "client-secret", "scopes", "bootstrap", "debug"} {
+	for _, name := range []string{"base-url", "auth-mode", "token-url", "client-id", "client-secret", "scopes", "access-token", "k8s-token-path", "bootstrap", "debug"} {
 		require.NotNil(t, root.PersistentFlags().Lookup(name), "missing persistent flag %q", name)
 	}
 }

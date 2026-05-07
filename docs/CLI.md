@@ -42,14 +42,19 @@ variables or a `.env` file in the working directory replace any flag.
 | Flag | Env variable | Default | Description |
 |---|---|---|---|
 | `--base-url` | `LAKEKEEPER_BASE_URL` | `http://localhost:8181` | Lakekeeper base URL |
-| `--token-url` | `LAKEKEEPER_TOKEN_URL` | _(none)_ | OAuth2 token endpoint |
-| `--client-id` | `LAKEKEEPER_CLIENT_ID` | _(none)_ | OAuth2 `client_id` |
-| `--client-secret` | `LAKEKEEPER_CLIENT_SECRET` | _(none)_ | OAuth2 `client_secret` |
-| `--scopes` | `LAKEKEEPER_SCOPE` | `lakekeeper` | Space-separated OAuth2 scopes |
+| `--auth-mode` | `LAKEKEEPER_AUTH_MODE` | `oauth2` | Auth mode: `oauth2`, `token`, or `k8s` |
+| `--token-url` | `LAKEKEEPER_TOKEN_URL` | _(none)_ | OAuth2 token endpoint (`auth-mode=oauth2`) |
+| `--client-id` | `LAKEKEEPER_CLIENT_ID` | _(none)_ | OAuth2 `client_id` (`auth-mode=oauth2`) |
+| `--client-secret` | `LAKEKEEPER_CLIENT_SECRET` | _(none)_ | OAuth2 `client_secret` (`auth-mode=oauth2`) |
+| `--scopes` | `LAKEKEEPER_SCOPE` | `lakekeeper` | Space-separated OAuth2 scopes (`auth-mode=oauth2`) |
+| `--access-token` | `LAKEKEEPER_ACCESS_TOKEN` | _(none)_ | Static bearer token (`auth-mode=token`) |
+| `--k8s-token-path` | `LAKEKEEPER_K8S_TOKEN_PATH` | `/var/run/secrets/kubernetes.io/serviceaccount/token` | Service-account token file (`auth-mode=k8s`) |
 | `--bootstrap` | `LAKEKEEPER_BOOTSTRAP` | `false` | Auto-bootstrap server on startup |
 | `--debug` | _(none)_ | `false` | Enable debug logging |
 
-Example with environment variables:
+### Auth mode examples
+
+**OAuth2 client credentials** (default — used by the integration stack):
 
 ```sh
 export LAKEKEEPER_BASE_URL=http://localhost:8181
@@ -57,6 +62,25 @@ export LAKEKEEPER_TOKEN_URL=http://localhost:30080/realms/iceberg/protocol/openi
 export LAKEKEEPER_CLIENT_ID=<your-client-id>
 export LAKEKEEPER_CLIENT_SECRET=<your-client-secret>
 export LAKEKEEPER_SCOPE=lakekeeper
+```
+
+**Static access token** — when you already hold a bearer token (CI, short-lived
+credentials, scripted impersonation):
+
+```sh
+export LAKEKEEPER_BASE_URL=http://localhost:8181
+export LAKEKEEPER_AUTH_MODE=token
+export LAKEKEEPER_ACCESS_TOKEN=<your-bearer-token>
+```
+
+**Kubernetes service account** — when running `lkctl` from inside a pod whose
+projected service-account token is accepted by the Lakekeeper server. The
+default path is the standard projected-volume mount; override via
+`--k8s-token-path` only if your pod uses a non-default location.
+
+```sh
+export LAKEKEEPER_BASE_URL=http://lakekeeper.lakekeeper.svc:8181
+export LAKEKEEPER_AUTH_MODE=k8s
 ```
 
 ---

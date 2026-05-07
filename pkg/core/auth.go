@@ -9,6 +9,12 @@ import (
 	"golang.org/x/oauth2"
 )
 
+// DefaultK8sServiceAccountTokenPath is the standard projected-volume mount
+// for a pod's service-account token. Used both as the SDK fallback when
+// K8sServiceAccountAuthSource.ServiceAccountTokenPath is nil and as the
+// lkctl --k8s-token-path default.
+const DefaultK8sServiceAccountTokenPath = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+
 type (
 	// AuthSource is used to obtain access tokens.
 	AuthSource interface {
@@ -96,7 +102,7 @@ func (as *K8sServiceAccountAuthSource) Init(context.Context) error {
 	var err error
 	as.doOnce.Do(func() {
 		if as.ServiceAccountTokenPath == nil {
-			as.ServiceAccountTokenPath = Ptr("/var/run/secrets/kubernetes.io/serviceaccount/token")
+			as.ServiceAccountTokenPath = Ptr(DefaultK8sServiceAccountTokenPath)
 		}
 
 		token, e := os.ReadFile(*as.ServiceAccountTokenPath)
