@@ -55,7 +55,7 @@ func newUserListCmd(opts *clientOptions) *cobra.Command {
 
 			resp, _, err := req.Execute()
 			if err != nil {
-				return fmt.Errorf("list users: %w", err)
+				return wrapAPIError("list users", err)
 			}
 
 			switch output {
@@ -100,7 +100,7 @@ func newUserGetCmd(opts *clientOptions) *cobra.Command {
 
 			user, _, err := c.UserAPI.GetUser(ctx, args[0]).Execute()
 			if err != nil {
-				return fmt.Errorf("get user: %w", err)
+				return wrapAPIError("get user", err)
 			}
 
 			switch output {
@@ -134,7 +134,7 @@ func newUserDeleteCmd(opts *clientOptions) *cobra.Command {
 			}
 
 			if _, err := c.UserAPI.DeleteUser(ctx, args[0]).Execute(); err != nil {
-				return fmt.Errorf("delete user: %w", err)
+				return wrapAPIError("delete user", err)
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "User %s deleted\n", args[0])
 			return nil
@@ -183,7 +183,7 @@ func newUserCreateCmd(opts *clientOptions) *cobra.Command {
 
 			user, _, err := c.UserAPI.CreateUser(ctx).CreateUserRequest(*req).Execute()
 			if err != nil {
-				return fmt.Errorf("create user: %w", err)
+				return wrapAPIError("create user", err)
 			}
 
 			switch output {

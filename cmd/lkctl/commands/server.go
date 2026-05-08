@@ -46,7 +46,7 @@ func newServerInfoCmd(opts *clientOptions) *cobra.Command {
 			}
 			info, _, err := c.ServerAPI.GetServerInfo(ctx).Execute()
 			if err != nil {
-				return fmt.Errorf("get server info: %w", err)
+				return wrapAPIError("get server info", err)
 			}
 
 			switch output {
@@ -90,14 +90,14 @@ func newServerBootstrapCmd(opts *clientOptions) *cobra.Command {
 			req.IsOperator = &asOperator
 
 			if _, err := c.ServerAPI.Bootstrap(ctx).BootstrapRequest(*req).Execute(); err != nil {
-				return fmt.Errorf("bootstrap: %w", err)
+				return wrapAPIError("bootstrap", err)
 			}
 
 			switch output {
 			case "json":
 				info, _, err := c.ServerAPI.GetServerInfo(ctx).Execute()
 				if err != nil {
-					return fmt.Errorf("get server info: %w", err)
+					return wrapAPIError("get server info", err)
 				}
 				return printJSON(cmd.OutOrStdout(), info)
 			case "text":
@@ -145,7 +145,7 @@ func newServerAccessCmd(opts *clientOptions) *cobra.Command {
 			}
 			resp, _, err := req.Execute()
 			if err != nil {
-				return fmt.Errorf("get server access: %w", err)
+				return wrapAPIError("get server access", err)
 			}
 
 			switch output {
@@ -191,7 +191,7 @@ func newServerAssignmentsCmd(opts *clientOptions) *cobra.Command {
 			}
 			resp, _, err := req.Execute()
 			if err != nil {
-				return fmt.Errorf("get server assignments: %w", err)
+				return wrapAPIError("get server assignments", err)
 			}
 
 			switch output {
@@ -256,7 +256,7 @@ func newServerGrantCmd(opts *clientOptions) *cobra.Command {
 				return err
 			}
 			if _, err := c.PermissionsOpenfgaAPI.UpdateServerAssignments(ctx).UpdateServerAssignmentsRequest(*req).Execute(); err != nil {
-				return fmt.Errorf("update server assignments: %w", err)
+				return wrapAPIError("update server assignments", err)
 			}
 			fmt.Fprintln(cmd.OutOrStdout(), "Server permissions updated")
 			return nil
@@ -318,7 +318,7 @@ func newServerRevokeCmd(opts *clientOptions) *cobra.Command {
 				return err
 			}
 			if _, err := c.PermissionsOpenfgaAPI.UpdateServerAssignments(ctx).UpdateServerAssignmentsRequest(*req).Execute(); err != nil {
-				return fmt.Errorf("update server assignments: %w", err)
+				return wrapAPIError("update server assignments", err)
 			}
 			fmt.Fprintln(cmd.OutOrStdout(), "Server permissions updated")
 			return nil

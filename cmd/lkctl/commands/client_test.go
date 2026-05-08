@@ -2,6 +2,7 @@ package commands
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -104,4 +105,21 @@ func TestClientOptionsValidate(t *testing.T) {
 			assert.Contains(t, err.Error(), tc.wantMsg)
 		})
 	}
+}
+
+func TestWrapAPIError(t *testing.T) {
+	t.Parallel()
+
+	t.Run("nil returns nil", func(t *testing.T) {
+		t.Parallel()
+		require.NoError(t, wrapAPIError("noop", nil))
+	})
+
+	t.Run("non-api error gets wrapped via %w", func(t *testing.T) {
+		t.Parallel()
+		base := errors.New("boom")
+		got := wrapAPIError("step", base)
+		require.EqualError(t, got, "step: boom")
+		require.ErrorIs(t, got, base, "non-API errors must remain unwrappable")
+	})
 }

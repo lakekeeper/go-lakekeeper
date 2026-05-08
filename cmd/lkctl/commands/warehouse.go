@@ -75,7 +75,7 @@ func newWarehouseListCmd(opts *clientOptions, project *string) *cobra.Command {
 			}
 			resp, _, err := req.Execute()
 			if err != nil {
-				return fmt.Errorf("list warehouses: %w", err)
+				return wrapAPIError("list warehouses", err)
 			}
 
 			switch output {
@@ -109,7 +109,7 @@ func newWarehouseGetCmd(opts *clientOptions) *cobra.Command {
 			}
 			wh, _, err := c.WarehouseAPI.GetWarehouse(ctx, args[0]).Execute()
 			if err != nil {
-				return fmt.Errorf("get warehouse: %w", err)
+				return wrapAPIError("get warehouse", err)
 			}
 			if wh == nil {
 				return errors.New("get warehouse: empty response")
@@ -174,7 +174,7 @@ func newWarehouseCreateCmd(opts *clientOptions, project *string) *cobra.Command 
 			}
 			wh, _, err := c.WarehouseAPI.CreateWarehouse(ctx).CreateWarehouseRequest(req).Execute()
 			if err != nil {
-				return fmt.Errorf("create warehouse: %w", err)
+				return wrapAPIError("create warehouse", err)
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "Warehouse %s created with id %s\n", wh.Name, wh.WarehouseId)
 			return nil
@@ -202,7 +202,7 @@ func newWarehouseRenameCmd(opts *clientOptions) *cobra.Command {
 
 			req := managementv1.NewRenameWarehouseRequest(args[1])
 			if _, _, err := c.WarehouseAPI.RenameWarehouse(ctx, args[0]).RenameWarehouseRequest(*req).Execute(); err != nil {
-				return fmt.Errorf("rename warehouse: %w", err)
+				return wrapAPIError("rename warehouse", err)
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "Warehouse %s renamed to %s\n", args[0], args[1])
 			return nil
@@ -223,7 +223,7 @@ func newWarehouseActivateCmd(opts *clientOptions) *cobra.Command {
 				return err
 			}
 			if _, err := c.WarehouseAPI.ActivateWarehouse(ctx, args[0]).Execute(); err != nil {
-				return fmt.Errorf("activate warehouse: %w", err)
+				return wrapAPIError("activate warehouse", err)
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "Warehouse %s activated\n", args[0])
 			return nil
@@ -244,7 +244,7 @@ func newWarehouseDeactivateCmd(opts *clientOptions) *cobra.Command {
 				return err
 			}
 			if _, err := c.WarehouseAPI.DeactivateWarehouse(ctx, args[0]).Execute(); err != nil {
-				return fmt.Errorf("deactivate warehouse: %w", err)
+				return wrapAPIError("deactivate warehouse", err)
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "Warehouse %s deactivated\n", args[0])
 			return nil
@@ -279,7 +279,7 @@ func newWarehouseSetProtectionCmd(opts *clientOptions) *cobra.Command {
 			req := managementv1.NewSetProtectionRequest(protected)
 			resp, _, err := c.WarehouseAPI.SetWarehouseProtection(ctx, args[0]).SetProtectionRequest(*req).Execute()
 			if err != nil {
-				return fmt.Errorf("set warehouse protection: %w", err)
+				return wrapAPIError("set warehouse protection", err)
 			}
 
 			switch output {
@@ -327,7 +327,7 @@ func newWarehouseStatisticsCmd(opts *clientOptions) *cobra.Command {
 			}
 			resp, _, err := req.Execute()
 			if err != nil {
-				return fmt.Errorf("get warehouse statistics: %w", err)
+				return wrapAPIError("get warehouse statistics", err)
 			}
 
 			switch output {
@@ -366,7 +366,7 @@ func newWarehouseDeleteCmd(opts *clientOptions) *cobra.Command {
 				return err
 			}
 			if _, err := c.WarehouseAPI.DeleteWarehouse(ctx, args[0]).Execute(); err != nil {
-				return fmt.Errorf("delete warehouse: %w", err)
+				return wrapAPIError("delete warehouse", err)
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "Warehouse %s deleted\n", args[0])
 			return nil
@@ -406,7 +406,7 @@ func newWarehouseAccessCmd(opts *clientOptions) *cobra.Command {
 			}
 			resp, _, err := req.Execute()
 			if err != nil {
-				return fmt.Errorf("get warehouse access: %w", err)
+				return wrapAPIError("get warehouse access", err)
 			}
 
 			switch output {
@@ -452,7 +452,7 @@ func newWarehouseAssignmentsCmd(opts *clientOptions) *cobra.Command {
 			}
 			resp, _, err := req.Execute()
 			if err != nil {
-				return fmt.Errorf("get warehouse assignments: %w", err)
+				return wrapAPIError("get warehouse assignments", err)
 			}
 
 			switch output {
@@ -517,7 +517,7 @@ func newWarehouseGrantCmd(opts *clientOptions) *cobra.Command {
 				return err
 			}
 			if _, err := c.PermissionsOpenfgaAPI.UpdateWarehouseAssignmentsById(ctx, args[0]).UpdateWarehouseAssignmentsRequest(*req).Execute(); err != nil {
-				return fmt.Errorf("update warehouse assignments: %w", err)
+				return wrapAPIError("update warehouse assignments", err)
 			}
 			fmt.Fprintln(cmd.OutOrStdout(), "Warehouse permissions updated")
 			return nil
@@ -579,7 +579,7 @@ func newWarehouseRevokeCmd(opts *clientOptions) *cobra.Command {
 				return err
 			}
 			if _, err := c.PermissionsOpenfgaAPI.UpdateWarehouseAssignmentsById(ctx, args[0]).UpdateWarehouseAssignmentsRequest(*req).Execute(); err != nil {
-				return fmt.Errorf("update warehouse assignments: %w", err)
+				return wrapAPIError("update warehouse assignments", err)
 			}
 			fmt.Fprintln(cmd.OutOrStdout(), "Warehouse permissions updated")
 			return nil
