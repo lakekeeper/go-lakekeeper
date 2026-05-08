@@ -54,6 +54,10 @@ variables or a `.env` file in the working directory replace any flag.
 
 ### Auth mode examples
 
+For a guide-level walkthrough that pairs each flow with the equivalent
+Go SDK setup — and a reference table of every auth-related environment
+variable — see [AUTHENTICATION.md](AUTHENTICATION.md).
+
 **OAuth2 client credentials** (default — used by the integration stack):
 
 ```sh
@@ -102,7 +106,9 @@ Top-level commands (and their aliases):
 
 The grant / revoke / access / assignments verbs follow the same shape
 across `server`, `project`, `warehouse`, and `role`. Read this section
-once for `project` and the others should feel familiar.
+once for `project` and the others should feel familiar. For the
+underlying authorization model, the assignment-value reference, and an
+end-to-end CLI ↔ SDK workflow, see [AUTHORIZATION.md](AUTHORIZATION.md).
 
 ### `lkctl server`
 
