@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 
 	"golang.org/x/oauth2/clientcredentials"
 
@@ -11,6 +12,33 @@ import (
 	"github.com/lakekeeper/go-lakekeeper/pkg/client"
 	"github.com/lakekeeper/go-lakekeeper/pkg/core"
 )
+
+// apiErrorBodyLimit caps how much of a server error body is included when
+// wrapping API errors. Generous enough for typical Lakekeeper RFC 7807
+// payloads, small enough to keep accidental HTML dumps from flooding stderr.
+const apiErrorBodyLimit = 1024
+
+// wrapAPIError annotates err with prefix and, when err carries a server
+// response body via *managementv1.GenericOpenAPIError, appends the body so
+// the operator sees the server's actual complaint instead of a bare HTTP
+// status. Falls back to fmt.Errorf("%s: %w", prefix, err) on any other error
+// type or on nil err (returns nil).
+func wrapAPIError(prefix string, err error) error {
+	if err == nil {
+		return nil
+	}
+	var apiErr *managementv1.GenericOpenAPIError
+	if errors.As(err, &apiErr) {
+		if body := apiErr.Body(); len(body) > 0 {
+			s := strings.TrimSpace(string(body))
+			if len(s) > apiErrorBodyLimit {
+				s = s[:apiErrorBodyLimit] + "...(truncated)"
+			}
+			return fmt.Errorf("%s: %s: %s", prefix, apiErr.Error(), s)
+		}
+	}
+	return fmt.Errorf("%s: %w", prefix, err)
+}
 
 // Auth modes accepted by --auth-mode / LAKEKEEPER_AUTH_MODE.
 const (

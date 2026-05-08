@@ -112,6 +112,19 @@ test-integration: $(ENV_FILE) ## Runs integration tests.
 	@echo === ./run-tests.sh
 	CONTAINER_ENGINE="$(CONTAINER_ENGINE)" CONTAINER_COMPOSE_ENGINE="$(CONTAINER_COMPOSE_ENGINE)" LAKEKEEPER_VERSION="$(LAKEKEEPER_VERSION)" ./run-tests.sh
 
+.PHONY: test-e2e-compose
+test-e2e-compose: $(ENV_FILE) ## Runs lkctl E2E tests against the docker-compose stack.
+	@echo === ./e2e/compose/run.sh
+	CONTAINER_ENGINE="$(CONTAINER_ENGINE)" CONTAINER_COMPOSE_ENGINE="$(CONTAINER_COMPOSE_ENGINE)" LAKEKEEPER_VERSION="$(LAKEKEEPER_VERSION)" ./e2e/compose/run.sh
+
+.PHONY: test-e2e-kind
+test-e2e-kind: ## Runs lkctl E2E tests against a kind cluster (real projected SA token).
+	@echo === ./e2e/kind/run.sh
+	CONTAINER_ENGINE="$(CONTAINER_ENGINE)" ./e2e/kind/run.sh
+
+.PHONY: test-e2e
+test-e2e: test-e2e-compose test-e2e-kind ## Runs every E2E backend sequentially.
+
 GORELEASER := $(BIN_DIR)/goreleaser
 $(GORELEASER): | $(BIN_DIR)
 	@echo === installing goreleaser

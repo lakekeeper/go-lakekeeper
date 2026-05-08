@@ -52,7 +52,7 @@ func newProjectListCmd(opts *clientOptions) *cobra.Command {
 			}
 			resp, _, err := c.ProjectAPI.ListProjects(ctx).Execute()
 			if err != nil {
-				return fmt.Errorf("list projects: %w", err)
+				return wrapAPIError("list projects", err)
 			}
 
 			switch output {
@@ -89,7 +89,7 @@ func newProjectGetCmd(opts *clientOptions) *cobra.Command {
 			}
 			resp, _, err := c.ProjectAPI.GetProject(ctx).XProjectId(args[0]).Execute()
 			if err != nil {
-				return fmt.Errorf("get project: %w", err)
+				return wrapAPIError("get project", err)
 			}
 
 			switch output {
@@ -126,7 +126,7 @@ func newProjectCreateCmd(opts *clientOptions) *cobra.Command {
 			req := managementv1.NewCreateProjectRequest(args[0])
 			created, _, err := c.ProjectAPI.CreateProject(ctx).CreateProjectRequest(*req).Execute()
 			if err != nil {
-				return fmt.Errorf("create project: %w", err)
+				return wrapAPIError("create project", err)
 			}
 
 			switch output {
@@ -136,7 +136,7 @@ func newProjectCreateCmd(opts *clientOptions) *cobra.Command {
 			case "json":
 				project, _, err := c.ProjectAPI.GetProject(ctx).XProjectId(created.ProjectId).Execute()
 				if err != nil {
-					return fmt.Errorf("get project: %w", err)
+					return wrapAPIError("get project", err)
 				}
 				return printJSON(cmd.OutOrStdout(), project)
 			default:
@@ -163,7 +163,7 @@ func newProjectRenameCmd(opts *clientOptions) *cobra.Command {
 
 			req := managementv1.NewRenameProjectRequest(args[1])
 			if _, err := c.ProjectAPI.RenameProject(ctx).XProjectId(args[0]).RenameProjectRequest(*req).Execute(); err != nil {
-				return fmt.Errorf("rename project: %w", err)
+				return wrapAPIError("rename project", err)
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "Project %s renamed to %s\n", args[0], args[1])
 			return nil
@@ -185,7 +185,7 @@ func newProjectDeleteCmd(opts *clientOptions) *cobra.Command {
 				return err
 			}
 			if _, err := c.ProjectAPI.DeleteProject(ctx).XProjectId(args[0]).Execute(); err != nil {
-				return fmt.Errorf("delete project: %w", err)
+				return wrapAPIError("delete project", err)
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "Project %s deleted\n", args[0])
 			return nil
@@ -229,7 +229,7 @@ func newProjectAccessCmd(opts *clientOptions) *cobra.Command {
 			}
 			resp, _, err := req.Execute()
 			if err != nil {
-				return fmt.Errorf("get project access: %w", err)
+				return wrapAPIError("get project access", err)
 			}
 
 			switch output {
@@ -279,7 +279,7 @@ func newProjectAssignmentsCmd(opts *clientOptions) *cobra.Command {
 			}
 			resp, _, err := req.Execute()
 			if err != nil {
-				return fmt.Errorf("get project assignments: %w", err)
+				return wrapAPIError("get project assignments", err)
 			}
 
 			switch output {
@@ -343,7 +343,7 @@ func newProjectGrantCmd(opts *clientOptions) *cobra.Command {
 				return err
 			}
 			if _, err := c.PermissionsOpenfgaAPI.UpdateProjectAssignmentsById(ctx, project).UpdateProjectAssignmentsRequest(*req).Execute(); err != nil {
-				return fmt.Errorf("update project assignments: %w", err)
+				return wrapAPIError("update project assignments", err)
 			}
 			fmt.Fprintln(cmd.OutOrStdout(), "Project permissions updated")
 			return nil
@@ -409,7 +409,7 @@ func newProjectRevokeCmd(opts *clientOptions) *cobra.Command {
 				return err
 			}
 			if _, err := c.PermissionsOpenfgaAPI.UpdateProjectAssignmentsById(ctx, project).UpdateProjectAssignmentsRequest(*req).Execute(); err != nil {
-				return fmt.Errorf("update project assignments: %w", err)
+				return wrapAPIError("update project assignments", err)
 			}
 			fmt.Fprintln(cmd.OutOrStdout(), "Project permissions updated")
 			return nil

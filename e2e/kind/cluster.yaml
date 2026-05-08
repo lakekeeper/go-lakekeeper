@@ -1,0 +1,18 @@
+# Kind cluster spec for the lkctl E2E suite.
+#
+# We pin a recent k8s minor and make `service-account-issuer` explicit so that
+# Lakekeeper's OIDC discovery is predictable: with a known issuer we can
+# trust the in-cluster JWKS endpoint via `additionalIssuers` in the chart
+# values, which is what gates `kubernetes-sa` auth-mode acceptance.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+  - role: control-plane
+    image: kindest/node:v1.31.4
+    kubeadmConfigPatches:
+      - |
+        kind: ClusterConfiguration
+        apiServer:
+          extraArgs:
+            service-account-issuer: https://kubernetes.default.svc.cluster.local
+            service-account-jwks-uri: https://kubernetes.default.svc.cluster.local/openid/v1/jwks

@@ -28,6 +28,8 @@ Other useful make targets:
 | `make validate` | `go vet` + `golangci-lint` (no build) |
 | `make test` | Unit tests under `./pkg/…` with coverage |
 | `make test-integration` | Spin up Lakekeeper + Keycloak + MinIO + OpenFGA via docker-compose and run integration tests |
+| `make test-e2e-compose` | E2E suite for `lkctl` itself, against the docker-compose stack (build tag `e2e_cli`). See [`e2e/`](../e2e/) |
+| `make test-e2e-kind` | E2E suite for `lkctl --auth-mode k8s` against a real kind cluster. See [`e2e/kind/`](../e2e/kind/) |
 | `make generate` | Regenerate the Management API client from the OpenAPI spec — see [GENERATION.md](GENERATION.md) |
 | `make snapshot` | goreleaser snapshot (multi-arch, no publish) |
 | `make clean` | Tear down compose stack and remove build artefacts |

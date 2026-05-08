@@ -65,7 +65,7 @@ func newRoleListCmd(opts *clientOptions, project *string) *cobra.Command {
 
 			resp, _, err := req.Execute()
 			if err != nil {
-				return fmt.Errorf("list roles: %w", err)
+				return wrapAPIError("list roles", err)
 			}
 
 			roles := resp.Roles
@@ -121,7 +121,7 @@ func newRoleGetCmd(opts *clientOptions, project *string) *cobra.Command {
 
 			role, _, err := c.RoleAPI.GetRole(ctx, args[0]).XProjectId(*project).Execute()
 			if err != nil {
-				return fmt.Errorf("get role: %w", err)
+				return wrapAPIError("get role", err)
 			}
 
 			switch output {
@@ -168,7 +168,7 @@ func newRoleCreateCmd(opts *clientOptions, project *string) *cobra.Command {
 			}
 			role, _, err := c.RoleAPI.CreateRole(ctx).XProjectId(*project).CreateRoleRequest(*req).Execute()
 			if err != nil {
-				return fmt.Errorf("create role: %w", err)
+				return wrapAPIError("create role", err)
 			}
 
 			switch output {
@@ -211,7 +211,7 @@ func newRoleUpdateCmd(opts *clientOptions, project *string) *cobra.Command {
 			}
 			role, _, err := c.RoleAPI.UpdateRole(ctx, args[0]).XProjectId(*project).UpdateRoleRequest(*req).Execute()
 			if err != nil {
-				return fmt.Errorf("update role: %w", err)
+				return wrapAPIError("update role", err)
 			}
 
 			switch output {
@@ -244,7 +244,7 @@ func newRoleDeleteCmd(opts *clientOptions, project *string) *cobra.Command {
 				return err
 			}
 			if _, err := c.RoleAPI.DeleteRole(ctx, args[0]).XProjectId(*project).Execute(); err != nil {
-				return fmt.Errorf("delete role: %w", err)
+				return wrapAPIError("delete role", err)
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "Role %s deleted\n", args[0])
 			return nil
@@ -283,7 +283,7 @@ func newRoleAccessCmd(opts *clientOptions) *cobra.Command {
 			}
 			resp, _, err := req.Execute()
 			if err != nil {
-				return fmt.Errorf("get role access: %w", err)
+				return wrapAPIError("get role access", err)
 			}
 
 			switch output {
@@ -330,7 +330,7 @@ func newRoleAssignmentsCmd(opts *clientOptions) *cobra.Command {
 
 			resp, _, err := req.Execute()
 			if err != nil {
-				return fmt.Errorf("get role assignments: %w", err)
+				return wrapAPIError("get role assignments", err)
 			}
 
 			switch output {
@@ -390,7 +390,7 @@ func newRoleGrantCmd(opts *clientOptions) *cobra.Command {
 				return err
 			}
 			if _, err := c.PermissionsOpenfgaAPI.UpdateRoleAssignmentsById(ctx, args[0]).UpdateRoleAssignmentsRequest(*req).Execute(); err != nil {
-				return fmt.Errorf("update role assignments: %w", err)
+				return wrapAPIError("update role assignments", err)
 			}
 			fmt.Fprintln(cmd.OutOrStdout(), "Role permissions updated")
 			return nil
@@ -452,7 +452,7 @@ func newRoleRevokeCmd(opts *clientOptions) *cobra.Command {
 				return err
 			}
 			if _, err := c.PermissionsOpenfgaAPI.UpdateRoleAssignmentsById(ctx, args[0]).UpdateRoleAssignmentsRequest(*req).Execute(); err != nil {
-				return fmt.Errorf("update role assignments: %w", err)
+				return wrapAPIError("update role assignments", err)
 			}
 			fmt.Fprintln(cmd.OutOrStdout(), "Role permissions updated")
 			return nil

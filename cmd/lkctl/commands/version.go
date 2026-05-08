@@ -88,7 +88,7 @@ func getServerVersion(ctx context.Context, opts *clientOptions) (string, error) 
 	}
 	info, _, err := c.ServerAPI.GetServerInfo(ctx).Execute()
 	if err != nil {
-		return "", fmt.Errorf("server info: %w", err)
+		return "", wrapAPIError("server info", err)
 	}
 	return info.Version, nil
 }

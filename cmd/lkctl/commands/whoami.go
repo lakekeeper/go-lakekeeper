@@ -23,7 +23,7 @@ func newWhoamiCmd(opts *clientOptions) *cobra.Command {
 			}
 			user, _, err := c.UserAPI.Whoami(ctx).Execute()
 			if err != nil {
-				return fmt.Errorf("whoami: %w", err)
+				return wrapAPIError("whoami", err)
 			}
 
 			switch output {

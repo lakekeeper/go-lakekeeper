@@ -50,3 +50,7 @@ CLAUDE.local.md
 
 # OpenAPI spec preprocessing artefacts (regenerated each `make generate`)
 *.processed.yaml
+
+# E2E harness artefacts
+dist/lkctl-e2e
+e2e/kind/.kubeconfig
