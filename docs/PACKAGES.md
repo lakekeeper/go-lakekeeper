@@ -117,6 +117,9 @@ the dependency root alongside the generated client.
 
 ### Authentication
 
+For a flow-by-flow guide that pairs each implementation below with the
+equivalent `lkctl` setup, see [AUTHENTICATION.md](AUTHENTICATION.md).
+
 `AuthSource` is the pluggable auth interface — any credential mechanism can
 be swapped without changing application code.
 
@@ -264,6 +267,9 @@ reach for the raw `managementv1` types when constructing requests
 ## `pkg/permissions`
 
 **Import path:** `github.com/lakekeeper/go-lakekeeper/pkg/permissions`
+
+For the authorization model, common assignment values, and end-to-end
+grant/revoke workflows, see [AUTHORIZATION.md](AUTHORIZATION.md).
 
 Generic helpers on top of the generated `*Assignment` union types. Every
 resource-specific assignment in the generated client (`ServerAssignment`,
