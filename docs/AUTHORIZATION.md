@@ -157,6 +157,7 @@ import (
     "github.com/lakekeeper/go-lakekeeper/pkg/permissions"
 )
 
+// err handling shown in the per-resource sections below.
 a, err := permissions.BuildAssignment[managementv1.WarehouseAssignment](
     "select", permissions.PrincipalUser, userID,
 )
@@ -275,9 +276,9 @@ lkctl warehouse assignments <WAREHOUSE-ID>
 ```
 
 **SDK.** Per-resource `Get<Resource>Access*` methods live on the
-permissions service field — `c.PermissionsOpenfgaAPI`, kept under that
-historical name from the OpenAPI tag. `c.AuthorizationAPI.BatchCheckActions`
-covers batch checks across resource types.
+permissions service field `c.PermissionsOpenfgaAPI`.
+`c.AuthorizationAPI.BatchCheckActions` covers batch checks across
+resource types.
 
 ```go
 // Effective actions for the current principal on a warehouse.
@@ -308,8 +309,8 @@ and the role granted `select` on a warehouse.
 | 1. Bootstrap | `lkctl server bootstrap --accept-terms-of-use --as-operator` | `client.NewWithAuthSource(ctx, baseURL, as, client.WithInitialBootstrap(true, true, core.Ptr(managementv1.USERTYPE_APPLICATION)))` |
 | 2. Create project | `PROJECT_ID=$(lkctl project create my-project -o json \| jq -r '."project-id"')` | `created, _, err := c.ProjectAPI.CreateProject(ctx).CreateProjectRequest(*managementv1.NewCreateProjectRequest("my-project")).Execute()` |
 | 3. Create role | `ROLE_ID=$(lkctl role create "data-readers" --project $PROJECT_ID -o json \| jq -r .id)` | `role, _, err := c.RoleAPI.CreateRole(ctx).XProjectId(projectID).CreateRoleRequest(*managementv1.NewCreateRoleRequest("data-readers")).Execute()` |
-| 4. Add user to role | `lkctl role grant $ROLE_ID --users $USER_ID --assignments assignee` | Build `RoleAssignment{type: "assignee", user: USER_ID}` via `permissions.BuildAssignment`, post via `UpdateRoleAssignmentsById` |
-| 5. Grant role on warehouse | `lkctl warehouse grant $WH_ID --roles $ROLE_ID --assignments select --project $PROJECT_ID` | Build `WarehouseAssignment{type: "select", role: ROLE_ID}`, post via `UpdateWarehouseAssignmentsById` |
+| 4. Add user to role | `lkctl role grant $ROLE_ID --users $USER_ID --assignments assignee` | Build a `RoleAssignment` with wire shape `{"type": "assignee", "user": "<id>"}` via `permissions.BuildAssignment`, post via `UpdateRoleAssignmentsById` |
+| 5. Grant role on warehouse | `lkctl warehouse grant $WH_ID --roles $ROLE_ID --assignments select --project $PROJECT_ID` | Build a `WarehouseAssignment` with wire shape `{"type": "select", "role": "<id>"}`, post via `UpdateWarehouseAssignmentsById` |
 | 6. Verify | `lkctl warehouse access $WH_ID --user $USER_ID` | `c.PermissionsOpenfgaAPI.GetWarehouseAccessById(ctx, WH_ID).PrincipalUser(USER_ID).Execute()` |
 
 The SDK side, end-to-end, in one block. To keep the snippet focused, it

@@ -31,13 +31,14 @@ The remaining sections show each flow on the CLI and the SDK side by side.
 ## OAuth2 client credentials
 
 The default mode. Tokens are obtained from an OIDC token endpoint and
-renewed transparently by `golang.org/x/oauth2`.
+re-fetched transparently when expired by `golang.org/x/oauth2`.
 
 **CLI** — see [CLI.md auth-mode examples](CLI.md#auth-mode-examples) for
 the full flag table:
 
 ```sh
 export LAKEKEEPER_BASE_URL=http://localhost:8181
+# LAKEKEEPER_AUTH_MODE=oauth2 is the default — no need to set it
 export LAKEKEEPER_TOKEN_URL=http://localhost:30080/realms/iceberg/protocol/openid-connect/token
 export LAKEKEEPER_CLIENT_ID=<your-client-id>
 export LAKEKEEPER_CLIENT_SECRET=<your-client-secret>
@@ -81,6 +82,8 @@ OAuth2 instead.
 export LAKEKEEPER_BASE_URL=http://localhost:8181
 export LAKEKEEPER_AUTH_MODE=token
 export LAKEKEEPER_ACCESS_TOKEN=<your-bearer-token>
+
+lkctl whoami        # smoke test
 ```
 
 **SDK** — see [PACKAGES.md `AccessTokenAuthSource`](PACKAGES.md#accesstokenauthsource--static-bearer-token):
@@ -109,6 +112,8 @@ pod must restart to pick up rotation.
 export LAKEKEEPER_BASE_URL=http://lakekeeper.lakekeeper.svc:8181
 export LAKEKEEPER_AUTH_MODE=k8s
 # --k8s-token-path / LAKEKEEPER_K8S_TOKEN_PATH only needed for non-default mounts
+
+lkctl whoami        # smoke test
 ```
 
 **SDK** — see [PACKAGES.md `K8sServiceAccountAuthSource`](PACKAGES.md#k8sserviceaccountauthsource--kubernetes-service-account):
@@ -170,7 +175,8 @@ on across restarts.
 
 The CLI honours these variables (names in
 [`pkg/common/env.go`](../pkg/common/env.go), defaults in
-[`pkg/common/defaults.go`](../pkg/common/defaults.go)). The SDK does
+[`pkg/common/defaults.go`](../pkg/common/defaults.go); K8s token-path
+default in [`pkg/core/auth.go`](../pkg/core/auth.go)). The SDK does
 **not** read the environment — pass values explicitly to the
 constructors, or reuse the same `pkg/common` constants if you want
 symmetric behaviour in your own binaries.
