@@ -1,0 +1,42 @@
+# Helm values for the lakekeeper chart in the kind E2E harness.
+#
+# The kind harness exercises the *production* Kubernetes SA auth path: the
+# runner pod's projected SA token is presented to Lakekeeper, which validates
+# it against the in-cluster OIDC discovery endpoints pinned in
+# `e2e/kind/cluster.yaml` (service-account-issuer / service-account-jwks-uri).
+# No Keycloak — that coverage lives in the compose harness.
+#
+# Chart reference: https://lakekeeper.github.io/lakekeeper-charts/ (chart "lakekeeper")
+
+# Pin the catalog Service to `lakekeeper` so pod-lkctl.yaml's
+# LAKEKEEPER_BASE_URL=http://lakekeeper.default.svc.cluster.local:8181
+# resolves without an extra alias.
+fullnameOverride: lakekeeper
+
+# Convert the db-migrations Job from a post-install Helm hook into a regular
+# pre-deploy resource so `helm install --wait` does not deadlock waiting on a
+# catalog pod whose `check-db` init container is itself waiting on the hook.
+helmWait: true
+
+auth:
+  # Kubernetes SA is the only auth mode in the kind harness. cluster.yaml
+  # pins service-account-issuer / service-account-jwks-uri so Lakekeeper's
+  # additionalIssuers can validate projected SA tokens against the
+  # in-cluster OIDC endpoint. Audience matches the projected token in
+  # pod-lkctl.yaml.
+  k8s:
+    enabled: true
+    audience: "lakekeeper"
+
+authz:
+  backend: openfga
+
+# Deploy the OpenFGA subchart in-cluster (top-level toggle on this chart).
+internalOpenFGA: true
+
+# Embedded postgres is fine for kind; persistence is off because the cluster
+# is torn down at the end of every run.
+postgresql:
+  enabled: true
+  storage:
+    requestedSize: 1Gi
