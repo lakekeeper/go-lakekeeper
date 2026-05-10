@@ -22,7 +22,7 @@ var _ MappedNullable = &SearchTabular{}
 // SearchTabular struct for SearchTabular
 type SearchTabular struct {
 	// Better matches have a lower distance
-	Distance NullableFloat32 `json:"distance,omitempty"`
+	Distance *float32 `json:"distance,omitempty"`
 	// Namespace name
 	NamespaceName []string `json:"namespace-name"`
 	// ID of the tabular
@@ -53,47 +53,36 @@ func NewSearchTabularWithDefaults() *SearchTabular {
 	return &this
 }
 
-// GetDistance returns the Distance field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetDistance returns the Distance field value if set, zero value otherwise.
 func (o *SearchTabular) GetDistance() float32 {
-	if o == nil || IsNil(o.Distance.Get()) {
+	if o == nil || IsNil(o.Distance) {
 		var ret float32
 		return ret
 	}
-	return *o.Distance.Get()
+	return *o.Distance
 }
 
 // GetDistanceOk returns a tuple with the Distance field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *SearchTabular) GetDistanceOk() (*float32, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.Distance) {
 		return nil, false
 	}
-	return o.Distance.Get(), o.Distance.IsSet()
+	return o.Distance, true
 }
 
 // HasDistance returns a boolean if a field has been set.
 func (o *SearchTabular) HasDistance() bool {
-	if o != nil && o.Distance.IsSet() {
+	if o != nil && !IsNil(o.Distance) {
 		return true
 	}
 
 	return false
 }
 
-// SetDistance gets a reference to the given NullableFloat32 and assigns it to the Distance field.
+// SetDistance gets a reference to the given float32 and assigns it to the Distance field.
 func (o *SearchTabular) SetDistance(v float32) {
-	o.Distance.Set(&v)
-}
-
-// SetDistanceNil sets the value for Distance to be an explicit nil
-func (o *SearchTabular) SetDistanceNil() {
-	o.Distance.Set(nil)
-}
-
-// UnsetDistance ensures that no value is present for Distance, not even an explicit nil
-func (o *SearchTabular) UnsetDistance() {
-	o.Distance.Unset()
+	o.Distance = &v
 }
 
 // GetNamespaceName returns the NamespaceName field value
@@ -168,18 +157,10 @@ func (o *SearchTabular) SetTabularName(v string) {
 	o.TabularName = v
 }
 
-func (o SearchTabular) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o SearchTabular) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if o.Distance.IsSet() {
-		toSerialize["distance"] = o.Distance.Get()
+	if !IsNil(o.Distance) {
+		toSerialize["distance"] = o.Distance
 	}
 	toSerialize["namespace-name"] = o.NamespaceName
 	toSerialize["tabular-id"] = o.TabularId

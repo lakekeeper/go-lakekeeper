@@ -69,14 +69,6 @@ func (o *ListWarehousesResponse) SetWarehouses(v []GetWarehouseResponse) {
 	o.Warehouses = v
 }
 
-func (o ListWarehousesResponse) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o ListWarehousesResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["warehouses"] = o.Warehouses

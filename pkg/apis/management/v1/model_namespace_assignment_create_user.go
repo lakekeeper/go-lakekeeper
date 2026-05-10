@@ -95,14 +95,6 @@ func (o *NamespaceAssignmentCreateUser) SetType(v string) {
 	o.Type = v
 }
 
-func (o NamespaceAssignmentCreateUser) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o NamespaceAssignmentCreateUser) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["user"] = o.User

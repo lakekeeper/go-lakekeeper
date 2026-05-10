@@ -104,14 +104,6 @@ func (o *UpdateNamespaceAssignmentsRequest) SetWrites(v []NamespaceAssignment) {
 	o.Writes = v
 }
 
-func (o UpdateNamespaceAssignmentsRequest) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o UpdateNamespaceAssignmentsRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if !IsNil(o.Deletes) {

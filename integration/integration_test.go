@@ -86,13 +86,13 @@ func TestMain(m *testing.M) {
 		os.Exit(1)
 	}
 
-	authSource := &core.OAuthTokenSource{TokenSource: tokenSource}
+	authSource := &core.OAuthClientCredentialsAuthSource{TokenSource: tokenSource}
 
 	c, err := client.NewWithAuthSource(
 		context.Background(),
 		os.Getenv("LAKEKEEPER_BASE_URL"),
 		authSource,
-		client.WithInitialBootstrap(true, true, core.Ptr(managementv1.USERTYPE_APPLICATION)),
+		client.WithInitialBootstrap(true, true, core.Ptr(managementv1.UserTypeApplication)),
 	)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "create client: %v\n", err)
@@ -120,7 +120,7 @@ func MustProvisionUser(t *testing.T, c *client.Client) *managementv1.User {
 	req.SetId(id)
 	req.SetName(name)
 	req.SetEmail(email)
-	req.SetUserType(managementv1.USERTYPE_HUMAN)
+	req.SetUserType(managementv1.UserTypeHuman)
 	req.SetUpdateIfExists(false)
 
 	user, _, err := c.UserAPI.CreateUser(t.Context()).CreateUserRequest(*req).Execute()
@@ -184,24 +184,24 @@ func MustCreateWarehouse(t *testing.T, c *client.Client, projectID string) (stri
 
 	name := randomName("test-wh")
 
-	sp := managementv1.StorageProfileS3AsStorageProfile(profile.NewS3Profile(
+	sp := profile.NewS3Profile(
 		"testacc", "eu-local-1",
 		profile.WithS3Endpoint("http://minio:9000/"),
 		profile.WithS3PathStyleAccess(),
-	))
+	)
 	sc := credential.NewS3AccessKey("minio-root-user", "minio-root-password")
 
 	req := managementv1.NewCreateWarehouseRequest(sp, name)
 	req.SetProjectId(projectID)
 	req.SetStorageCredential(sc)
 
-	wh, _, err := c.WarehouseAPI.CreateWarehouse(t.Context()).CreateWarehouseRequest(*req).Execute()
+	wh, err := c.Warehouses.Create(t.Context(), req)
 	if err != nil {
 		t.Fatalf("create warehouse: %v", err)
 	}
 
 	t.Cleanup(func() {
-		if _, err := c.WarehouseAPI.DeleteWarehouse(context.Background(), wh.WarehouseId).Execute(); err != nil {
+		if err := c.Warehouses.Delete(context.Background(), wh.WarehouseId); err != nil {
 			t.Errorf("delete warehouse: %v", err)
 		}
 	})

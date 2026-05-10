@@ -20,12 +20,12 @@ type TableRelation string
 
 // List of TableRelation
 const (
-	TABLERELATION_OWNERSHIP     TableRelation = "ownership"
-	TABLERELATION_PASS_GRANTS   TableRelation = "pass_grants"
-	TABLERELATION_MANAGE_GRANTS TableRelation = "manage_grants"
-	TABLERELATION_DESCRIBE      TableRelation = "describe"
-	TABLERELATION_SELECT        TableRelation = "select"
-	TABLERELATION_MODIFY        TableRelation = "modify"
+	TableRelationOwnership    TableRelation = "ownership"
+	TableRelationPassGrants   TableRelation = "pass_grants"
+	TableRelationManageGrants TableRelation = "manage_grants"
+	TableRelationDescribe     TableRelation = "describe"
+	TableRelationSelect       TableRelation = "select"
+	TableRelationModify       TableRelation = "modify"
 )
 
 // All allowed values of TableRelation enum

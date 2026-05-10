@@ -15,7 +15,28 @@ both `lkctl` and the Go SDK. For the underlying reference material:
 abstraction both surfaces consume. `lkctl` selects an implementation from
 `--auth-mode`; the SDK accepts one directly via
 `client.NewWithAuthSource`. Three implementations ship in `pkg/core`:
-`OAuthTokenSource`, `AccessTokenAuthSource`, `K8sServiceAccountAuthSource`.
+`OAuthClientCredentialsAuthSource`, `AccessTokenAuthSource`,
+`K8sServiceAccountAuthSource`. Each one's `Init` validates eagerly so a
+misconfigured token URL, empty bearer, or unreadable service-account
+token surfaces at `client.NewWithAuthSource` rather than at the first
+request.
+
+The umbrella package adds two convenience constructors that hide the
+two-line `core.*AuthSource{}` + `client.NewWithAuthSource` setup for the
+common cases:
+
+```go
+import "github.com/lakekeeper/go-lakekeeper/pkg/lakekeeper"
+
+// OAuth client-credentials in one call
+c, err := lakekeeper.NewOAuthClientCredentials(ctx, baseURL, tokenURL, clientID, clientSecret, []string{"lakekeeper"})
+
+// Kubernetes service account, default token path
+c, err := lakekeeper.NewK8sServiceAccount(ctx, baseURL, "")
+
+// Bearer token (the umbrella's lakekeeper.New is the shortest path)
+c, err := lakekeeper.New(ctx, baseURL, token)
+```
 
 ## Choosing a flow
 
@@ -47,8 +68,22 @@ export LAKEKEEPER_SCOPE=lakekeeper
 lkctl whoami        # smoke test
 ```
 
-**SDK** — see [PACKAGES.md `OAuthTokenSource`](PACKAGES.md#oauthtokensource--oauth-20-client-credentials)
-for the sequence diagram and full reference:
+**SDK** — see [PACKAGES.md `OAuthClientCredentialsAuthSource`](PACKAGES.md#oauthclientcredentialsauthsource--oauth-20-client-credentials)
+for the sequence diagram and full reference. The umbrella package's
+`NewOAuthClientCredentials` is the shortest path:
+
+```go
+import "github.com/lakekeeper/go-lakekeeper/pkg/lakekeeper"
+
+c, err := lakekeeper.NewOAuthClientCredentials(ctx,
+    "http://localhost:8181",
+    "http://localhost:30080/realms/iceberg/protocol/openid-connect/token",
+    "<your-client-id>", "<your-client-secret>",
+    []string{"lakekeeper"})
+```
+
+If you need to pass a pre-built `oauth2.TokenSource` (e.g. for an
+auth-code or device-flow source), drop down to the underlying type:
 
 ```go
 import (
@@ -58,15 +93,9 @@ import (
     "github.com/lakekeeper/go-lakekeeper/pkg/core"
 )
 
-cfg := &clientcredentials.Config{
-    ClientID:     "<your-client-id>",
-    ClientSecret: "<your-client-secret>",
-    TokenURL:     "http://localhost:30080/realms/iceberg/protocol/openid-connect/token",
-    Scopes:       []string{"lakekeeper"},
-}
-
-as := &core.OAuthTokenSource{TokenSource: cfg.TokenSource(ctx)}
-c, err := client.NewWithAuthSource(ctx, "http://localhost:8181", as)
+cfg := &clientcredentials.Config{ /* ... */ }
+as := &core.OAuthClientCredentialsAuthSource{TokenSource: cfg.TokenSource(ctx)}
+c, err := client.NewWithAuthSource(ctx, baseURL, as)
 ```
 
 ## Static access token
@@ -103,8 +132,8 @@ is accepted by the Lakekeeper server. The default token path
 (`/var/run/secrets/kubernetes.io/serviceaccount/token`, see
 [`pkg/core/auth.go:16`](../pkg/core/auth.go)) covers the standard
 projected-volume mount; override only for non-default mounts (e.g.
-audience-scoped tokens). The token is read **once at construction** — the
-pod must restart to pick up rotation.
+audience-scoped tokens). **The token file is re-read on every request**, so
+the kubelet's hourly rotation is picked up without process restart.
 
 **CLI** — see [CLI.md k8s example](CLI.md#auth-mode-examples):
 
@@ -116,16 +145,28 @@ export LAKEKEEPER_AUTH_MODE=k8s
 lkctl whoami        # smoke test
 ```
 
-**SDK** — see [PACKAGES.md `K8sServiceAccountAuthSource`](PACKAGES.md#k8sserviceaccountauthsource--kubernetes-service-account):
+**SDK** — the umbrella's `NewK8sServiceAccount` is the shortest path:
 
 ```go
+import "github.com/lakekeeper/go-lakekeeper/pkg/lakekeeper"
+
 // Default token path
-as := &core.K8sServiceAccountAuthSource{}
+c, err := lakekeeper.NewK8sServiceAccount(ctx, baseURL, "")
 
-// Or with a custom path:
-path := "/var/run/secrets/lakekeeper/token"
-as := &core.K8sServiceAccountAuthSource{ServiceAccountTokenPath: &path}
+// Custom path (e.g. audience-scoped projected token)
+c, err = lakekeeper.NewK8sServiceAccount(ctx, baseURL, "/var/run/secrets/lakekeeper/token")
+```
 
+The lower-level shape, when you need to pass extra `client.Option`s or
+share an existing `core.AuthSource` across multiple clients:
+
+```go
+import (
+    "github.com/lakekeeper/go-lakekeeper/pkg/client"
+    "github.com/lakekeeper/go-lakekeeper/pkg/core"
+)
+
+as := &core.K8sServiceAccountAuthSource{}  // default path
 c, err := client.NewWithAuthSource(ctx, baseURL, as)
 ```
 
@@ -162,7 +203,7 @@ c, err := client.NewWithAuthSource(ctx, baseURL, as,
     client.WithInitialBootstrap(
         true,                                       // acceptTermsOfUse
         true,                                       // isOperator
-        core.Ptr(managementv1.USERTYPE_APPLICATION), // userType (optional)
+        core.Ptr(managementv1.UserTypeApplication), // userType (optional)
     ),
 )
 ```

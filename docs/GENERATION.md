@@ -96,13 +96,49 @@ The short version: openapi-generator cannot represent
 struct holding the union of all variant fields, breaking both marshal
 (zero-valued fields ship on the wire) and unmarshal (correct payloads get
 rejected for missing fields they shouldn't contain). The preprocessor walks
-`components.schemas` in five phases to flatten these constructs into named
-leaf schemas with disambiguating discriminators, so the generator can emit
-clean union types.
+`components.schemas` to flatten these constructs into named leaf schemas
+with disambiguating discriminators, so the generator can emit clean union
+types.
 
 This is what unlocks the correct wire format for `StorageCredential` (commit
 `cb74e97`) and the `*Assignment` families (commit `372cdc9`).
 
+The preprocessor also runs two ergonomic passes that the generator alone
+cannot deliver:
+
+- **Phase 5 — strip `'null'` from `type: [<X>, 'null']` arrays.** OAS 3.1
+  nullable type-arrays trigger `NullableX` 200-line wrappers in the Go
+  generator output. Stripping the `'null'` member produces plain `*X`
+  fields with `omitempty` instead. The wire format on absent values is
+  identical; the lost capability is sending an explicit JSON `null`
+  distinct from absent. Lakekeeper has no fields where that distinction is
+  load-bearing today; for the ones that ever do, `keepNullable` in the
+  preprocessor is a per-field opt-out list.
+- **Phase 6 — inject `x-enum-varnames` on every named enum schema.** The
+  Go generator's default constant naming
+  (`<UPPER_SCHEMA>_<UPPER_VALUE>` — e.g. `S3FLAVOR_AWS`) is not Go
+  idiomatic. The preprocessor synthesises
+  `<PascalSchema><PascalValue>` per value (`S3FlavorAws`) and the
+  generator config drops `enumClassPrefix`. The synthesised varnames
+  preserve cross-enum uniqueness, so values that repeat across enums
+  (`create`, `delete`, `select` on several `*Action` enums) still produce
+  distinct constants like `ProjectActionCreate` and `ServerActionCreate`.
+
 When the spec adds a **new** `allOf(oneOf, extras)` shape and the round-trip
 tests in [`pkg/apis/management/v1tests/`](../pkg/apis/management/v1tests/)
 start failing, the preprocessor is the place to extend.
+
+## Generator configuration
+
+[`management-config.yaml`](../api/openapi/management-config.yaml) keeps a
+small set of knobs flipped from openapi-generator's defaults. The current
+choices, with the intent behind each:
+
+| Key | Value | Why |
+|---|---|---|
+| `useOneOfDiscriminatorLookup` | `true` | Lets the generator emit unambiguous unmarshal logic when the preprocessor adds a `discriminator` block |
+| `enumClassPrefix` | `false` | Pairs with the preprocessor's `x-enum-varnames` injection; without this, the prefix would stack and produce names like `S3FLAVOR_S3FlavorAws` |
+| `generateMarshalJSON` | `false` | Default Go encoding via the struct's `json:` tags is byte-identical to the custom `ToMap`-driven `MarshalJSON` (every optional field carries `omitempty`). Saves ~8 lines per model file with no wire-format change |
+| `generateUnmarshalJSON` | `true` | Kept on so inbound responses still error on a missing required field. The price is rejecting payloads with unknown fields (`DisallowUnknownFields`); we accept that because Lakekeeper does not introduce unknown fields without a spec bump that the SDK regenerates against |
+| `generateInterfaces` | `false` | We expose the generated client through `pkg/client`, so the additional `XxxAPI` interface variants are not needed |
+| `withGoMod`, `isGoSubmodule` | `false`, `true` | Embed the generated package inside this module instead of producing a standalone Go SDK |

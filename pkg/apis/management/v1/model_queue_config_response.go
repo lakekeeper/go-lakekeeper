@@ -68,14 +68,6 @@ func (o *QueueConfigResponse) SetQueueName(v string) {
 	o.QueueName = v
 }
 
-func (o QueueConfigResponse) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o QueueConfigResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["queue-name"] = o.QueueName

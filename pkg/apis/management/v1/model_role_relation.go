@@ -20,8 +20,8 @@ type RoleRelation string
 
 // List of RoleRelation
 const (
-	ROLERELATION_ASSIGNEE  RoleRelation = "assignee"
-	ROLERELATION_OWNERSHIP RoleRelation = "ownership"
+	RoleRelationAssignee  RoleRelation = "assignee"
+	RoleRelationOwnership RoleRelation = "ownership"
 )
 
 // All allowed values of RoleRelation enum

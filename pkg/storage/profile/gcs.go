@@ -7,7 +7,11 @@ type GCSOption func(*managementv1.StorageProfileGcs)
 
 // NewGCSProfile constructs a StorageProfileGcs with the spec-required field
 // (bucket) populated. Apply With* options for anything else.
-func NewGCSProfile(bucket string, opts ...GCSOption) *managementv1.StorageProfileGcs {
+//
+// Returns the StorageProfile union directly so callers can pass it to
+// request setters (e.g. CreateWarehouseRequest.StorageProfile) without going
+// through the generated *AsStorageProfile wrapper.
+func NewGCSProfile(bucket string, opts ...GCSOption) managementv1.StorageProfile {
 	p := &managementv1.StorageProfileGcs{
 		Bucket: bucket,
 		Type:   typeGCS,
@@ -15,7 +19,7 @@ func NewGCSProfile(bucket string, opts ...GCSOption) *managementv1.StorageProfil
 	for _, opt := range opts {
 		opt(p)
 	}
-	return p
+	return managementv1.StorageProfileGcsAsStorageProfile(p)
 }
 
 func WithGCSKeyPrefix(prefix string) GCSOption {

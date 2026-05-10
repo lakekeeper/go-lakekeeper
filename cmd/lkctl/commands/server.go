@@ -9,7 +9,6 @@ import (
 	"github.com/spf13/cobra"
 
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
-	"github.com/lakekeeper/go-lakekeeper/pkg/permissions"
 )
 
 func newServerCmd(opts *clientOptions) *cobra.Command {
@@ -228,27 +227,12 @@ func newServerGrantCmd(opts *clientOptions) *cobra.Command {
   lkctl server grant --roles 0198618c-5be8-7a82-a0b9-1076c9dd12f0 --assignments operator`,
 		Args: cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			if len(users) == 0 && len(roles) == 0 {
-				return errors.New("at least one --users or --roles value is required")
+			set, err := buildAssignmentSet[managementv1.ServerAssignment](assignments, users, roles)
+			if err != nil {
+				return err
 			}
-
 			req := managementv1.NewUpdateServerAssignmentsRequest()
-			for _, rel := range assignments {
-				for _, u := range users {
-					a, err := permissions.BuildAssignment[managementv1.ServerAssignment](rel, permissions.PrincipalUser, u)
-					if err != nil {
-						return err
-					}
-					req.Writes = append(req.Writes, a)
-				}
-				for _, r := range roles {
-					a, err := permissions.BuildAssignment[managementv1.ServerAssignment](rel, permissions.PrincipalRole, r)
-					if err != nil {
-						return err
-					}
-					req.Writes = append(req.Writes, a)
-				}
-			}
+			req.Writes = set
 
 			ctx := cmd.Context()
 			c, err := newClient(ctx, opts)
@@ -290,27 +274,12 @@ func newServerRevokeCmd(opts *clientOptions) *cobra.Command {
   lkctl server revoke --roles 0198618c-5be8-7a82-a0b9-1076c9dd12f0 --assignments operator`,
 		Args: cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			if len(users) == 0 && len(roles) == 0 {
-				return errors.New("at least one --users or --roles value is required")
+			set, err := buildAssignmentSet[managementv1.ServerAssignment](assignments, users, roles)
+			if err != nil {
+				return err
 			}
-
 			req := managementv1.NewUpdateServerAssignmentsRequest()
-			for _, rel := range assignments {
-				for _, u := range users {
-					a, err := permissions.BuildAssignment[managementv1.ServerAssignment](rel, permissions.PrincipalUser, u)
-					if err != nil {
-						return err
-					}
-					req.Deletes = append(req.Deletes, a)
-				}
-				for _, r := range roles {
-					a, err := permissions.BuildAssignment[managementv1.ServerAssignment](rel, permissions.PrincipalRole, r)
-					if err != nil {
-						return err
-					}
-					req.Deletes = append(req.Deletes, a)
-				}
-			}
+			req.Deletes = set
 
 			ctx := cmd.Context()
 			c, err := newClient(ctx, opts)
@@ -338,7 +307,7 @@ func printServerInfo(w io.Writer, info *managementv1.ServerInfo) error {
 	fmt.Fprintf(w, "ID: %s\n", info.ServerId)
 	fmt.Fprintf(w, "Version: %s\n", info.Version)
 	fmt.Fprintf(w, "Lakekeeper Version: %s\n", info.GetLakekeeperVersion())
-	fmt.Fprintf(w, "Default Project ID: %s\n", formatNullableString(info.DefaultProjectId))
+	fmt.Fprintf(w, "Default Project ID: %s\n", formatStringPtr(info.DefaultProjectId))
 	fmt.Fprintf(w, "Bootstrapped: %t\n", info.Bootstrapped)
 	fmt.Fprintf(w, "Authorization Backend: %s\n", info.AuthzBackend)
 	fmt.Fprintf(w, "AWS System Identities Enabled: %t\n", info.AwsSystemIdentitiesEnabled)

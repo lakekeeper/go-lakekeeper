@@ -95,14 +95,6 @@ func (o *WarehouseAssignmentOwnershipUser) SetType(v string) {
 	o.Type = v
 }
 
-func (o WarehouseAssignmentOwnershipUser) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o WarehouseAssignmentOwnershipUser) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["user"] = o.User

@@ -22,7 +22,7 @@ var _ MappedNullable = &CatalogActionCheckItem{}
 // CatalogActionCheckItem A single check item with optional identity override
 type CatalogActionCheckItem struct {
 	// Optional identifier for this check (returned in response). If not specified, the index in the request array will be used.
-	Id NullableString `json:"id,omitempty"`
+	Id *string `json:"id,omitempty"`
 	// The user or role to check access for. If not specified, the identity of the user making the request is used.
 	Identity NullableUserOrRole `json:"identity,omitempty"`
 	// The operation to check
@@ -49,47 +49,36 @@ func NewCatalogActionCheckItemWithDefaults() *CatalogActionCheckItem {
 	return &this
 }
 
-// GetId returns the Id field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetId returns the Id field value if set, zero value otherwise.
 func (o *CatalogActionCheckItem) GetId() string {
-	if o == nil || IsNil(o.Id.Get()) {
+	if o == nil || IsNil(o.Id) {
 		var ret string
 		return ret
 	}
-	return *o.Id.Get()
+	return *o.Id
 }
 
 // GetIdOk returns a tuple with the Id field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *CatalogActionCheckItem) GetIdOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.Id) {
 		return nil, false
 	}
-	return o.Id.Get(), o.Id.IsSet()
+	return o.Id, true
 }
 
 // HasId returns a boolean if a field has been set.
 func (o *CatalogActionCheckItem) HasId() bool {
-	if o != nil && o.Id.IsSet() {
+	if o != nil && !IsNil(o.Id) {
 		return true
 	}
 
 	return false
 }
 
-// SetId gets a reference to the given NullableString and assigns it to the Id field.
+// SetId gets a reference to the given string and assigns it to the Id field.
 func (o *CatalogActionCheckItem) SetId(v string) {
-	o.Id.Set(&v)
-}
-
-// SetIdNil sets the value for Id to be an explicit nil
-func (o *CatalogActionCheckItem) SetIdNil() {
-	o.Id.Set(nil)
-}
-
-// UnsetId ensures that no value is present for Id, not even an explicit nil
-func (o *CatalogActionCheckItem) UnsetId() {
-	o.Id.Unset()
+	o.Id = &v
 }
 
 // GetIdentity returns the Identity field value if set, zero value otherwise (both if not set or set to explicit null).
@@ -159,18 +148,10 @@ func (o *CatalogActionCheckItem) SetOperation(v CatalogActionCheckOperation) {
 	o.Operation = v
 }
 
-func (o CatalogActionCheckItem) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o CatalogActionCheckItem) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if o.Id.IsSet() {
-		toSerialize["id"] = o.Id.Get()
+	if !IsNil(o.Id) {
+		toSerialize["id"] = o.Id
 	}
 	if o.Identity.IsSet() {
 		toSerialize["identity"] = o.Identity.Get()

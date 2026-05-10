@@ -10,7 +10,6 @@ import (
 	"github.com/spf13/cobra"
 
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
-	"github.com/lakekeeper/go-lakekeeper/pkg/permissions"
 )
 
 func newProjectCmd(opts *clientOptions) *cobra.Command {
@@ -311,31 +310,17 @@ func newProjectGrantCmd(opts *clientOptions) *cobra.Command {
 		Short:   "Add project assignments",
 		Args:    cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if len(users) == 0 && len(roles) == 0 {
-				return errors.New("at least one --users or --roles value is required")
-			}
 			project := uuid.Nil.String()
 			if len(args) == 1 {
 				project = args[0]
 			}
 
-			req := managementv1.NewUpdateProjectAssignmentsRequest()
-			for _, rel := range assignments {
-				for _, u := range users {
-					a, err := permissions.BuildAssignment[managementv1.ProjectAssignment](rel, permissions.PrincipalUser, u)
-					if err != nil {
-						return err
-					}
-					req.Writes = append(req.Writes, a)
-				}
-				for _, r := range roles {
-					a, err := permissions.BuildAssignment[managementv1.ProjectAssignment](rel, permissions.PrincipalRole, r)
-					if err != nil {
-						return err
-					}
-					req.Writes = append(req.Writes, a)
-				}
+			set, err := buildAssignmentSet[managementv1.ProjectAssignment](assignments, users, roles)
+			if err != nil {
+				return err
 			}
+			req := managementv1.NewUpdateProjectAssignmentsRequest()
+			req.Writes = set
 
 			ctx := cmd.Context()
 			c, err := newClient(ctx, opts)
@@ -377,31 +362,17 @@ func newProjectRevokeCmd(opts *clientOptions) *cobra.Command {
   lkctl project revoke 0198618c-5be8-7a82-a0b9-1076c9dd12f0 --roles 11111111-2222-3333-4444-555555555555 --assignments select`,
 		Args: cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if len(users) == 0 && len(roles) == 0 {
-				return errors.New("at least one --users or --roles value is required")
-			}
 			project := uuid.Nil.String()
 			if len(args) == 1 {
 				project = args[0]
 			}
 
-			req := managementv1.NewUpdateProjectAssignmentsRequest()
-			for _, rel := range assignments {
-				for _, u := range users {
-					a, err := permissions.BuildAssignment[managementv1.ProjectAssignment](rel, permissions.PrincipalUser, u)
-					if err != nil {
-						return err
-					}
-					req.Deletes = append(req.Deletes, a)
-				}
-				for _, r := range roles {
-					a, err := permissions.BuildAssignment[managementv1.ProjectAssignment](rel, permissions.PrincipalRole, r)
-					if err != nil {
-						return err
-					}
-					req.Deletes = append(req.Deletes, a)
-				}
+			set, err := buildAssignmentSet[managementv1.ProjectAssignment](assignments, users, roles)
+			if err != nil {
+				return err
 			}
+			req := managementv1.NewUpdateProjectAssignmentsRequest()
+			req.Deletes = set
 
 			ctx := cmd.Context()
 			c, err := newClient(ctx, opts)

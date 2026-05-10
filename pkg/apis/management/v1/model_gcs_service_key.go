@@ -328,14 +328,6 @@ func (o *GcsServiceKey) SetUniverseDomain(v string) {
 	o.UniverseDomain = v
 }
 
-func (o GcsServiceKey) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o GcsServiceKey) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["auth_provider_x509_cert_url"] = o.AuthProviderX509CertUrl

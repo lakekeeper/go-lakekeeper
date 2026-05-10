@@ -68,14 +68,6 @@ func (o *LakekeeperRoleActionOneOf1) SetAction(v string) {
 	o.Action = v
 }
 
-func (o LakekeeperRoleActionOneOf1) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o LakekeeperRoleActionOneOf1) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["action"] = o.Action

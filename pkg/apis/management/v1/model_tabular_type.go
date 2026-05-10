@@ -20,8 +20,8 @@ type TabularType string
 
 // List of TabularType
 const (
-	TABULARTYPE_TABLE TabularType = "table"
-	TABULARTYPE_VIEW  TabularType = "view"
+	TabularTypeTable TabularType = "table"
+	TabularTypeView  TabularType = "view"
 )
 
 // All allowed values of TabularType enum

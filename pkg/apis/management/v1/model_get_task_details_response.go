@@ -522,9 +522,9 @@ func (o *GetTaskDetailsResponse) SetAttempts(v []TaskAttempt) {
 	o.Attempts = v
 }
 
-// GetExecutionDetails returns the ExecutionDetails field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetExecutionDetails returns the ExecutionDetails field value if set, zero value otherwise.
 func (o *GetTaskDetailsResponse) GetExecutionDetails() map[string]interface{} {
-	if o == nil {
+	if o == nil || IsNil(o.ExecutionDetails) {
 		var ret map[string]interface{}
 		return ret
 	}
@@ -533,7 +533,6 @@ func (o *GetTaskDetailsResponse) GetExecutionDetails() map[string]interface{} {
 
 // GetExecutionDetailsOk returns a tuple with the ExecutionDetails field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *GetTaskDetailsResponse) GetExecutionDetailsOk() (map[string]interface{}, bool) {
 	if o == nil || IsNil(o.ExecutionDetails) {
 		return map[string]interface{}{}, false
@@ -579,14 +578,6 @@ func (o *GetTaskDetailsResponse) SetTaskData(v map[string]interface{}) {
 	o.TaskData = v
 }
 
-func (o GetTaskDetailsResponse) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o GetTaskDetailsResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["attempt"] = o.Attempt
@@ -617,7 +608,7 @@ func (o GetTaskDetailsResponse) ToMap() (map[string]interface{}, error) {
 	}
 	toSerialize["warehouse-id"] = o.WarehouseId
 	toSerialize["attempts"] = o.Attempts
-	if o.ExecutionDetails != nil {
+	if !IsNil(o.ExecutionDetails) {
 		toSerialize["execution-details"] = o.ExecutionDetails
 	}
 	toSerialize["task-data"] = o.TaskData

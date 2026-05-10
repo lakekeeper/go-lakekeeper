@@ -68,14 +68,6 @@ func (o *GetLakekeeperNamespaceActionsResponse) SetAllowedActions(v []Lakekeeper
 	o.AllowedActions = v
 }
 
-func (o GetLakekeeperNamespaceActionsResponse) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o GetLakekeeperNamespaceActionsResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["allowed-actions"] = o.AllowedActions

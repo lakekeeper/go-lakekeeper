@@ -94,14 +94,6 @@ func (o *TabularDeleteProfileSoft) SetType(v string) {
 	o.Type = v
 }
 
-func (o TabularDeleteProfileSoft) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o TabularDeleteProfileSoft) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["expiration-seconds"] = o.ExpirationSeconds

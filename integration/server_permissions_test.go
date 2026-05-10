@@ -27,13 +27,13 @@ func TestPermissions_Server_GetAccess(t *testing.T) {
 	assert.Equal(t, http.StatusOK, r.StatusCode)
 
 	want := []managementv1.ServerAction{
-		managementv1.SERVERACTION_CREATE_PROJECT,
-		managementv1.SERVERACTION_UPDATE_USERS,
-		managementv1.SERVERACTION_DELETE_USERS,
-		managementv1.SERVERACTION_LIST_USERS,
-		managementv1.SERVERACTION_GRANT_ADMIN,
-		managementv1.SERVERACTION_PROVISION_USERS,
-		managementv1.SERVERACTION_READ_ASSIGNMENTS,
+		managementv1.ServerActionCreateProject,
+		managementv1.ServerActionUpdateUsers,
+		managementv1.ServerActionDeleteUsers,
+		managementv1.ServerActionListUsers,
+		managementv1.ServerActionGrantAdmin,
+		managementv1.ServerActionProvisionUsers,
+		managementv1.ServerActionReadAssignments,
 	}
 	assert.Subset(t, want, resp.AllowedActions)
 }
@@ -160,13 +160,13 @@ func TestPermissions_Server_GetAccess_UserFilter(t *testing.T) {
 	require.NoError(t, err)
 
 	want := []managementv1.ServerAction{
-		managementv1.SERVERACTION_CREATE_PROJECT,
-		managementv1.SERVERACTION_UPDATE_USERS,
-		managementv1.SERVERACTION_DELETE_USERS,
-		managementv1.SERVERACTION_LIST_USERS,
-		managementv1.SERVERACTION_GRANT_ADMIN,
-		managementv1.SERVERACTION_PROVISION_USERS,
-		managementv1.SERVERACTION_READ_ASSIGNMENTS,
+		managementv1.ServerActionCreateProject,
+		managementv1.ServerActionUpdateUsers,
+		managementv1.ServerActionDeleteUsers,
+		managementv1.ServerActionListUsers,
+		managementv1.ServerActionGrantAdmin,
+		managementv1.ServerActionProvisionUsers,
+		managementv1.ServerActionReadAssignments,
 	}
 	assert.Subset(t, want, resp.AllowedActions)
 }
@@ -199,13 +199,13 @@ func TestPermissions_Server_GetAccess_RoleFilter(t *testing.T) {
 	require.NoError(t, err)
 
 	want := []managementv1.ServerAction{
-		managementv1.SERVERACTION_CREATE_PROJECT,
-		managementv1.SERVERACTION_UPDATE_USERS,
-		managementv1.SERVERACTION_DELETE_USERS,
-		managementv1.SERVERACTION_LIST_USERS,
-		managementv1.SERVERACTION_GRANT_ADMIN,
-		managementv1.SERVERACTION_PROVISION_USERS,
-		managementv1.SERVERACTION_READ_ASSIGNMENTS,
+		managementv1.ServerActionCreateProject,
+		managementv1.ServerActionUpdateUsers,
+		managementv1.ServerActionDeleteUsers,
+		managementv1.ServerActionListUsers,
+		managementv1.ServerActionGrantAdmin,
+		managementv1.ServerActionProvisionUsers,
+		managementv1.ServerActionReadAssignments,
 	}
 	assert.Subset(t, want, resp.AllowedActions)
 }

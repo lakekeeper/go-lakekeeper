@@ -360,14 +360,6 @@ func (o *StorageProfileAdls) SetType(v string) {
 	o.Type = v
 }
 
-func (o StorageProfileAdls) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o StorageProfileAdls) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["account-name"] = o.AccountName

@@ -101,8 +101,8 @@ func bootstrapForCompose() error {
 	ts := cfg.TokenSource(ctx)
 	if _, err := client.NewWithAuthSource(ctx,
 		os.Getenv("LAKEKEEPER_BASE_URL"),
-		&core.OAuthTokenSource{TokenSource: ts},
-		client.WithInitialBootstrap(true, true, core.Ptr(managementv1.USERTYPE_APPLICATION)),
+		&core.OAuthClientCredentialsAuthSource{TokenSource: ts},
+		client.WithInitialBootstrap(true, true, core.Ptr(managementv1.UserTypeApplication)),
 	); err != nil {
 		return fmt.Errorf("create client: %w", err)
 	}

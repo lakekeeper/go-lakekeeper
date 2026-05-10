@@ -22,23 +22,23 @@ var _ MappedNullable = &S3Profile{}
 // S3Profile struct for S3Profile
 type S3Profile struct {
 	// Allow `s3a://` and `s3n://` in locations. This is disabled by default. We do not recommend to use this setting except for migration of old hadoop-based tables via the register endpoint. Tables with `s3a` paths are not accessible outside the Java ecosystem.
-	AllowAlternativeProtocols NullableBool `json:"allow-alternative-protocols,omitempty"`
+	AllowAlternativeProtocols *bool `json:"allow-alternative-protocols,omitempty"`
 	// Optional ARN to assume when accessing the bucket from Lakekeeper.
-	AssumeRoleArn NullableString `json:"assume-role-arn,omitempty"`
+	AssumeRoleArn *string `json:"assume-role-arn,omitempty"`
 	// ARN of the KMS key used to encrypt the S3 bucket, if any.
-	AwsKmsKeyArn NullableString `json:"aws-kms-key-arn,omitempty"`
+	AwsKmsKeyArn *string `json:"aws-kms-key-arn,omitempty"`
 	// Name of the S3 bucket
 	Bucket string `json:"bucket"`
 	// Optional endpoint to use for S3 requests, if not provided the region will be used to determine the endpoint. If both region and endpoint are provided, the endpoint will be used. Example: `http://s3-de.my-domain.com:9000`
-	Endpoint NullableString `json:"endpoint,omitempty"`
+	Endpoint *string `json:"endpoint,omitempty"`
 	// S3 flavor to use. Defaults to AWS
 	Flavor *S3Flavor `json:"flavor,omitempty"`
 	// Subpath in the bucket to use.
-	KeyPrefix NullableString `json:"key-prefix,omitempty"`
+	KeyPrefix *string `json:"key-prefix,omitempty"`
 	// Legacy MD5 behavior for S3 operations requiring checksums. When enabled, Lakekeeper will use the legacy MD5 checksum for operations like `DeleteObjects`.
-	LegacyMd5Behavior NullableBool `json:"legacy-md5-behavior,omitempty"`
+	LegacyMd5Behavior *bool `json:"legacy-md5-behavior,omitempty"`
 	// Path style access for S3 requests. If the underlying S3 supports both, we recommend to not set `path_style_access`.
-	PathStyleAccess NullableBool `json:"path-style-access,omitempty"`
+	PathStyleAccess *bool `json:"path-style-access,omitempty"`
 	// Controls whether the `s3.delete-enabled=false` flag is sent to clients.  In all Iceberg 1.x versions, when Spark executes `DROP TABLE xxx PURGE`, it directly deletes files from S3, bypassing the catalog's soft-deletion mechanism. Other query engines properly delegate this operation to the catalog. This Spark behavior is expected to change in Iceberg 2.0.  Setting this to `true` pushes the `s3.delete-enabled=false` flag to clients, which discourages Spark from directly deleting files during `DROP TABLE xxx PURGE` operations. Note that clients may override this setting, and it affects other Spark operations that require file deletion, such as removing snapshots.  For more details, refer to Lakekeeper's [Soft-Deletion documentation](https://docs.lakekeeper.io/docs/nightly/concepts/#soft-deletion). This flag has no effect if Soft-Deletion is disabled for the warehouse.
 	PushS3DeleteDisabled *bool `json:"push-s3-delete-disabled,omitempty"`
 	// Region to use for S3 requests.
@@ -51,9 +51,9 @@ type S3Profile struct {
 	StorageLayout NullableStorageLayout `json:"storage-layout,omitempty"`
 	StsEnabled    bool                  `json:"sts-enabled"`
 	// Optional endpoint to use for STS requests. Use this when the STS endpoint differs from the S3 endpoint, which is common with S3-compatible storage systems. If not provided, the S3 `endpoint` is used for STS requests as well.
-	StsEndpoint NullableString `json:"sts-endpoint,omitempty"`
+	StsEndpoint *string `json:"sts-endpoint,omitempty"`
 	// Optional role ARN to assume for sts vended-credentials. If not provided, `assume_role_arn` is used. Either `assume_role_arn` or `sts_role_arn` must be provided if `sts_enabled` is true.
-	StsRoleArn NullableString `json:"sts-role-arn,omitempty"`
+	StsRoleArn *string `json:"sts-role-arn,omitempty"`
 	// Optional session tags for STS assume role operations.
 	StsSessionTags map[string]string `json:"sts-session-tags,omitempty"`
 	// The validity of the sts tokens in seconds. Default is 3600
@@ -82,133 +82,100 @@ func NewS3ProfileWithDefaults() *S3Profile {
 	return &this
 }
 
-// GetAllowAlternativeProtocols returns the AllowAlternativeProtocols field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetAllowAlternativeProtocols returns the AllowAlternativeProtocols field value if set, zero value otherwise.
 func (o *S3Profile) GetAllowAlternativeProtocols() bool {
-	if o == nil || IsNil(o.AllowAlternativeProtocols.Get()) {
+	if o == nil || IsNil(o.AllowAlternativeProtocols) {
 		var ret bool
 		return ret
 	}
-	return *o.AllowAlternativeProtocols.Get()
+	return *o.AllowAlternativeProtocols
 }
 
 // GetAllowAlternativeProtocolsOk returns a tuple with the AllowAlternativeProtocols field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *S3Profile) GetAllowAlternativeProtocolsOk() (*bool, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.AllowAlternativeProtocols) {
 		return nil, false
 	}
-	return o.AllowAlternativeProtocols.Get(), o.AllowAlternativeProtocols.IsSet()
+	return o.AllowAlternativeProtocols, true
 }
 
 // HasAllowAlternativeProtocols returns a boolean if a field has been set.
 func (o *S3Profile) HasAllowAlternativeProtocols() bool {
-	if o != nil && o.AllowAlternativeProtocols.IsSet() {
+	if o != nil && !IsNil(o.AllowAlternativeProtocols) {
 		return true
 	}
 
 	return false
 }
 
-// SetAllowAlternativeProtocols gets a reference to the given NullableBool and assigns it to the AllowAlternativeProtocols field.
+// SetAllowAlternativeProtocols gets a reference to the given bool and assigns it to the AllowAlternativeProtocols field.
 func (o *S3Profile) SetAllowAlternativeProtocols(v bool) {
-	o.AllowAlternativeProtocols.Set(&v)
+	o.AllowAlternativeProtocols = &v
 }
 
-// SetAllowAlternativeProtocolsNil sets the value for AllowAlternativeProtocols to be an explicit nil
-func (o *S3Profile) SetAllowAlternativeProtocolsNil() {
-	o.AllowAlternativeProtocols.Set(nil)
-}
-
-// UnsetAllowAlternativeProtocols ensures that no value is present for AllowAlternativeProtocols, not even an explicit nil
-func (o *S3Profile) UnsetAllowAlternativeProtocols() {
-	o.AllowAlternativeProtocols.Unset()
-}
-
-// GetAssumeRoleArn returns the AssumeRoleArn field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetAssumeRoleArn returns the AssumeRoleArn field value if set, zero value otherwise.
 func (o *S3Profile) GetAssumeRoleArn() string {
-	if o == nil || IsNil(o.AssumeRoleArn.Get()) {
+	if o == nil || IsNil(o.AssumeRoleArn) {
 		var ret string
 		return ret
 	}
-	return *o.AssumeRoleArn.Get()
+	return *o.AssumeRoleArn
 }
 
 // GetAssumeRoleArnOk returns a tuple with the AssumeRoleArn field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *S3Profile) GetAssumeRoleArnOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.AssumeRoleArn) {
 		return nil, false
 	}
-	return o.AssumeRoleArn.Get(), o.AssumeRoleArn.IsSet()
+	return o.AssumeRoleArn, true
 }
 
 // HasAssumeRoleArn returns a boolean if a field has been set.
 func (o *S3Profile) HasAssumeRoleArn() bool {
-	if o != nil && o.AssumeRoleArn.IsSet() {
+	if o != nil && !IsNil(o.AssumeRoleArn) {
 		return true
 	}
 
 	return false
 }
 
-// SetAssumeRoleArn gets a reference to the given NullableString and assigns it to the AssumeRoleArn field.
+// SetAssumeRoleArn gets a reference to the given string and assigns it to the AssumeRoleArn field.
 func (o *S3Profile) SetAssumeRoleArn(v string) {
-	o.AssumeRoleArn.Set(&v)
+	o.AssumeRoleArn = &v
 }
 
-// SetAssumeRoleArnNil sets the value for AssumeRoleArn to be an explicit nil
-func (o *S3Profile) SetAssumeRoleArnNil() {
-	o.AssumeRoleArn.Set(nil)
-}
-
-// UnsetAssumeRoleArn ensures that no value is present for AssumeRoleArn, not even an explicit nil
-func (o *S3Profile) UnsetAssumeRoleArn() {
-	o.AssumeRoleArn.Unset()
-}
-
-// GetAwsKmsKeyArn returns the AwsKmsKeyArn field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetAwsKmsKeyArn returns the AwsKmsKeyArn field value if set, zero value otherwise.
 func (o *S3Profile) GetAwsKmsKeyArn() string {
-	if o == nil || IsNil(o.AwsKmsKeyArn.Get()) {
+	if o == nil || IsNil(o.AwsKmsKeyArn) {
 		var ret string
 		return ret
 	}
-	return *o.AwsKmsKeyArn.Get()
+	return *o.AwsKmsKeyArn
 }
 
 // GetAwsKmsKeyArnOk returns a tuple with the AwsKmsKeyArn field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *S3Profile) GetAwsKmsKeyArnOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.AwsKmsKeyArn) {
 		return nil, false
 	}
-	return o.AwsKmsKeyArn.Get(), o.AwsKmsKeyArn.IsSet()
+	return o.AwsKmsKeyArn, true
 }
 
 // HasAwsKmsKeyArn returns a boolean if a field has been set.
 func (o *S3Profile) HasAwsKmsKeyArn() bool {
-	if o != nil && o.AwsKmsKeyArn.IsSet() {
+	if o != nil && !IsNil(o.AwsKmsKeyArn) {
 		return true
 	}
 
 	return false
 }
 
-// SetAwsKmsKeyArn gets a reference to the given NullableString and assigns it to the AwsKmsKeyArn field.
+// SetAwsKmsKeyArn gets a reference to the given string and assigns it to the AwsKmsKeyArn field.
 func (o *S3Profile) SetAwsKmsKeyArn(v string) {
-	o.AwsKmsKeyArn.Set(&v)
-}
-
-// SetAwsKmsKeyArnNil sets the value for AwsKmsKeyArn to be an explicit nil
-func (o *S3Profile) SetAwsKmsKeyArnNil() {
-	o.AwsKmsKeyArn.Set(nil)
-}
-
-// UnsetAwsKmsKeyArn ensures that no value is present for AwsKmsKeyArn, not even an explicit nil
-func (o *S3Profile) UnsetAwsKmsKeyArn() {
-	o.AwsKmsKeyArn.Unset()
+	o.AwsKmsKeyArn = &v
 }
 
 // GetBucket returns the Bucket field value
@@ -235,47 +202,36 @@ func (o *S3Profile) SetBucket(v string) {
 	o.Bucket = v
 }
 
-// GetEndpoint returns the Endpoint field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetEndpoint returns the Endpoint field value if set, zero value otherwise.
 func (o *S3Profile) GetEndpoint() string {
-	if o == nil || IsNil(o.Endpoint.Get()) {
+	if o == nil || IsNil(o.Endpoint) {
 		var ret string
 		return ret
 	}
-	return *o.Endpoint.Get()
+	return *o.Endpoint
 }
 
 // GetEndpointOk returns a tuple with the Endpoint field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *S3Profile) GetEndpointOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.Endpoint) {
 		return nil, false
 	}
-	return o.Endpoint.Get(), o.Endpoint.IsSet()
+	return o.Endpoint, true
 }
 
 // HasEndpoint returns a boolean if a field has been set.
 func (o *S3Profile) HasEndpoint() bool {
-	if o != nil && o.Endpoint.IsSet() {
+	if o != nil && !IsNil(o.Endpoint) {
 		return true
 	}
 
 	return false
 }
 
-// SetEndpoint gets a reference to the given NullableString and assigns it to the Endpoint field.
+// SetEndpoint gets a reference to the given string and assigns it to the Endpoint field.
 func (o *S3Profile) SetEndpoint(v string) {
-	o.Endpoint.Set(&v)
-}
-
-// SetEndpointNil sets the value for Endpoint to be an explicit nil
-func (o *S3Profile) SetEndpointNil() {
-	o.Endpoint.Set(nil)
-}
-
-// UnsetEndpoint ensures that no value is present for Endpoint, not even an explicit nil
-func (o *S3Profile) UnsetEndpoint() {
-	o.Endpoint.Unset()
+	o.Endpoint = &v
 }
 
 // GetFlavor returns the Flavor field value if set, zero value otherwise.
@@ -310,133 +266,100 @@ func (o *S3Profile) SetFlavor(v S3Flavor) {
 	o.Flavor = &v
 }
 
-// GetKeyPrefix returns the KeyPrefix field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetKeyPrefix returns the KeyPrefix field value if set, zero value otherwise.
 func (o *S3Profile) GetKeyPrefix() string {
-	if o == nil || IsNil(o.KeyPrefix.Get()) {
+	if o == nil || IsNil(o.KeyPrefix) {
 		var ret string
 		return ret
 	}
-	return *o.KeyPrefix.Get()
+	return *o.KeyPrefix
 }
 
 // GetKeyPrefixOk returns a tuple with the KeyPrefix field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *S3Profile) GetKeyPrefixOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.KeyPrefix) {
 		return nil, false
 	}
-	return o.KeyPrefix.Get(), o.KeyPrefix.IsSet()
+	return o.KeyPrefix, true
 }
 
 // HasKeyPrefix returns a boolean if a field has been set.
 func (o *S3Profile) HasKeyPrefix() bool {
-	if o != nil && o.KeyPrefix.IsSet() {
+	if o != nil && !IsNil(o.KeyPrefix) {
 		return true
 	}
 
 	return false
 }
 
-// SetKeyPrefix gets a reference to the given NullableString and assigns it to the KeyPrefix field.
+// SetKeyPrefix gets a reference to the given string and assigns it to the KeyPrefix field.
 func (o *S3Profile) SetKeyPrefix(v string) {
-	o.KeyPrefix.Set(&v)
+	o.KeyPrefix = &v
 }
 
-// SetKeyPrefixNil sets the value for KeyPrefix to be an explicit nil
-func (o *S3Profile) SetKeyPrefixNil() {
-	o.KeyPrefix.Set(nil)
-}
-
-// UnsetKeyPrefix ensures that no value is present for KeyPrefix, not even an explicit nil
-func (o *S3Profile) UnsetKeyPrefix() {
-	o.KeyPrefix.Unset()
-}
-
-// GetLegacyMd5Behavior returns the LegacyMd5Behavior field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetLegacyMd5Behavior returns the LegacyMd5Behavior field value if set, zero value otherwise.
 func (o *S3Profile) GetLegacyMd5Behavior() bool {
-	if o == nil || IsNil(o.LegacyMd5Behavior.Get()) {
+	if o == nil || IsNil(o.LegacyMd5Behavior) {
 		var ret bool
 		return ret
 	}
-	return *o.LegacyMd5Behavior.Get()
+	return *o.LegacyMd5Behavior
 }
 
 // GetLegacyMd5BehaviorOk returns a tuple with the LegacyMd5Behavior field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *S3Profile) GetLegacyMd5BehaviorOk() (*bool, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.LegacyMd5Behavior) {
 		return nil, false
 	}
-	return o.LegacyMd5Behavior.Get(), o.LegacyMd5Behavior.IsSet()
+	return o.LegacyMd5Behavior, true
 }
 
 // HasLegacyMd5Behavior returns a boolean if a field has been set.
 func (o *S3Profile) HasLegacyMd5Behavior() bool {
-	if o != nil && o.LegacyMd5Behavior.IsSet() {
+	if o != nil && !IsNil(o.LegacyMd5Behavior) {
 		return true
 	}
 
 	return false
 }
 
-// SetLegacyMd5Behavior gets a reference to the given NullableBool and assigns it to the LegacyMd5Behavior field.
+// SetLegacyMd5Behavior gets a reference to the given bool and assigns it to the LegacyMd5Behavior field.
 func (o *S3Profile) SetLegacyMd5Behavior(v bool) {
-	o.LegacyMd5Behavior.Set(&v)
+	o.LegacyMd5Behavior = &v
 }
 
-// SetLegacyMd5BehaviorNil sets the value for LegacyMd5Behavior to be an explicit nil
-func (o *S3Profile) SetLegacyMd5BehaviorNil() {
-	o.LegacyMd5Behavior.Set(nil)
-}
-
-// UnsetLegacyMd5Behavior ensures that no value is present for LegacyMd5Behavior, not even an explicit nil
-func (o *S3Profile) UnsetLegacyMd5Behavior() {
-	o.LegacyMd5Behavior.Unset()
-}
-
-// GetPathStyleAccess returns the PathStyleAccess field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetPathStyleAccess returns the PathStyleAccess field value if set, zero value otherwise.
 func (o *S3Profile) GetPathStyleAccess() bool {
-	if o == nil || IsNil(o.PathStyleAccess.Get()) {
+	if o == nil || IsNil(o.PathStyleAccess) {
 		var ret bool
 		return ret
 	}
-	return *o.PathStyleAccess.Get()
+	return *o.PathStyleAccess
 }
 
 // GetPathStyleAccessOk returns a tuple with the PathStyleAccess field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *S3Profile) GetPathStyleAccessOk() (*bool, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.PathStyleAccess) {
 		return nil, false
 	}
-	return o.PathStyleAccess.Get(), o.PathStyleAccess.IsSet()
+	return o.PathStyleAccess, true
 }
 
 // HasPathStyleAccess returns a boolean if a field has been set.
 func (o *S3Profile) HasPathStyleAccess() bool {
-	if o != nil && o.PathStyleAccess.IsSet() {
+	if o != nil && !IsNil(o.PathStyleAccess) {
 		return true
 	}
 
 	return false
 }
 
-// SetPathStyleAccess gets a reference to the given NullableBool and assigns it to the PathStyleAccess field.
+// SetPathStyleAccess gets a reference to the given bool and assigns it to the PathStyleAccess field.
 func (o *S3Profile) SetPathStyleAccess(v bool) {
-	o.PathStyleAccess.Set(&v)
-}
-
-// SetPathStyleAccessNil sets the value for PathStyleAccess to be an explicit nil
-func (o *S3Profile) SetPathStyleAccessNil() {
-	o.PathStyleAccess.Set(nil)
-}
-
-// UnsetPathStyleAccess ensures that no value is present for PathStyleAccess, not even an explicit nil
-func (o *S3Profile) UnsetPathStyleAccess() {
-	o.PathStyleAccess.Unset()
+	o.PathStyleAccess = &v
 }
 
 // GetPushS3DeleteDisabled returns the PushS3DeleteDisabled field value if set, zero value otherwise.
@@ -626,90 +549,68 @@ func (o *S3Profile) SetStsEnabled(v bool) {
 	o.StsEnabled = v
 }
 
-// GetStsEndpoint returns the StsEndpoint field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetStsEndpoint returns the StsEndpoint field value if set, zero value otherwise.
 func (o *S3Profile) GetStsEndpoint() string {
-	if o == nil || IsNil(o.StsEndpoint.Get()) {
+	if o == nil || IsNil(o.StsEndpoint) {
 		var ret string
 		return ret
 	}
-	return *o.StsEndpoint.Get()
+	return *o.StsEndpoint
 }
 
 // GetStsEndpointOk returns a tuple with the StsEndpoint field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *S3Profile) GetStsEndpointOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.StsEndpoint) {
 		return nil, false
 	}
-	return o.StsEndpoint.Get(), o.StsEndpoint.IsSet()
+	return o.StsEndpoint, true
 }
 
 // HasStsEndpoint returns a boolean if a field has been set.
 func (o *S3Profile) HasStsEndpoint() bool {
-	if o != nil && o.StsEndpoint.IsSet() {
+	if o != nil && !IsNil(o.StsEndpoint) {
 		return true
 	}
 
 	return false
 }
 
-// SetStsEndpoint gets a reference to the given NullableString and assigns it to the StsEndpoint field.
+// SetStsEndpoint gets a reference to the given string and assigns it to the StsEndpoint field.
 func (o *S3Profile) SetStsEndpoint(v string) {
-	o.StsEndpoint.Set(&v)
+	o.StsEndpoint = &v
 }
 
-// SetStsEndpointNil sets the value for StsEndpoint to be an explicit nil
-func (o *S3Profile) SetStsEndpointNil() {
-	o.StsEndpoint.Set(nil)
-}
-
-// UnsetStsEndpoint ensures that no value is present for StsEndpoint, not even an explicit nil
-func (o *S3Profile) UnsetStsEndpoint() {
-	o.StsEndpoint.Unset()
-}
-
-// GetStsRoleArn returns the StsRoleArn field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetStsRoleArn returns the StsRoleArn field value if set, zero value otherwise.
 func (o *S3Profile) GetStsRoleArn() string {
-	if o == nil || IsNil(o.StsRoleArn.Get()) {
+	if o == nil || IsNil(o.StsRoleArn) {
 		var ret string
 		return ret
 	}
-	return *o.StsRoleArn.Get()
+	return *o.StsRoleArn
 }
 
 // GetStsRoleArnOk returns a tuple with the StsRoleArn field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *S3Profile) GetStsRoleArnOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.StsRoleArn) {
 		return nil, false
 	}
-	return o.StsRoleArn.Get(), o.StsRoleArn.IsSet()
+	return o.StsRoleArn, true
 }
 
 // HasStsRoleArn returns a boolean if a field has been set.
 func (o *S3Profile) HasStsRoleArn() bool {
-	if o != nil && o.StsRoleArn.IsSet() {
+	if o != nil && !IsNil(o.StsRoleArn) {
 		return true
 	}
 
 	return false
 }
 
-// SetStsRoleArn gets a reference to the given NullableString and assigns it to the StsRoleArn field.
+// SetStsRoleArn gets a reference to the given string and assigns it to the StsRoleArn field.
 func (o *S3Profile) SetStsRoleArn(v string) {
-	o.StsRoleArn.Set(&v)
-}
-
-// SetStsRoleArnNil sets the value for StsRoleArn to be an explicit nil
-func (o *S3Profile) SetStsRoleArnNil() {
-	o.StsRoleArn.Set(nil)
-}
-
-// UnsetStsRoleArn ensures that no value is present for StsRoleArn, not even an explicit nil
-func (o *S3Profile) UnsetStsRoleArn() {
-	o.StsRoleArn.Unset()
+	o.StsRoleArn = &v
 }
 
 // GetStsSessionTags returns the StsSessionTags field value if set, zero value otherwise.
@@ -776,40 +677,32 @@ func (o *S3Profile) SetStsTokenValiditySeconds(v int64) {
 	o.StsTokenValiditySeconds = &v
 }
 
-func (o S3Profile) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o S3Profile) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if o.AllowAlternativeProtocols.IsSet() {
-		toSerialize["allow-alternative-protocols"] = o.AllowAlternativeProtocols.Get()
+	if !IsNil(o.AllowAlternativeProtocols) {
+		toSerialize["allow-alternative-protocols"] = o.AllowAlternativeProtocols
 	}
-	if o.AssumeRoleArn.IsSet() {
-		toSerialize["assume-role-arn"] = o.AssumeRoleArn.Get()
+	if !IsNil(o.AssumeRoleArn) {
+		toSerialize["assume-role-arn"] = o.AssumeRoleArn
 	}
-	if o.AwsKmsKeyArn.IsSet() {
-		toSerialize["aws-kms-key-arn"] = o.AwsKmsKeyArn.Get()
+	if !IsNil(o.AwsKmsKeyArn) {
+		toSerialize["aws-kms-key-arn"] = o.AwsKmsKeyArn
 	}
 	toSerialize["bucket"] = o.Bucket
-	if o.Endpoint.IsSet() {
-		toSerialize["endpoint"] = o.Endpoint.Get()
+	if !IsNil(o.Endpoint) {
+		toSerialize["endpoint"] = o.Endpoint
 	}
 	if !IsNil(o.Flavor) {
 		toSerialize["flavor"] = o.Flavor
 	}
-	if o.KeyPrefix.IsSet() {
-		toSerialize["key-prefix"] = o.KeyPrefix.Get()
+	if !IsNil(o.KeyPrefix) {
+		toSerialize["key-prefix"] = o.KeyPrefix
 	}
-	if o.LegacyMd5Behavior.IsSet() {
-		toSerialize["legacy-md5-behavior"] = o.LegacyMd5Behavior.Get()
+	if !IsNil(o.LegacyMd5Behavior) {
+		toSerialize["legacy-md5-behavior"] = o.LegacyMd5Behavior
 	}
-	if o.PathStyleAccess.IsSet() {
-		toSerialize["path-style-access"] = o.PathStyleAccess.Get()
+	if !IsNil(o.PathStyleAccess) {
+		toSerialize["path-style-access"] = o.PathStyleAccess
 	}
 	if !IsNil(o.PushS3DeleteDisabled) {
 		toSerialize["push-s3-delete-disabled"] = o.PushS3DeleteDisabled
@@ -825,11 +718,11 @@ func (o S3Profile) ToMap() (map[string]interface{}, error) {
 		toSerialize["storage-layout"] = o.StorageLayout.Get()
 	}
 	toSerialize["sts-enabled"] = o.StsEnabled
-	if o.StsEndpoint.IsSet() {
-		toSerialize["sts-endpoint"] = o.StsEndpoint.Get()
+	if !IsNil(o.StsEndpoint) {
+		toSerialize["sts-endpoint"] = o.StsEndpoint
 	}
-	if o.StsRoleArn.IsSet() {
-		toSerialize["sts-role-arn"] = o.StsRoleArn.Get()
+	if !IsNil(o.StsRoleArn) {
+		toSerialize["sts-role-arn"] = o.StsRoleArn
 	}
 	if !IsNil(o.StsSessionTags) {
 		toSerialize["sts-session-tags"] = o.StsSessionTags

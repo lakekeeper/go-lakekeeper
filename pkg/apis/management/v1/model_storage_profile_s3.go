@@ -692,14 +692,6 @@ func (o *StorageProfileS3) SetType(v string) {
 	o.Type = v
 }
 
-func (o StorageProfileS3) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o StorageProfileS3) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if !IsNil(o.AllowAlternativeProtocols) {

@@ -1,12 +1,26 @@
 package commands
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"text/tabwriter"
 
 	"github.com/lakekeeper/go-lakekeeper/pkg/permissions"
 )
+
+// buildAssignmentSet wraps permissions.BuildAssignmentSet with the lkctl
+// "at least one --users or --roles" precondition. Used by every grant/revoke
+// verb on every resource so the precondition message stays consistent.
+func buildAssignmentSet[T any](relations, users, roles []string) ([]T, error) {
+	if len(users) == 0 && len(roles) == 0 {
+		return nil, errors.New("at least one --users or --roles value is required")
+	}
+	return permissions.BuildAssignmentSet[T](relations, permissions.PrincipalSet{
+		Users: users,
+		Roles: roles,
+	})
+}
 
 // printAssignments writes a tabular listing of permission assignments to w.
 // Empty input writes "No assignments". The function is generic over the

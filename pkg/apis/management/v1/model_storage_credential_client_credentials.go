@@ -172,14 +172,6 @@ func (o *StorageCredentialClientCredentials) SetType(v string) {
 	o.Type = v
 }
 
-func (o StorageCredentialClientCredentials) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o StorageCredentialClientCredentials) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["client-id"] = o.ClientId

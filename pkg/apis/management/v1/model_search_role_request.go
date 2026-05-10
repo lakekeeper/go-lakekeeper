@@ -22,7 +22,7 @@ var _ MappedNullable = &SearchRoleRequest{}
 // SearchRoleRequest struct for SearchRoleRequest
 type SearchRoleRequest struct {
 	// Deprecated: Please use the `x-project-id` header instead. Project ID in which the role is created.
-	ProjectId NullableString `json:"project-id,omitempty"`
+	ProjectId *string `json:"project-id,omitempty"`
 	// Search string for fuzzy search. Length is truncated to 64 characters.
 	Search string `json:"search"`
 }
@@ -47,47 +47,36 @@ func NewSearchRoleRequestWithDefaults() *SearchRoleRequest {
 	return &this
 }
 
-// GetProjectId returns the ProjectId field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetProjectId returns the ProjectId field value if set, zero value otherwise.
 func (o *SearchRoleRequest) GetProjectId() string {
-	if o == nil || IsNil(o.ProjectId.Get()) {
+	if o == nil || IsNil(o.ProjectId) {
 		var ret string
 		return ret
 	}
-	return *o.ProjectId.Get()
+	return *o.ProjectId
 }
 
 // GetProjectIdOk returns a tuple with the ProjectId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *SearchRoleRequest) GetProjectIdOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.ProjectId) {
 		return nil, false
 	}
-	return o.ProjectId.Get(), o.ProjectId.IsSet()
+	return o.ProjectId, true
 }
 
 // HasProjectId returns a boolean if a field has been set.
 func (o *SearchRoleRequest) HasProjectId() bool {
-	if o != nil && o.ProjectId.IsSet() {
+	if o != nil && !IsNil(o.ProjectId) {
 		return true
 	}
 
 	return false
 }
 
-// SetProjectId gets a reference to the given NullableString and assigns it to the ProjectId field.
+// SetProjectId gets a reference to the given string and assigns it to the ProjectId field.
 func (o *SearchRoleRequest) SetProjectId(v string) {
-	o.ProjectId.Set(&v)
-}
-
-// SetProjectIdNil sets the value for ProjectId to be an explicit nil
-func (o *SearchRoleRequest) SetProjectIdNil() {
-	o.ProjectId.Set(nil)
-}
-
-// UnsetProjectId ensures that no value is present for ProjectId, not even an explicit nil
-func (o *SearchRoleRequest) UnsetProjectId() {
-	o.ProjectId.Unset()
+	o.ProjectId = &v
 }
 
 // GetSearch returns the Search field value
@@ -114,18 +103,10 @@ func (o *SearchRoleRequest) SetSearch(v string) {
 	o.Search = v
 }
 
-func (o SearchRoleRequest) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o SearchRoleRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if o.ProjectId.IsSet() {
-		toSerialize["project-id"] = o.ProjectId.Get()
+	if !IsNil(o.ProjectId) {
+		toSerialize["project-id"] = o.ProjectId
 	}
 	toSerialize["search"] = o.Search
 	return toSerialize, nil

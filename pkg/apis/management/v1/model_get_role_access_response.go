@@ -68,14 +68,6 @@ func (o *GetRoleAccessResponse) SetAllowedActions(v []RoleAction) {
 	o.AllowedActions = v
 }
 
-func (o GetRoleAccessResponse) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o GetRoleAccessResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["allowed-actions"] = o.AllowedActions

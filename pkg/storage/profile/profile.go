@@ -5,15 +5,14 @@
 // that takes the required spec-mandated fields positionally and accepts a
 // variadic list of With*-style options for the optional ones.
 //
-// Builders return the typed concrete struct (e.g. *managementv1.StorageProfileS3).
-// Callers wrap into the union with the generator-emitted helpers when handing
-// off to the API:
+// Builders return the StorageProfile union directly — callers pass the result
+// straight to request setters without an intermediate wrap step:
 //
-//	p := profile.NewS3Profile("my-bucket", "us-east-1",
+//	sp := profile.NewS3Profile("my-bucket", "us-east-1",
 //	    profile.WithS3Endpoint("http://minio:9000"),
 //	    profile.WithS3STSEnabled(),
 //	)
-//	req.SetStorageProfile(managementv1.StorageProfileS3AsStorageProfile(p))
+//	req.StorageProfile = sp
 package profile
 
 import managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
@@ -38,3 +37,32 @@ type (
 	S3UrlStyleDetectionMode = managementv1.S3UrlStyleDetectionMode
 	StorageLayout           = managementv1.StorageLayout
 )
+
+// AsS3 returns the S3 variant of a StorageProfile union, or (nil, false)
+// if the union holds a different variant. Symmetric with NewS3Profile;
+// removes the `if sp.StorageProfileS3 != nil { ... sp.StorageProfileS3 ... }`
+// ladder from response-handling code.
+func AsS3(sp managementv1.StorageProfile) (*managementv1.StorageProfileS3, bool) {
+	if sp.StorageProfileS3 == nil {
+		return nil, false
+	}
+	return sp.StorageProfileS3, true
+}
+
+// AsGCS returns the GCS variant of a StorageProfile union, or (nil, false)
+// if the union holds a different variant.
+func AsGCS(sp managementv1.StorageProfile) (*managementv1.StorageProfileGcs, bool) {
+	if sp.StorageProfileGcs == nil {
+		return nil, false
+	}
+	return sp.StorageProfileGcs, true
+}
+
+// AsADLS returns the ADLS variant of a StorageProfile union, or (nil, false)
+// if the union holds a different variant.
+func AsADLS(sp managementv1.StorageProfile) (*managementv1.StorageProfileAdls, bool) {
+	if sp.StorageProfileAdls == nil {
+		return nil, false
+	}
+	return sp.StorageProfileAdls, true
+}

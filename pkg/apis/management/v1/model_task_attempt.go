@@ -27,17 +27,17 @@ type TaskAttempt struct {
 	// When this attempt was created
 	CreatedAt time.Time `json:"created-at"`
 	// How long this attempt took
-	Duration NullableString `json:"duration,omitempty"`
+	Duration *string `json:"duration,omitempty"`
 	// Execution details for this attempt
 	ExecutionDetails map[string]interface{} `json:"execution-details,omitempty"`
 	// Message associated with this attempt
-	Message NullableString `json:"message,omitempty"`
+	Message *string `json:"message,omitempty"`
 	// Progress achieved in this attempt
 	Progress float32 `json:"progress"`
 	// When this attempt was scheduled for
 	ScheduledFor time.Time `json:"scheduled-for"`
 	// When this attempt started
-	StartedAt NullableTime `json:"started-at,omitempty"`
+	StartedAt *time.Time `json:"started-at,omitempty"`
 	// Status of this attempt
 	Status TaskStatus `json:"status"`
 }
@@ -114,52 +114,41 @@ func (o *TaskAttempt) SetCreatedAt(v time.Time) {
 	o.CreatedAt = v
 }
 
-// GetDuration returns the Duration field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetDuration returns the Duration field value if set, zero value otherwise.
 func (o *TaskAttempt) GetDuration() string {
-	if o == nil || IsNil(o.Duration.Get()) {
+	if o == nil || IsNil(o.Duration) {
 		var ret string
 		return ret
 	}
-	return *o.Duration.Get()
+	return *o.Duration
 }
 
 // GetDurationOk returns a tuple with the Duration field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *TaskAttempt) GetDurationOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.Duration) {
 		return nil, false
 	}
-	return o.Duration.Get(), o.Duration.IsSet()
+	return o.Duration, true
 }
 
 // HasDuration returns a boolean if a field has been set.
 func (o *TaskAttempt) HasDuration() bool {
-	if o != nil && o.Duration.IsSet() {
+	if o != nil && !IsNil(o.Duration) {
 		return true
 	}
 
 	return false
 }
 
-// SetDuration gets a reference to the given NullableString and assigns it to the Duration field.
+// SetDuration gets a reference to the given string and assigns it to the Duration field.
 func (o *TaskAttempt) SetDuration(v string) {
-	o.Duration.Set(&v)
+	o.Duration = &v
 }
 
-// SetDurationNil sets the value for Duration to be an explicit nil
-func (o *TaskAttempt) SetDurationNil() {
-	o.Duration.Set(nil)
-}
-
-// UnsetDuration ensures that no value is present for Duration, not even an explicit nil
-func (o *TaskAttempt) UnsetDuration() {
-	o.Duration.Unset()
-}
-
-// GetExecutionDetails returns the ExecutionDetails field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetExecutionDetails returns the ExecutionDetails field value if set, zero value otherwise.
 func (o *TaskAttempt) GetExecutionDetails() map[string]interface{} {
-	if o == nil {
+	if o == nil || IsNil(o.ExecutionDetails) {
 		var ret map[string]interface{}
 		return ret
 	}
@@ -168,7 +157,6 @@ func (o *TaskAttempt) GetExecutionDetails() map[string]interface{} {
 
 // GetExecutionDetailsOk returns a tuple with the ExecutionDetails field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *TaskAttempt) GetExecutionDetailsOk() (map[string]interface{}, bool) {
 	if o == nil || IsNil(o.ExecutionDetails) {
 		return map[string]interface{}{}, false
@@ -190,47 +178,36 @@ func (o *TaskAttempt) SetExecutionDetails(v map[string]interface{}) {
 	o.ExecutionDetails = v
 }
 
-// GetMessage returns the Message field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetMessage returns the Message field value if set, zero value otherwise.
 func (o *TaskAttempt) GetMessage() string {
-	if o == nil || IsNil(o.Message.Get()) {
+	if o == nil || IsNil(o.Message) {
 		var ret string
 		return ret
 	}
-	return *o.Message.Get()
+	return *o.Message
 }
 
 // GetMessageOk returns a tuple with the Message field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *TaskAttempt) GetMessageOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.Message) {
 		return nil, false
 	}
-	return o.Message.Get(), o.Message.IsSet()
+	return o.Message, true
 }
 
 // HasMessage returns a boolean if a field has been set.
 func (o *TaskAttempt) HasMessage() bool {
-	if o != nil && o.Message.IsSet() {
+	if o != nil && !IsNil(o.Message) {
 		return true
 	}
 
 	return false
 }
 
-// SetMessage gets a reference to the given NullableString and assigns it to the Message field.
+// SetMessage gets a reference to the given string and assigns it to the Message field.
 func (o *TaskAttempt) SetMessage(v string) {
-	o.Message.Set(&v)
-}
-
-// SetMessageNil sets the value for Message to be an explicit nil
-func (o *TaskAttempt) SetMessageNil() {
-	o.Message.Set(nil)
-}
-
-// UnsetMessage ensures that no value is present for Message, not even an explicit nil
-func (o *TaskAttempt) UnsetMessage() {
-	o.Message.Unset()
+	o.Message = &v
 }
 
 // GetProgress returns the Progress field value
@@ -281,47 +258,36 @@ func (o *TaskAttempt) SetScheduledFor(v time.Time) {
 	o.ScheduledFor = v
 }
 
-// GetStartedAt returns the StartedAt field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetStartedAt returns the StartedAt field value if set, zero value otherwise.
 func (o *TaskAttempt) GetStartedAt() time.Time {
-	if o == nil || IsNil(o.StartedAt.Get()) {
+	if o == nil || IsNil(o.StartedAt) {
 		var ret time.Time
 		return ret
 	}
-	return *o.StartedAt.Get()
+	return *o.StartedAt
 }
 
 // GetStartedAtOk returns a tuple with the StartedAt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *TaskAttempt) GetStartedAtOk() (*time.Time, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.StartedAt) {
 		return nil, false
 	}
-	return o.StartedAt.Get(), o.StartedAt.IsSet()
+	return o.StartedAt, true
 }
 
 // HasStartedAt returns a boolean if a field has been set.
 func (o *TaskAttempt) HasStartedAt() bool {
-	if o != nil && o.StartedAt.IsSet() {
+	if o != nil && !IsNil(o.StartedAt) {
 		return true
 	}
 
 	return false
 }
 
-// SetStartedAt gets a reference to the given NullableTime and assigns it to the StartedAt field.
+// SetStartedAt gets a reference to the given time.Time and assigns it to the StartedAt field.
 func (o *TaskAttempt) SetStartedAt(v time.Time) {
-	o.StartedAt.Set(&v)
-}
-
-// SetStartedAtNil sets the value for StartedAt to be an explicit nil
-func (o *TaskAttempt) SetStartedAtNil() {
-	o.StartedAt.Set(nil)
-}
-
-// UnsetStartedAt ensures that no value is present for StartedAt, not even an explicit nil
-func (o *TaskAttempt) UnsetStartedAt() {
-	o.StartedAt.Unset()
+	o.StartedAt = &v
 }
 
 // GetStatus returns the Status field value
@@ -348,31 +314,23 @@ func (o *TaskAttempt) SetStatus(v TaskStatus) {
 	o.Status = v
 }
 
-func (o TaskAttempt) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o TaskAttempt) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["attempt"] = o.Attempt
 	toSerialize["created-at"] = o.CreatedAt
-	if o.Duration.IsSet() {
-		toSerialize["duration"] = o.Duration.Get()
+	if !IsNil(o.Duration) {
+		toSerialize["duration"] = o.Duration
 	}
-	if o.ExecutionDetails != nil {
+	if !IsNil(o.ExecutionDetails) {
 		toSerialize["execution-details"] = o.ExecutionDetails
 	}
-	if o.Message.IsSet() {
-		toSerialize["message"] = o.Message.Get()
+	if !IsNil(o.Message) {
+		toSerialize["message"] = o.Message
 	}
 	toSerialize["progress"] = o.Progress
 	toSerialize["scheduled-for"] = o.ScheduledFor
-	if o.StartedAt.IsSet() {
-		toSerialize["started-at"] = o.StartedAt.Get()
+	if !IsNil(o.StartedAt) {
+		toSerialize["started-at"] = o.StartedAt
 	}
 	toSerialize["status"] = o.Status
 	return toSerialize, nil

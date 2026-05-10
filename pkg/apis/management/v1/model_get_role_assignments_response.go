@@ -68,14 +68,6 @@ func (o *GetRoleAssignmentsResponse) SetAssignments(v []RoleAssignment) {
 	o.Assignments = v
 }
 
-func (o GetRoleAssignmentsResponse) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o GetRoleAssignmentsResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["assignments"] = o.Assignments

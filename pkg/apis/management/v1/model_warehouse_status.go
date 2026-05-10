@@ -20,8 +20,8 @@ type WarehouseStatus string
 
 // List of WarehouseStatus
 const (
-	WAREHOUSESTATUS_ACTIVE   WarehouseStatus = "active"
-	WAREHOUSESTATUS_INACTIVE WarehouseStatus = "inactive"
+	WarehouseStatusActive   WarehouseStatus = "active"
+	WarehouseStatusInactive WarehouseStatus = "inactive"
 )
 
 // All allowed values of WarehouseStatus enum

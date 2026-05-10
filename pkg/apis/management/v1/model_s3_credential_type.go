@@ -20,9 +20,9 @@ type S3CredentialType string
 
 // List of S3CredentialType
 const (
-	S3CREDENTIALTYPE_ACCESS_KEY          S3CredentialType = "access-key"
-	S3CREDENTIALTYPE_AWS_SYSTEM_IDENTITY S3CredentialType = "aws-system-identity"
-	S3CREDENTIALTYPE_CLOUDFLARE_R2       S3CredentialType = "cloudflare-r2"
+	S3CredentialTypeAccessKey         S3CredentialType = "access-key"
+	S3CredentialTypeAwsSystemIdentity S3CredentialType = "aws-system-identity"
+	S3CredentialTypeCloudflareR2      S3CredentialType = "cloudflare-r2"
 )
 
 // All allowed values of S3CredentialType enum

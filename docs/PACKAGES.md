@@ -10,6 +10,7 @@ packages depend on each other. Complements [GENERATION.md](GENERATION.md)
 ```mermaid
 graph LR
     CLI["cmd/lkctl"]
+    UMBRELLA["pkg/lakekeeper<br/>(umbrella)"]
     CLIENT["pkg/client"]
     GEN["pkg/apis/management/v1<br/>(generated)"]
     PERM["pkg/permissions"]
@@ -24,6 +25,11 @@ graph LR
     CLI --> COMMON
     CLI --> PERM
     CLI --> GEN
+    UMBRELLA --> CLIENT
+    UMBRELLA --> PERM
+    UMBRELLA --> PROFILE
+    UMBRELLA --> CRED
+    UMBRELLA --> GEN
     CLIENT --> GEN
     CLIENT --> CORE
     CLIENT --> VERSION
@@ -34,10 +40,87 @@ graph LR
     GEN -.->|HTTP via http.Client| CORE
 ```
 
-The generated `pkg/apis/management/v1` package is the only one that imports
-no other repo package — it's the dependency root. `pkg/client` wires it up
-with auth and retries; `pkg/permissions` and `pkg/storage/*` provide
-ergonomic builders on top of its types.
+The generated `pkg/apis/management/v1` package is the dependency root —
+nothing else in this module imports it transitively without going through
+the typed packages above. `pkg/client` wires it up with auth and retries;
+`pkg/permissions` and `pkg/storage/*` provide ergonomic builders on top of
+its types; and `pkg/lakekeeper` re-exports a curated subset of all four for
+single-import call sites.
+
+---
+
+## Building requests
+
+Most request types are constructed through a generator-emitted
+`New<Resource>Request` constructor that takes only the spec-required fields
+positionally, plus `Set<Field>(value)` mutators for everything else:
+
+```go
+req := managementv1.NewCreateWarehouseRequest(sp, "main")  // required: profile, name
+req.SetProjectId(projectID)                                // optional
+req.SetStorageCredential(sc)                               // optional
+```
+
+This is mildly more verbose than the AWS SDK's struct-literal idiom
+(`&ec2.RunInstancesInput{...}`). The trade-off is that the `Set*` mutators
+absorb the `*string`/`*bool` ceremony for optional scalars — `req.SetDescription("x")`
+takes a value, the mutator stores `&v` internally. If you'd rather use
+struct literals, you can; you just have to wrap optional scalars yourself
+(`Description: managementv1.PtrString("x")` or with a `s := "x"; ... &s`
+temp). The setters are the recommended idiom for that reason.
+
+For request types whose only required input is the body itself
+(`SetProtectionRequest`, `RenameWarehouseRequest`, …), the umbrella's
+`New<Resource>Request` is a simple value constructor with no setters
+afterwards.
+
+---
+
+## `pkg/lakekeeper` (umbrella)
+
+**Import path:** `github.com/lakekeeper/go-lakekeeper/pkg/lakekeeper`
+
+Convenience umbrella that re-exports the most-used types and constructors
+from `pkg/client`, `pkg/storage/{profile,credential}`, `pkg/permissions`,
+and a curated subset of `pkg/apis/management/v1`. The goal is a single
+import for the common call site:
+
+```go
+import "github.com/lakekeeper/go-lakekeeper/pkg/lakekeeper"
+
+c, err := lakekeeper.New(ctx, baseURL, token)
+sp := lakekeeper.NewS3Profile("bucket", "us-east-1",
+    lakekeeper.WithS3Endpoint("http://minio:9000"))
+sc := lakekeeper.NewS3AccessKey("ak", "sk")
+
+req := lakekeeper.NewCreateWarehouseRequest(sp, "main")
+req.SetProjectId(projectID)
+req.SetStorageCredential(sc)
+
+wh, err := c.Warehouses.Create(ctx, req)
+```
+
+What it re-exports:
+- `Client`, `Option`, and every constructor from [`pkg/client`](#pkgclient).
+- All profile and credential builders from `pkg/storage/{profile,credential}`.
+- Permission helpers (`PrincipalSet`, `BuildAssignment`,
+  `BuildAssignmentSet`, `DescribeAssignment`).
+- Common request and response types — `Warehouse`, `Project`, `Role`,
+  `User`, `CreateWarehouseRequest`, `*Assignment` family, etc. — as
+  identity-preserving aliases. Values flow between the umbrella and the
+  underlying `managementv1` import without conversion.
+
+What it does **not** re-export:
+- The full ~189-schema Management API surface. Reach for `managementv1`
+  when you need a less-common type.
+- Generated enum constants. Use `managementv1.<EnumValue>` directly; the
+  preprocessor produces idiomatic Go names there
+  (`managementv1.WarehouseStatusActive`, `managementv1.S3FlavorAws`),
+  so an alias would only add a second name for the same value.
+
+The umbrella is a thin file (~150 LoC) that runs `go vet` clean and
+provides no behaviour of its own — every symbol resolves through
+`type X = …` aliases or `var X = …` function-value references.
 
 ---
 
@@ -65,9 +148,35 @@ client, err := client.NewWithAuthSource(ctx, baseURL, authSource, options...)
 `AuthSource.Init` is invoked **once during construction** — no lazy
 initialisation on the first request.
 
-### Embedded service handles
+### Resource façades (one-call ergonomic surface)
 
-The generated services are exposed as fields on `*Client`:
+For the common case — single-body request, single-response result — reach
+for the resource façades on `*Client`. Each one compresses the generator's
+three-call fluent pattern (`c.WarehouseAPI.X(ctx).Body(*req).Execute()`)
+into a single method call returning `(value, error)` instead of the
+generator's `(value, *http.Response, error)` triple.
+
+| Field | Purpose |
+|---|---|
+| `c.Warehouses` | Create / Get / Delete / List / Rename / Activate / Deactivate / SetProtection / Statistics |
+| `c.Projects` | Create / Get / Delete / List / Rename |
+| `c.Roles` | Create / Get / Delete / List / Update (project-scoped) |
+| `c.Users` | Create / Get / Delete / List / Update / Whoami |
+| `c.Server` | Info / Bootstrap |
+
+```go
+wh, err := c.Warehouses.Create(ctx, req)         // façade — one call
+wh, _, err := c.WarehouseAPI.CreateWarehouse(ctx). // generator — full control
+    CreateWarehouseRequest(*req).Execute()
+```
+
+The façades cover roughly 90% of `lkctl`'s call sites. For endpoints with
+extra query params, custom request options, or where you need the raw
+`*http.Response`, reach for the embedded generated service handles below.
+
+### Embedded service handles (generator-shaped fluent surface)
+
+Every generated service is exposed as a field on `*Client`:
 
 | Field | Purpose |
 |---|---|
@@ -139,11 +248,32 @@ type AuthSource interface {
 
 Three implementations ship in the package.
 
-#### `OAuthTokenSource` — OAuth 2.0 client credentials
+Each implementation's `Init` validates eagerly: a misconfigured token URL,
+empty bearer, or unreadable service-account file surfaces as an error
+from `client.NewWithAuthSource` rather than as a deferred 401 on the
+first API call.
+
+#### `OAuthClientCredentialsAuthSource` — OAuth 2.0 client credentials
 
 The most common production choice. Wraps any
 `golang.org/x/oauth2.TokenSource`, which handles token caching and silent
-renewal automatically.
+renewal before expiry automatically (via `oauth2.ReuseTokenSource`).
+
+The umbrella's `lakekeeper.NewOAuthClientCredentials` is the shortest
+construction path:
+
+```go
+import "github.com/lakekeeper/go-lakekeeper/pkg/lakekeeper"
+
+c, err := lakekeeper.NewOAuthClientCredentials(ctx,
+    "https://lakekeeper.example.com",
+    "https://keycloak.example.com/realms/iceberg/protocol/openid-connect/token",
+    "my-client", "my-secret",
+    []string{"lakekeeper"})
+```
+
+The lower-level shape, when you need to pass a pre-built `oauth2.TokenSource`
+(auth-code, device flow, refresh-only) or attach extra `client.Option`s:
 
 ```go
 import (
@@ -153,37 +283,34 @@ import (
     "github.com/lakekeeper/go-lakekeeper/pkg/core"
 )
 
-cfg := &clientcredentials.Config{
-    ClientID:     "my-client",
-    ClientSecret: "my-secret",
-    TokenURL:     "https://keycloak.example.com/realms/iceberg/protocol/openid-connect/token",
-    Scopes:       []string{"lakekeeper"},
-}
-
-as := &core.OAuthTokenSource{TokenSource: cfg.TokenSource(ctx)}
-c, err := client.NewWithAuthSource(ctx, "https://lakekeeper.example.com", as)
+cfg := &clientcredentials.Config{ /* … */ }
+as := &core.OAuthClientCredentialsAuthSource{TokenSource: cfg.TokenSource(ctx)}
+c, err := client.NewWithAuthSource(ctx, baseURL, as)
 ```
 
 ```mermaid
 sequenceDiagram
     participant App
-    participant OAuthTS as core.OAuthTokenSource
+    participant OAuthAS as core.OAuthClientCredentialsAuthSource
     participant oauth2 as golang.org/x/oauth2
     participant Keycloak as Keycloak / OIDC IdP
 
-    App->>OAuthTS: Header(ctx)
-    OAuthTS->>oauth2: TokenSource.Token()
+    App->>OAuthAS: Header(ctx)
+    OAuthAS->>oauth2: TokenSource.Token()
     alt token not cached or expired
         oauth2->>Keycloak: POST /token<br/>grant_type=client_credentials<br/>client_id + client_secret
         Keycloak-->>oauth2: {"access_token": "…", "expires_in": 300}
         Note over oauth2: Token cached until expiry
     end
-    oauth2-->>OAuthTS: *oauth2.Token
-    OAuthTS-->>App: "Authorization", "Bearer <access_token>"
+    oauth2-->>OAuthAS: *oauth2.Token
+    OAuthAS-->>App: "Authorization", "Bearer <access_token>"
 ```
 
-Token renewal is handled transparently by `golang.org/x/oauth2`. No manual
-refresh logic is needed.
+The struct technically accepts any `oauth2.TokenSource`, so non-client-credentials
+flows (auth-code, device, refresh-only) work too. The type name is
+specific to client-credentials because that is the only flow the SDK
+documents and tests; if you need another flow, build the `oauth2.TokenSource`
+yourself or implement `AuthSource` directly.
 
 #### `AccessTokenAuthSource` — static bearer token
 
@@ -198,27 +325,41 @@ c, err := client.NewWithAuthSource(ctx, baseURL, as)
 c, err := client.New(ctx, baseURL, "eyJhbGci...")
 ```
 
-`Init` is a no-op. There is no expiry handling — if the token expires,
-requests return 401. Use `OAuthTokenSource` for long-running processes.
+`Init` rejects an empty token. There is no expiry handling — once the
+token expires, requests return 401. Use `OAuthClientCredentialsAuthSource`
+for long-running processes.
 
 #### `K8sServiceAccountAuthSource` — Kubernetes service account
 
-For workloads running inside a Kubernetes cluster. The projected service
-account token is mounted by the kubelet and read once at construction.
+For workloads running inside a Kubernetes cluster. The projected service-account
+token is mounted by the kubelet and **re-read on every request**, so the
+hourly rotation is picked up without process restart.
+
+The umbrella's `lakekeeper.NewK8sServiceAccount` is the shortest path:
 
 ```go
+import "github.com/lakekeeper/go-lakekeeper/pkg/lakekeeper"
+
 // Default token path: /var/run/secrets/kubernetes.io/serviceaccount/token
-as := &core.K8sServiceAccountAuthSource{}
+c, err := lakekeeper.NewK8sServiceAccount(ctx, baseURL, "")
 
 // Or specify a custom path (e.g. for audience-scoped tokens)
-path := "/var/run/secrets/lakekeeper/token"
-as := &core.K8sServiceAccountAuthSource{ServiceAccountTokenPath: &path}
+c, err = lakekeeper.NewK8sServiceAccount(ctx, baseURL, "/var/run/secrets/lakekeeper/token")
+```
+
+The lower-level shape:
+
+```go
+as := &core.K8sServiceAccountAuthSource{}                            // default path
+as := &core.K8sServiceAccountAuthSource{ServiceAccountTokenPath: &p} // custom
 
 c, err := client.NewWithAuthSource(ctx, baseURL, as)
 ```
 
-The token file is read exactly once. If the kubelet rotates the projected
-token, the process must restart. Lakekeeper must be configured to trust your
+`Init` validates the token file is readable at construction. Subsequent
+`Header` calls re-read on each request — file reads against tmpfs are
+sub-microsecond, and the kubelet writes via atomic rename, so partial
+reads are impossible. Lakekeeper must be configured to trust your
 cluster's OIDC issuer; the auth source sends the raw k8s JWT directly
 without exchanging it through an IdP.
 
@@ -226,10 +367,10 @@ without exchanging it through an IdP.
 
 | Scenario | Recommended |
 |---|---|
-| Production service with an OIDC IdP (Keycloak, Dex, …) | `OAuthTokenSource` with `clientcredentials.Config` |
-| Short-lived script or manual testing | `AccessTokenAuthSource` |
-| Workload running inside Kubernetes | `K8sServiceAccountAuthSource` |
-| Custom token logic (refresh token, device flow, …) | Implement `AuthSource` directly |
+| Production service with an OIDC IdP (Keycloak, Dex, …) | `OAuthClientCredentialsAuthSource` (or `lakekeeper.NewOAuthClientCredentials`) |
+| Short-lived script or manual testing | `AccessTokenAuthSource` (or `lakekeeper.New`) |
+| Workload running inside Kubernetes | `K8sServiceAccountAuthSource` (or `lakekeeper.NewK8sServiceAccount`) |
+| Custom token logic (refresh token, device flow, …) | Build an `oauth2.TokenSource` or implement `AuthSource` directly |
 
 ### Other types in `pkg/core`
 
@@ -281,12 +422,37 @@ hard-code which discriminator branch each relation belongs to.
 | Symbol | Description |
 |---|---|
 | `PrincipalKind` (constants `PrincipalUser`, `PrincipalRole`) | Wire-format principal discriminator |
+| `PrincipalSet` | `{Users []string; Roles []string}` for multi-relation grant/revoke |
 | `AssignmentRow` | Flattened `{PrincipalType, PrincipalID, Relation}` projection used by display layers |
 | `BuildAssignment[T any](relation string, kind PrincipalKind, id string) (T, error)` | Builds a typed `*Assignment` for any resource by JSON-roundtripping the wire shape into the union's generated `UnmarshalJSON` |
+| `BuildAssignmentSet[T any](relations []string, set PrincipalSet) ([]T, error)` | Expands `relations × (set.Users + set.Roles)` into a slice of `*Assignment` values for assignment to a request's `Writes` (grant) or `Deletes` (revoke) field. Replaces the four-line nested loop that previously appeared at every grant/revoke call site |
 | `DescribeAssignment(a any) (AssignmentRow, bool)` | Inverse of `BuildAssignment` — extracts the wire shape from any `*Assignment` value |
 
 The `lkctl` `grant` / `revoke` / `assignments` subcommands use these
 helpers; see [`cmd/lkctl/commands/`](../cmd/lkctl/commands/) for examples.
+
+### Relation strings
+
+`BuildAssignment` / `BuildAssignmentSet` take the relation as a `string`
+to keep them resource-generic, but the spec exports a typed enum per
+resource: `managementv1.WarehouseRelation`, `ProjectRelation`,
+`RoleRelation`, `ServerRelation`, `NamespaceRelation`, `TableRelation`,
+`ViewRelation`. Their constants
+(`managementv1.WarehouseRelationOwnership`,
+`managementv1.ProjectRelationDescribe`, …) are typed strings that pass
+straight in via conversion:
+
+```go
+writes, err := permissions.BuildAssignmentSet[managementv1.WarehouseAssignment](
+    []string{string(managementv1.WarehouseRelationOwnership)},
+    permissions.PrincipalSet{Users: []string{userID}},
+)
+```
+
+Using the constants instead of bare `"ownership"` literals catches typos
+at compile time when the spec eventually changes a relation name. The
+SDK still accepts arbitrary strings so a relation introduced server-side
+before a client regen can be passed without a code change.
 
 ---
 
@@ -300,22 +466,37 @@ that takes the spec-mandated fields positionally and accepts a variadic
 list of `With*` options for the optional ones.
 
 ```go
-import (
-    managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
-    "github.com/lakekeeper/go-lakekeeper/pkg/storage/profile"
-)
+import "github.com/lakekeeper/go-lakekeeper/pkg/storage/profile"
 
-p := profile.NewS3Profile("my-bucket", "us-east-1",
+sp := profile.NewS3Profile("my-bucket", "us-east-1",
     profile.WithS3Endpoint("http://minio:9000"),
     profile.WithS3PathStyleAccess(),
 )
-req.SetStorageProfile(managementv1.StorageProfileS3AsStorageProfile(p))
+req.StorageProfile = sp
 ```
 
-Constructors return the typed concrete struct
-(`*managementv1.StorageProfileS3` etc.). Callers wrap into the union with
-the generator-emitted `…AsStorageProfile` helpers when handing off to the
-API.
+Constructors return the `managementv1.StorageProfile` umbrella union
+directly — callers pass the value straight to request setters without an
+intermediate `…AsStorageProfile` wrap step.
+
+For the read direction, use the `As*` accessors — symmetric with the
+builders:
+
+```go
+wh, err := c.Warehouses.Get(ctx, id)
+
+if s3, ok := profile.AsS3(wh.StorageProfile); ok {
+    fmt.Println(s3.Bucket, s3.Region)
+}
+```
+
+The accessors return `(*<variant>, false)` when the union holds a
+different variant, replacing the
+`if wh.StorageProfile.StorageProfileS3 != nil { … }` ladder.
+
+`profile.AsS3` / `AsGCS` / `AsADLS` and `credential.AsS3AccessKey` /
+`AsS3AwsSystemIdentity` / etc. are also re-exported from the umbrella as
+`lakekeeper.AsS3Profile` etc.
 
 ---
 

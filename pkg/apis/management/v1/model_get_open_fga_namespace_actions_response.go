@@ -68,14 +68,6 @@ func (o *GetOpenFGANamespaceActionsResponse) SetAllowedActions(v []OpenFGANamesp
 	o.AllowedActions = v
 }
 
-func (o GetOpenFGANamespaceActionsResponse) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o GetOpenFGANamespaceActionsResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["allowed-actions"] = o.AllowedActions

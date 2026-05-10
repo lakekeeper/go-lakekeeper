@@ -68,14 +68,6 @@ func (o *GetViewAccessResponse) SetAllowedActions(v []ViewAction) {
 	o.AllowedActions = v
 }
 
-func (o GetViewAccessResponse) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o GetViewAccessResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["allowed-actions"] = o.AllowedActions

@@ -173,14 +173,6 @@ func (o *CheckOperationViewView) SetAction(v ViewAction) {
 	o.Action = v
 }
 
-func (o CheckOperationViewView) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o CheckOperationViewView) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["table-id"] = o.TableId

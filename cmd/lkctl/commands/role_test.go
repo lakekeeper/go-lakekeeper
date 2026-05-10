@@ -51,7 +51,7 @@ func TestPrintRolesText(t *testing.T) {
 		Name:        "data-eng",
 		ProjectId:   "proj-1",
 		CreatedAt:   time.Date(2026, 1, 2, 3, 4, 5, 0, time.UTC),
-		Description: *managementv1.NewNullableString(managementv1.PtrString("data engineering team")),
+		Description: managementv1.PtrString("data engineering team"),
 	}
 
 	var buf bytes.Buffer
@@ -77,7 +77,7 @@ func TestPrintRolesWide(t *testing.T) {
 		Name:        "data-eng",
 		ProjectId:   "proj-1",
 		CreatedAt:   time.Date(2026, 1, 2, 3, 4, 5, 0, time.UTC),
-		Description: *managementv1.NewNullableString(managementv1.PtrString("data engineering team")),
+		Description: managementv1.PtrString("data engineering team"),
 	}
 
 	var buf bytes.Buffer

@@ -68,14 +68,6 @@ func (o *GetOpenFGARoleActionsResponse) SetAllowedActions(v []OpenFGARoleAction)
 	o.AllowedActions = v
 }
 
-func (o GetOpenFGARoleActionsResponse) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o GetOpenFGARoleActionsResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["allowed-actions"] = o.AllowedActions

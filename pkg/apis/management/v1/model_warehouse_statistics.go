@@ -151,14 +151,6 @@ func (o *WarehouseStatistics) SetUpdatedAt(v time.Time) {
 	o.UpdatedAt = v
 }
 
-func (o WarehouseStatistics) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o WarehouseStatistics) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["number-of-tables"] = o.NumberOfTables

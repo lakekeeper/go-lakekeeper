@@ -20,10 +20,10 @@ type UserLastUpdatedWith string
 
 // List of UserLastUpdatedWith
 const (
-	USERLASTUPDATEDWITH_CREATE_ENDPOINT      UserLastUpdatedWith = "create-endpoint"
-	USERLASTUPDATEDWITH_CONFIG_CALL_CREATION UserLastUpdatedWith = "config-call-creation"
-	USERLASTUPDATEDWITH_UPDATE_ENDPOINT      UserLastUpdatedWith = "update-endpoint"
-	USERLASTUPDATEDWITH_ROLE_PROVIDER        UserLastUpdatedWith = "role-provider"
+	UserLastUpdatedWithCreateEndpoint     UserLastUpdatedWith = "create-endpoint"
+	UserLastUpdatedWithConfigCallCreation UserLastUpdatedWith = "config-call-creation"
+	UserLastUpdatedWithUpdateEndpoint     UserLastUpdatedWith = "update-endpoint"
+	UserLastUpdatedWithRoleProvider       UserLastUpdatedWith = "role-provider"
 )
 
 // All allowed values of UserLastUpdatedWith enum

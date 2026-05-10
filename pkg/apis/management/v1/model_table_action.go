@@ -20,22 +20,22 @@ type TableAction string
 
 // List of TableAction
 const (
-	TABLEACTION_DROP                TableAction = "drop"
-	TABLEACTION_WRITE_DATA          TableAction = "write_data"
-	TABLEACTION_READ_DATA           TableAction = "read_data"
-	TABLEACTION_GET_METADATA        TableAction = "get_metadata"
-	TABLEACTION_COMMIT              TableAction = "commit"
-	TABLEACTION_RENAME              TableAction = "rename"
-	TABLEACTION_READ_ASSIGNMENTS    TableAction = "read_assignments"
-	TABLEACTION_GRANT_PASS_GRANTS   TableAction = "grant_pass_grants"
-	TABLEACTION_GRANT_MANAGE_GRANTS TableAction = "grant_manage_grants"
-	TABLEACTION_GRANT_DESCRIBE      TableAction = "grant_describe"
-	TABLEACTION_GRANT_SELECT        TableAction = "grant_select"
-	TABLEACTION_GRANT_MODIFY        TableAction = "grant_modify"
-	TABLEACTION_CHANGE_OWNERSHIP    TableAction = "change_ownership"
-	TABLEACTION_GET_TASKS           TableAction = "get_tasks"
-	TABLEACTION_CONTROL_TASKS       TableAction = "control_tasks"
-	TABLEACTION_SET_PROTECTION      TableAction = "set_protection"
+	TableActionDrop              TableAction = "drop"
+	TableActionWriteData         TableAction = "write_data"
+	TableActionReadData          TableAction = "read_data"
+	TableActionGetMetadata       TableAction = "get_metadata"
+	TableActionCommit            TableAction = "commit"
+	TableActionRename            TableAction = "rename"
+	TableActionReadAssignments   TableAction = "read_assignments"
+	TableActionGrantPassGrants   TableAction = "grant_pass_grants"
+	TableActionGrantManageGrants TableAction = "grant_manage_grants"
+	TableActionGrantDescribe     TableAction = "grant_describe"
+	TableActionGrantSelect       TableAction = "grant_select"
+	TableActionGrantModify       TableAction = "grant_modify"
+	TableActionChangeOwnership   TableAction = "change_ownership"
+	TableActionGetTasks          TableAction = "get_tasks"
+	TableActionControlTasks      TableAction = "control_tasks"
+	TableActionSetProtection     TableAction = "set_protection"
 )
 
 // All allowed values of TableAction enum

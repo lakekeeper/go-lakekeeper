@@ -20,8 +20,8 @@ type UserType string
 
 // List of UserType
 const (
-	USERTYPE_HUMAN       UserType = "human"
-	USERTYPE_APPLICATION UserType = "application"
+	UserTypeHuman       UserType = "human"
+	UserTypeApplication UserType = "application"
 )
 
 // All allowed values of UserType enum

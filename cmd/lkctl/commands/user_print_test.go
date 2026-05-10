@@ -18,10 +18,10 @@ func TestPrintUsersText(t *testing.T) {
 	user := managementv1.User{
 		Id:              "oidc~abc",
 		Name:            "Alice",
-		Email:           *managementv1.NewNullableString(managementv1.PtrString("alice@example.com")),
-		UserType:        managementv1.USERTYPE_HUMAN,
+		Email:           managementv1.PtrString("alice@example.com"),
+		UserType:        managementv1.UserTypeHuman,
 		CreatedAt:       created,
-		LastUpdatedWith: managementv1.USERLASTUPDATEDWITH_CREATE_ENDPOINT,
+		LastUpdatedWith: managementv1.UserLastUpdatedWithCreateEndpoint,
 	}
 
 	var buf bytes.Buffer
@@ -33,7 +33,7 @@ func TestPrintUsersText(t *testing.T) {
 	assert.Contains(t, got, "oidc~abc")
 	assert.Contains(t, got, "Alice")
 	assert.Contains(t, got, "alice@example.com")
-	assert.Contains(t, got, string(managementv1.USERTYPE_HUMAN))
+	assert.Contains(t, got, string(managementv1.UserTypeHuman))
 }
 
 func TestPrintUsersWide(t *testing.T) {
@@ -43,9 +43,9 @@ func TestPrintUsersWide(t *testing.T) {
 	user := managementv1.User{
 		Id:              "oidc~abc",
 		Name:            "Alice",
-		UserType:        managementv1.USERTYPE_HUMAN,
+		UserType:        managementv1.UserTypeHuman,
 		CreatedAt:       created,
-		LastUpdatedWith: managementv1.USERLASTUPDATEDWITH_CREATE_ENDPOINT,
+		LastUpdatedWith: managementv1.UserLastUpdatedWithCreateEndpoint,
 	}
 
 	var buf bytes.Buffer

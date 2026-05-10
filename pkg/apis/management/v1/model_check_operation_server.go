@@ -68,14 +68,6 @@ func (o *CheckOperationServer) SetServer(v CheckOperationServerServer) {
 	o.Server = v
 }
 
-func (o CheckOperationServer) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o CheckOperationServer) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["server"] = o.Server

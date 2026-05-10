@@ -11,7 +11,11 @@ type ADLSOption func(*managementv1.StorageProfileAdls)
 
 // NewADLSProfile constructs a StorageProfileAdls with the spec-required fields
 // (account name, filesystem) populated. Apply With* options for anything else.
-func NewADLSProfile(accountName, filesystem string, opts ...ADLSOption) *managementv1.StorageProfileAdls {
+//
+// Returns the StorageProfile union directly so callers can pass it to
+// request setters (e.g. CreateWarehouseRequest.StorageProfile) without going
+// through the generated *AsStorageProfile wrapper.
+func NewADLSProfile(accountName, filesystem string, opts ...ADLSOption) managementv1.StorageProfile {
 	p := &managementv1.StorageProfileAdls{
 		AccountName: accountName,
 		Filesystem:  filesystem,
@@ -20,7 +24,7 @@ func NewADLSProfile(accountName, filesystem string, opts ...ADLSOption) *managem
 	for _, opt := range opts {
 		opt(p)
 	}
-	return p
+	return managementv1.StorageProfileAdlsAsStorageProfile(p)
 }
 
 func WithADLSKeyPrefix(prefix string) ADLSOption {

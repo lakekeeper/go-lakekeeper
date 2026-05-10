@@ -68,14 +68,6 @@ func (o *CheckOperationView) SetView(v CheckOperationViewView) {
 	o.View = v
 }
 
-func (o CheckOperationView) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o CheckOperationView) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["view"] = o.View

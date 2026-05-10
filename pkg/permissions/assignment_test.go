@@ -114,3 +114,49 @@ func TestDescribeAssignmentEmpty(t *testing.T) {
 	_, ok := DescribeAssignment(empty)
 	assert.False(t, ok)
 }
+
+func TestBuildAssignmentSetExpandsCartesian(t *testing.T) {
+	t.Parallel()
+
+	// 2 relations × (2 users + 1 role) = 6 assignments, in
+	// (rel0,user0) (rel0,user1) (rel0,role0) (rel1,user0) (rel1,user1) (rel1,role0) order.
+	got, err := BuildAssignmentSet[managementv1.ServerAssignment](
+		[]string{"admin", "operator"},
+		PrincipalSet{Users: []string{"alice", "bob"}, Roles: []string{"team"}},
+	)
+	require.NoError(t, err)
+	require.Len(t, got, 6)
+
+	rows := make([]AssignmentRow, 0, len(got))
+	for _, a := range got {
+		row, ok := DescribeAssignment(a)
+		require.True(t, ok)
+		rows = append(rows, row)
+	}
+	assert.ElementsMatch(t, []AssignmentRow{
+		{PrincipalType: "user", PrincipalID: "alice", Relation: "admin"},
+		{PrincipalType: "user", PrincipalID: "bob", Relation: "admin"},
+		{PrincipalType: "role", PrincipalID: "team", Relation: "admin"},
+		{PrincipalType: "user", PrincipalID: "alice", Relation: "operator"},
+		{PrincipalType: "user", PrincipalID: "bob", Relation: "operator"},
+		{PrincipalType: "role", PrincipalID: "team", Relation: "operator"},
+	}, rows)
+}
+
+func TestBuildAssignmentSetRejectsEmptyPrincipals(t *testing.T) {
+	t.Parallel()
+
+	_, err := BuildAssignmentSet[managementv1.ServerAssignment]([]string{"admin"}, PrincipalSet{})
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "no principals")
+}
+
+func TestBuildAssignmentSetPropagatesUnknownRelation(t *testing.T) {
+	t.Parallel()
+
+	_, err := BuildAssignmentSet[managementv1.ServerAssignment](
+		[]string{"definitely-not-a-relation"},
+		PrincipalSet{Users: []string{"alice"}},
+	)
+	require.Error(t, err)
+}

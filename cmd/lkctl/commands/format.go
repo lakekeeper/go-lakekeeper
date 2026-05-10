@@ -1,25 +1,22 @@
 package commands
 
-import (
-	"time"
+import "time"
 
-	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
-)
-
-// formatNullableString returns the string value held by a NullableString, or
-// an empty string if the value is nil/unset.
-func formatNullableString(v managementv1.NullableString) string {
-	if !v.IsSet() || v.Get() == nil {
+// formatStringPtr returns the string value pointed to, or an empty string for
+// nil. Used for the optional response fields the generator emits as *string
+// after the preprocessor strips OAS-3.1 nullable type-arrays.
+func formatStringPtr(p *string) string {
+	if p == nil {
 		return ""
 	}
-	return *v.Get()
+	return *p
 }
 
-// formatNullableTime returns the RFC3339-formatted time held by a NullableTime,
-// or an empty string if the value is nil/unset.
-func formatNullableTime(v managementv1.NullableTime) string {
-	if !v.IsSet() || v.Get() == nil {
+// formatTimePtr returns the RFC3339-formatted time pointed to, or an empty
+// string for nil.
+func formatTimePtr(p *time.Time) string {
+	if p == nil {
 		return ""
 	}
-	return v.Get().Format(time.RFC3339)
+	return p.Format(time.RFC3339)
 }

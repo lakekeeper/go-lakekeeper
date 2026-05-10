@@ -95,14 +95,6 @@ func (o *StorageLayoutOneOf1) SetType(v string) {
 	o.Type = v
 }
 
-func (o StorageLayoutOneOf1) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o StorageLayoutOneOf1) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["tabular"] = o.Tabular

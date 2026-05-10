@@ -19,11 +19,11 @@ func TestWarehouse_Create_Default(t *testing.T) {
 	t.Parallel()
 	c := sharedClient
 
-	sp := managementv1.StorageProfileS3AsStorageProfile(profile.NewS3Profile(
+	sp := profile.NewS3Profile(
 		"testacc", "eu-local-1",
 		profile.WithS3Endpoint("http://minio:9000/"),
 		profile.WithS3PathStyleAccess(),
-	))
+	)
 	sc := credential.NewS3AccessKey("minio-root-user", "minio-root-password")
 
 	name := randomName("test-wh-default")
@@ -52,7 +52,7 @@ func TestWarehouse_Create_Default(t *testing.T) {
 	assert.Equal(t, wh.WarehouseId, got.WarehouseId)
 	assert.Equal(t, name, got.Name)
 	assert.Equal(t, defaultProjectID, got.ProjectId)
-	assert.Equal(t, managementv1.WAREHOUSESTATUS_ACTIVE, got.Status)
+	assert.Equal(t, managementv1.WarehouseStatusActive, got.Status)
 	assert.False(t, got.Protected)
 	require.NotNil(t, got.StorageProfile.StorageProfileS3)
 	assert.Equal(t, "testacc", got.StorageProfile.StorageProfileS3.Bucket)
@@ -68,11 +68,11 @@ func TestWarehouse_Create_NewProject(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, p)
 
-	sp := managementv1.StorageProfileS3AsStorageProfile(profile.NewS3Profile(
+	sp := profile.NewS3Profile(
 		"testacc", "eu-local-1",
 		profile.WithS3Endpoint("http://minio:9000/"),
 		profile.WithS3PathStyleAccess(),
-	))
+	)
 	sc := credential.NewS3AccessKey("minio-root-user", "minio-root-password")
 
 	req := managementv1.NewCreateWarehouseRequest(sp, "test")
@@ -150,7 +150,7 @@ func TestWarehouse_DeactivateActivate(t *testing.T) {
 
 	got, _, err := c.WarehouseAPI.GetWarehouse(t.Context(), whID).Execute()
 	require.NoError(t, err)
-	assert.Equal(t, managementv1.WAREHOUSESTATUS_INACTIVE, got.Status)
+	assert.Equal(t, managementv1.WarehouseStatusInactive, got.Status)
 
 	r, err = c.WarehouseAPI.ActivateWarehouse(t.Context(), whID).Execute()
 	require.NoError(t, err)
@@ -158,7 +158,7 @@ func TestWarehouse_DeactivateActivate(t *testing.T) {
 
 	got, _, err = c.WarehouseAPI.GetWarehouse(t.Context(), whID).Execute()
 	require.NoError(t, err)
-	assert.Equal(t, managementv1.WAREHOUSESTATUS_ACTIVE, got.Status)
+	assert.Equal(t, managementv1.WarehouseStatusActive, got.Status)
 }
 
 func TestWarehouse_SetProtection(t *testing.T) {
@@ -173,7 +173,7 @@ func TestWarehouse_SetProtection(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusOK, r.StatusCode)
 	assert.True(t, resp.Protected)
-	assert.True(t, resp.UpdatedAt.IsSet())
+	assert.NotNil(t, resp.UpdatedAt)
 
 	// Unprotect before MustCreateWarehouse's delete cleanup runs (cleanups
 	// are LIFO, so this one fires first). Without it, deletion 409s on the

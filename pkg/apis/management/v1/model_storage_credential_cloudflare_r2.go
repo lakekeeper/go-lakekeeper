@@ -202,14 +202,6 @@ func (o *StorageCredentialCloudflareR2) SetType(v string) {
 	o.Type = v
 }
 
-func (o StorageCredentialCloudflareR2) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o StorageCredentialCloudflareR2) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["access-key-id"] = o.AccessKeyId

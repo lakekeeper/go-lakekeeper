@@ -24,7 +24,7 @@ type GcsProfile struct {
 	// Name of the GCS bucket
 	Bucket string `json:"bucket"`
 	// Subpath in the bucket to use.
-	KeyPrefix NullableString `json:"key-prefix,omitempty"`
+	KeyPrefix *string `json:"key-prefix,omitempty"`
 	// Storage layout for namespace and tabular paths.
 	StorageLayout NullableStorageLayout `json:"storage-layout,omitempty"`
 	// Enable STS (Security Token Service) downscoped token generation for GCS. When disabled, clients cannot use vended credentials for this storage profile. Defaults to true.
@@ -75,47 +75,36 @@ func (o *GcsProfile) SetBucket(v string) {
 	o.Bucket = v
 }
 
-// GetKeyPrefix returns the KeyPrefix field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetKeyPrefix returns the KeyPrefix field value if set, zero value otherwise.
 func (o *GcsProfile) GetKeyPrefix() string {
-	if o == nil || IsNil(o.KeyPrefix.Get()) {
+	if o == nil || IsNil(o.KeyPrefix) {
 		var ret string
 		return ret
 	}
-	return *o.KeyPrefix.Get()
+	return *o.KeyPrefix
 }
 
 // GetKeyPrefixOk returns a tuple with the KeyPrefix field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *GcsProfile) GetKeyPrefixOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.KeyPrefix) {
 		return nil, false
 	}
-	return o.KeyPrefix.Get(), o.KeyPrefix.IsSet()
+	return o.KeyPrefix, true
 }
 
 // HasKeyPrefix returns a boolean if a field has been set.
 func (o *GcsProfile) HasKeyPrefix() bool {
-	if o != nil && o.KeyPrefix.IsSet() {
+	if o != nil && !IsNil(o.KeyPrefix) {
 		return true
 	}
 
 	return false
 }
 
-// SetKeyPrefix gets a reference to the given NullableString and assigns it to the KeyPrefix field.
+// SetKeyPrefix gets a reference to the given string and assigns it to the KeyPrefix field.
 func (o *GcsProfile) SetKeyPrefix(v string) {
-	o.KeyPrefix.Set(&v)
-}
-
-// SetKeyPrefixNil sets the value for KeyPrefix to be an explicit nil
-func (o *GcsProfile) SetKeyPrefixNil() {
-	o.KeyPrefix.Set(nil)
-}
-
-// UnsetKeyPrefix ensures that no value is present for KeyPrefix, not even an explicit nil
-func (o *GcsProfile) UnsetKeyPrefix() {
-	o.KeyPrefix.Unset()
+	o.KeyPrefix = &v
 }
 
 // GetStorageLayout returns the StorageLayout field value if set, zero value otherwise (both if not set or set to explicit null).
@@ -193,19 +182,11 @@ func (o *GcsProfile) SetStsEnabled(v bool) {
 	o.StsEnabled = &v
 }
 
-func (o GcsProfile) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o GcsProfile) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["bucket"] = o.Bucket
-	if o.KeyPrefix.IsSet() {
-		toSerialize["key-prefix"] = o.KeyPrefix.Get()
+	if !IsNil(o.KeyPrefix) {
+		toSerialize["key-prefix"] = o.KeyPrefix
 	}
 	if o.StorageLayout.IsSet() {
 		toSerialize["storage-layout"] = o.StorageLayout.Get()

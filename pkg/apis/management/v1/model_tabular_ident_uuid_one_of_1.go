@@ -94,14 +94,6 @@ func (o *TabularIdentUuidOneOf1) SetType(v string) {
 	o.Type = v
 }
 
-func (o TabularIdentUuidOneOf1) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o TabularIdentUuidOneOf1) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["id"] = o.Id

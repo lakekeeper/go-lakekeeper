@@ -68,14 +68,6 @@ func (o *GetOpenFGAProjectActionsResponse) SetAllowedActions(v []OpenFGAProjectA
 	o.AllowedActions = v
 }
 
-func (o GetOpenFGAProjectActionsResponse) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o GetOpenFGAProjectActionsResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["allowed-actions"] = o.AllowedActions

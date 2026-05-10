@@ -31,11 +31,11 @@ type EndpointStatistic struct {
 	// The status code of the response.
 	StatusCode int32 `json:"status-code"`
 	// Timestamp at which the datapoint was last updated.  This is the exact time at which the current datapoint was last updated.
-	UpdatedAt NullableTime `json:"updated-at,omitempty"`
+	UpdatedAt *time.Time `json:"updated-at,omitempty"`
 	// The ID of the warehouse that handled the request.  Only present for requests that could be associated with a warehouse. Some management endpoints cannot be associated with a warehouse, e.g. warehouse creation or user management will not have a `warehouse-id`.
-	WarehouseId NullableString `json:"warehouse-id,omitempty"`
+	WarehouseId *string `json:"warehouse-id,omitempty"`
 	// The name of the warehouse that handled the request.  Only present for requests that could be associated with a warehouse. Some management endpoints cannot be associated with a warehouse, e.g. warehouse creation or user management will not have a `warehouse-id`
-	WarehouseName NullableString `json:"warehouse-name,omitempty"`
+	WarehouseName *string `json:"warehouse-name,omitempty"`
 }
 
 type _EndpointStatistic EndpointStatistic
@@ -157,141 +157,100 @@ func (o *EndpointStatistic) SetStatusCode(v int32) {
 	o.StatusCode = v
 }
 
-// GetUpdatedAt returns the UpdatedAt field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetUpdatedAt returns the UpdatedAt field value if set, zero value otherwise.
 func (o *EndpointStatistic) GetUpdatedAt() time.Time {
-	if o == nil || IsNil(o.UpdatedAt.Get()) {
+	if o == nil || IsNil(o.UpdatedAt) {
 		var ret time.Time
 		return ret
 	}
-	return *o.UpdatedAt.Get()
+	return *o.UpdatedAt
 }
 
 // GetUpdatedAtOk returns a tuple with the UpdatedAt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *EndpointStatistic) GetUpdatedAtOk() (*time.Time, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.UpdatedAt) {
 		return nil, false
 	}
-	return o.UpdatedAt.Get(), o.UpdatedAt.IsSet()
+	return o.UpdatedAt, true
 }
 
 // HasUpdatedAt returns a boolean if a field has been set.
 func (o *EndpointStatistic) HasUpdatedAt() bool {
-	if o != nil && o.UpdatedAt.IsSet() {
+	if o != nil && !IsNil(o.UpdatedAt) {
 		return true
 	}
 
 	return false
 }
 
-// SetUpdatedAt gets a reference to the given NullableTime and assigns it to the UpdatedAt field.
+// SetUpdatedAt gets a reference to the given time.Time and assigns it to the UpdatedAt field.
 func (o *EndpointStatistic) SetUpdatedAt(v time.Time) {
-	o.UpdatedAt.Set(&v)
+	o.UpdatedAt = &v
 }
 
-// SetUpdatedAtNil sets the value for UpdatedAt to be an explicit nil
-func (o *EndpointStatistic) SetUpdatedAtNil() {
-	o.UpdatedAt.Set(nil)
-}
-
-// UnsetUpdatedAt ensures that no value is present for UpdatedAt, not even an explicit nil
-func (o *EndpointStatistic) UnsetUpdatedAt() {
-	o.UpdatedAt.Unset()
-}
-
-// GetWarehouseId returns the WarehouseId field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetWarehouseId returns the WarehouseId field value if set, zero value otherwise.
 func (o *EndpointStatistic) GetWarehouseId() string {
-	if o == nil || IsNil(o.WarehouseId.Get()) {
+	if o == nil || IsNil(o.WarehouseId) {
 		var ret string
 		return ret
 	}
-	return *o.WarehouseId.Get()
+	return *o.WarehouseId
 }
 
 // GetWarehouseIdOk returns a tuple with the WarehouseId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *EndpointStatistic) GetWarehouseIdOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.WarehouseId) {
 		return nil, false
 	}
-	return o.WarehouseId.Get(), o.WarehouseId.IsSet()
+	return o.WarehouseId, true
 }
 
 // HasWarehouseId returns a boolean if a field has been set.
 func (o *EndpointStatistic) HasWarehouseId() bool {
-	if o != nil && o.WarehouseId.IsSet() {
+	if o != nil && !IsNil(o.WarehouseId) {
 		return true
 	}
 
 	return false
 }
 
-// SetWarehouseId gets a reference to the given NullableString and assigns it to the WarehouseId field.
+// SetWarehouseId gets a reference to the given string and assigns it to the WarehouseId field.
 func (o *EndpointStatistic) SetWarehouseId(v string) {
-	o.WarehouseId.Set(&v)
+	o.WarehouseId = &v
 }
 
-// SetWarehouseIdNil sets the value for WarehouseId to be an explicit nil
-func (o *EndpointStatistic) SetWarehouseIdNil() {
-	o.WarehouseId.Set(nil)
-}
-
-// UnsetWarehouseId ensures that no value is present for WarehouseId, not even an explicit nil
-func (o *EndpointStatistic) UnsetWarehouseId() {
-	o.WarehouseId.Unset()
-}
-
-// GetWarehouseName returns the WarehouseName field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetWarehouseName returns the WarehouseName field value if set, zero value otherwise.
 func (o *EndpointStatistic) GetWarehouseName() string {
-	if o == nil || IsNil(o.WarehouseName.Get()) {
+	if o == nil || IsNil(o.WarehouseName) {
 		var ret string
 		return ret
 	}
-	return *o.WarehouseName.Get()
+	return *o.WarehouseName
 }
 
 // GetWarehouseNameOk returns a tuple with the WarehouseName field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *EndpointStatistic) GetWarehouseNameOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.WarehouseName) {
 		return nil, false
 	}
-	return o.WarehouseName.Get(), o.WarehouseName.IsSet()
+	return o.WarehouseName, true
 }
 
 // HasWarehouseName returns a boolean if a field has been set.
 func (o *EndpointStatistic) HasWarehouseName() bool {
-	if o != nil && o.WarehouseName.IsSet() {
+	if o != nil && !IsNil(o.WarehouseName) {
 		return true
 	}
 
 	return false
 }
 
-// SetWarehouseName gets a reference to the given NullableString and assigns it to the WarehouseName field.
+// SetWarehouseName gets a reference to the given string and assigns it to the WarehouseName field.
 func (o *EndpointStatistic) SetWarehouseName(v string) {
-	o.WarehouseName.Set(&v)
-}
-
-// SetWarehouseNameNil sets the value for WarehouseName to be an explicit nil
-func (o *EndpointStatistic) SetWarehouseNameNil() {
-	o.WarehouseName.Set(nil)
-}
-
-// UnsetWarehouseName ensures that no value is present for WarehouseName, not even an explicit nil
-func (o *EndpointStatistic) UnsetWarehouseName() {
-	o.WarehouseName.Unset()
-}
-
-func (o EndpointStatistic) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
+	o.WarehouseName = &v
 }
 
 func (o EndpointStatistic) ToMap() (map[string]interface{}, error) {
@@ -300,14 +259,14 @@ func (o EndpointStatistic) ToMap() (map[string]interface{}, error) {
 	toSerialize["created-at"] = o.CreatedAt
 	toSerialize["http-route"] = o.HttpRoute
 	toSerialize["status-code"] = o.StatusCode
-	if o.UpdatedAt.IsSet() {
-		toSerialize["updated-at"] = o.UpdatedAt.Get()
+	if !IsNil(o.UpdatedAt) {
+		toSerialize["updated-at"] = o.UpdatedAt
 	}
-	if o.WarehouseId.IsSet() {
-		toSerialize["warehouse-id"] = o.WarehouseId.Get()
+	if !IsNil(o.WarehouseId) {
+		toSerialize["warehouse-id"] = o.WarehouseId
 	}
-	if o.WarehouseName.IsSet() {
-		toSerialize["warehouse-name"] = o.WarehouseName.Get()
+	if !IsNil(o.WarehouseName) {
+		toSerialize["warehouse-name"] = o.WarehouseName
 	}
 	return toSerialize, nil
 }

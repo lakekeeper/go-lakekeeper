@@ -20,8 +20,8 @@ type GcsCredentialType string
 
 // List of GcsCredentialType
 const (
-	GCSCREDENTIALTYPE_SERVICE_ACCOUNT_KEY GcsCredentialType = "service-account-key"
-	GCSCREDENTIALTYPE_GCP_SYSTEM_IDENTITY GcsCredentialType = "gcp-system-identity"
+	GcsCredentialTypeServiceAccountKey GcsCredentialType = "service-account-key"
+	GcsCredentialTypeGcpSystemIdentity GcsCredentialType = "gcp-system-identity"
 )
 
 // All allowed values of GcsCredentialType enum

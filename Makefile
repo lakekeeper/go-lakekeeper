@@ -173,6 +173,7 @@ generate: ## Regenerate Go bindings from OpenAPI specs.
 	@mkdir -p $(SELF_DIR)/$(MANAGEMENT_API_OUTPUT)
 	@cp $(OPENAPI_DIR)/.openapi-generator-ignore $(SELF_DIR)/$(MANAGEMENT_API_OUTPUT)/
 	@$(CONTAINER_ENGINE) run --rm \
+		--user $$(id -u):$$(id -g) \
 		-v $(SELF_DIR):/local \
 		$(OPENAPI_GENERATOR_IMAGE) generate \
 		-i /local/api/openapi/management-open-api.processed.yaml \

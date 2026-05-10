@@ -11,7 +11,6 @@ import (
 	"github.com/spf13/cobra"
 
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
-	"github.com/lakekeeper/go-lakekeeper/pkg/permissions"
 )
 
 func newRoleCmd(opts *clientOptions) *cobra.Command {
@@ -90,8 +89,8 @@ func newRoleListCmd(opts *clientOptions, project *string) *cobra.Command {
 				if err := printRoles(cmd.OutOrStdout(), output, roles...); err != nil {
 					return err
 				}
-				if resp.NextPageToken.IsSet() {
-					fmt.Fprintf(cmd.OutOrStdout(), "\nNext page token: %s\n", *resp.NextPageToken.Get())
+				if resp.NextPageToken != nil {
+					fmt.Fprintf(cmd.OutOrStdout(), "\nNext page token: %s\n", *resp.NextPageToken)
 				}
 				return nil
 			default:
@@ -362,27 +361,12 @@ func newRoleGrantCmd(opts *clientOptions) *cobra.Command {
 		Short:   "Add role assignments",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if len(users) == 0 && len(roles) == 0 {
-				return errors.New("at least one --users or --roles value is required")
+			set, err := buildAssignmentSet[managementv1.RoleAssignment](assignments, users, roles)
+			if err != nil {
+				return err
 			}
-
 			req := managementv1.NewUpdateRoleAssignmentsRequest()
-			for _, rel := range assignments {
-				for _, u := range users {
-					a, err := permissions.BuildAssignment[managementv1.RoleAssignment](rel, permissions.PrincipalUser, u)
-					if err != nil {
-						return err
-					}
-					req.Writes = append(req.Writes, a)
-				}
-				for _, r := range roles {
-					a, err := permissions.BuildAssignment[managementv1.RoleAssignment](rel, permissions.PrincipalRole, r)
-					if err != nil {
-						return err
-					}
-					req.Writes = append(req.Writes, a)
-				}
-			}
+			req.Writes = set
 
 			ctx := cmd.Context()
 			c, err := newClient(ctx, opts)
@@ -424,27 +408,12 @@ func newRoleRevokeCmd(opts *clientOptions) *cobra.Command {
   lkctl role revoke 0198618c-5be8-7a82-a0b9-1076c9dd12f0 --roles 11111111-2222-3333-4444-555555555555 --assignments assignee`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if len(users) == 0 && len(roles) == 0 {
-				return errors.New("at least one --users or --roles value is required")
+			set, err := buildAssignmentSet[managementv1.RoleAssignment](assignments, users, roles)
+			if err != nil {
+				return err
 			}
-
 			req := managementv1.NewUpdateRoleAssignmentsRequest()
-			for _, rel := range assignments {
-				for _, u := range users {
-					a, err := permissions.BuildAssignment[managementv1.RoleAssignment](rel, permissions.PrincipalUser, u)
-					if err != nil {
-						return err
-					}
-					req.Deletes = append(req.Deletes, a)
-				}
-				for _, r := range roles {
-					a, err := permissions.BuildAssignment[managementv1.RoleAssignment](rel, permissions.PrincipalRole, r)
-					if err != nil {
-						return err
-					}
-					req.Deletes = append(req.Deletes, a)
-				}
-			}
+			req.Deletes = set
 
 			ctx := cmd.Context()
 			c, err := newClient(ctx, opts)
@@ -477,8 +446,8 @@ func printRoles(w io.Writer, output string, roles ...managementv1.Role) error {
 			fmt.Fprintf(tw, "%s\t%s\t%s\t%s\t%s\t%s\n",
 				r.Id, r.Name, r.ProjectId,
 				r.CreatedAt.Format(time.RFC3339),
-				formatNullableTime(r.UpdatedAt),
-				formatNullableString(r.Description))
+				formatTimePtr(r.UpdatedAt),
+				formatStringPtr(r.Description))
 		}
 	} else {
 		fmt.Fprintln(tw, "ID\tNAME\tPROJECT ID\tCREATED AT\tUPDATED AT")
@@ -487,7 +456,7 @@ func printRoles(w io.Writer, output string, roles ...managementv1.Role) error {
 			fmt.Fprintf(tw, "%s\t%s\t%s\t%s\t%s\n",
 				r.Id, r.Name, r.ProjectId,
 				r.CreatedAt.Format(time.RFC3339),
-				formatNullableTime(r.UpdatedAt))
+				formatTimePtr(r.UpdatedAt))
 		}
 	}
 	return tw.Flush()

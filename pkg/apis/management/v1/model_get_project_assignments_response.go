@@ -94,14 +94,6 @@ func (o *GetProjectAssignmentsResponse) SetProjectId(v string) {
 	o.ProjectId = v
 }
 
-func (o GetProjectAssignmentsResponse) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o GetProjectAssignmentsResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["assignments"] = o.Assignments

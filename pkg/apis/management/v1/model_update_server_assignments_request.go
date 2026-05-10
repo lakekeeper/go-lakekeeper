@@ -104,14 +104,6 @@ func (o *UpdateServerAssignmentsRequest) SetWrites(v []ServerAssignment) {
 	o.Writes = v
 }
 
-func (o UpdateServerAssignmentsRequest) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o UpdateServerAssignmentsRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if !IsNil(o.Deletes) {

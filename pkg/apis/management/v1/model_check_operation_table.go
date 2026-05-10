@@ -68,14 +68,6 @@ func (o *CheckOperationTable) SetTable(v CheckOperationTableTable) {
 	o.Table = v
 }
 
-func (o CheckOperationTable) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o CheckOperationTable) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["table"] = o.Table

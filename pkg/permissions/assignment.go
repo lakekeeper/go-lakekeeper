@@ -84,6 +84,48 @@ func BuildAssignment[T any](relation string, kind PrincipalKind, id string) (T, 
 	return out, nil
 }
 
+// PrincipalSet groups user and role ids for a multi-relation grant or
+// revoke. It is the input shape for BuildAssignmentSet, which expands the
+// (relation × principal) cartesian product into a slice of generated
+// *Assignment values.
+type PrincipalSet struct {
+	Users []string
+	Roles []string
+}
+
+// BuildAssignmentSet expands `relations × (set.Users + set.Roles)` into a
+// slice of generated *Assignment values for assignment to a request's
+// Writes (grant) or Deletes (revoke) field. Returns the first error if any
+// single assignment fails to build (e.g., an unknown relation for the
+// resource type).
+//
+// The four-line nested loop this replaces appears once per resource per
+// verb (warehouse/project/role/server × grant/revoke), so consolidating it
+// here removes ~120 LoC from lkctl alone.
+func BuildAssignmentSet[T any](relations []string, set PrincipalSet) ([]T, error) {
+	if len(set.Users) == 0 && len(set.Roles) == 0 {
+		return nil, errors.New("no principals: set.Users and set.Roles are both empty")
+	}
+	out := make([]T, 0, len(relations)*(len(set.Users)+len(set.Roles)))
+	for _, rel := range relations {
+		for _, u := range set.Users {
+			a, err := BuildAssignment[T](rel, PrincipalUser, u)
+			if err != nil {
+				return nil, err
+			}
+			out = append(out, a)
+		}
+		for _, r := range set.Roles {
+			a, err := BuildAssignment[T](rel, PrincipalRole, r)
+			if err != nil {
+				return nil, err
+			}
+			out = append(out, a)
+		}
+	}
+	return out, nil
+}
+
 // DescribeAssignment converts any generated *Assignment union value into an
 // AssignmentRow by JSON-roundtripping through the wire shape they all share:
 // `{type, user?, role?}`.

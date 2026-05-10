@@ -21,15 +21,15 @@ var _ MappedNullable = &ListTasksRequest{}
 // ListTasksRequest struct for ListTasksRequest
 type ListTasksRequest struct {
 	// Filter tasks created after this timestamp
-	CreatedAfter NullableTime `json:"created-after,omitempty"`
+	CreatedAfter *time.Time `json:"created-after,omitempty"`
 	// Filter tasks created before this timestamp
-	CreatedBefore NullableTime `json:"created-before,omitempty"`
+	CreatedBefore *time.Time `json:"created-before,omitempty"`
 	// Filter by specific entity
 	Entities []WarehouseTaskEntityFilter `json:"entities,omitempty"`
 	// Number of results per page
-	PageSize NullableInt64 `json:"page-size,omitempty"`
+	PageSize *int64 `json:"page-size,omitempty"`
 	// Next page token, re-use the same request as for the original request, but set this to the `next_page_token` from the previous response. Stop iterating when no more items are returned in a page.
-	PageToken NullableString `json:"page-token,omitempty"`
+	PageToken *string `json:"page-token,omitempty"`
 	// Filter by one or more queue names
 	QueueName []string `json:"queue-name,omitempty"`
 	// Filter by task status
@@ -53,95 +53,73 @@ func NewListTasksRequestWithDefaults() *ListTasksRequest {
 	return &this
 }
 
-// GetCreatedAfter returns the CreatedAfter field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetCreatedAfter returns the CreatedAfter field value if set, zero value otherwise.
 func (o *ListTasksRequest) GetCreatedAfter() time.Time {
-	if o == nil || IsNil(o.CreatedAfter.Get()) {
+	if o == nil || IsNil(o.CreatedAfter) {
 		var ret time.Time
 		return ret
 	}
-	return *o.CreatedAfter.Get()
+	return *o.CreatedAfter
 }
 
 // GetCreatedAfterOk returns a tuple with the CreatedAfter field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *ListTasksRequest) GetCreatedAfterOk() (*time.Time, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.CreatedAfter) {
 		return nil, false
 	}
-	return o.CreatedAfter.Get(), o.CreatedAfter.IsSet()
+	return o.CreatedAfter, true
 }
 
 // HasCreatedAfter returns a boolean if a field has been set.
 func (o *ListTasksRequest) HasCreatedAfter() bool {
-	if o != nil && o.CreatedAfter.IsSet() {
+	if o != nil && !IsNil(o.CreatedAfter) {
 		return true
 	}
 
 	return false
 }
 
-// SetCreatedAfter gets a reference to the given NullableTime and assigns it to the CreatedAfter field.
+// SetCreatedAfter gets a reference to the given time.Time and assigns it to the CreatedAfter field.
 func (o *ListTasksRequest) SetCreatedAfter(v time.Time) {
-	o.CreatedAfter.Set(&v)
+	o.CreatedAfter = &v
 }
 
-// SetCreatedAfterNil sets the value for CreatedAfter to be an explicit nil
-func (o *ListTasksRequest) SetCreatedAfterNil() {
-	o.CreatedAfter.Set(nil)
-}
-
-// UnsetCreatedAfter ensures that no value is present for CreatedAfter, not even an explicit nil
-func (o *ListTasksRequest) UnsetCreatedAfter() {
-	o.CreatedAfter.Unset()
-}
-
-// GetCreatedBefore returns the CreatedBefore field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetCreatedBefore returns the CreatedBefore field value if set, zero value otherwise.
 func (o *ListTasksRequest) GetCreatedBefore() time.Time {
-	if o == nil || IsNil(o.CreatedBefore.Get()) {
+	if o == nil || IsNil(o.CreatedBefore) {
 		var ret time.Time
 		return ret
 	}
-	return *o.CreatedBefore.Get()
+	return *o.CreatedBefore
 }
 
 // GetCreatedBeforeOk returns a tuple with the CreatedBefore field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *ListTasksRequest) GetCreatedBeforeOk() (*time.Time, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.CreatedBefore) {
 		return nil, false
 	}
-	return o.CreatedBefore.Get(), o.CreatedBefore.IsSet()
+	return o.CreatedBefore, true
 }
 
 // HasCreatedBefore returns a boolean if a field has been set.
 func (o *ListTasksRequest) HasCreatedBefore() bool {
-	if o != nil && o.CreatedBefore.IsSet() {
+	if o != nil && !IsNil(o.CreatedBefore) {
 		return true
 	}
 
 	return false
 }
 
-// SetCreatedBefore gets a reference to the given NullableTime and assigns it to the CreatedBefore field.
+// SetCreatedBefore gets a reference to the given time.Time and assigns it to the CreatedBefore field.
 func (o *ListTasksRequest) SetCreatedBefore(v time.Time) {
-	o.CreatedBefore.Set(&v)
+	o.CreatedBefore = &v
 }
 
-// SetCreatedBeforeNil sets the value for CreatedBefore to be an explicit nil
-func (o *ListTasksRequest) SetCreatedBeforeNil() {
-	o.CreatedBefore.Set(nil)
-}
-
-// UnsetCreatedBefore ensures that no value is present for CreatedBefore, not even an explicit nil
-func (o *ListTasksRequest) UnsetCreatedBefore() {
-	o.CreatedBefore.Unset()
-}
-
-// GetEntities returns the Entities field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetEntities returns the Entities field value if set, zero value otherwise.
 func (o *ListTasksRequest) GetEntities() []WarehouseTaskEntityFilter {
-	if o == nil {
+	if o == nil || IsNil(o.Entities) {
 		var ret []WarehouseTaskEntityFilter
 		return ret
 	}
@@ -150,7 +128,6 @@ func (o *ListTasksRequest) GetEntities() []WarehouseTaskEntityFilter {
 
 // GetEntitiesOk returns a tuple with the Entities field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *ListTasksRequest) GetEntitiesOk() ([]WarehouseTaskEntityFilter, bool) {
 	if o == nil || IsNil(o.Entities) {
 		return nil, false
@@ -172,95 +149,73 @@ func (o *ListTasksRequest) SetEntities(v []WarehouseTaskEntityFilter) {
 	o.Entities = v
 }
 
-// GetPageSize returns the PageSize field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetPageSize returns the PageSize field value if set, zero value otherwise.
 func (o *ListTasksRequest) GetPageSize() int64 {
-	if o == nil || IsNil(o.PageSize.Get()) {
+	if o == nil || IsNil(o.PageSize) {
 		var ret int64
 		return ret
 	}
-	return *o.PageSize.Get()
+	return *o.PageSize
 }
 
 // GetPageSizeOk returns a tuple with the PageSize field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *ListTasksRequest) GetPageSizeOk() (*int64, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.PageSize) {
 		return nil, false
 	}
-	return o.PageSize.Get(), o.PageSize.IsSet()
+	return o.PageSize, true
 }
 
 // HasPageSize returns a boolean if a field has been set.
 func (o *ListTasksRequest) HasPageSize() bool {
-	if o != nil && o.PageSize.IsSet() {
+	if o != nil && !IsNil(o.PageSize) {
 		return true
 	}
 
 	return false
 }
 
-// SetPageSize gets a reference to the given NullableInt64 and assigns it to the PageSize field.
+// SetPageSize gets a reference to the given int64 and assigns it to the PageSize field.
 func (o *ListTasksRequest) SetPageSize(v int64) {
-	o.PageSize.Set(&v)
+	o.PageSize = &v
 }
 
-// SetPageSizeNil sets the value for PageSize to be an explicit nil
-func (o *ListTasksRequest) SetPageSizeNil() {
-	o.PageSize.Set(nil)
-}
-
-// UnsetPageSize ensures that no value is present for PageSize, not even an explicit nil
-func (o *ListTasksRequest) UnsetPageSize() {
-	o.PageSize.Unset()
-}
-
-// GetPageToken returns the PageToken field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetPageToken returns the PageToken field value if set, zero value otherwise.
 func (o *ListTasksRequest) GetPageToken() string {
-	if o == nil || IsNil(o.PageToken.Get()) {
+	if o == nil || IsNil(o.PageToken) {
 		var ret string
 		return ret
 	}
-	return *o.PageToken.Get()
+	return *o.PageToken
 }
 
 // GetPageTokenOk returns a tuple with the PageToken field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *ListTasksRequest) GetPageTokenOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.PageToken) {
 		return nil, false
 	}
-	return o.PageToken.Get(), o.PageToken.IsSet()
+	return o.PageToken, true
 }
 
 // HasPageToken returns a boolean if a field has been set.
 func (o *ListTasksRequest) HasPageToken() bool {
-	if o != nil && o.PageToken.IsSet() {
+	if o != nil && !IsNil(o.PageToken) {
 		return true
 	}
 
 	return false
 }
 
-// SetPageToken gets a reference to the given NullableString and assigns it to the PageToken field.
+// SetPageToken gets a reference to the given string and assigns it to the PageToken field.
 func (o *ListTasksRequest) SetPageToken(v string) {
-	o.PageToken.Set(&v)
+	o.PageToken = &v
 }
 
-// SetPageTokenNil sets the value for PageToken to be an explicit nil
-func (o *ListTasksRequest) SetPageTokenNil() {
-	o.PageToken.Set(nil)
-}
-
-// UnsetPageToken ensures that no value is present for PageToken, not even an explicit nil
-func (o *ListTasksRequest) UnsetPageToken() {
-	o.PageToken.Unset()
-}
-
-// GetQueueName returns the QueueName field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetQueueName returns the QueueName field value if set, zero value otherwise.
 func (o *ListTasksRequest) GetQueueName() []string {
-	if o == nil {
+	if o == nil || IsNil(o.QueueName) {
 		var ret []string
 		return ret
 	}
@@ -269,7 +224,6 @@ func (o *ListTasksRequest) GetQueueName() []string {
 
 // GetQueueNameOk returns a tuple with the QueueName field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *ListTasksRequest) GetQueueNameOk() ([]string, bool) {
 	if o == nil || IsNil(o.QueueName) {
 		return nil, false
@@ -291,9 +245,9 @@ func (o *ListTasksRequest) SetQueueName(v []string) {
 	o.QueueName = v
 }
 
-// GetStatus returns the Status field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetStatus returns the Status field value if set, zero value otherwise.
 func (o *ListTasksRequest) GetStatus() []TaskStatus {
-	if o == nil {
+	if o == nil || IsNil(o.Status) {
 		var ret []TaskStatus
 		return ret
 	}
@@ -302,7 +256,6 @@ func (o *ListTasksRequest) GetStatus() []TaskStatus {
 
 // GetStatusOk returns a tuple with the Status field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *ListTasksRequest) GetStatusOk() ([]TaskStatus, bool) {
 	if o == nil || IsNil(o.Status) {
 		return nil, false
@@ -324,35 +277,27 @@ func (o *ListTasksRequest) SetStatus(v []TaskStatus) {
 	o.Status = v
 }
 
-func (o ListTasksRequest) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o ListTasksRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if o.CreatedAfter.IsSet() {
-		toSerialize["created-after"] = o.CreatedAfter.Get()
+	if !IsNil(o.CreatedAfter) {
+		toSerialize["created-after"] = o.CreatedAfter
 	}
-	if o.CreatedBefore.IsSet() {
-		toSerialize["created-before"] = o.CreatedBefore.Get()
+	if !IsNil(o.CreatedBefore) {
+		toSerialize["created-before"] = o.CreatedBefore
 	}
-	if o.Entities != nil {
+	if !IsNil(o.Entities) {
 		toSerialize["entities"] = o.Entities
 	}
-	if o.PageSize.IsSet() {
-		toSerialize["page-size"] = o.PageSize.Get()
+	if !IsNil(o.PageSize) {
+		toSerialize["page-size"] = o.PageSize
 	}
-	if o.PageToken.IsSet() {
-		toSerialize["page-token"] = o.PageToken.Get()
+	if !IsNil(o.PageToken) {
+		toSerialize["page-token"] = o.PageToken
 	}
-	if o.QueueName != nil {
+	if !IsNil(o.QueueName) {
 		toSerialize["queue-name"] = o.QueueName
 	}
-	if o.Status != nil {
+	if !IsNil(o.Status) {
 		toSerialize["status"] = o.Status
 	}
 	return toSerialize, nil

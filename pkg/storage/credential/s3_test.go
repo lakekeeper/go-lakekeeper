@@ -10,6 +10,21 @@ import (
 	"github.com/lakekeeper/go-lakekeeper/pkg/storage/credential"
 )
 
+func TestAsS3AccessKey_RoundTrip(t *testing.T) {
+	t.Parallel()
+
+	sc := credential.NewS3AccessKey("ak", "sk")
+	got, ok := credential.AsS3AccessKey(sc)
+	require.True(t, ok)
+	require.NotNil(t, got)
+	assert.Equal(t, "ak", got.AccessKeyId)
+	assert.Equal(t, "sk", got.SecretAccessKey)
+
+	// Cross-variant accessor on the same value must return (nil, false).
+	_, ok = credential.AsS3CloudflareR2(sc)
+	assert.False(t, ok)
+}
+
 func TestNewS3AccessKey(t *testing.T) {
 	t.Parallel()
 

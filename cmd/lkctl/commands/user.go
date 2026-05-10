@@ -66,11 +66,7 @@ func newUserListCmd(opts *clientOptions) *cobra.Command {
 				for i := range resp.Users {
 					users[i] = &resp.Users[i]
 				}
-				var nextToken *string
-				if resp.NextPageToken.IsSet() {
-					nextToken = resp.NextPageToken.Get()
-				}
-				return printUsers(cmd.OutOrStdout(), output, nextToken, users...)
+				return printUsers(cmd.OutOrStdout(), output, resp.NextPageToken, users...)
 			default:
 				return fmt.Errorf("unknown output format: %s", output)
 			}

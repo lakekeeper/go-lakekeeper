@@ -69,14 +69,6 @@ func (o *RenameProjectRequest) SetNewName(v string) {
 	o.NewName = v
 }
 
-func (o RenameProjectRequest) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o RenameProjectRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["new-name"] = o.NewName

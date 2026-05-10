@@ -31,11 +31,11 @@ type WarehouseTaskInfo struct {
 	// Name of the entity this task operates on. None if this is a warehouse-level task.
 	EntityName []string `json:"entity-name,omitempty"`
 	// Last heartbeat timestamp for running tasks
-	LastHeartbeatAt NullableTime `json:"last-heartbeat-at,omitempty"`
+	LastHeartbeatAt *time.Time `json:"last-heartbeat-at,omitempty"`
 	// Parent task ID if this is a sub-task
-	ParentTaskId NullableString `json:"parent-task-id,omitempty"`
+	ParentTaskId *string `json:"parent-task-id,omitempty"`
 	// When the latest attempt of the task was picked up for processing by a worker.
-	PickedUpAt NullableTime `json:"picked-up-at,omitempty"`
+	PickedUpAt *time.Time `json:"picked-up-at,omitempty"`
 	// Progress of the task (0.0 to 1.0)
 	Progress float32 `json:"progress"`
 	// Project ID associated with the task
@@ -49,7 +49,7 @@ type WarehouseTaskInfo struct {
 	// Unique identifier for the task
 	TaskId string `json:"task-id"`
 	// When the task was last updated
-	UpdatedAt NullableTime `json:"updated-at,omitempty"`
+	UpdatedAt *time.Time `json:"updated-at,omitempty"`
 	// Warehouse ID associated with the task
 	WarehouseId string `json:"warehouse-id"`
 }
@@ -173,9 +173,9 @@ func (o *WarehouseTaskInfo) UnsetEntity() {
 	o.Entity.Unset()
 }
 
-// GetEntityName returns the EntityName field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetEntityName returns the EntityName field value if set, zero value otherwise.
 func (o *WarehouseTaskInfo) GetEntityName() []string {
-	if o == nil {
+	if o == nil || IsNil(o.EntityName) {
 		var ret []string
 		return ret
 	}
@@ -184,7 +184,6 @@ func (o *WarehouseTaskInfo) GetEntityName() []string {
 
 // GetEntityNameOk returns a tuple with the EntityName field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *WarehouseTaskInfo) GetEntityNameOk() ([]string, bool) {
 	if o == nil || IsNil(o.EntityName) {
 		return nil, false
@@ -206,133 +205,100 @@ func (o *WarehouseTaskInfo) SetEntityName(v []string) {
 	o.EntityName = v
 }
 
-// GetLastHeartbeatAt returns the LastHeartbeatAt field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetLastHeartbeatAt returns the LastHeartbeatAt field value if set, zero value otherwise.
 func (o *WarehouseTaskInfo) GetLastHeartbeatAt() time.Time {
-	if o == nil || IsNil(o.LastHeartbeatAt.Get()) {
+	if o == nil || IsNil(o.LastHeartbeatAt) {
 		var ret time.Time
 		return ret
 	}
-	return *o.LastHeartbeatAt.Get()
+	return *o.LastHeartbeatAt
 }
 
 // GetLastHeartbeatAtOk returns a tuple with the LastHeartbeatAt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *WarehouseTaskInfo) GetLastHeartbeatAtOk() (*time.Time, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.LastHeartbeatAt) {
 		return nil, false
 	}
-	return o.LastHeartbeatAt.Get(), o.LastHeartbeatAt.IsSet()
+	return o.LastHeartbeatAt, true
 }
 
 // HasLastHeartbeatAt returns a boolean if a field has been set.
 func (o *WarehouseTaskInfo) HasLastHeartbeatAt() bool {
-	if o != nil && o.LastHeartbeatAt.IsSet() {
+	if o != nil && !IsNil(o.LastHeartbeatAt) {
 		return true
 	}
 
 	return false
 }
 
-// SetLastHeartbeatAt gets a reference to the given NullableTime and assigns it to the LastHeartbeatAt field.
+// SetLastHeartbeatAt gets a reference to the given time.Time and assigns it to the LastHeartbeatAt field.
 func (o *WarehouseTaskInfo) SetLastHeartbeatAt(v time.Time) {
-	o.LastHeartbeatAt.Set(&v)
+	o.LastHeartbeatAt = &v
 }
 
-// SetLastHeartbeatAtNil sets the value for LastHeartbeatAt to be an explicit nil
-func (o *WarehouseTaskInfo) SetLastHeartbeatAtNil() {
-	o.LastHeartbeatAt.Set(nil)
-}
-
-// UnsetLastHeartbeatAt ensures that no value is present for LastHeartbeatAt, not even an explicit nil
-func (o *WarehouseTaskInfo) UnsetLastHeartbeatAt() {
-	o.LastHeartbeatAt.Unset()
-}
-
-// GetParentTaskId returns the ParentTaskId field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetParentTaskId returns the ParentTaskId field value if set, zero value otherwise.
 func (o *WarehouseTaskInfo) GetParentTaskId() string {
-	if o == nil || IsNil(o.ParentTaskId.Get()) {
+	if o == nil || IsNil(o.ParentTaskId) {
 		var ret string
 		return ret
 	}
-	return *o.ParentTaskId.Get()
+	return *o.ParentTaskId
 }
 
 // GetParentTaskIdOk returns a tuple with the ParentTaskId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *WarehouseTaskInfo) GetParentTaskIdOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.ParentTaskId) {
 		return nil, false
 	}
-	return o.ParentTaskId.Get(), o.ParentTaskId.IsSet()
+	return o.ParentTaskId, true
 }
 
 // HasParentTaskId returns a boolean if a field has been set.
 func (o *WarehouseTaskInfo) HasParentTaskId() bool {
-	if o != nil && o.ParentTaskId.IsSet() {
+	if o != nil && !IsNil(o.ParentTaskId) {
 		return true
 	}
 
 	return false
 }
 
-// SetParentTaskId gets a reference to the given NullableString and assigns it to the ParentTaskId field.
+// SetParentTaskId gets a reference to the given string and assigns it to the ParentTaskId field.
 func (o *WarehouseTaskInfo) SetParentTaskId(v string) {
-	o.ParentTaskId.Set(&v)
+	o.ParentTaskId = &v
 }
 
-// SetParentTaskIdNil sets the value for ParentTaskId to be an explicit nil
-func (o *WarehouseTaskInfo) SetParentTaskIdNil() {
-	o.ParentTaskId.Set(nil)
-}
-
-// UnsetParentTaskId ensures that no value is present for ParentTaskId, not even an explicit nil
-func (o *WarehouseTaskInfo) UnsetParentTaskId() {
-	o.ParentTaskId.Unset()
-}
-
-// GetPickedUpAt returns the PickedUpAt field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetPickedUpAt returns the PickedUpAt field value if set, zero value otherwise.
 func (o *WarehouseTaskInfo) GetPickedUpAt() time.Time {
-	if o == nil || IsNil(o.PickedUpAt.Get()) {
+	if o == nil || IsNil(o.PickedUpAt) {
 		var ret time.Time
 		return ret
 	}
-	return *o.PickedUpAt.Get()
+	return *o.PickedUpAt
 }
 
 // GetPickedUpAtOk returns a tuple with the PickedUpAt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *WarehouseTaskInfo) GetPickedUpAtOk() (*time.Time, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.PickedUpAt) {
 		return nil, false
 	}
-	return o.PickedUpAt.Get(), o.PickedUpAt.IsSet()
+	return o.PickedUpAt, true
 }
 
 // HasPickedUpAt returns a boolean if a field has been set.
 func (o *WarehouseTaskInfo) HasPickedUpAt() bool {
-	if o != nil && o.PickedUpAt.IsSet() {
+	if o != nil && !IsNil(o.PickedUpAt) {
 		return true
 	}
 
 	return false
 }
 
-// SetPickedUpAt gets a reference to the given NullableTime and assigns it to the PickedUpAt field.
+// SetPickedUpAt gets a reference to the given time.Time and assigns it to the PickedUpAt field.
 func (o *WarehouseTaskInfo) SetPickedUpAt(v time.Time) {
-	o.PickedUpAt.Set(&v)
-}
-
-// SetPickedUpAtNil sets the value for PickedUpAt to be an explicit nil
-func (o *WarehouseTaskInfo) SetPickedUpAtNil() {
-	o.PickedUpAt.Set(nil)
-}
-
-// UnsetPickedUpAt ensures that no value is present for PickedUpAt, not even an explicit nil
-func (o *WarehouseTaskInfo) UnsetPickedUpAt() {
-	o.PickedUpAt.Unset()
+	o.PickedUpAt = &v
 }
 
 // GetProgress returns the Progress field value
@@ -479,47 +445,36 @@ func (o *WarehouseTaskInfo) SetTaskId(v string) {
 	o.TaskId = v
 }
 
-// GetUpdatedAt returns the UpdatedAt field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetUpdatedAt returns the UpdatedAt field value if set, zero value otherwise.
 func (o *WarehouseTaskInfo) GetUpdatedAt() time.Time {
-	if o == nil || IsNil(o.UpdatedAt.Get()) {
+	if o == nil || IsNil(o.UpdatedAt) {
 		var ret time.Time
 		return ret
 	}
-	return *o.UpdatedAt.Get()
+	return *o.UpdatedAt
 }
 
 // GetUpdatedAtOk returns a tuple with the UpdatedAt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *WarehouseTaskInfo) GetUpdatedAtOk() (*time.Time, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.UpdatedAt) {
 		return nil, false
 	}
-	return o.UpdatedAt.Get(), o.UpdatedAt.IsSet()
+	return o.UpdatedAt, true
 }
 
 // HasUpdatedAt returns a boolean if a field has been set.
 func (o *WarehouseTaskInfo) HasUpdatedAt() bool {
-	if o != nil && o.UpdatedAt.IsSet() {
+	if o != nil && !IsNil(o.UpdatedAt) {
 		return true
 	}
 
 	return false
 }
 
-// SetUpdatedAt gets a reference to the given NullableTime and assigns it to the UpdatedAt field.
+// SetUpdatedAt gets a reference to the given time.Time and assigns it to the UpdatedAt field.
 func (o *WarehouseTaskInfo) SetUpdatedAt(v time.Time) {
-	o.UpdatedAt.Set(&v)
-}
-
-// SetUpdatedAtNil sets the value for UpdatedAt to be an explicit nil
-func (o *WarehouseTaskInfo) SetUpdatedAtNil() {
-	o.UpdatedAt.Set(nil)
-}
-
-// UnsetUpdatedAt ensures that no value is present for UpdatedAt, not even an explicit nil
-func (o *WarehouseTaskInfo) UnsetUpdatedAt() {
-	o.UpdatedAt.Unset()
+	o.UpdatedAt = &v
 }
 
 // GetWarehouseId returns the WarehouseId field value
@@ -546,14 +501,6 @@ func (o *WarehouseTaskInfo) SetWarehouseId(v string) {
 	o.WarehouseId = v
 }
 
-func (o WarehouseTaskInfo) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o WarehouseTaskInfo) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["attempt"] = o.Attempt
@@ -561,17 +508,17 @@ func (o WarehouseTaskInfo) ToMap() (map[string]interface{}, error) {
 	if o.Entity.IsSet() {
 		toSerialize["entity"] = o.Entity.Get()
 	}
-	if o.EntityName != nil {
+	if !IsNil(o.EntityName) {
 		toSerialize["entity-name"] = o.EntityName
 	}
-	if o.LastHeartbeatAt.IsSet() {
-		toSerialize["last-heartbeat-at"] = o.LastHeartbeatAt.Get()
+	if !IsNil(o.LastHeartbeatAt) {
+		toSerialize["last-heartbeat-at"] = o.LastHeartbeatAt
 	}
-	if o.ParentTaskId.IsSet() {
-		toSerialize["parent-task-id"] = o.ParentTaskId.Get()
+	if !IsNil(o.ParentTaskId) {
+		toSerialize["parent-task-id"] = o.ParentTaskId
 	}
-	if o.PickedUpAt.IsSet() {
-		toSerialize["picked-up-at"] = o.PickedUpAt.Get()
+	if !IsNil(o.PickedUpAt) {
+		toSerialize["picked-up-at"] = o.PickedUpAt
 	}
 	toSerialize["progress"] = o.Progress
 	toSerialize["project-id"] = o.ProjectId
@@ -579,8 +526,8 @@ func (o WarehouseTaskInfo) ToMap() (map[string]interface{}, error) {
 	toSerialize["scheduled-for"] = o.ScheduledFor
 	toSerialize["status"] = o.Status
 	toSerialize["task-id"] = o.TaskId
-	if o.UpdatedAt.IsSet() {
-		toSerialize["updated-at"] = o.UpdatedAt.Get()
+	if !IsNil(o.UpdatedAt) {
+		toSerialize["updated-at"] = o.UpdatedAt
 	}
 	toSerialize["warehouse-id"] = o.WarehouseId
 	return toSerialize, nil

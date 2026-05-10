@@ -156,14 +156,6 @@ func (o *ErrorModel) SetType(v string) {
 	o.Type = v
 }
 
-func (o ErrorModel) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o ErrorModel) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["code"] = o.Code

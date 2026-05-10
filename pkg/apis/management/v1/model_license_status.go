@@ -23,17 +23,17 @@ var _ MappedNullable = &LicenseStatus{}
 // LicenseStatus Status of license validation
 type LicenseStatus struct {
 	// Audience or entity the license is issued to
-	Audience NullableString `json:"audience,omitempty"`
+	Audience *string `json:"audience,omitempty"`
 	// Customer name the license is issued to (None for open source)
-	Customer NullableString `json:"customer,omitempty"`
+	Customer *string `json:"customer,omitempty"`
 	// Any validation error that occurred
-	Error NullableString `json:"error,omitempty"`
+	Error *string `json:"error,omitempty"`
 	// License expiration date (None for perpetual licenses like Apache)
-	Expiration NullableTime `json:"expiration,omitempty"`
+	Expiration *time.Time `json:"expiration,omitempty"`
 	// Organization or entity that issued the license for Lakekeeper
-	Issuer NullableString `json:"issuer,omitempty"`
+	Issuer *string `json:"issuer,omitempty"`
 	// License ID or identifier
-	LicenseId NullableString `json:"license-id,omitempty"`
+	LicenseId *string `json:"license-id,omitempty"`
 	// License type (e.g., \"Apache-2.0\", \"Vakamo-Enterprise\", etc.)
 	LicenseType string `json:"license-type"`
 	// If the license is valid and active
@@ -61,262 +61,196 @@ func NewLicenseStatusWithDefaults() *LicenseStatus {
 	return &this
 }
 
-// GetAudience returns the Audience field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetAudience returns the Audience field value if set, zero value otherwise.
 func (o *LicenseStatus) GetAudience() string {
-	if o == nil || IsNil(o.Audience.Get()) {
+	if o == nil || IsNil(o.Audience) {
 		var ret string
 		return ret
 	}
-	return *o.Audience.Get()
+	return *o.Audience
 }
 
 // GetAudienceOk returns a tuple with the Audience field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *LicenseStatus) GetAudienceOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.Audience) {
 		return nil, false
 	}
-	return o.Audience.Get(), o.Audience.IsSet()
+	return o.Audience, true
 }
 
 // HasAudience returns a boolean if a field has been set.
 func (o *LicenseStatus) HasAudience() bool {
-	if o != nil && o.Audience.IsSet() {
+	if o != nil && !IsNil(o.Audience) {
 		return true
 	}
 
 	return false
 }
 
-// SetAudience gets a reference to the given NullableString and assigns it to the Audience field.
+// SetAudience gets a reference to the given string and assigns it to the Audience field.
 func (o *LicenseStatus) SetAudience(v string) {
-	o.Audience.Set(&v)
+	o.Audience = &v
 }
 
-// SetAudienceNil sets the value for Audience to be an explicit nil
-func (o *LicenseStatus) SetAudienceNil() {
-	o.Audience.Set(nil)
-}
-
-// UnsetAudience ensures that no value is present for Audience, not even an explicit nil
-func (o *LicenseStatus) UnsetAudience() {
-	o.Audience.Unset()
-}
-
-// GetCustomer returns the Customer field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetCustomer returns the Customer field value if set, zero value otherwise.
 func (o *LicenseStatus) GetCustomer() string {
-	if o == nil || IsNil(o.Customer.Get()) {
+	if o == nil || IsNil(o.Customer) {
 		var ret string
 		return ret
 	}
-	return *o.Customer.Get()
+	return *o.Customer
 }
 
 // GetCustomerOk returns a tuple with the Customer field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *LicenseStatus) GetCustomerOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.Customer) {
 		return nil, false
 	}
-	return o.Customer.Get(), o.Customer.IsSet()
+	return o.Customer, true
 }
 
 // HasCustomer returns a boolean if a field has been set.
 func (o *LicenseStatus) HasCustomer() bool {
-	if o != nil && o.Customer.IsSet() {
+	if o != nil && !IsNil(o.Customer) {
 		return true
 	}
 
 	return false
 }
 
-// SetCustomer gets a reference to the given NullableString and assigns it to the Customer field.
+// SetCustomer gets a reference to the given string and assigns it to the Customer field.
 func (o *LicenseStatus) SetCustomer(v string) {
-	o.Customer.Set(&v)
+	o.Customer = &v
 }
 
-// SetCustomerNil sets the value for Customer to be an explicit nil
-func (o *LicenseStatus) SetCustomerNil() {
-	o.Customer.Set(nil)
-}
-
-// UnsetCustomer ensures that no value is present for Customer, not even an explicit nil
-func (o *LicenseStatus) UnsetCustomer() {
-	o.Customer.Unset()
-}
-
-// GetError returns the Error field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetError returns the Error field value if set, zero value otherwise.
 func (o *LicenseStatus) GetError() string {
-	if o == nil || IsNil(o.Error.Get()) {
+	if o == nil || IsNil(o.Error) {
 		var ret string
 		return ret
 	}
-	return *o.Error.Get()
+	return *o.Error
 }
 
 // GetErrorOk returns a tuple with the Error field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *LicenseStatus) GetErrorOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.Error) {
 		return nil, false
 	}
-	return o.Error.Get(), o.Error.IsSet()
+	return o.Error, true
 }
 
 // HasError returns a boolean if a field has been set.
 func (o *LicenseStatus) HasError() bool {
-	if o != nil && o.Error.IsSet() {
+	if o != nil && !IsNil(o.Error) {
 		return true
 	}
 
 	return false
 }
 
-// SetError gets a reference to the given NullableString and assigns it to the Error field.
+// SetError gets a reference to the given string and assigns it to the Error field.
 func (o *LicenseStatus) SetError(v string) {
-	o.Error.Set(&v)
+	o.Error = &v
 }
 
-// SetErrorNil sets the value for Error to be an explicit nil
-func (o *LicenseStatus) SetErrorNil() {
-	o.Error.Set(nil)
-}
-
-// UnsetError ensures that no value is present for Error, not even an explicit nil
-func (o *LicenseStatus) UnsetError() {
-	o.Error.Unset()
-}
-
-// GetExpiration returns the Expiration field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetExpiration returns the Expiration field value if set, zero value otherwise.
 func (o *LicenseStatus) GetExpiration() time.Time {
-	if o == nil || IsNil(o.Expiration.Get()) {
+	if o == nil || IsNil(o.Expiration) {
 		var ret time.Time
 		return ret
 	}
-	return *o.Expiration.Get()
+	return *o.Expiration
 }
 
 // GetExpirationOk returns a tuple with the Expiration field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *LicenseStatus) GetExpirationOk() (*time.Time, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.Expiration) {
 		return nil, false
 	}
-	return o.Expiration.Get(), o.Expiration.IsSet()
+	return o.Expiration, true
 }
 
 // HasExpiration returns a boolean if a field has been set.
 func (o *LicenseStatus) HasExpiration() bool {
-	if o != nil && o.Expiration.IsSet() {
+	if o != nil && !IsNil(o.Expiration) {
 		return true
 	}
 
 	return false
 }
 
-// SetExpiration gets a reference to the given NullableTime and assigns it to the Expiration field.
+// SetExpiration gets a reference to the given time.Time and assigns it to the Expiration field.
 func (o *LicenseStatus) SetExpiration(v time.Time) {
-	o.Expiration.Set(&v)
+	o.Expiration = &v
 }
 
-// SetExpirationNil sets the value for Expiration to be an explicit nil
-func (o *LicenseStatus) SetExpirationNil() {
-	o.Expiration.Set(nil)
-}
-
-// UnsetExpiration ensures that no value is present for Expiration, not even an explicit nil
-func (o *LicenseStatus) UnsetExpiration() {
-	o.Expiration.Unset()
-}
-
-// GetIssuer returns the Issuer field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetIssuer returns the Issuer field value if set, zero value otherwise.
 func (o *LicenseStatus) GetIssuer() string {
-	if o == nil || IsNil(o.Issuer.Get()) {
+	if o == nil || IsNil(o.Issuer) {
 		var ret string
 		return ret
 	}
-	return *o.Issuer.Get()
+	return *o.Issuer
 }
 
 // GetIssuerOk returns a tuple with the Issuer field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *LicenseStatus) GetIssuerOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.Issuer) {
 		return nil, false
 	}
-	return o.Issuer.Get(), o.Issuer.IsSet()
+	return o.Issuer, true
 }
 
 // HasIssuer returns a boolean if a field has been set.
 func (o *LicenseStatus) HasIssuer() bool {
-	if o != nil && o.Issuer.IsSet() {
+	if o != nil && !IsNil(o.Issuer) {
 		return true
 	}
 
 	return false
 }
 
-// SetIssuer gets a reference to the given NullableString and assigns it to the Issuer field.
+// SetIssuer gets a reference to the given string and assigns it to the Issuer field.
 func (o *LicenseStatus) SetIssuer(v string) {
-	o.Issuer.Set(&v)
+	o.Issuer = &v
 }
 
-// SetIssuerNil sets the value for Issuer to be an explicit nil
-func (o *LicenseStatus) SetIssuerNil() {
-	o.Issuer.Set(nil)
-}
-
-// UnsetIssuer ensures that no value is present for Issuer, not even an explicit nil
-func (o *LicenseStatus) UnsetIssuer() {
-	o.Issuer.Unset()
-}
-
-// GetLicenseId returns the LicenseId field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetLicenseId returns the LicenseId field value if set, zero value otherwise.
 func (o *LicenseStatus) GetLicenseId() string {
-	if o == nil || IsNil(o.LicenseId.Get()) {
+	if o == nil || IsNil(o.LicenseId) {
 		var ret string
 		return ret
 	}
-	return *o.LicenseId.Get()
+	return *o.LicenseId
 }
 
 // GetLicenseIdOk returns a tuple with the LicenseId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *LicenseStatus) GetLicenseIdOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.LicenseId) {
 		return nil, false
 	}
-	return o.LicenseId.Get(), o.LicenseId.IsSet()
+	return o.LicenseId, true
 }
 
 // HasLicenseId returns a boolean if a field has been set.
 func (o *LicenseStatus) HasLicenseId() bool {
-	if o != nil && o.LicenseId.IsSet() {
+	if o != nil && !IsNil(o.LicenseId) {
 		return true
 	}
 
 	return false
 }
 
-// SetLicenseId gets a reference to the given NullableString and assigns it to the LicenseId field.
+// SetLicenseId gets a reference to the given string and assigns it to the LicenseId field.
 func (o *LicenseStatus) SetLicenseId(v string) {
-	o.LicenseId.Set(&v)
-}
-
-// SetLicenseIdNil sets the value for LicenseId to be an explicit nil
-func (o *LicenseStatus) SetLicenseIdNil() {
-	o.LicenseId.Set(nil)
-}
-
-// UnsetLicenseId ensures that no value is present for LicenseId, not even an explicit nil
-func (o *LicenseStatus) UnsetLicenseId() {
-	o.LicenseId.Unset()
+	o.LicenseId = &v
 }
 
 // GetLicenseType returns the LicenseType field value
@@ -367,33 +301,25 @@ func (o *LicenseStatus) SetValid(v bool) {
 	o.Valid = v
 }
 
-func (o LicenseStatus) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o LicenseStatus) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if o.Audience.IsSet() {
-		toSerialize["audience"] = o.Audience.Get()
+	if !IsNil(o.Audience) {
+		toSerialize["audience"] = o.Audience
 	}
-	if o.Customer.IsSet() {
-		toSerialize["customer"] = o.Customer.Get()
+	if !IsNil(o.Customer) {
+		toSerialize["customer"] = o.Customer
 	}
-	if o.Error.IsSet() {
-		toSerialize["error"] = o.Error.Get()
+	if !IsNil(o.Error) {
+		toSerialize["error"] = o.Error
 	}
-	if o.Expiration.IsSet() {
-		toSerialize["expiration"] = o.Expiration.Get()
+	if !IsNil(o.Expiration) {
+		toSerialize["expiration"] = o.Expiration
 	}
-	if o.Issuer.IsSet() {
-		toSerialize["issuer"] = o.Issuer.Get()
+	if !IsNil(o.Issuer) {
+		toSerialize["issuer"] = o.Issuer
 	}
-	if o.LicenseId.IsSet() {
-		toSerialize["license-id"] = o.LicenseId.Get()
+	if !IsNil(o.LicenseId) {
+		toSerialize["license-id"] = o.LicenseId
 	}
 	toSerialize["license-type"] = o.LicenseType
 	toSerialize["valid"] = o.Valid

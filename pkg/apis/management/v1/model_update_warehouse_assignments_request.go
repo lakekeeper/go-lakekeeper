@@ -104,14 +104,6 @@ func (o *UpdateWarehouseAssignmentsRequest) SetWrites(v []WarehouseAssignment) {
 	o.Writes = v
 }
 
-func (o UpdateWarehouseAssignmentsRequest) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o UpdateWarehouseAssignmentsRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if !IsNil(o.Deletes) {

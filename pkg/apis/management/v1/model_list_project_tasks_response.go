@@ -22,7 +22,7 @@ var _ MappedNullable = &ListProjectTasksResponse{}
 // ListProjectTasksResponse struct for ListProjectTasksResponse
 type ListProjectTasksResponse struct {
 	// Token for the next page of results
-	NextPageToken NullableString `json:"next-page-token,omitempty"`
+	NextPageToken *string `json:"next-page-token,omitempty"`
 	// List of tasks
 	Tasks []ProjectTaskInfo `json:"tasks"`
 }
@@ -47,47 +47,36 @@ func NewListProjectTasksResponseWithDefaults() *ListProjectTasksResponse {
 	return &this
 }
 
-// GetNextPageToken returns the NextPageToken field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetNextPageToken returns the NextPageToken field value if set, zero value otherwise.
 func (o *ListProjectTasksResponse) GetNextPageToken() string {
-	if o == nil || IsNil(o.NextPageToken.Get()) {
+	if o == nil || IsNil(o.NextPageToken) {
 		var ret string
 		return ret
 	}
-	return *o.NextPageToken.Get()
+	return *o.NextPageToken
 }
 
 // GetNextPageTokenOk returns a tuple with the NextPageToken field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *ListProjectTasksResponse) GetNextPageTokenOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.NextPageToken) {
 		return nil, false
 	}
-	return o.NextPageToken.Get(), o.NextPageToken.IsSet()
+	return o.NextPageToken, true
 }
 
 // HasNextPageToken returns a boolean if a field has been set.
 func (o *ListProjectTasksResponse) HasNextPageToken() bool {
-	if o != nil && o.NextPageToken.IsSet() {
+	if o != nil && !IsNil(o.NextPageToken) {
 		return true
 	}
 
 	return false
 }
 
-// SetNextPageToken gets a reference to the given NullableString and assigns it to the NextPageToken field.
+// SetNextPageToken gets a reference to the given string and assigns it to the NextPageToken field.
 func (o *ListProjectTasksResponse) SetNextPageToken(v string) {
-	o.NextPageToken.Set(&v)
-}
-
-// SetNextPageTokenNil sets the value for NextPageToken to be an explicit nil
-func (o *ListProjectTasksResponse) SetNextPageTokenNil() {
-	o.NextPageToken.Set(nil)
-}
-
-// UnsetNextPageToken ensures that no value is present for NextPageToken, not even an explicit nil
-func (o *ListProjectTasksResponse) UnsetNextPageToken() {
-	o.NextPageToken.Unset()
+	o.NextPageToken = &v
 }
 
 // GetTasks returns the Tasks field value
@@ -114,18 +103,10 @@ func (o *ListProjectTasksResponse) SetTasks(v []ProjectTaskInfo) {
 	o.Tasks = v
 }
 
-func (o ListProjectTasksResponse) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o ListProjectTasksResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if o.NextPageToken.IsSet() {
-		toSerialize["next-page-token"] = o.NextPageToken.Get()
+	if !IsNil(o.NextPageToken) {
+		toSerialize["next-page-token"] = o.NextPageToken
 	}
 	toSerialize["tasks"] = o.Tasks
 	return toSerialize, nil

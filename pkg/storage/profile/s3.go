@@ -12,7 +12,11 @@ type S3Option func(*managementv1.StorageProfileS3)
 // NewS3Profile constructs a StorageProfileS3 with the spec-required fields
 // (bucket, region) populated and STS disabled by default. Apply With* options
 // to set anything else.
-func NewS3Profile(bucket, region string, opts ...S3Option) *managementv1.StorageProfileS3 {
+//
+// Returns the StorageProfile union directly so callers can pass it to
+// request setters (e.g. CreateWarehouseRequest.StorageProfile) without going
+// through the generated *AsStorageProfile wrapper.
+func NewS3Profile(bucket, region string, opts ...S3Option) managementv1.StorageProfile {
 	p := &managementv1.StorageProfileS3{
 		Bucket:     bucket,
 		Region:     region,
@@ -22,7 +26,7 @@ func NewS3Profile(bucket, region string, opts ...S3Option) *managementv1.Storage
 	for _, opt := range opts {
 		opt(p)
 	}
-	return p
+	return managementv1.StorageProfileS3AsStorageProfile(p)
 }
 
 func WithS3Endpoint(endpoint string) S3Option {

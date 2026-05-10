@@ -20,13 +20,13 @@ type ServerAction string
 
 // List of ServerAction
 const (
-	SERVERACTION_CREATE_PROJECT   ServerAction = "create_project"
-	SERVERACTION_UPDATE_USERS     ServerAction = "update_users"
-	SERVERACTION_DELETE_USERS     ServerAction = "delete_users"
-	SERVERACTION_LIST_USERS       ServerAction = "list_users"
-	SERVERACTION_GRANT_ADMIN      ServerAction = "grant_admin"
-	SERVERACTION_PROVISION_USERS  ServerAction = "provision_users"
-	SERVERACTION_READ_ASSIGNMENTS ServerAction = "read_assignments"
+	ServerActionCreateProject   ServerAction = "create_project"
+	ServerActionUpdateUsers     ServerAction = "update_users"
+	ServerActionDeleteUsers     ServerAction = "delete_users"
+	ServerActionListUsers       ServerAction = "list_users"
+	ServerActionGrantAdmin      ServerAction = "grant_admin"
+	ServerActionProvisionUsers  ServerAction = "provision_users"
+	ServerActionReadAssignments ServerAction = "read_assignments"
 )
 
 // All allowed values of ServerAction enum

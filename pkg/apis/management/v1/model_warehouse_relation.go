@@ -20,13 +20,13 @@ type WarehouseRelation string
 
 // List of WarehouseRelation
 const (
-	WAREHOUSERELATION_OWNERSHIP     WarehouseRelation = "ownership"
-	WAREHOUSERELATION_PASS_GRANTS   WarehouseRelation = "pass_grants"
-	WAREHOUSERELATION_MANAGE_GRANTS WarehouseRelation = "manage_grants"
-	WAREHOUSERELATION_DESCRIBE      WarehouseRelation = "describe"
-	WAREHOUSERELATION_SELECT        WarehouseRelation = "select"
-	WAREHOUSERELATION_CREATE        WarehouseRelation = "create"
-	WAREHOUSERELATION_MODIFY        WarehouseRelation = "modify"
+	WarehouseRelationOwnership    WarehouseRelation = "ownership"
+	WarehouseRelationPassGrants   WarehouseRelation = "pass_grants"
+	WarehouseRelationManageGrants WarehouseRelation = "manage_grants"
+	WarehouseRelationDescribe     WarehouseRelation = "describe"
+	WarehouseRelationSelect       WarehouseRelation = "select"
+	WarehouseRelationCreate       WarehouseRelation = "create"
+	WarehouseRelationModify       WarehouseRelation = "modify"
 )
 
 // All allowed values of WarehouseRelation enum

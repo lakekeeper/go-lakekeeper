@@ -24,7 +24,7 @@ type CreateWarehouseRequest struct {
 	// Profile to determine behavior upon dropping of tabulars. Default: hard deletion.
 	DeleteProfile *TabularDeleteProfile `json:"delete-profile,omitempty"`
 	// Project ID in which to create the warehouse. Deprecated: Please use the `x-project-id` header instead.
-	ProjectId NullableString `json:"project-id,omitempty"`
+	ProjectId *string `json:"project-id,omitempty"`
 	// Optional storage credential to use for the warehouse.
 	StorageCredential NullableStorageCredential `json:"storage-credential,omitempty"`
 	// Storage profile to use for the warehouse.
@@ -86,47 +86,36 @@ func (o *CreateWarehouseRequest) SetDeleteProfile(v TabularDeleteProfile) {
 	o.DeleteProfile = &v
 }
 
-// GetProjectId returns the ProjectId field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetProjectId returns the ProjectId field value if set, zero value otherwise.
 func (o *CreateWarehouseRequest) GetProjectId() string {
-	if o == nil || IsNil(o.ProjectId.Get()) {
+	if o == nil || IsNil(o.ProjectId) {
 		var ret string
 		return ret
 	}
-	return *o.ProjectId.Get()
+	return *o.ProjectId
 }
 
 // GetProjectIdOk returns a tuple with the ProjectId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *CreateWarehouseRequest) GetProjectIdOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.ProjectId) {
 		return nil, false
 	}
-	return o.ProjectId.Get(), o.ProjectId.IsSet()
+	return o.ProjectId, true
 }
 
 // HasProjectId returns a boolean if a field has been set.
 func (o *CreateWarehouseRequest) HasProjectId() bool {
-	if o != nil && o.ProjectId.IsSet() {
+	if o != nil && !IsNil(o.ProjectId) {
 		return true
 	}
 
 	return false
 }
 
-// SetProjectId gets a reference to the given NullableString and assigns it to the ProjectId field.
+// SetProjectId gets a reference to the given string and assigns it to the ProjectId field.
 func (o *CreateWarehouseRequest) SetProjectId(v string) {
-	o.ProjectId.Set(&v)
-}
-
-// SetProjectIdNil sets the value for ProjectId to be an explicit nil
-func (o *CreateWarehouseRequest) SetProjectIdNil() {
-	o.ProjectId.Set(nil)
-}
-
-// UnsetProjectId ensures that no value is present for ProjectId, not even an explicit nil
-func (o *CreateWarehouseRequest) UnsetProjectId() {
-	o.ProjectId.Unset()
+	o.ProjectId = &v
 }
 
 // GetStorageCredential returns the StorageCredential field value if set, zero value otherwise (both if not set or set to explicit null).
@@ -220,21 +209,13 @@ func (o *CreateWarehouseRequest) SetWarehouseName(v string) {
 	o.WarehouseName = v
 }
 
-func (o CreateWarehouseRequest) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o CreateWarehouseRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if !IsNil(o.DeleteProfile) {
 		toSerialize["delete-profile"] = o.DeleteProfile
 	}
-	if o.ProjectId.IsSet() {
-		toSerialize["project-id"] = o.ProjectId.Get()
+	if !IsNil(o.ProjectId) {
+		toSerialize["project-id"] = o.ProjectId
 	}
 	if o.StorageCredential.IsSet() {
 		toSerialize["storage-credential"] = o.StorageCredential.Get()

@@ -20,7 +20,7 @@ func printUsers(w io.Writer, output string, nextPageToken *string, users ...*man
 		tw := tabwriter.NewWriter(w, 0, 0, 2, ' ', 0)
 		fmt.Fprintln(tw, "ID\tNAME\tEMAIL\tUSER TYPE")
 		for _, u := range users {
-			fmt.Fprintf(tw, "%s\t%s\t%s\t%s\n", u.Id, u.Name, formatNullableString(u.Email), u.UserType)
+			fmt.Fprintf(tw, "%s\t%s\t%s\t%s\n", u.Id, u.Name, formatStringPtr(u.Email), u.UserType)
 		}
 		if err := tw.Flush(); err != nil {
 			return err
@@ -30,8 +30,8 @@ func printUsers(w io.Writer, output string, nextPageToken *string, users ...*man
 		fmt.Fprintln(tw, "ID\tNAME\tEMAIL\tUSER TYPE\tCREATED AT\tUPDATED AT\tLAST UPDATED WITH")
 		for _, u := range users {
 			fmt.Fprintf(tw, "%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
-				u.Id, u.Name, formatNullableString(u.Email), u.UserType,
-				u.CreatedAt.Format(time.RFC3339), formatNullableTime(u.UpdatedAt), u.LastUpdatedWith)
+				u.Id, u.Name, formatStringPtr(u.Email), u.UserType,
+				u.CreatedAt.Format(time.RFC3339), formatTimePtr(u.UpdatedAt), u.LastUpdatedWith)
 		}
 		if err := tw.Flush(); err != nil {
 			return err
