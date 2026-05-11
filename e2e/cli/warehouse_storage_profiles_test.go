@@ -42,7 +42,7 @@ func TestWarehouseStorageProfiles(t *testing.T) {
 			stdout, stderr, code := runRaw(t, body, args...)
 			require.Zero(t, code, "stdout: %s\nstderr: %s", stdout, stderr)
 
-			id := parseIDFromCreate(t, string(stdout), "with id ")
+			id := parseIDFromCreate(t, string(stdout))
 			t.Cleanup(func() {
 				_, _, _, _ = activeBackend.Exec(t.Context(), nil,
 					append(authFlagsOAuth2(), "warehouse", "delete", id)...)
