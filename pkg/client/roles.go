@@ -20,25 +20,25 @@ func (r *Roles) Create(ctx context.Context, projectID string, req *managementv1.
 		return nil, errors.New("create role: request must not be nil")
 	}
 	out, _, err := r.api.CreateRole(ctx).XProjectId(projectID).CreateRoleRequest(*req).Execute()
-	return out, err
+	return out, wrapAPIError("create role", err)
 }
 
 // Get retrieves a role by id, scoped to the given project.
 func (r *Roles) Get(ctx context.Context, projectID, roleID string) (*managementv1.Role, error) {
 	out, _, err := r.api.GetRole(ctx, roleID).XProjectId(projectID).Execute()
-	return out, err
+	return out, wrapAPIError("get role", err)
 }
 
 // Delete removes a role.
 func (r *Roles) Delete(ctx context.Context, projectID, roleID string) error {
 	_, err := r.api.DeleteRole(ctx, roleID).XProjectId(projectID).Execute()
-	return err
+	return wrapAPIError("delete role", err)
 }
 
 // List returns roles in the given project.
 func (r *Roles) List(ctx context.Context, projectID string) (*managementv1.ListRolesResponse, error) {
 	out, _, err := r.api.ListRoles(ctx).XProjectId(projectID).Execute()
-	return out, err
+	return out, wrapAPIError("list roles", err)
 }
 
 // Update mutates a role's name/description.
@@ -47,5 +47,5 @@ func (r *Roles) Update(ctx context.Context, projectID, roleID string, req *manag
 		return nil, errors.New("update role: request must not be nil")
 	}
 	out, _, err := r.api.UpdateRole(ctx, roleID).XProjectId(projectID).UpdateRoleRequest(*req).Execute()
-	return out, err
+	return out, wrapAPIError("update role", err)
 }

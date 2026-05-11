@@ -18,26 +18,26 @@ func (u *Users) Create(ctx context.Context, req *managementv1.CreateUserRequest)
 		return nil, errors.New("create user: request must not be nil")
 	}
 	out, _, err := u.api.CreateUser(ctx).CreateUserRequest(*req).Execute()
-	return out, err
+	return out, wrapAPIError("create user", err)
 }
 
 // Get fetches a user by id.
 func (u *Users) Get(ctx context.Context, userID string) (*managementv1.User, error) {
 	out, _, err := u.api.GetUser(ctx, userID).Execute()
-	return out, err
+	return out, wrapAPIError("get user", err)
 }
 
 // Delete removes a user.
 func (u *Users) Delete(ctx context.Context, userID string) error {
 	_, err := u.api.DeleteUser(ctx, userID).Execute()
-	return err
+	return wrapAPIError("delete user", err)
 }
 
 // List returns users with optional paging. Use c.UserAPI.ListUser directly
 // for filter parameters not exposed here.
 func (u *Users) List(ctx context.Context) (*managementv1.ListUsersResponse, error) {
 	out, _, err := u.api.ListUser(ctx).Execute()
-	return out, err
+	return out, wrapAPIError("list users", err)
 }
 
 // Update mutates a user's profile fields.
@@ -46,11 +46,11 @@ func (u *Users) Update(ctx context.Context, userID string, req *managementv1.Upd
 		return errors.New("update user: request must not be nil")
 	}
 	_, err := u.api.UpdateUser(ctx, userID).UpdateUserRequest(*req).Execute()
-	return err
+	return wrapAPIError("update user", err)
 }
 
 // Whoami returns the calling principal's user record.
 func (u *Users) Whoami(ctx context.Context) (*managementv1.User, error) {
 	out, _, err := u.api.Whoami(ctx).Execute()
-	return out, err
+	return out, wrapAPIError("whoami", err)
 }

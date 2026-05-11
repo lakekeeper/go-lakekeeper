@@ -20,25 +20,25 @@ func (p *Projects) Create(ctx context.Context, req *managementv1.CreateProjectRe
 		return nil, errors.New("create project: request must not be nil")
 	}
 	out, _, err := p.api.CreateProject(ctx).CreateProjectRequest(*req).Execute()
-	return out, err
+	return out, wrapAPIError("create project", err)
 }
 
 // Get fetches a project by id.
 func (p *Projects) Get(ctx context.Context, projectID string) (*managementv1.GetProjectResponse, error) {
 	out, _, err := p.api.GetProject(ctx).XProjectId(projectID).Execute()
-	return out, err
+	return out, wrapAPIError("get project", err)
 }
 
 // Delete removes a project by id.
 func (p *Projects) Delete(ctx context.Context, projectID string) error {
 	_, err := p.api.DeleteProject(ctx).XProjectId(projectID).Execute()
-	return err
+	return wrapAPIError("delete project", err)
 }
 
 // List returns all projects visible to the caller.
 func (p *Projects) List(ctx context.Context) (*managementv1.ListProjectsResponse, error) {
 	out, _, err := p.api.ListProjects(ctx).Execute()
-	return out, err
+	return out, wrapAPIError("list projects", err)
 }
 
 // Rename updates a project's display name.
@@ -47,5 +47,5 @@ func (p *Projects) Rename(ctx context.Context, projectID string, req *management
 		return errors.New("rename project: request must not be nil")
 	}
 	_, err := p.api.RenameProject(ctx).XProjectId(projectID).RenameProjectRequest(*req).Execute()
-	return err
+	return wrapAPIError("rename project", err)
 }
