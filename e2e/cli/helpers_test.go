@@ -25,8 +25,7 @@ func MustProvisionUser(t *testing.T) string {
 	name := randomName("e2e-user")
 	runOK(t, "user", "create", id, name, "human", "--email", name+"@example.com")
 	t.Cleanup(func() {
-		_, _, _, _ = activeBackend.Exec(t.Context(), nil,
-			append(authFlagsOAuth2(), "user", "delete", id)...)
+		cleanupOK(t, "user", "delete", id)
 	})
 	return id
 }
@@ -46,8 +45,7 @@ func MustProvisionRole(t *testing.T) string {
 		t.Fatalf("create role: empty id in output %s", out)
 	}
 	t.Cleanup(func() {
-		_, _, _, _ = activeBackend.Exec(t.Context(), nil,
-			append(authFlagsOAuth2(), "role", "delete", role.ID)...)
+		cleanupOK(t, "role", "delete", role.ID)
 	})
 	return role.ID
 }
@@ -77,8 +75,7 @@ func MustProvisionWarehouse(t *testing.T) (string, string) {
 	id := parseIDFromCreate(t, string(stdout))
 
 	t.Cleanup(func() {
-		_, _, _, _ = activeBackend.Exec(t.Context(), nil,
-			append(authFlagsOAuth2(), "warehouse", "delete", id)...)
+		cleanupOK(t, "warehouse", "delete", id)
 	})
 	return id, name
 }

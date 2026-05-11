@@ -12,10 +12,8 @@
 package clie2e
 
 import (
-	"context"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
@@ -287,28 +285,4 @@ func decodePlaybookActions(t *testing.T, raw []byte) []string {
 	}
 	decodeJSON(t, raw, &resp)
 	return resp.AllowedActions
-}
-
-// cleanupOK is the t.Cleanup-safe sibling of runOK. The harness's runOK
-// resolves its context from t.Context(), but Go cancels that context the
-// moment the test body returns — so by the time t.Cleanup callbacks fire,
-// exec.CommandContext aborts every spawn with "context canceled" before the
-// process even starts. cleanupOK supplies a fresh, time-bounded context so
-// teardown actually reaches the server and a real failure (e.g. a leaked
-// resource) surfaces as a test failure instead of a spurious one.
-func cleanupOK(t *testing.T, args ...string) {
-	t.Helper()
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-
-	full := append(backendAdminFlags(), args...)
-	stdout, stderr, code, err := activeBackend.Exec(ctx, nil, full...)
-	if err != nil {
-		t.Errorf("cleanup lkctl %v: spawn error: %v\nstderr: %s", redactArgs(args), err, stderr)
-		return
-	}
-	if code != 0 {
-		t.Errorf("cleanup lkctl %v: exit %d\nstdout: %s\nstderr: %s",
-			redactArgs(args), code, stdout, stderr)
-	}
 }
