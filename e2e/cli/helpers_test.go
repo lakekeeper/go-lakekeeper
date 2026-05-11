@@ -25,8 +25,7 @@ func MustProvisionUser(t *testing.T) string {
 	name := randomName("e2e-user")
 	runOK(t, "user", "create", id, name, "human", "--email", name+"@example.com")
 	t.Cleanup(func() {
-		_, _, _, _ = activeBackend.Exec(t.Context(), nil,
-			append(authFlagsOAuth2(), "user", "delete", id)...)
+		cleanupOK(t, "user", "delete", id)
 	})
 	return id
 }
@@ -46,8 +45,7 @@ func MustProvisionRole(t *testing.T) string {
 		t.Fatalf("create role: empty id in output %s", out)
 	}
 	t.Cleanup(func() {
-		_, _, _, _ = activeBackend.Exec(t.Context(), nil,
-			append(authFlagsOAuth2(), "role", "delete", role.ID)...)
+		cleanupOK(t, "role", "delete", role.ID)
 	})
 	return role.ID
 }
@@ -74,11 +72,10 @@ func MustProvisionWarehouse(t *testing.T) (string, string) {
 		t.Fatalf("create warehouse exit %d\nstdout: %s\nstderr: %s", code, stdout, stderr)
 	}
 
-	id := parseIDFromCreate(t, string(stdout), "with id ")
+	id := parseIDFromCreate(t, string(stdout))
 
 	t.Cleanup(func() {
-		_, _, _, _ = activeBackend.Exec(t.Context(), nil,
-			append(authFlagsOAuth2(), "warehouse", "delete", id)...)
+		cleanupOK(t, "warehouse", "delete", id)
 	})
 	return id, name
 }
@@ -119,10 +116,12 @@ func warehouseConfig(name string) []byte {
 	return out
 }
 
-// parseIDFromCreate is the shared sibling of parseProjectIDFromCreate for
-// any `Foo bar created with id <uuid>` shaped output line.
-func parseIDFromCreate(t *testing.T, out, marker string) string {
+// parseIDFromCreate digs the UUID out of any `Foo bar created with id <uuid>`
+// shaped output line. The marker is the same for every lkctl create verb, so
+// it is wired here rather than passed by each caller.
+func parseIDFromCreate(t *testing.T, out string) string {
 	t.Helper()
+	const marker = "with id "
 	i := strings.Index(out, marker)
 	if i < 0 {
 		t.Fatalf("create output missing %q marker: %q", marker, out)

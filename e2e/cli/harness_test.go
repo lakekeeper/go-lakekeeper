@@ -21,6 +21,7 @@ import (
 	"strings"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/joho/godotenv"
@@ -191,6 +192,26 @@ func runOK(t *testing.T, args ...string) []byte {
 			redactArgs(args), code, stdout, stderr)
 	}
 	return stdout
+}
+
+// cleanupOK is the t.Cleanup-safe sibling of runOK: fresh context (so it
+// survives t.Context() cancellation at test return), bounded timeout, and
+// t.Errorf rather than t.Fatalf (so other cleanup callbacks still run
+// after one fails).
+func cleanupOK(t *testing.T, args ...string) {
+	t.Helper()
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	full := append(backendAdminFlags(), args...)
+	stdout, stderr, code, err := activeBackend.Exec(ctx, nil, full...)
+	if err != nil {
+		t.Errorf("cleanup lkctl %v: spawn error: %v\nstderr: %s", redactArgs(args), err, stderr)
+		return
+	}
+	if code != 0 {
+		t.Errorf("cleanup lkctl %v: exit %d\nstdout: %s\nstderr: %s",
+			redactArgs(args), code, stdout, stderr)
+	}
 }
 
 // runFail executes lkctl with admin creds for the active backend (oauth2 on

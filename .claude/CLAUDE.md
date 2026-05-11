@@ -15,6 +15,9 @@ Everything goes through `make`:
 - `make build` — builds `dist/lkctl`; runs `mod`, `fmt`, `vet`, `test` first.
 - `make test` — unit tests, `./pkg/...` only, with coverage.
 - `make test-integration` — spins up Lakekeeper + Keycloak + MinIO + OpenFGA via docker-compose and runs tests tagged `integration`. Do **not** call `go test -tags integration` directly; use the make target so the stack and `.env` are provisioned.
+- `make test-e2e-compose` — spins up the compose stack and runs the `e2e_cli` suite against the host-built `lkctl`. Do **not** call `./e2e/compose/run.sh` or `go test -tags e2e_cli` directly; the make target wires `CONTAINER_ENGINE` and `.env` so podman-only hosts work.
+- `make test-e2e-kind` — runs the `e2e_cli` suite against a kind cluster (allowlist of four auth-only tests; lifecycle tests skip via `requireBackend`).
+- `make test-e2e` — runs `test-e2e-compose` then `test-e2e-kind` sequentially.
 - `make fmt` — `golangci-lint run --fix ./...` (runs gofumpt + goimports via golangci-lint v2).
 - `make lint` — `golangci-lint run ./...`.
 - `make validate` — `vet` + `lint`.

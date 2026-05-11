@@ -24,10 +24,12 @@ func TestProjectLifecycle(t *testing.T) {
 	// create
 	createOut := runOK(t, "project", "create", name)
 	id := parseProjectIDFromCreate(t, string(createOut))
+	var deleted bool
 	t.Cleanup(func() {
-		// best-effort: ignore failure if delete already ran in-test
-		_, _, _, _ = activeBackend.Exec(t.Context(), nil,
-			append(authFlagsOAuth2(), "project", "delete", id)...)
+		if deleted {
+			return
+		}
+		cleanupOK(t, "project", "delete", id)
 	})
 	require.NotEmpty(t, id)
 
@@ -47,6 +49,7 @@ func TestProjectLifecycle(t *testing.T) {
 
 	// delete
 	runOK(t, "project", "delete", id)
+	deleted = true
 
 	// not-found exit asserted in errors_test.go; here we just confirm
 	// further `get` fails (non-zero exit).
@@ -92,7 +95,7 @@ func TestProjectGrantRevoke(t *testing.T) {
 // parseProjectIDFromCreate digs the UUID out of `Project NAME created with id UUID`.
 func parseProjectIDFromCreate(t *testing.T, out string) string {
 	t.Helper()
-	id := parseIDFromCreate(t, out, "with id ")
+	id := parseIDFromCreate(t, out)
 	if _, err := uuid.Parse(id); err != nil {
 		t.Fatalf("expected uuid in create output, got %q: %v", id, err)
 	}
