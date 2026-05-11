@@ -20,6 +20,7 @@ services:
       - LAKEKEEPER__OPENID_AUDIENCE=lakekeeper
       - LAKEKEEPER__UI__OPENID_PROVIDER_URI=http://localhost:30080/realms/iceberg
       - LAKEKEEPER__UI__OPENID_CLIENT_ID=lakekeeper
+      - LAKEKEEPER__SKIP_STORAGE_VALIDATION=true
       - RUST_LOG=INFO
     command: ["serve"]
     healthcheck:
