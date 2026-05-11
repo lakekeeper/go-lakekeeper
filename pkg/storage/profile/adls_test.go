@@ -13,9 +13,10 @@ import (
 func TestNewADLSProfile_Defaults(t *testing.T) {
 	t.Parallel()
 
-	p := profile.NewADLSProfile("acct", "fs")
+	sp := profile.NewADLSProfile("acct", "fs")
 
-	require.NotNil(t, p)
+	require.NotNil(t, sp.StorageProfileAdls, "ADLS builder must populate the ADLS variant of the union")
+	p := sp.StorageProfileAdls
 	assert.Equal(t, "acct", p.AccountName)
 	assert.Equal(t, "fs", p.Filesystem)
 	assert.Equal(t, "adls", p.Type)
@@ -27,7 +28,7 @@ func TestNewADLSProfile_Defaults(t *testing.T) {
 func TestNewADLSProfile_OptionsApplied(t *testing.T) {
 	t.Parallel()
 
-	p := profile.NewADLSProfile("acct", "fs",
+	sp := profile.NewADLSProfile("acct", "fs",
 		profile.WithADLSKeyPrefix("warehouses/foo"),
 		profile.WithADLSAuthorityHost("https://login.microsoftonline.de"),
 		profile.WithADLSHost("dfs.core.windows.de"),
@@ -36,6 +37,8 @@ func TestNewADLSProfile_OptionsApplied(t *testing.T) {
 		profile.WithADLSSASTokenValidity(30*time.Minute),
 	)
 
+	require.NotNil(t, sp.StorageProfileAdls)
+	p := sp.StorageProfileAdls
 	assert.Equal(t, "warehouses/foo", *p.KeyPrefix)
 	assert.Equal(t, "https://login.microsoftonline.de", *p.AuthorityHost)
 	assert.Equal(t, "dfs.core.windows.de", *p.Host)

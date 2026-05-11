@@ -104,14 +104,6 @@ func (o *UpdateProjectAssignmentsRequest) SetWrites(v []ProjectAssignment) {
 	o.Writes = v
 }
 
-func (o UpdateProjectAssignmentsRequest) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o UpdateProjectAssignmentsRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if !IsNil(o.Deletes) {

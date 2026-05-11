@@ -146,14 +146,6 @@ func (o *AzCredentialClientCredentials) SetTenantId(v string) {
 	o.TenantId = v
 }
 
-func (o AzCredentialClientCredentials) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o AzCredentialClientCredentials) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["client-id"] = o.ClientId

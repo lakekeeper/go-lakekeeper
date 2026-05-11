@@ -25,7 +25,7 @@ type User struct {
 	// Timestamp when the user was created
 	CreatedAt time.Time `json:"created-at"`
 	// Email of the user
-	Email NullableString `json:"email,omitempty"`
+	Email *string `json:"email,omitempty"`
 	// The user's ID
 	Id string `json:"id"`
 	// The endpoint that last updated the user
@@ -33,7 +33,7 @@ type User struct {
 	// Name of the user
 	Name string `json:"name"`
 	// Timestamp when the user was last updated
-	UpdatedAt NullableTime `json:"updated-at,omitempty"`
+	UpdatedAt *time.Time `json:"updated-at,omitempty"`
 	// Type of the user
 	UserType UserType `json:"user-type"`
 }
@@ -86,47 +86,36 @@ func (o *User) SetCreatedAt(v time.Time) {
 	o.CreatedAt = v
 }
 
-// GetEmail returns the Email field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetEmail returns the Email field value if set, zero value otherwise.
 func (o *User) GetEmail() string {
-	if o == nil || IsNil(o.Email.Get()) {
+	if o == nil || IsNil(o.Email) {
 		var ret string
 		return ret
 	}
-	return *o.Email.Get()
+	return *o.Email
 }
 
 // GetEmailOk returns a tuple with the Email field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *User) GetEmailOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.Email) {
 		return nil, false
 	}
-	return o.Email.Get(), o.Email.IsSet()
+	return o.Email, true
 }
 
 // HasEmail returns a boolean if a field has been set.
 func (o *User) HasEmail() bool {
-	if o != nil && o.Email.IsSet() {
+	if o != nil && !IsNil(o.Email) {
 		return true
 	}
 
 	return false
 }
 
-// SetEmail gets a reference to the given NullableString and assigns it to the Email field.
+// SetEmail gets a reference to the given string and assigns it to the Email field.
 func (o *User) SetEmail(v string) {
-	o.Email.Set(&v)
-}
-
-// SetEmailNil sets the value for Email to be an explicit nil
-func (o *User) SetEmailNil() {
-	o.Email.Set(nil)
-}
-
-// UnsetEmail ensures that no value is present for Email, not even an explicit nil
-func (o *User) UnsetEmail() {
-	o.Email.Unset()
+	o.Email = &v
 }
 
 // GetId returns the Id field value
@@ -201,47 +190,36 @@ func (o *User) SetName(v string) {
 	o.Name = v
 }
 
-// GetUpdatedAt returns the UpdatedAt field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetUpdatedAt returns the UpdatedAt field value if set, zero value otherwise.
 func (o *User) GetUpdatedAt() time.Time {
-	if o == nil || IsNil(o.UpdatedAt.Get()) {
+	if o == nil || IsNil(o.UpdatedAt) {
 		var ret time.Time
 		return ret
 	}
-	return *o.UpdatedAt.Get()
+	return *o.UpdatedAt
 }
 
 // GetUpdatedAtOk returns a tuple with the UpdatedAt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *User) GetUpdatedAtOk() (*time.Time, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.UpdatedAt) {
 		return nil, false
 	}
-	return o.UpdatedAt.Get(), o.UpdatedAt.IsSet()
+	return o.UpdatedAt, true
 }
 
 // HasUpdatedAt returns a boolean if a field has been set.
 func (o *User) HasUpdatedAt() bool {
-	if o != nil && o.UpdatedAt.IsSet() {
+	if o != nil && !IsNil(o.UpdatedAt) {
 		return true
 	}
 
 	return false
 }
 
-// SetUpdatedAt gets a reference to the given NullableTime and assigns it to the UpdatedAt field.
+// SetUpdatedAt gets a reference to the given time.Time and assigns it to the UpdatedAt field.
 func (o *User) SetUpdatedAt(v time.Time) {
-	o.UpdatedAt.Set(&v)
-}
-
-// SetUpdatedAtNil sets the value for UpdatedAt to be an explicit nil
-func (o *User) SetUpdatedAtNil() {
-	o.UpdatedAt.Set(nil)
-}
-
-// UnsetUpdatedAt ensures that no value is present for UpdatedAt, not even an explicit nil
-func (o *User) UnsetUpdatedAt() {
-	o.UpdatedAt.Unset()
+	o.UpdatedAt = &v
 }
 
 // GetUserType returns the UserType field value
@@ -268,25 +246,17 @@ func (o *User) SetUserType(v UserType) {
 	o.UserType = v
 }
 
-func (o User) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o User) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["created-at"] = o.CreatedAt
-	if o.Email.IsSet() {
-		toSerialize["email"] = o.Email.Get()
+	if !IsNil(o.Email) {
+		toSerialize["email"] = o.Email
 	}
 	toSerialize["id"] = o.Id
 	toSerialize["last-updated-with"] = o.LastUpdatedWith
 	toSerialize["name"] = o.Name
-	if o.UpdatedAt.IsSet() {
-		toSerialize["updated-at"] = o.UpdatedAt.Get()
+	if !IsNil(o.UpdatedAt) {
+		toSerialize["updated-at"] = o.UpdatedAt
 	}
 	toSerialize["user-type"] = o.UserType
 	return toSerialize, nil

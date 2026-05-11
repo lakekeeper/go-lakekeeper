@@ -259,14 +259,6 @@ func (o *DeletedTabularResponse) SetWarehouseId(v string) {
 	o.WarehouseId = v
 }
 
-func (o DeletedTabularResponse) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o DeletedTabularResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["created-at"] = o.CreatedAt

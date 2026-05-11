@@ -68,14 +68,6 @@ func (o *IcebergErrorResponse) SetError(v ErrorModel) {
 	o.Error = v
 }
 
-func (o IcebergErrorResponse) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o IcebergErrorResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["error"] = o.Error

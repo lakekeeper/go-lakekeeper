@@ -20,8 +20,8 @@ type OpenFGAServerAction string
 
 // List of OpenFGAServerAction
 const (
-	OPENFGASERVERACTION_READ_ASSIGNMENTS OpenFGAServerAction = "read_assignments"
-	OPENFGASERVERACTION_GRANT_ADMIN      OpenFGAServerAction = "grant_admin"
+	OpenFGAServerActionReadAssignments OpenFGAServerAction = "read_assignments"
+	OpenFGAServerActionGrantAdmin      OpenFGAServerAction = "grant_admin"
 )
 
 // All allowed values of OpenFGAServerAction enum

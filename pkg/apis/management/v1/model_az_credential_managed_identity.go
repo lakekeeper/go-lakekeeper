@@ -68,14 +68,6 @@ func (o *AzCredentialManagedIdentity) SetCredentialType(v string) {
 	o.CredentialType = v
 }
 
-func (o AzCredentialManagedIdentity) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o AzCredentialManagedIdentity) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["credential-type"] = o.CredentialType

@@ -68,14 +68,6 @@ func (o *GetOpenFGAWarehouseActionsResponse) SetAllowedActions(v []OpenFGAWareho
 	o.AllowedActions = v
 }
 
-func (o GetOpenFGAWarehouseActionsResponse) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o GetOpenFGAWarehouseActionsResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["allowed-actions"] = o.AllowedActions

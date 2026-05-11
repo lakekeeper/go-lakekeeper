@@ -68,14 +68,6 @@ func (o *CatalogActionCheckOperationProject) SetProject(v CatalogActionCheckOper
 	o.Project = v
 }
 
-func (o CatalogActionCheckOperationProject) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o CatalogActionCheckOperationProject) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["project"] = o.Project

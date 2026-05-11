@@ -26,8 +26,23 @@ var defaultUserAgent = "go-lakekeeper/" + version.GetVersion().Version
 // directly on Client. The facade adds: auth wiring (via core.AuthSource and a
 // custom http.RoundTripper), optional retry behaviour, optional bootstrap on
 // construction, and a CatalogV1 helper that delegates to apache/iceberg-go.
+//
+// For the common cases — single-body request, single-response result —
+// reach for the resource façades (Warehouses, Projects, Roles, Users,
+// Server). They compress the generator's three-call fluent pattern into
+// one method call. The full fluent surface remains available via the
+// embedded APIClient when you need extra request options or the raw
+// *http.Response.
 type Client struct {
 	*managementv1.APIClient
+
+	// Resource façades for one-call ergonomic access. Initialised in
+	// NewWithAuthSource against the embedded APIClient's service handles.
+	Warehouses *Warehouses
+	Projects   *Projects
+	Roles      *Roles
+	Users      *Users
+	Server     *Server
 
 	baseURL    *url.URL
 	authSource core.AuthSource
@@ -75,8 +90,14 @@ func NewWithAuthSource(ctx context.Context, baseURL string, as core.AuthSource, 
 	cfg.Servers = managementv1.ServerConfigurations{{URL: parsed.String()}}
 	cfg.HTTPClient = newHTTPClient(as, settings)
 
+	api := managementv1.NewAPIClient(cfg)
 	c := &Client{
-		APIClient:  managementv1.NewAPIClient(cfg),
+		APIClient:  api,
+		Warehouses: &Warehouses{api: api.WarehouseAPI},
+		Projects:   &Projects{api: api.ProjectAPI},
+		Roles:      &Roles{api: api.RoleAPI},
+		Users:      &Users{api: api.UserAPI},
+		Server:     &Server{api: api.ServerAPI},
 		baseURL:    parsed,
 		authSource: as,
 	}

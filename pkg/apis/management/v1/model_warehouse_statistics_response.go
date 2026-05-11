@@ -22,7 +22,7 @@ var _ MappedNullable = &WarehouseStatisticsResponse{}
 // WarehouseStatisticsResponse struct for WarehouseStatisticsResponse
 type WarehouseStatisticsResponse struct {
 	// Next page token
-	NextPageToken NullableString `json:"next-page-token,omitempty"`
+	NextPageToken *string `json:"next-page-token,omitempty"`
 	// Ordered list of warehouse statistics.
 	Stats []WarehouseStatistics `json:"stats"`
 	// ID of the warehouse for which the stats were collected.
@@ -50,47 +50,36 @@ func NewWarehouseStatisticsResponseWithDefaults() *WarehouseStatisticsResponse {
 	return &this
 }
 
-// GetNextPageToken returns the NextPageToken field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetNextPageToken returns the NextPageToken field value if set, zero value otherwise.
 func (o *WarehouseStatisticsResponse) GetNextPageToken() string {
-	if o == nil || IsNil(o.NextPageToken.Get()) {
+	if o == nil || IsNil(o.NextPageToken) {
 		var ret string
 		return ret
 	}
-	return *o.NextPageToken.Get()
+	return *o.NextPageToken
 }
 
 // GetNextPageTokenOk returns a tuple with the NextPageToken field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *WarehouseStatisticsResponse) GetNextPageTokenOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.NextPageToken) {
 		return nil, false
 	}
-	return o.NextPageToken.Get(), o.NextPageToken.IsSet()
+	return o.NextPageToken, true
 }
 
 // HasNextPageToken returns a boolean if a field has been set.
 func (o *WarehouseStatisticsResponse) HasNextPageToken() bool {
-	if o != nil && o.NextPageToken.IsSet() {
+	if o != nil && !IsNil(o.NextPageToken) {
 		return true
 	}
 
 	return false
 }
 
-// SetNextPageToken gets a reference to the given NullableString and assigns it to the NextPageToken field.
+// SetNextPageToken gets a reference to the given string and assigns it to the NextPageToken field.
 func (o *WarehouseStatisticsResponse) SetNextPageToken(v string) {
-	o.NextPageToken.Set(&v)
-}
-
-// SetNextPageTokenNil sets the value for NextPageToken to be an explicit nil
-func (o *WarehouseStatisticsResponse) SetNextPageTokenNil() {
-	o.NextPageToken.Set(nil)
-}
-
-// UnsetNextPageToken ensures that no value is present for NextPageToken, not even an explicit nil
-func (o *WarehouseStatisticsResponse) UnsetNextPageToken() {
-	o.NextPageToken.Unset()
+	o.NextPageToken = &v
 }
 
 // GetStats returns the Stats field value
@@ -141,18 +130,10 @@ func (o *WarehouseStatisticsResponse) SetWarehouseIdent(v string) {
 	o.WarehouseIdent = v
 }
 
-func (o WarehouseStatisticsResponse) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o WarehouseStatisticsResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if o.NextPageToken.IsSet() {
-		toSerialize["next-page-token"] = o.NextPageToken.Get()
+	if !IsNil(o.NextPageToken) {
+		toSerialize["next-page-token"] = o.NextPageToken
 	}
 	toSerialize["stats"] = o.Stats
 	toSerialize["warehouse-ident"] = o.WarehouseIdent

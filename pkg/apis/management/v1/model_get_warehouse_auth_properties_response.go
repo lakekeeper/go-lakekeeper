@@ -68,14 +68,6 @@ func (o *GetWarehouseAuthPropertiesResponse) SetManagedAccess(v bool) {
 	o.ManagedAccess = v
 }
 
-func (o GetWarehouseAuthPropertiesResponse) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o GetWarehouseAuthPropertiesResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["managed-access"] = o.ManagedAccess

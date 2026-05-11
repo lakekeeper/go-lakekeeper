@@ -19,7 +19,7 @@ var _ MappedNullable = &S3AwsSystemIdentityCredential{}
 
 // S3AwsSystemIdentityCredential struct for S3AwsSystemIdentityCredential
 type S3AwsSystemIdentityCredential struct {
-	ExternalId NullableString `json:"external-id,omitempty"`
+	ExternalId *string `json:"external-id,omitempty"`
 }
 
 // NewS3AwsSystemIdentityCredential instantiates a new S3AwsSystemIdentityCredential object
@@ -39,61 +39,42 @@ func NewS3AwsSystemIdentityCredentialWithDefaults() *S3AwsSystemIdentityCredenti
 	return &this
 }
 
-// GetExternalId returns the ExternalId field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetExternalId returns the ExternalId field value if set, zero value otherwise.
 func (o *S3AwsSystemIdentityCredential) GetExternalId() string {
-	if o == nil || IsNil(o.ExternalId.Get()) {
+	if o == nil || IsNil(o.ExternalId) {
 		var ret string
 		return ret
 	}
-	return *o.ExternalId.Get()
+	return *o.ExternalId
 }
 
 // GetExternalIdOk returns a tuple with the ExternalId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *S3AwsSystemIdentityCredential) GetExternalIdOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.ExternalId) {
 		return nil, false
 	}
-	return o.ExternalId.Get(), o.ExternalId.IsSet()
+	return o.ExternalId, true
 }
 
 // HasExternalId returns a boolean if a field has been set.
 func (o *S3AwsSystemIdentityCredential) HasExternalId() bool {
-	if o != nil && o.ExternalId.IsSet() {
+	if o != nil && !IsNil(o.ExternalId) {
 		return true
 	}
 
 	return false
 }
 
-// SetExternalId gets a reference to the given NullableString and assigns it to the ExternalId field.
+// SetExternalId gets a reference to the given string and assigns it to the ExternalId field.
 func (o *S3AwsSystemIdentityCredential) SetExternalId(v string) {
-	o.ExternalId.Set(&v)
-}
-
-// SetExternalIdNil sets the value for ExternalId to be an explicit nil
-func (o *S3AwsSystemIdentityCredential) SetExternalIdNil() {
-	o.ExternalId.Set(nil)
-}
-
-// UnsetExternalId ensures that no value is present for ExternalId, not even an explicit nil
-func (o *S3AwsSystemIdentityCredential) UnsetExternalId() {
-	o.ExternalId.Unset()
-}
-
-func (o S3AwsSystemIdentityCredential) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
+	o.ExternalId = &v
 }
 
 func (o S3AwsSystemIdentityCredential) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if o.ExternalId.IsSet() {
-		toSerialize["external-id"] = o.ExternalId.Get()
+	if !IsNil(o.ExternalId) {
+		toSerialize["external-id"] = o.ExternalId
 	}
 	return toSerialize, nil
 }

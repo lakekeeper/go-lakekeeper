@@ -20,9 +20,9 @@ type S3UrlStyleDetectionMode string
 
 // List of S3UrlStyleDetectionMode
 const (
-	S3URLSTYLEDETECTIONMODE_PATH         S3UrlStyleDetectionMode = "path"
-	S3URLSTYLEDETECTIONMODE_VIRTUAL_HOST S3UrlStyleDetectionMode = "virtual_host"
-	S3URLSTYLEDETECTIONMODE_AUTO         S3UrlStyleDetectionMode = "auto"
+	S3UrlStyleDetectionModePath        S3UrlStyleDetectionMode = "path"
+	S3UrlStyleDetectionModeVirtualHost S3UrlStyleDetectionMode = "virtual_host"
+	S3UrlStyleDetectionModeAuto        S3UrlStyleDetectionMode = "auto"
 )
 
 // All allowed values of S3UrlStyleDetectionMode enum

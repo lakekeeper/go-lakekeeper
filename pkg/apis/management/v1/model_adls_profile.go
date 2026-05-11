@@ -26,17 +26,17 @@ type AdlsProfile struct {
 	// Allow alternative protocols such as `wasbs://` in locations. This is disabled by default. We do not recommend to use this setting except for migration of old tables via the register endpoint.
 	AllowAlternativeProtocols *bool `json:"allow-alternative-protocols,omitempty"`
 	// The authority host to use for authentication. Default: `https://login.microsoftonline.com`.
-	AuthorityHost NullableString `json:"authority-host,omitempty"`
+	AuthorityHost *string `json:"authority-host,omitempty"`
 	// Name of the adls filesystem, in blobstorage also known as container.
 	Filesystem string `json:"filesystem"`
 	// The host to use for the storage account. Default: `dfs.core.windows.net`.
-	Host NullableString `json:"host,omitempty"`
+	Host *string `json:"host,omitempty"`
 	// Subpath in the filesystem to use.
-	KeyPrefix NullableString `json:"key-prefix,omitempty"`
+	KeyPrefix *string `json:"key-prefix,omitempty"`
 	// Enable SAS (Shared Access Signature) token generation for Azure Data Lake Storage. When disabled, clients cannot use vended credentials for this storage profile. Defaults to true.
 	SasEnabled *bool `json:"sas-enabled,omitempty"`
 	// The validity of the sas token in seconds. Default: 3600.
-	SasTokenValiditySeconds NullableInt64 `json:"sas-token-validity-seconds,omitempty"`
+	SasTokenValiditySeconds *int64 `json:"sas-token-validity-seconds,omitempty"`
 	// Storage layout for namespace and tabular paths.
 	StorageLayout NullableStorageLayout `json:"storage-layout,omitempty"`
 }
@@ -118,47 +118,36 @@ func (o *AdlsProfile) SetAllowAlternativeProtocols(v bool) {
 	o.AllowAlternativeProtocols = &v
 }
 
-// GetAuthorityHost returns the AuthorityHost field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetAuthorityHost returns the AuthorityHost field value if set, zero value otherwise.
 func (o *AdlsProfile) GetAuthorityHost() string {
-	if o == nil || IsNil(o.AuthorityHost.Get()) {
+	if o == nil || IsNil(o.AuthorityHost) {
 		var ret string
 		return ret
 	}
-	return *o.AuthorityHost.Get()
+	return *o.AuthorityHost
 }
 
 // GetAuthorityHostOk returns a tuple with the AuthorityHost field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *AdlsProfile) GetAuthorityHostOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.AuthorityHost) {
 		return nil, false
 	}
-	return o.AuthorityHost.Get(), o.AuthorityHost.IsSet()
+	return o.AuthorityHost, true
 }
 
 // HasAuthorityHost returns a boolean if a field has been set.
 func (o *AdlsProfile) HasAuthorityHost() bool {
-	if o != nil && o.AuthorityHost.IsSet() {
+	if o != nil && !IsNil(o.AuthorityHost) {
 		return true
 	}
 
 	return false
 }
 
-// SetAuthorityHost gets a reference to the given NullableString and assigns it to the AuthorityHost field.
+// SetAuthorityHost gets a reference to the given string and assigns it to the AuthorityHost field.
 func (o *AdlsProfile) SetAuthorityHost(v string) {
-	o.AuthorityHost.Set(&v)
-}
-
-// SetAuthorityHostNil sets the value for AuthorityHost to be an explicit nil
-func (o *AdlsProfile) SetAuthorityHostNil() {
-	o.AuthorityHost.Set(nil)
-}
-
-// UnsetAuthorityHost ensures that no value is present for AuthorityHost, not even an explicit nil
-func (o *AdlsProfile) UnsetAuthorityHost() {
-	o.AuthorityHost.Unset()
+	o.AuthorityHost = &v
 }
 
 // GetFilesystem returns the Filesystem field value
@@ -185,90 +174,68 @@ func (o *AdlsProfile) SetFilesystem(v string) {
 	o.Filesystem = v
 }
 
-// GetHost returns the Host field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetHost returns the Host field value if set, zero value otherwise.
 func (o *AdlsProfile) GetHost() string {
-	if o == nil || IsNil(o.Host.Get()) {
+	if o == nil || IsNil(o.Host) {
 		var ret string
 		return ret
 	}
-	return *o.Host.Get()
+	return *o.Host
 }
 
 // GetHostOk returns a tuple with the Host field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *AdlsProfile) GetHostOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.Host) {
 		return nil, false
 	}
-	return o.Host.Get(), o.Host.IsSet()
+	return o.Host, true
 }
 
 // HasHost returns a boolean if a field has been set.
 func (o *AdlsProfile) HasHost() bool {
-	if o != nil && o.Host.IsSet() {
+	if o != nil && !IsNil(o.Host) {
 		return true
 	}
 
 	return false
 }
 
-// SetHost gets a reference to the given NullableString and assigns it to the Host field.
+// SetHost gets a reference to the given string and assigns it to the Host field.
 func (o *AdlsProfile) SetHost(v string) {
-	o.Host.Set(&v)
+	o.Host = &v
 }
 
-// SetHostNil sets the value for Host to be an explicit nil
-func (o *AdlsProfile) SetHostNil() {
-	o.Host.Set(nil)
-}
-
-// UnsetHost ensures that no value is present for Host, not even an explicit nil
-func (o *AdlsProfile) UnsetHost() {
-	o.Host.Unset()
-}
-
-// GetKeyPrefix returns the KeyPrefix field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetKeyPrefix returns the KeyPrefix field value if set, zero value otherwise.
 func (o *AdlsProfile) GetKeyPrefix() string {
-	if o == nil || IsNil(o.KeyPrefix.Get()) {
+	if o == nil || IsNil(o.KeyPrefix) {
 		var ret string
 		return ret
 	}
-	return *o.KeyPrefix.Get()
+	return *o.KeyPrefix
 }
 
 // GetKeyPrefixOk returns a tuple with the KeyPrefix field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *AdlsProfile) GetKeyPrefixOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.KeyPrefix) {
 		return nil, false
 	}
-	return o.KeyPrefix.Get(), o.KeyPrefix.IsSet()
+	return o.KeyPrefix, true
 }
 
 // HasKeyPrefix returns a boolean if a field has been set.
 func (o *AdlsProfile) HasKeyPrefix() bool {
-	if o != nil && o.KeyPrefix.IsSet() {
+	if o != nil && !IsNil(o.KeyPrefix) {
 		return true
 	}
 
 	return false
 }
 
-// SetKeyPrefix gets a reference to the given NullableString and assigns it to the KeyPrefix field.
+// SetKeyPrefix gets a reference to the given string and assigns it to the KeyPrefix field.
 func (o *AdlsProfile) SetKeyPrefix(v string) {
-	o.KeyPrefix.Set(&v)
-}
-
-// SetKeyPrefixNil sets the value for KeyPrefix to be an explicit nil
-func (o *AdlsProfile) SetKeyPrefixNil() {
-	o.KeyPrefix.Set(nil)
-}
-
-// UnsetKeyPrefix ensures that no value is present for KeyPrefix, not even an explicit nil
-func (o *AdlsProfile) UnsetKeyPrefix() {
-	o.KeyPrefix.Unset()
+	o.KeyPrefix = &v
 }
 
 // GetSasEnabled returns the SasEnabled field value if set, zero value otherwise.
@@ -303,47 +270,36 @@ func (o *AdlsProfile) SetSasEnabled(v bool) {
 	o.SasEnabled = &v
 }
 
-// GetSasTokenValiditySeconds returns the SasTokenValiditySeconds field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetSasTokenValiditySeconds returns the SasTokenValiditySeconds field value if set, zero value otherwise.
 func (o *AdlsProfile) GetSasTokenValiditySeconds() int64 {
-	if o == nil || IsNil(o.SasTokenValiditySeconds.Get()) {
+	if o == nil || IsNil(o.SasTokenValiditySeconds) {
 		var ret int64
 		return ret
 	}
-	return *o.SasTokenValiditySeconds.Get()
+	return *o.SasTokenValiditySeconds
 }
 
 // GetSasTokenValiditySecondsOk returns a tuple with the SasTokenValiditySeconds field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *AdlsProfile) GetSasTokenValiditySecondsOk() (*int64, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.SasTokenValiditySeconds) {
 		return nil, false
 	}
-	return o.SasTokenValiditySeconds.Get(), o.SasTokenValiditySeconds.IsSet()
+	return o.SasTokenValiditySeconds, true
 }
 
 // HasSasTokenValiditySeconds returns a boolean if a field has been set.
 func (o *AdlsProfile) HasSasTokenValiditySeconds() bool {
-	if o != nil && o.SasTokenValiditySeconds.IsSet() {
+	if o != nil && !IsNil(o.SasTokenValiditySeconds) {
 		return true
 	}
 
 	return false
 }
 
-// SetSasTokenValiditySeconds gets a reference to the given NullableInt64 and assigns it to the SasTokenValiditySeconds field.
+// SetSasTokenValiditySeconds gets a reference to the given int64 and assigns it to the SasTokenValiditySeconds field.
 func (o *AdlsProfile) SetSasTokenValiditySeconds(v int64) {
-	o.SasTokenValiditySeconds.Set(&v)
-}
-
-// SetSasTokenValiditySecondsNil sets the value for SasTokenValiditySeconds to be an explicit nil
-func (o *AdlsProfile) SetSasTokenValiditySecondsNil() {
-	o.SasTokenValiditySeconds.Set(nil)
-}
-
-// UnsetSasTokenValiditySeconds ensures that no value is present for SasTokenValiditySeconds, not even an explicit nil
-func (o *AdlsProfile) UnsetSasTokenValiditySeconds() {
-	o.SasTokenValiditySeconds.Unset()
+	o.SasTokenValiditySeconds = &v
 }
 
 // GetStorageLayout returns the StorageLayout field value if set, zero value otherwise (both if not set or set to explicit null).
@@ -389,35 +345,27 @@ func (o *AdlsProfile) UnsetStorageLayout() {
 	o.StorageLayout.Unset()
 }
 
-func (o AdlsProfile) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o AdlsProfile) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["account-name"] = o.AccountName
 	if !IsNil(o.AllowAlternativeProtocols) {
 		toSerialize["allow-alternative-protocols"] = o.AllowAlternativeProtocols
 	}
-	if o.AuthorityHost.IsSet() {
-		toSerialize["authority-host"] = o.AuthorityHost.Get()
+	if !IsNil(o.AuthorityHost) {
+		toSerialize["authority-host"] = o.AuthorityHost
 	}
 	toSerialize["filesystem"] = o.Filesystem
-	if o.Host.IsSet() {
-		toSerialize["host"] = o.Host.Get()
+	if !IsNil(o.Host) {
+		toSerialize["host"] = o.Host
 	}
-	if o.KeyPrefix.IsSet() {
-		toSerialize["key-prefix"] = o.KeyPrefix.Get()
+	if !IsNil(o.KeyPrefix) {
+		toSerialize["key-prefix"] = o.KeyPrefix
 	}
 	if !IsNil(o.SasEnabled) {
 		toSerialize["sas-enabled"] = o.SasEnabled
 	}
-	if o.SasTokenValiditySeconds.IsSet() {
-		toSerialize["sas-token-validity-seconds"] = o.SasTokenValiditySeconds.Get()
+	if !IsNil(o.SasTokenValiditySeconds) {
+		toSerialize["sas-token-validity-seconds"] = o.SasTokenValiditySeconds
 	}
 	if o.StorageLayout.IsSet() {
 		toSerialize["storage-layout"] = o.StorageLayout.Get()

@@ -20,20 +20,20 @@ type NamespaceAction string
 
 // List of NamespaceAction
 const (
-	NAMESPACEACTION_CREATE_TABLE        NamespaceAction = "create_table"
-	NAMESPACEACTION_CREATE_VIEW         NamespaceAction = "create_view"
-	NAMESPACEACTION_CREATE_NAMESPACE    NamespaceAction = "create_namespace"
-	NAMESPACEACTION_DELETE              NamespaceAction = "delete"
-	NAMESPACEACTION_UPDATE_PROPERTIES   NamespaceAction = "update_properties"
-	NAMESPACEACTION_GET_METADATA        NamespaceAction = "get_metadata"
-	NAMESPACEACTION_READ_ASSIGNMENTS    NamespaceAction = "read_assignments"
-	NAMESPACEACTION_GRANT_CREATE        NamespaceAction = "grant_create"
-	NAMESPACEACTION_GRANT_DESCRIBE      NamespaceAction = "grant_describe"
-	NAMESPACEACTION_GRANT_MODIFY        NamespaceAction = "grant_modify"
-	NAMESPACEACTION_GRANT_SELECT        NamespaceAction = "grant_select"
-	NAMESPACEACTION_GRANT_PASS_GRANTS   NamespaceAction = "grant_pass_grants"
-	NAMESPACEACTION_GRANT_MANAGE_GRANTS NamespaceAction = "grant_manage_grants"
-	NAMESPACEACTION_SET_PROTECTION      NamespaceAction = "set_protection"
+	NamespaceActionCreateTable       NamespaceAction = "create_table"
+	NamespaceActionCreateView        NamespaceAction = "create_view"
+	NamespaceActionCreateNamespace   NamespaceAction = "create_namespace"
+	NamespaceActionDelete            NamespaceAction = "delete"
+	NamespaceActionUpdateProperties  NamespaceAction = "update_properties"
+	NamespaceActionGetMetadata       NamespaceAction = "get_metadata"
+	NamespaceActionReadAssignments   NamespaceAction = "read_assignments"
+	NamespaceActionGrantCreate       NamespaceAction = "grant_create"
+	NamespaceActionGrantDescribe     NamespaceAction = "grant_describe"
+	NamespaceActionGrantModify       NamespaceAction = "grant_modify"
+	NamespaceActionGrantSelect       NamespaceAction = "grant_select"
+	NamespaceActionGrantPassGrants   NamespaceAction = "grant_pass_grants"
+	NamespaceActionGrantManageGrants NamespaceAction = "grant_manage_grants"
+	NamespaceActionSetProtection     NamespaceAction = "set_protection"
 )
 
 // All allowed values of NamespaceAction enum

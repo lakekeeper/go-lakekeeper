@@ -14,9 +14,10 @@ import (
 func TestNewS3Profile_Defaults(t *testing.T) {
 	t.Parallel()
 
-	p := profile.NewS3Profile("my-bucket", "us-east-1")
+	sp := profile.NewS3Profile("my-bucket", "us-east-1")
 
-	require.NotNil(t, p)
+	require.NotNil(t, sp.StorageProfileS3, "S3 builder must populate the S3 variant of the union")
+	p := sp.StorageProfileS3
 	assert.Equal(t, "my-bucket", p.Bucket)
 	assert.Equal(t, "us-east-1", p.Region)
 	assert.Equal(t, "s3", p.Type, "discriminator must be set so the StorageProfile oneOf marshaler picks the right variant")
@@ -29,12 +30,12 @@ func TestNewS3Profile_Defaults(t *testing.T) {
 func TestNewS3Profile_AllOptionsApplied(t *testing.T) {
 	t.Parallel()
 
-	flavor := managementv1.S3FLAVOR_S3_COMPAT
-	style := managementv1.S3URLSTYLEDETECTIONMODE_PATH
+	flavor := managementv1.S3FlavorS3Compat
+	style := managementv1.S3UrlStyleDetectionModePath
 
 	tags := map[string]string{"env": "prod", "team": "data"}
 
-	p := profile.NewS3Profile("bucket", "eu-central-1",
+	sp := profile.NewS3Profile("bucket", "eu-central-1",
 		profile.WithS3Endpoint("https://minio:9000"),
 		profile.WithS3KeyPrefix("warehouses/foo"),
 		profile.WithS3Flavor(flavor),
@@ -53,6 +54,8 @@ func TestNewS3Profile_AllOptionsApplied(t *testing.T) {
 		profile.WithS3StsSessionTags(tags),
 	)
 
+	require.NotNil(t, sp.StorageProfileS3)
+	p := sp.StorageProfileS3
 	require.Equal(t, "https://minio:9000", *p.Endpoint)
 	assert.Equal(t, "warehouses/foo", *p.KeyPrefix)
 	assert.Equal(t, flavor, *p.Flavor)
@@ -71,12 +74,37 @@ func TestNewS3Profile_AllOptionsApplied(t *testing.T) {
 	assert.Equal(t, tags, p.StsSessionTags)
 }
 
+func TestAsS3_OnS3Union(t *testing.T) {
+	t.Parallel()
+
+	sp := profile.NewS3Profile("b", "r")
+	got, ok := profile.AsS3(sp)
+	require.True(t, ok)
+	require.NotNil(t, got)
+	assert.Equal(t, "b", got.Bucket)
+
+	// AsGCS / AsADLS on an S3 union must report the variant mismatch.
+	_, ok = profile.AsGCS(sp)
+	assert.False(t, ok)
+	_, ok = profile.AsADLS(sp)
+	assert.False(t, ok)
+}
+
+func TestAsS3_OnNonS3Union(t *testing.T) {
+	t.Parallel()
+
+	gcs := profile.NewGCSProfile("g")
+	_, ok := profile.AsS3(gcs)
+	assert.False(t, ok, "AsS3 must return false on a non-S3 union")
+}
+
 func TestNewS3Profile_OptionsAreOverridable(t *testing.T) {
 	t.Parallel()
 
-	p := profile.NewS3Profile("b", "r",
+	sp := profile.NewS3Profile("b", "r",
 		profile.WithS3Endpoint("first"),
 		profile.WithS3Endpoint("second"),
 	)
-	assert.Equal(t, "second", *p.Endpoint, "later options must override earlier ones")
+	require.NotNil(t, sp.StorageProfileS3)
+	assert.Equal(t, "second", *sp.StorageProfileS3.Endpoint, "later options must override earlier ones")
 }

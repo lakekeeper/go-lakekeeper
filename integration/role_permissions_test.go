@@ -35,10 +35,10 @@ func TestPermissions_Role_GetAccess(t *testing.T) {
 	// to other action types in the new model. (For the assert.Subset
 	// convention shared by all *_GetAccess tests, see integration_test.go.)
 	want := []managementv1.OpenFGARoleAction{
-		managementv1.OPENFGAROLEACTION_ASSUME,
-		managementv1.OPENFGAROLEACTION_CAN_GRANT_ASSIGNEE,
-		managementv1.OPENFGAROLEACTION_CAN_CHANGE_OWNERSHIP,
-		managementv1.OPENFGAROLEACTION_READ_ASSIGNMENTS,
+		managementv1.OpenFGARoleActionAssume,
+		managementv1.OpenFGARoleActionCanGrantAssignee,
+		managementv1.OpenFGARoleActionCanChangeOwnership,
+		managementv1.OpenFGARoleActionReadAssignments,
 	}
 	assert.Subset(t, want, resp.AllowedActions)
 }

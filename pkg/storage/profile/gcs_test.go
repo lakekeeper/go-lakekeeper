@@ -12,9 +12,10 @@ import (
 func TestNewGCSProfile_Defaults(t *testing.T) {
 	t.Parallel()
 
-	p := profile.NewGCSProfile("my-gcs-bucket")
+	sp := profile.NewGCSProfile("my-gcs-bucket")
 
-	require.NotNil(t, p)
+	require.NotNil(t, sp.StorageProfileGcs, "GCS builder must populate the GCS variant of the union")
+	p := sp.StorageProfileGcs
 	assert.Equal(t, "my-gcs-bucket", p.Bucket)
 	assert.Equal(t, "gcs", p.Type)
 	assert.Nil(t, p.KeyPrefix)
@@ -24,11 +25,13 @@ func TestNewGCSProfile_Defaults(t *testing.T) {
 func TestNewGCSProfile_OptionsApplied(t *testing.T) {
 	t.Parallel()
 
-	p := profile.NewGCSProfile("bucket",
+	sp := profile.NewGCSProfile("bucket",
 		profile.WithGCSKeyPrefix("warehouses/foo"),
 		profile.WithGCSSTSEnabled(false),
 	)
 
+	require.NotNil(t, sp.StorageProfileGcs)
+	p := sp.StorageProfileGcs
 	assert.Equal(t, "warehouses/foo", *p.KeyPrefix)
 	require.NotNil(t, p.StsEnabled)
 	assert.False(t, *p.StsEnabled)

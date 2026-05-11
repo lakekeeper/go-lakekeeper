@@ -68,14 +68,6 @@ func (o *CheckOperationNamespace) SetNamespace(v CheckOperationNamespaceNamespac
 	o.Namespace = v
 }
 
-func (o CheckOperationNamespace) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o CheckOperationNamespace) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["namespace"] = o.Namespace

@@ -20,13 +20,13 @@ type NamespaceRelation string
 
 // List of NamespaceRelation
 const (
-	NAMESPACERELATION_OWNERSHIP     NamespaceRelation = "ownership"
-	NAMESPACERELATION_PASS_GRANTS   NamespaceRelation = "pass_grants"
-	NAMESPACERELATION_MANAGE_GRANTS NamespaceRelation = "manage_grants"
-	NAMESPACERELATION_DESCRIBE      NamespaceRelation = "describe"
-	NAMESPACERELATION_SELECT        NamespaceRelation = "select"
-	NAMESPACERELATION_CREATE        NamespaceRelation = "create"
-	NAMESPACERELATION_MODIFY        NamespaceRelation = "modify"
+	NamespaceRelationOwnership    NamespaceRelation = "ownership"
+	NamespaceRelationPassGrants   NamespaceRelation = "pass_grants"
+	NamespaceRelationManageGrants NamespaceRelation = "manage_grants"
+	NamespaceRelationDescribe     NamespaceRelation = "describe"
+	NamespaceRelationSelect       NamespaceRelation = "select"
+	NamespaceRelationCreate       NamespaceRelation = "create"
+	NamespaceRelationModify       NamespaceRelation = "modify"
 )
 
 // All allowed values of NamespaceRelation enum

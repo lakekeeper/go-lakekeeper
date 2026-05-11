@@ -20,12 +20,12 @@ type TaskStatus string
 
 // List of TaskStatus
 const (
-	TASKSTATUS_RUNNING   TaskStatus = "RUNNING"
-	TASKSTATUS_SCHEDULED TaskStatus = "SCHEDULED"
-	TASKSTATUS_STOPPING  TaskStatus = "STOPPING"
-	TASKSTATUS_CANCELLED TaskStatus = "CANCELLED"
-	TASKSTATUS_SUCCESS   TaskStatus = "SUCCESS"
-	TASKSTATUS_FAILED    TaskStatus = "FAILED"
+	TaskStatusRUNNING   TaskStatus = "RUNNING"
+	TaskStatusSCHEDULED TaskStatus = "SCHEDULED"
+	TaskStatusSTOPPING  TaskStatus = "STOPPING"
+	TaskStatusCANCELLED TaskStatus = "CANCELLED"
+	TaskStatusSUCCESS   TaskStatus = "SUCCESS"
+	TaskStatusFAILED    TaskStatus = "FAILED"
 )
 
 // All allowed values of TaskStatus enum

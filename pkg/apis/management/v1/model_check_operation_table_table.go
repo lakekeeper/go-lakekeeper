@@ -173,14 +173,6 @@ func (o *CheckOperationTableTable) SetAction(v TableAction) {
 	o.Action = v
 }
 
-func (o CheckOperationTableTable) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o CheckOperationTableTable) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["table-id"] = o.TableId

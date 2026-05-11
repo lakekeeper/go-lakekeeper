@@ -68,14 +68,6 @@ func (o *CatalogActionCheckOperationServerServer) SetAction(v LakekeeperServerAc
 	o.Action = v
 }
 
-func (o CatalogActionCheckOperationServerServer) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o CatalogActionCheckOperationServerServer) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["action"] = o.Action

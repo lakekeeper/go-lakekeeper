@@ -95,14 +95,6 @@ func (o *StorageCredentialTypeOneOf1) SetType(v string) {
 	o.Type = v
 }
 
-func (o StorageCredentialTypeOneOf1) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o StorageCredentialTypeOneOf1) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["credential-type"] = o.CredentialType

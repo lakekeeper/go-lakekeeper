@@ -69,14 +69,6 @@ func (o *UserOrRoleUser) SetUser(v string) {
 	o.User = v
 }
 
-func (o UserOrRoleUser) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o UserOrRoleUser) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["user"] = o.User

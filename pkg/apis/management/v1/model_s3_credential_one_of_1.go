@@ -101,14 +101,6 @@ func (o *S3CredentialOneOf1) SetCredentialType(v string) {
 	o.CredentialType = v
 }
 
-func (o S3CredentialOneOf1) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o S3CredentialOneOf1) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if !IsNil(o.ExternalId) {

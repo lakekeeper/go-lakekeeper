@@ -94,14 +94,6 @@ func (o *GcsCredentialServiceAccountKey) SetKey(v GcsServiceKey) {
 	o.Key = v
 }
 
-func (o GcsCredentialServiceAccountKey) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o GcsCredentialServiceAccountKey) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["credential-type"] = o.CredentialType

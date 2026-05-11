@@ -70,11 +70,11 @@ func TestWireFormat_CredentialVariants(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			sp := managementv1.StorageProfileS3AsStorageProfile(profile.NewS3Profile(
+			sp := profile.NewS3Profile(
 				"testacc", "eu-local-1",
 				profile.WithS3Endpoint("http://minio:9000/"),
 				profile.WithS3PathStyleAccess(),
-			))
+			)
 
 			req := managementv1.NewCreateWarehouseRequest(sp, "wire-format-"+tc.name)
 			req.SetProjectId(defaultProjectID)
@@ -115,11 +115,11 @@ func TestWireFormat_CredentialVariants(t *testing.T) {
 func TestWireFormat_AccessKeyEndToEnd(t *testing.T) {
 	c := sharedClient
 
-	sp := managementv1.StorageProfileS3AsStorageProfile(profile.NewS3Profile(
+	sp := profile.NewS3Profile(
 		"testacc", "eu-local-1",
 		profile.WithS3Endpoint("http://minio:9000/"),
 		profile.WithS3PathStyleAccess(),
-	))
+	)
 	sc := credential.NewS3AccessKey("minio-root-user", "minio-root-password")
 
 	req := managementv1.NewCreateWarehouseRequest(sp, "wire-format-roundtrip")

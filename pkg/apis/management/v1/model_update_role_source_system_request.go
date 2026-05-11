@@ -96,14 +96,6 @@ func (o *UpdateRoleSourceSystemRequest) SetSourceId(v string) {
 	o.SourceId = v
 }
 
-func (o UpdateRoleSourceSystemRequest) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o UpdateRoleSourceSystemRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["provider-id"] = o.ProviderId

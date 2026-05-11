@@ -31,6 +31,19 @@
 //     members by the shared enum and emits a middle-schema layer per group.
 //     The inner level relies on disjoint required-field sets — exactly what
 //     Phase 0 guarantees by extracting the presence-discriminated inner.
+//  5. Strips `'null'` from any `type: [<X>, 'null']` array (OAS 3.1 nullable
+//     syntax). This avoids the generator emitting heavyweight `NullableX`
+//     wrapper types. The wire-format effect is that fields marked optional
+//     can no longer carry an explicit JSON `null` distinct from absent;
+//     Lakekeeper has no such fields today, so the simplification is safe.
+//     Fields listed in `keepNullable` are exempt and retain explicit-null
+//     semantics.
+//  6. Injects `x-enum-varnames` on every named top-level enum schema,
+//     producing constants like `S3FlavorAws` instead of openapi-generator's
+//     default `S3FLAVOR_AWS`. Paired with `enumClassPrefix: false` in the
+//     generator config; the preprocessor synthesises the prefix per-value
+//     so cross-enum value collisions (`create`, `delete`, `select` across
+//     several `*Action` enums) still produce distinct constant names.
 //
 // This transformation does not change any wire-format payload. It only
 // changes how the spec is expressed to the generator.
@@ -119,6 +132,17 @@ func run(inPath, outPath string) error {
 		transformed++
 	}
 
+	// Phase 5: strip the `'null'` member from any `type: [<X>, 'null']` array
+	// so the generator emits plain `*X` fields instead of the verbose
+	// NullableX wrapper. Idempotent — already-stripped types are no-ops.
+	stripped := stripTypeArrayNull(schemas)
+
+	// Phase 6: inject `x-enum-varnames` on every top-level enum schema so
+	// the generator can emit Go-idiomatic constant names without enum-class
+	// prefixing collapsing across enums. Idempotent — schemas with an
+	// existing `x-enum-varnames` are skipped.
+	enumed := injectEnumVarnames(schemas)
+
 	out, err := os.Create(outPath)
 	if err != nil {
 		return fmt.Errorf("create output: %w", err)
@@ -134,7 +158,7 @@ func run(inPath, outPath string) error {
 		return fmt.Errorf("close encoder: %w", err)
 	}
 
-	fmt.Fprintf(os.Stderr, "preprocess: transformed %d schema(s)\n", transformed)
+	fmt.Fprintf(os.Stderr, "preprocess: transformed %d schema(s), stripped %d nullable type-arrays, named %d enum schema(s)\n", transformed, stripped, enumed)
 	return nil
 }
 
@@ -720,4 +744,210 @@ func leafSuffix(member, schemas *yaml.Node) (string, error) {
 		return "", fmt.Errorf("hierarchical: ref target %q is not presence-discriminated", refName)
 	}
 	return toPascalCase(req), nil
+}
+
+// keepNullable lists property paths whose `'null'` type member must be kept
+// because explicit-null is semantically distinct from absent (e.g. PATCH
+// payloads that use `null` to signal "clear this field"). Lakekeeper has no
+// such fields today; the list is a forward-compatible escape hatch. Format:
+// "<containing-schema>.<property>".
+var keepNullable = map[string]bool{}
+
+// stripTypeArrayNull rewrites every `type: [<X>, 'null']` (OAS 3.1 nullable
+// syntax) to `type: <X>`, walking the entire schemas subtree. Only mappings
+// whose `type` is a sequence of length 2 with one `'null'` scalar member
+// are rewritten, so unrelated mappings are untouched. Returns the number of
+// rewrites performed.
+//
+// Effect on generated code: the openapi-generator Go target emits plain
+// `*X` fields (with `omitempty`) instead of 200-line `NullableX` wrapper
+// types for affected fields. The wire format on absent values stays
+// identical; the lost capability is sending an explicit JSON `null`. Use
+// keepNullable to opt fields out where that distinction matters.
+func stripTypeArrayNull(root *yaml.Node) int {
+	if root == nil {
+		return 0
+	}
+	var count int
+	walkProperties(root, "", func(path string, prop *yaml.Node) {
+		if keepNullable[path] {
+			return
+		}
+		if rewriteTypeArrayNull(prop) {
+			count++
+		}
+	})
+	// Also rewrite top-level component schemas that aren't accessible via a
+	// `properties.X` walk (e.g. a component schema whose own `type` is a
+	// nullable array — rare, but handled for completeness).
+	for i := 1; i < len(root.Content); i += 2 {
+		if rewriteTypeArrayNull(root.Content[i]) {
+			count++
+		}
+	}
+	return count
+}
+
+// rewriteTypeArrayNull mutates a schema node in place: if its `type` is
+// `[<X>, 'null']`, replace with the scalar `<X>`. Returns true if rewritten.
+func rewriteTypeArrayNull(schema *yaml.Node) bool {
+	if schema == nil || schema.Kind != yaml.MappingNode {
+		return false
+	}
+	t := lookup(schema, "type")
+	if t == nil || t.Kind != yaml.SequenceNode || len(t.Content) != 2 {
+		return false
+	}
+	var nonNull *yaml.Node
+	for _, m := range t.Content {
+		if m.Kind != yaml.ScalarNode {
+			return false
+		}
+		if m.Value == "null" {
+			continue
+		}
+		if nonNull != nil {
+			return false // two non-null entries: not the shape we rewrite.
+		}
+		nonNull = m
+	}
+	if nonNull == nil {
+		return false
+	}
+	// Replace the SequenceNode with a ScalarNode in place by mutating the
+	// existing slot inside the schema's content list.
+	for i := 0; i+1 < len(schema.Content); i += 2 {
+		if schema.Content[i].Value == "type" {
+			schema.Content[i+1] = &yaml.Node{Kind: yaml.ScalarNode, Tag: "!!str", Value: nonNull.Value}
+			return true
+		}
+	}
+	return false
+}
+
+// walkProperties invokes fn for every property schema reachable from root
+// via `properties.<name>`, including those nested inside `oneOf`, `allOf`,
+// `anyOf`, `items`, and `additionalProperties`. The path is the dotted
+// chain of containing-schema-name + property name (e.g.
+// "CreateWarehouseRequest.project-id"). Top-level schema names form the
+// initial path component.
+func walkProperties(root *yaml.Node, schemaName string, fn func(path string, prop *yaml.Node)) {
+	if root == nil {
+		return
+	}
+	switch root.Kind {
+	case yaml.MappingNode:
+		// If this mapping has a `properties` child, recurse into each property
+		// with a refined path.
+		if props := lookup(root, "properties"); props != nil && props.Kind == yaml.MappingNode {
+			for i := 0; i+1 < len(props.Content); i += 2 {
+				name := props.Content[i].Value
+				prop := props.Content[i+1]
+				path := name
+				if schemaName != "" {
+					path = schemaName + "." + name
+				}
+				fn(path, prop)
+				// Recurse into this property's own subtree, carrying the new path
+				// as the schema-context so nested properties inherit it.
+				walkProperties(prop, path, fn)
+			}
+		}
+		// Recurse into other structural keys without changing schemaName.
+		for _, key := range []string{"oneOf", "allOf", "anyOf", "items", "additionalProperties"} {
+			if child := lookup(root, key); child != nil {
+				walkProperties(child, schemaName, fn)
+			}
+		}
+		// For the very top-level `components.schemas` map, recurse into each
+		// schema under its name as the schemaName.
+		if schemaName == "" {
+			// Heuristic: treat any mapping whose keys look like schema names
+			// (start with an uppercase letter) as the schemas map. The
+			// preprocessor only ever passes the actual schemas node here, so
+			// this is reached on the initial call.
+			for i := 0; i+1 < len(root.Content); i += 2 {
+				name := root.Content[i].Value
+				if name == "" || !isUpperASCII(name[0]) {
+					continue
+				}
+				walkProperties(root.Content[i+1], name, fn)
+			}
+		}
+	case yaml.SequenceNode:
+		for _, child := range root.Content {
+			walkProperties(child, schemaName, fn)
+		}
+	}
+}
+
+func isUpperASCII(b byte) bool { return b >= 'A' && b <= 'Z' }
+
+// injectEnumVarnames adds an `x-enum-varnames` array to every top-level
+// schema under `components.schemas` that is itself a `type: string, enum: [
+// ... ]` definition. Names are formed as `<SchemaName><PascalCase(value)>`.
+// Schemas that already carry `x-enum-varnames` are left untouched so manual
+// overrides survive regeneration. Returns the number of schemas annotated.
+//
+// Pairs with `enumClassPrefix: false` in the generator config: that flag
+// disables openapi-generator's default SCREAMING_SNAKE_CASE prefixing, and
+// the synthesised varnames here both supply Go-idiomatic names and
+// preserve cross-enum uniqueness (e.g. `create` appears as a value in
+// several `*Action` enums but maps to `ProjectActionCreate` /
+// `ServerActionCreate` / etc. — distinct constants).
+func injectEnumVarnames(schemas *yaml.Node) int {
+	if schemas == nil || schemas.Kind != yaml.MappingNode {
+		return 0
+	}
+	var count int
+	for i := 0; i+1 < len(schemas.Content); i += 2 {
+		name := schemas.Content[i].Value
+		schema := schemas.Content[i+1]
+		if schema.Kind != yaml.MappingNode {
+			continue
+		}
+		if !isStringEnumSchema(schema) {
+			continue
+		}
+		if lookup(schema, "x-enum-varnames") != nil {
+			continue
+		}
+		enumNode := lookup(schema, "enum")
+		varnames := make([]*yaml.Node, 0, len(enumNode.Content))
+		for _, v := range enumNode.Content {
+			if v.Kind != yaml.ScalarNode {
+				varnames = nil
+				break
+			}
+			varnames = append(varnames, &yaml.Node{
+				Kind:  yaml.ScalarNode,
+				Tag:   "!!str",
+				Value: name + toPascalCase(v.Value),
+			})
+		}
+		if varnames == nil {
+			continue
+		}
+		schema.Content = append(schema.Content,
+			&yaml.Node{Kind: yaml.ScalarNode, Value: "x-enum-varnames"},
+			&yaml.Node{Kind: yaml.SequenceNode, Content: varnames},
+		)
+		count++
+	}
+	return count
+}
+
+// isStringEnumSchema reports whether the node is a top-level enum schema
+// shape: `type: string` (scalar, not an array) plus a non-empty `enum`
+// sequence directly on the schema.
+func isStringEnumSchema(schema *yaml.Node) bool {
+	t := lookup(schema, "type")
+	if t == nil || t.Kind != yaml.ScalarNode || t.Value != "string" {
+		return false
+	}
+	enumNode := lookup(schema, "enum")
+	if enumNode == nil || enumNode.Kind != yaml.SequenceNode || len(enumNode.Content) == 0 {
+		return false
+	}
+	return true
 }

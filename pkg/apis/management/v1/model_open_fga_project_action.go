@@ -20,15 +20,15 @@ type OpenFGAProjectAction string
 
 // List of OpenFGAProjectAction
 const (
-	OPENFGAPROJECTACTION_READ_ASSIGNMENTS     OpenFGAProjectAction = "read_assignments"
-	OPENFGAPROJECTACTION_GRANT_ROLE_CREATOR   OpenFGAProjectAction = "grant_role_creator"
-	OPENFGAPROJECTACTION_GRANT_CREATE         OpenFGAProjectAction = "grant_create"
-	OPENFGAPROJECTACTION_GRANT_DESCRIBE       OpenFGAProjectAction = "grant_describe"
-	OPENFGAPROJECTACTION_GRANT_MODIFY         OpenFGAProjectAction = "grant_modify"
-	OPENFGAPROJECTACTION_GRANT_SELECT         OpenFGAProjectAction = "grant_select"
-	OPENFGAPROJECTACTION_GRANT_PROJECT_ADMIN  OpenFGAProjectAction = "grant_project_admin"
-	OPENFGAPROJECTACTION_GRANT_SECURITY_ADMIN OpenFGAProjectAction = "grant_security_admin"
-	OPENFGAPROJECTACTION_GRANT_DATA_ADMIN     OpenFGAProjectAction = "grant_data_admin"
+	OpenFGAProjectActionReadAssignments    OpenFGAProjectAction = "read_assignments"
+	OpenFGAProjectActionGrantRoleCreator   OpenFGAProjectAction = "grant_role_creator"
+	OpenFGAProjectActionGrantCreate        OpenFGAProjectAction = "grant_create"
+	OpenFGAProjectActionGrantDescribe      OpenFGAProjectAction = "grant_describe"
+	OpenFGAProjectActionGrantModify        OpenFGAProjectAction = "grant_modify"
+	OpenFGAProjectActionGrantSelect        OpenFGAProjectAction = "grant_select"
+	OpenFGAProjectActionGrantProjectAdmin  OpenFGAProjectAction = "grant_project_admin"
+	OpenFGAProjectActionGrantSecurityAdmin OpenFGAProjectAction = "grant_security_admin"
+	OpenFGAProjectActionGrantDataAdmin     OpenFGAProjectAction = "grant_data_admin"
 )
 
 // All allowed values of OpenFGAProjectAction enum

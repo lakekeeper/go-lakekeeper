@@ -96,14 +96,6 @@ func (o *ControlTaskActionOneOf3) SetScheduledFor(v time.Time) {
 	o.ScheduledFor = v
 }
 
-func (o ControlTaskActionOneOf3) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o ControlTaskActionOneOf3) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["action-type"] = o.ActionType

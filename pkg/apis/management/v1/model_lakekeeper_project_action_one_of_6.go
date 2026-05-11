@@ -68,14 +68,6 @@ func (o *LakekeeperProjectActionOneOf6) SetAction(v string) {
 	o.Action = v
 }
 
-func (o LakekeeperProjectActionOneOf6) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o LakekeeperProjectActionOneOf6) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["action"] = o.Action

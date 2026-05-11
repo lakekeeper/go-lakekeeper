@@ -151,14 +151,6 @@ func (o *EndpointStatisticsResponse) SetTimestamps(v []time.Time) {
 	o.Timestamps = v
 }
 
-func (o EndpointStatisticsResponse) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o EndpointStatisticsResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["called-endpoints"] = o.CalledEndpoints

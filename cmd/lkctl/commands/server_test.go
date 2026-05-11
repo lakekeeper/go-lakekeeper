@@ -49,7 +49,7 @@ func TestPrintServerInfoText(t *testing.T) {
 		ServerId:                     "srv-1",
 		Version:                      "0.9.1",
 		LakekeeperVersion:            managementv1.PtrString("0.9.1"),
-		DefaultProjectId:             *managementv1.NewNullableString(managementv1.PtrString("default-proj")),
+		DefaultProjectId:             managementv1.PtrString("default-proj"),
 		Bootstrapped:                 true,
 		AuthzBackend:                 "openfga",
 		AwsSystemIdentitiesEnabled:   true,
@@ -79,8 +79,8 @@ func TestPrintAllowedActionsTable(t *testing.T) {
 	t.Parallel()
 
 	actions := []managementv1.ServerAction{
-		managementv1.SERVERACTION_CREATE_PROJECT,
-		managementv1.SERVERACTION_PROVISION_USERS,
+		managementv1.ServerActionCreateProject,
+		managementv1.ServerActionProvisionUsers,
 	}
 
 	var buf bytes.Buffer
@@ -88,6 +88,6 @@ func TestPrintAllowedActionsTable(t *testing.T) {
 	out := buf.String()
 
 	assert.Contains(t, out, "ALLOWED ACTIONS")
-	assert.Contains(t, out, string(managementv1.SERVERACTION_CREATE_PROJECT))
-	assert.Contains(t, out, string(managementv1.SERVERACTION_PROVISION_USERS))
+	assert.Contains(t, out, string(managementv1.ServerActionCreateProject))
+	assert.Contains(t, out, string(managementv1.ServerActionProvisionUsers))
 }

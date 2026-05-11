@@ -94,14 +94,6 @@ func (o *WarehouseTaskEntityFilterOneOf1) SetViewId(v string) {
 	o.ViewId = v
 }
 
-func (o WarehouseTaskEntityFilterOneOf1) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o WarehouseTaskEntityFilterOneOf1) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["type"] = o.Type

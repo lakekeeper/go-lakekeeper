@@ -20,14 +20,14 @@ type ProjectRelation string
 
 // List of ProjectRelation
 const (
-	PROJECTRELATION_PROJECT_ADMIN  ProjectRelation = "project_admin"
-	PROJECTRELATION_SECURITY_ADMIN ProjectRelation = "security_admin"
-	PROJECTRELATION_DATA_ADMIN     ProjectRelation = "data_admin"
-	PROJECTRELATION_ROLE_CREATOR   ProjectRelation = "role_creator"
-	PROJECTRELATION_DESCRIBE       ProjectRelation = "describe"
-	PROJECTRELATION_SELECT         ProjectRelation = "select"
-	PROJECTRELATION_CREATE         ProjectRelation = "create"
-	PROJECTRELATION_MODIFY         ProjectRelation = "modify"
+	ProjectRelationProjectAdmin  ProjectRelation = "project_admin"
+	ProjectRelationSecurityAdmin ProjectRelation = "security_admin"
+	ProjectRelationDataAdmin     ProjectRelation = "data_admin"
+	ProjectRelationRoleCreator   ProjectRelation = "role_creator"
+	ProjectRelationDescribe      ProjectRelation = "describe"
+	ProjectRelationSelect        ProjectRelation = "select"
+	ProjectRelationCreate        ProjectRelation = "create"
+	ProjectRelationModify        ProjectRelation = "modify"
 )
 
 // All allowed values of ProjectRelation enum

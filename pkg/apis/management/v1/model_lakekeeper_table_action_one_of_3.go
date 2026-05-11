@@ -134,14 +134,6 @@ func (o *LakekeeperTableActionOneOf3) SetUpdatedProperties(v map[string]string) 
 	o.UpdatedProperties = v
 }
 
-func (o LakekeeperTableActionOneOf3) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o LakekeeperTableActionOneOf3) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["action"] = o.Action

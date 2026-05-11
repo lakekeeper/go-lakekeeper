@@ -94,14 +94,6 @@ func (o *CatalogActionCheckOperationWarehouseWarehouse) SetWarehouseId(v string)
 	o.WarehouseId = v
 }
 
-func (o CatalogActionCheckOperationWarehouseWarehouse) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o CatalogActionCheckOperationWarehouseWarehouse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["action"] = o.Action

@@ -20,12 +20,12 @@ type ViewRelation string
 
 // List of ViewRelation
 const (
-	VIEWRELATION_OWNERSHIP     ViewRelation = "ownership"
-	VIEWRELATION_PASS_GRANTS   ViewRelation = "pass_grants"
-	VIEWRELATION_MANAGE_GRANTS ViewRelation = "manage_grants"
-	VIEWRELATION_DESCRIBE      ViewRelation = "describe"
-	VIEWRELATION_SELECT        ViewRelation = "select"
-	VIEWRELATION_MODIFY        ViewRelation = "modify"
+	ViewRelationOwnership    ViewRelation = "ownership"
+	ViewRelationPassGrants   ViewRelation = "pass_grants"
+	ViewRelationManageGrants ViewRelation = "manage_grants"
+	ViewRelationDescribe     ViewRelation = "describe"
+	ViewRelationSelect       ViewRelation = "select"
+	ViewRelationModify       ViewRelation = "modify"
 )
 
 // All allowed values of ViewRelation enum

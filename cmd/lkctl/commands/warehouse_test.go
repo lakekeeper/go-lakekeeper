@@ -104,7 +104,7 @@ func TestPrintWarehousesText(t *testing.T) {
 		WarehouseId:    "wh-1",
 		Name:           "main",
 		ProjectId:      "proj-1",
-		Status:         managementv1.WAREHOUSESTATUS_ACTIVE,
+		Status:         managementv1.WarehouseStatusActive,
 		StorageProfile: s3Profile,
 	}
 
@@ -115,7 +115,7 @@ func TestPrintWarehousesText(t *testing.T) {
 	assert.Contains(t, out, "wh-1")
 	assert.Contains(t, out, "main")
 	assert.Contains(t, out, "proj-1")
-	assert.Contains(t, out, string(managementv1.WAREHOUSESTATUS_ACTIVE))
+	assert.Contains(t, out, string(managementv1.WarehouseStatusActive))
 	assert.Contains(t, out, "s3", "STORAGE column should show the storage family")
 }
 

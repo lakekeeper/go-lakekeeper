@@ -20,8 +20,8 @@ type S3Flavor string
 
 // List of S3Flavor
 const (
-	S3FLAVOR_AWS       S3Flavor = "aws"
-	S3FLAVOR_S3_COMPAT S3Flavor = "s3-compat"
+	S3FlavorAws      S3Flavor = "aws"
+	S3FlavorS3Compat S3Flavor = "s3-compat"
 )
 
 // All allowed values of S3Flavor enum

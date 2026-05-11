@@ -22,7 +22,7 @@ var _ MappedNullable = &CatalogActionCheckOperationProjectProject{}
 // CatalogActionCheckOperationProjectProject struct for CatalogActionCheckOperationProjectProject
 type CatalogActionCheckOperationProjectProject struct {
 	Action    LakekeeperProjectAction `json:"action"`
-	ProjectId NullableString          `json:"project-id,omitempty"`
+	ProjectId *string                 `json:"project-id,omitempty"`
 }
 
 type _CatalogActionCheckOperationProjectProject CatalogActionCheckOperationProjectProject
@@ -69,62 +69,43 @@ func (o *CatalogActionCheckOperationProjectProject) SetAction(v LakekeeperProjec
 	o.Action = v
 }
 
-// GetProjectId returns the ProjectId field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetProjectId returns the ProjectId field value if set, zero value otherwise.
 func (o *CatalogActionCheckOperationProjectProject) GetProjectId() string {
-	if o == nil || IsNil(o.ProjectId.Get()) {
+	if o == nil || IsNil(o.ProjectId) {
 		var ret string
 		return ret
 	}
-	return *o.ProjectId.Get()
+	return *o.ProjectId
 }
 
 // GetProjectIdOk returns a tuple with the ProjectId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *CatalogActionCheckOperationProjectProject) GetProjectIdOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.ProjectId) {
 		return nil, false
 	}
-	return o.ProjectId.Get(), o.ProjectId.IsSet()
+	return o.ProjectId, true
 }
 
 // HasProjectId returns a boolean if a field has been set.
 func (o *CatalogActionCheckOperationProjectProject) HasProjectId() bool {
-	if o != nil && o.ProjectId.IsSet() {
+	if o != nil && !IsNil(o.ProjectId) {
 		return true
 	}
 
 	return false
 }
 
-// SetProjectId gets a reference to the given NullableString and assigns it to the ProjectId field.
+// SetProjectId gets a reference to the given string and assigns it to the ProjectId field.
 func (o *CatalogActionCheckOperationProjectProject) SetProjectId(v string) {
-	o.ProjectId.Set(&v)
-}
-
-// SetProjectIdNil sets the value for ProjectId to be an explicit nil
-func (o *CatalogActionCheckOperationProjectProject) SetProjectIdNil() {
-	o.ProjectId.Set(nil)
-}
-
-// UnsetProjectId ensures that no value is present for ProjectId, not even an explicit nil
-func (o *CatalogActionCheckOperationProjectProject) UnsetProjectId() {
-	o.ProjectId.Unset()
-}
-
-func (o CatalogActionCheckOperationProjectProject) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
+	o.ProjectId = &v
 }
 
 func (o CatalogActionCheckOperationProjectProject) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["action"] = o.Action
-	if o.ProjectId.IsSet() {
-		toSerialize["project-id"] = o.ProjectId.Get()
+	if !IsNil(o.ProjectId) {
+		toSerialize["project-id"] = o.ProjectId
 	}
 	return toSerialize, nil
 }

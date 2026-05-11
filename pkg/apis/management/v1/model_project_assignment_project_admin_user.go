@@ -95,14 +95,6 @@ func (o *ProjectAssignmentProjectAdminUser) SetType(v string) {
 	o.Type = v
 }
 
-func (o ProjectAssignmentProjectAdminUser) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o ProjectAssignmentProjectAdminUser) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["user"] = o.User

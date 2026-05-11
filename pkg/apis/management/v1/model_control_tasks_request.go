@@ -96,14 +96,6 @@ func (o *ControlTasksRequest) SetTaskIds(v []string) {
 	o.TaskIds = v
 }
 
-func (o ControlTasksRequest) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o ControlTasksRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["action"] = o.Action

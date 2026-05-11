@@ -103,14 +103,6 @@ func (o *CatalogActionsBatchCheckRequest) SetErrorOnNotFound(v bool) {
 	o.ErrorOnNotFound = &v
 }
 
-func (o CatalogActionsBatchCheckRequest) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o CatalogActionsBatchCheckRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["checks"] = o.Checks

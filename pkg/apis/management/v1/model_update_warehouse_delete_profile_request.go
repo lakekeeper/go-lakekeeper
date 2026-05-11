@@ -68,14 +68,6 @@ func (o *UpdateWarehouseDeleteProfileRequest) SetDeleteProfile(v TabularDeletePr
 	o.DeleteProfile = v
 }
 
-func (o UpdateWarehouseDeleteProfileRequest) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o UpdateWarehouseDeleteProfileRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["delete-profile"] = o.DeleteProfile

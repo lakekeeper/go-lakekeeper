@@ -173,14 +173,6 @@ func (o *CatalogActionCheckOperationTableTable) SetAction(v LakekeeperTableActio
 	o.Action = v
 }
 
-func (o CatalogActionCheckOperationTableTable) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o CatalogActionCheckOperationTableTable) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["table-id"] = o.TableId

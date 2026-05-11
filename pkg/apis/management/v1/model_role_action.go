@@ -20,13 +20,13 @@ type RoleAction string
 
 // List of RoleAction
 const (
-	ROLEACTION_ASSUME               RoleAction = "assume"
-	ROLEACTION_CAN_GRANT_ASSIGNEE   RoleAction = "can_grant_assignee"
-	ROLEACTION_CAN_CHANGE_OWNERSHIP RoleAction = "can_change_ownership"
-	ROLEACTION_DELETE               RoleAction = "delete"
-	ROLEACTION_UPDATE               RoleAction = "update"
-	ROLEACTION_READ                 RoleAction = "read"
-	ROLEACTION_READ_ASSIGNMENTS     RoleAction = "read_assignments"
+	RoleActionAssume             RoleAction = "assume"
+	RoleActionCanGrantAssignee   RoleAction = "can_grant_assignee"
+	RoleActionCanChangeOwnership RoleAction = "can_change_ownership"
+	RoleActionDelete             RoleAction = "delete"
+	RoleActionUpdate             RoleAction = "update"
+	RoleActionRead               RoleAction = "read"
+	RoleActionReadAssignments    RoleAction = "read_assignments"
 )
 
 // All allowed values of RoleAction enum

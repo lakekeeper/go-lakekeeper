@@ -25,7 +25,7 @@ type ProtectionResponse struct {
 	// Indicates whether the entity is protected
 	Protected bool `json:"protected"`
 	// Updated at
-	UpdatedAt NullableTime `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 }
 
 type _ProtectionResponse ProtectionResponse
@@ -72,62 +72,43 @@ func (o *ProtectionResponse) SetProtected(v bool) {
 	o.Protected = v
 }
 
-// GetUpdatedAt returns the UpdatedAt field value if set, zero value otherwise (both if not set or set to explicit null).
+// GetUpdatedAt returns the UpdatedAt field value if set, zero value otherwise.
 func (o *ProtectionResponse) GetUpdatedAt() time.Time {
-	if o == nil || IsNil(o.UpdatedAt.Get()) {
+	if o == nil || IsNil(o.UpdatedAt) {
 		var ret time.Time
 		return ret
 	}
-	return *o.UpdatedAt.Get()
+	return *o.UpdatedAt
 }
 
 // GetUpdatedAtOk returns a tuple with the UpdatedAt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *ProtectionResponse) GetUpdatedAtOk() (*time.Time, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.UpdatedAt) {
 		return nil, false
 	}
-	return o.UpdatedAt.Get(), o.UpdatedAt.IsSet()
+	return o.UpdatedAt, true
 }
 
 // HasUpdatedAt returns a boolean if a field has been set.
 func (o *ProtectionResponse) HasUpdatedAt() bool {
-	if o != nil && o.UpdatedAt.IsSet() {
+	if o != nil && !IsNil(o.UpdatedAt) {
 		return true
 	}
 
 	return false
 }
 
-// SetUpdatedAt gets a reference to the given NullableTime and assigns it to the UpdatedAt field.
+// SetUpdatedAt gets a reference to the given time.Time and assigns it to the UpdatedAt field.
 func (o *ProtectionResponse) SetUpdatedAt(v time.Time) {
-	o.UpdatedAt.Set(&v)
-}
-
-// SetUpdatedAtNil sets the value for UpdatedAt to be an explicit nil
-func (o *ProtectionResponse) SetUpdatedAtNil() {
-	o.UpdatedAt.Set(nil)
-}
-
-// UnsetUpdatedAt ensures that no value is present for UpdatedAt, not even an explicit nil
-func (o *ProtectionResponse) UnsetUpdatedAt() {
-	o.UpdatedAt.Unset()
-}
-
-func (o ProtectionResponse) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
+	o.UpdatedAt = &v
 }
 
 func (o ProtectionResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["protected"] = o.Protected
-	if o.UpdatedAt.IsSet() {
-		toSerialize["updated_at"] = o.UpdatedAt.Get()
+	if !IsNil(o.UpdatedAt) {
+		toSerialize["updated_at"] = o.UpdatedAt
 	}
 	return toSerialize, nil
 }

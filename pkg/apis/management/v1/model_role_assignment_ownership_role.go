@@ -95,14 +95,6 @@ func (o *RoleAssignmentOwnershipRole) SetType(v string) {
 	o.Type = v
 }
 
-func (o RoleAssignmentOwnershipRole) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o RoleAssignmentOwnershipRole) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["role"] = o.Role

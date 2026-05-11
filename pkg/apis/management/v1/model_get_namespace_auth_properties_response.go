@@ -94,14 +94,6 @@ func (o *GetNamespaceAuthPropertiesResponse) SetManagedAccessInherited(v bool) {
 	o.ManagedAccessInherited = v
 }
 
-func (o GetNamespaceAuthPropertiesResponse) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o GetNamespaceAuthPropertiesResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["managed-access"] = o.ManagedAccess

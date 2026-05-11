@@ -68,14 +68,6 @@ func (o *SetManagedAccessRequest) SetManagedAccess(v bool) {
 	o.ManagedAccess = v
 }
 
-func (o SetManagedAccessRequest) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o SetManagedAccessRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["managed-access"] = o.ManagedAccess

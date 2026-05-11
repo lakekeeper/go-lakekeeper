@@ -69,14 +69,6 @@ func (o *SearchUserRequest) SetSearch(v string) {
 	o.Search = v
 }
 
-func (o SearchUserRequest) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o SearchUserRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["search"] = o.Search

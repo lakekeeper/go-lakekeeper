@@ -69,14 +69,6 @@ func (o *SearchRoleResponse) SetRoles(v []Role) {
 	o.Roles = v
 }
 
-func (o SearchRoleResponse) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o SearchRoleResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["roles"] = o.Roles

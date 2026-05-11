@@ -123,14 +123,6 @@ func (o *TimeWindowSelectorOneOf) SetType(v string) {
 	o.Type = v
 }
 
-func (o TimeWindowSelectorOneOf) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o TimeWindowSelectorOneOf) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["end"] = o.End

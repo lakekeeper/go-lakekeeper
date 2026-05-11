@@ -109,7 +109,7 @@ func newClient(ctx context.Context, opts *clientOptions) (*client.Client, error)
 
 	var clientOpts []client.Option
 	if opts.bootstrap {
-		clientOpts = append(clientOpts, client.WithInitialBootstrap(true, true, core.Ptr(managementv1.USERTYPE_APPLICATION)))
+		clientOpts = append(clientOpts, client.WithInitialBootstrap(true, true, core.Ptr(managementv1.UserTypeApplication)))
 	}
 
 	return client.NewWithAuthSource(ctx, opts.baseURL, authSource, clientOpts...)
@@ -128,7 +128,7 @@ func buildAuthSource(ctx context.Context, opts *clientOptions) (core.AuthSource,
 		if _, err := tokenSource.Token(); err != nil {
 			return nil, fmt.Errorf("oauth2 token: %w", err)
 		}
-		return &core.OAuthTokenSource{TokenSource: tokenSource}, nil
+		return &core.OAuthClientCredentialsAuthSource{TokenSource: tokenSource}, nil
 	case authModeToken:
 		return &core.AccessTokenAuthSource{Token: opts.accessToken}, nil
 	case authModeK8s:

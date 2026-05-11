@@ -20,10 +20,10 @@ type OpenFGARoleAction string
 
 // List of OpenFGARoleAction
 const (
-	OPENFGAROLEACTION_ASSUME               OpenFGARoleAction = "assume"
-	OPENFGAROLEACTION_CAN_GRANT_ASSIGNEE   OpenFGARoleAction = "can_grant_assignee"
-	OPENFGAROLEACTION_CAN_CHANGE_OWNERSHIP OpenFGARoleAction = "can_change_ownership"
-	OPENFGAROLEACTION_READ_ASSIGNMENTS     OpenFGARoleAction = "read_assignments"
+	OpenFGARoleActionAssume             OpenFGARoleAction = "assume"
+	OpenFGARoleActionCanGrantAssignee   OpenFGARoleAction = "can_grant_assignee"
+	OpenFGARoleActionCanChangeOwnership OpenFGARoleAction = "can_change_ownership"
+	OpenFGARoleActionReadAssignments    OpenFGARoleAction = "read_assignments"
 )
 
 // All allowed values of OpenFGARoleAction enum

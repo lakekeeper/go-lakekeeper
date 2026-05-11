@@ -204,14 +204,6 @@ func (o *RoleMetadata) SetSourceId(v string) {
 	o.SourceId = v
 }
 
-func (o RoleMetadata) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o RoleMetadata) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["id"] = o.Id

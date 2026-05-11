@@ -146,14 +146,6 @@ func (o *CatalogActionCheckOperationNamespaceNamespace) SetAction(v LakekeeperNa
 	o.Action = v
 }
 
-func (o CatalogActionCheckOperationNamespaceNamespace) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o CatalogActionCheckOperationNamespaceNamespace) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["namespace-id"] = o.NamespaceId

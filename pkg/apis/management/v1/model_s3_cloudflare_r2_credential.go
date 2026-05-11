@@ -150,14 +150,6 @@ func (o *S3CloudflareR2Credential) SetToken(v string) {
 	o.Token = v
 }
 
-func (o S3CloudflareR2Credential) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
-	if err != nil {
-		return []byte{}, err
-	}
-	return json.Marshal(toSerialize)
-}
-
 func (o S3CloudflareR2Credential) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["access-key-id"] = o.AccessKeyId
