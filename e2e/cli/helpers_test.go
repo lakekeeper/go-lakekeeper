@@ -74,7 +74,7 @@ func MustProvisionWarehouse(t *testing.T) (string, string) {
 		t.Fatalf("create warehouse exit %d\nstdout: %s\nstderr: %s", code, stdout, stderr)
 	}
 
-	id := parseIDFromCreate(t, string(stdout), "with id ")
+	id := parseIDFromCreate(t, string(stdout))
 
 	t.Cleanup(func() {
 		_, _, _, _ = activeBackend.Exec(t.Context(), nil,
@@ -119,10 +119,12 @@ func warehouseConfig(name string) []byte {
 	return out
 }
 
-// parseIDFromCreate is the shared sibling of parseProjectIDFromCreate for
-// any `Foo bar created with id <uuid>` shaped output line.
-func parseIDFromCreate(t *testing.T, out, marker string) string {
+// parseIDFromCreate digs the UUID out of any `Foo bar created with id <uuid>`
+// shaped output line. The marker is the same for every lkctl create verb, so
+// it is wired here rather than passed by each caller.
+func parseIDFromCreate(t *testing.T, out string) string {
 	t.Helper()
+	const marker = "with id "
 	i := strings.Index(out, marker)
 	if i < 0 {
 		t.Fatalf("create output missing %q marker: %q", marker, out)

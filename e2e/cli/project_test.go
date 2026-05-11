@@ -92,7 +92,7 @@ func TestProjectGrantRevoke(t *testing.T) {
 // parseProjectIDFromCreate digs the UUID out of `Project NAME created with id UUID`.
 func parseProjectIDFromCreate(t *testing.T, out string) string {
 	t.Helper()
-	id := parseIDFromCreate(t, out, "with id ")
+	id := parseIDFromCreate(t, out)
 	if _, err := uuid.Parse(id); err != nil {
 		t.Fatalf("expected uuid in create output, got %q: %v", id, err)
 	}
