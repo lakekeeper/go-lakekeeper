@@ -33,3 +33,17 @@ jobs:
 
       - run: GOPATH=$(go env GOPATH) LAKEKEEPER_VERSION=latest-main make test-integration
         timeout-minutes: 10
+
+      - run: GOPATH=$(go env GOPATH) LAKEKEEPER_VERSION=latest-main make test-e2e-compose
+        timeout-minutes: 15
+
+      - name: setup kind
+        uses: helm/kind-action@v1
+        with:
+          install_only: true
+
+      - name: setup helm
+        uses: azure/setup-helm@v4
+
+      - run: GOPATH=$(go env GOPATH) make test-e2e-kind
+        timeout-minutes: 20
