@@ -2,338 +2,615 @@ package commands
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
 	"text/tabwriter"
+	"time"
 
 	"github.com/google/uuid"
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
-	"github.com/lakekeeper/go-lakekeeper/cmd/lkctl/errors"
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
-	profilev1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1/storage/profile"
-	"github.com/lakekeeper/go-lakekeeper/pkg/core"
 )
 
-func NewWarehouseCmd(clientOpts *clientOptions) *cobra.Command {
+func newWarehouseCmd(opts *clientOptions) *cobra.Command {
 	var project string
 
-	command := cobra.Command{
+	cmd := &cobra.Command{
 		Use:     "warehouse",
 		Aliases: []string{"wh"},
 		Short:   "Manage warehouses",
-		Run: func(cmd *cobra.Command, args []string) {
-			cmd.HelpFunc()(cmd, args)
+		RunE: func(cmd *cobra.Command, _ []string) error {
+			return cmd.Help()
 		},
 	}
 
-	command.PersistentFlags().StringVarP(&project, "project", "p", uuid.Nil.String(), "Select a project")
+	cmd.PersistentFlags().StringVarP(&project, "project", "p", uuid.Nil.String(), "Select a project")
 
-	command.AddCommand(NewWarehouseListCmd(clientOpts, &project))
-	command.AddCommand(NewWarehouseGetCmd(clientOpts, &project))
-	command.AddCommand(NewWarehouseCreateCmd(clientOpts, &project))
-	command.AddCommand(NewWarehouseDeleteCmd(clientOpts, &project))
+	cmd.AddCommand(newWarehouseListCmd(opts, &project))
+	cmd.AddCommand(newWarehouseGetCmd(opts))
+	cmd.AddCommand(newWarehouseCreateCmd(opts, &project))
+	cmd.AddCommand(newWarehouseRenameCmd(opts))
+	cmd.AddCommand(newWarehouseActivateCmd(opts))
+	cmd.AddCommand(newWarehouseDeactivateCmd(opts))
+	cmd.AddCommand(newWarehouseSetProtectionCmd(opts))
+	cmd.AddCommand(newWarehouseStatisticsCmd(opts))
+	cmd.AddCommand(newWarehouseDeleteCmd(opts))
+	cmd.AddCommand(newWarehouseAccessCmd(opts))
+	cmd.AddCommand(newWarehouseAssignmentsCmd(opts))
+	cmd.AddCommand(newWarehouseGrantCmd(opts))
+	cmd.AddCommand(newWarehouseRevokeCmd(opts))
 
-	return &command
+	return cmd
 }
 
-func NewWarehouseCreateCmd(clientOpts *clientOptions, project *string) *cobra.Command {
-	var config string
-
-	command := cobra.Command{
-		Use:   "create WAREHOUSENAME -f JSONCONFIGFILE",
-		Short: "Create a new warehouse",
-		Example: `  # Create a warehouse from file
-  lkctl warehouse create "New Warehouse" -f warehouse-config.json
-  
-  # Create a warehouse from stdin
-  cat warehouse-config.json | lkctl warehouse create "New Warehouse" -f -`,
-		Run: func(cmd *cobra.Command, args []string) {
-			ctx := cmd.Context()
-
-			if len(args) != 1 || config == "" {
-				cmd.HelpFunc()(cmd, args)
-				os.Exit(1)
-			}
-
-			var reader io.Reader
-
-			if config == "-" {
-				reader = cmd.InOrStdin()
-			} else {
-				file, err := os.Open(config)
-				errors.Check(err)
-				defer file.Close()
-
-				reader = file
-			}
-
-			var opt managementv1.CreateWarehouseOptions
-
-			err := json.NewDecoder(reader).Decode(&opt)
-			errors.Check(err)
-
-			if opt.Name != args[0] {
-				log.Fatal("Warehouse name provided in config does not match the name supplied as argument")
-			}
-
-			//nolint:staticcheck // project id needs to be remove from the API first
-			if opt.ProjectID == nil {
-				opt.ProjectID = project //nolint:staticcheck // project id needs to be remove from the API first
-			}
-
-			//nolint:staticcheck // project id needs to be remove from the API first
-			if *project != *opt.ProjectID {
-				log.Fatal("Project ID provided in config does not match the project ID supplied as argument")
-			}
-
-			resp, _, err := MustCreateClient(ctx, clientOpts).WarehouseV1(*project).Create(cmd.Context(), &opt)
-			errors.Check(err)
-
-			fmt.Printf("Warehouse %s created with id %s\n", opt.Name, resp.ID)
-		},
-	}
-
-	command.Flags().StringVarP(&config, "file", "f", "", "Warehouse config file. JSON file or '-' for stdin")
-
-	return &command
-}
-
-func NewWarehouseListCmd(clientOpts *clientOptions, project *string) *cobra.Command {
+func newWarehouseListCmd(opts *clientOptions, project *string) *cobra.Command {
 	var (
 		status []string
-
 		output string
 	)
 
-	command := cobra.Command{
+	cmd := &cobra.Command{
 		Use:     "list",
-		Short:   "List warehouses",
 		Aliases: []string{"ls"},
-		Example: `  # List warehouses
-  lkctl warehouse ls
-  
-  # Filter by inactive status
-  lkctl warehouse ls --status inactive`,
-		Run: func(cmd *cobra.Command, _ []string) {
+		Short:   "List warehouses",
+		Args:    cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			ctx := cmd.Context()
-
-			opt := managementv1.ListWarehouseOptions{
-				ProjectID:       project,
-				WarehouseStatus: []managementv1.WarehouseStatus{},
+			c, err := newClient(ctx, opts)
+			if err != nil {
+				return err
 			}
 
+			req := c.WarehouseAPI.ListWarehouses(ctx).ProjectId(*project)
 			if len(status) > 0 {
+				vals := make([]managementv1.WarehouseStatus, 0, len(status))
 				for _, s := range status {
-					opt.WarehouseStatus = append(opt.WarehouseStatus, managementv1.WarehouseStatus(s))
+					vals = append(vals, managementv1.WarehouseStatus(s))
 				}
+				req = req.WarehouseStatus(vals)
 			}
-
-			resp, _, err := MustCreateClient(ctx, clientOpts).WarehouseV1(*project).List(ctx, &opt)
-			errors.Check(err)
+			resp, _, err := req.Execute()
+			if err != nil {
+				return wrapAPIError("list warehouses", err)
+			}
 
 			switch output {
-			case "text", "wide":
-				printWarehouses(output, resp.Warehouses...)
 			case "json":
-				err := PrintResource(resp, output)
-				errors.Check(err)
+				return printJSON(cmd.OutOrStdout(), resp)
+			case "text":
+				return printWarehouses(cmd.OutOrStdout(), output, resp.Warehouses...)
 			default:
-				log.Fatalf("unknown output format: %s", output)
+				return fmt.Errorf("unknown output format: %s", output)
 			}
 		},
 	}
 
-	command.Flags().StringSliceVar(&status, "status", []string{}, "Filter by status. Can be repeated multiple times to filter by multiple statuses. One of: active|inactice")
-	command.Flags().StringVarP(&output, "output", "o", "text", "Output format. One of: json|text|wide")
-
-	return &command
+	cmd.Flags().StringSliceVar(&status, "status", nil, "Filter by status; repeat or comma-separate. One of: active|inactive")
+	cmd.Flags().StringVarP(&output, "output", "o", "text", "Output format. One of: json|text")
+	return cmd
 }
 
-func NewWarehouseGetCmd(clientOpts *clientOptions, project *string) *cobra.Command {
+func newWarehouseGetCmd(opts *clientOptions) *cobra.Command {
 	var output string
 
-	command := cobra.Command{
-		Use:   "get WAREHOUSEIDs",
-		Short: "get a warehouse by id",
-		Example: `  # get a warehouse by id
-  lkctl warehouse get 019861a0-6d4e-7bf3-96c6-9aef2d4a2749`,
-		Run: func(cmd *cobra.Command, args []string) {
+	cmd := &cobra.Command{
+		Use:   "get WAREHOUSEID",
+		Short: "Get a warehouse by id",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
+			c, err := newClient(ctx, opts)
+			if err != nil {
+				return err
+			}
+			wh, _, err := c.WarehouseAPI.GetWarehouse(ctx, args[0]).Execute()
+			if err != nil {
+				return wrapAPIError("get warehouse", err)
+			}
+			if wh == nil {
+				return errors.New("get warehouse: empty response")
+			}
+			switch output {
+			case "json":
+				return printJSON(cmd.OutOrStdout(), wh)
+			case "text":
+				return printWarehouses(cmd.OutOrStdout(), output, *wh)
+			default:
+				return fmt.Errorf("unknown output format: %s", output)
+			}
+		},
+	}
 
-			if len(args) != 1 {
-				cmd.HelpFunc()(cmd, args)
-				os.Exit(1)
+	cmd.Flags().StringVarP(&output, "output", "o", "text", "Output format. One of: json|text")
+	return cmd
+}
+
+func newWarehouseCreateCmd(opts *clientOptions, project *string) *cobra.Command {
+	var config string
+
+	cmd := &cobra.Command{
+		Use:   "create WAREHOUSENAME -f JSONCONFIGFILE",
+		Short: "Create a warehouse from a JSON config file",
+		Example: `  # From a file
+  lkctl warehouse create "New Warehouse" -f warehouse-config.json
+
+  # From stdin
+  cat warehouse-config.json | lkctl warehouse create "New Warehouse" -f -`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			var reader io.Reader
+			if config == "-" {
+				reader = cmd.InOrStdin()
+			} else {
+				f, err := os.Open(config)
+				if err != nil {
+					return fmt.Errorf("open config: %w", err)
+				}
+				defer f.Close()
+				reader = f
 			}
 
-			resp, _, err := MustCreateClient(ctx, clientOpts).WarehouseV1(*project).Get(ctx, args[0])
-			errors.Check(err)
+			var req managementv1.CreateWarehouseRequest
+			if err := json.NewDecoder(reader).Decode(&req); err != nil {
+				return fmt.Errorf("decode config: %w", err)
+			}
+			if req.WarehouseName != args[0] {
+				return errors.New("warehouse name in config does not match the name argument")
+			}
+
+			ctx := cmd.Context()
+			c, err := newClient(ctx, opts)
+			if err != nil {
+				return err
+			}
+			if req.ProjectId == nil {
+				req.SetProjectId(*project)
+			} else if *req.ProjectId != *project {
+				return errors.New("project id in config does not match --project")
+			}
+			wh, _, err := c.WarehouseAPI.CreateWarehouse(ctx).CreateWarehouseRequest(req).Execute()
+			if err != nil {
+				return wrapAPIError("create warehouse", err)
+			}
+			fmt.Fprintf(cmd.OutOrStdout(), "Warehouse %s created with id %s\n", wh.Name, wh.WarehouseId)
+			return nil
+		},
+	}
+
+	cmd.Flags().StringVarP(&config, "file", "f", "", "Warehouse config file (JSON), or '-' for stdin")
+	if err := cmd.MarkFlagRequired("file"); err != nil {
+		panic(err) // unreachable: the flag was just registered.
+	}
+	return cmd
+}
+
+func newWarehouseRenameCmd(opts *clientOptions) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "rename WAREHOUSEID NEW-NAME",
+		Short: "Rename a warehouse",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := cmd.Context()
+			c, err := newClient(ctx, opts)
+			if err != nil {
+				return err
+			}
+
+			req := managementv1.NewRenameWarehouseRequest(args[1])
+			if _, _, err := c.WarehouseAPI.RenameWarehouse(ctx, args[0]).RenameWarehouseRequest(*req).Execute(); err != nil {
+				return wrapAPIError("rename warehouse", err)
+			}
+			fmt.Fprintf(cmd.OutOrStdout(), "Warehouse %s renamed to %s\n", args[0], args[1])
+			return nil
+		},
+	}
+	return cmd
+}
+
+func newWarehouseActivateCmd(opts *clientOptions) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "activate WAREHOUSEID",
+		Short: "Activate a warehouse",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := cmd.Context()
+			c, err := newClient(ctx, opts)
+			if err != nil {
+				return err
+			}
+			if _, err := c.WarehouseAPI.ActivateWarehouse(ctx, args[0]).Execute(); err != nil {
+				return wrapAPIError("activate warehouse", err)
+			}
+			fmt.Fprintf(cmd.OutOrStdout(), "Warehouse %s activated\n", args[0])
+			return nil
+		},
+	}
+	return cmd
+}
+
+func newWarehouseDeactivateCmd(opts *clientOptions) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "deactivate WAREHOUSEID",
+		Short: "Deactivate a warehouse",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := cmd.Context()
+			c, err := newClient(ctx, opts)
+			if err != nil {
+				return err
+			}
+			if _, err := c.WarehouseAPI.DeactivateWarehouse(ctx, args[0]).Execute(); err != nil {
+				return wrapAPIError("deactivate warehouse", err)
+			}
+			fmt.Fprintf(cmd.OutOrStdout(), "Warehouse %s deactivated\n", args[0])
+			return nil
+		},
+	}
+	return cmd
+}
+
+func newWarehouseSetProtectionCmd(opts *clientOptions) *cobra.Command {
+	var (
+		protected bool
+		output    string
+	)
+
+	cmd := &cobra.Command{
+		Use:   "set-protection WAREHOUSEID --protected=true|false",
+		Short: "Set protection on a warehouse",
+		Long:  "Set protection on a warehouse. A protected warehouse cannot be deleted unless force is used.",
+		Example: `  # Protect a warehouse
+  lkctl warehouse set-protection 0198618c-5be8-7a82-a0b9-1076c9dd12f0 --protected=true
+
+  # Unprotect a warehouse
+  lkctl warehouse set-protection 0198618c-5be8-7a82-a0b9-1076c9dd12f0 --protected=false`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := cmd.Context()
+			c, err := newClient(ctx, opts)
+			if err != nil {
+				return err
+			}
+
+			req := managementv1.NewSetProtectionRequest(protected)
+			resp, _, err := c.WarehouseAPI.SetWarehouseProtection(ctx, args[0]).SetProtectionRequest(*req).Execute()
+			if err != nil {
+				return wrapAPIError("set warehouse protection", err)
+			}
 
 			switch output {
-			case "text":
-				printWarehouses(output, resp)
-			case "wide":
-				printWarehouse(resp)
 			case "json":
-				err := PrintResource(resp, output)
-				errors.Check(err)
+				return printJSON(cmd.OutOrStdout(), resp)
+			case "text":
+				fmt.Fprintf(cmd.OutOrStdout(), "Warehouse %s protection set to %t\n", args[0], resp.Protected)
+				return nil
 			default:
-				log.Fatalf("unknown output format: %s", output)
+				return fmt.Errorf("unknown output format: %s", output)
 			}
 		},
 	}
 
-	command.Flags().StringVarP(&output, "output", "o", "text", "Output format. One of: json|text|wide")
-
-	return &command
+	cmd.Flags().BoolVar(&protected, "protected", false, "Whether the warehouse is protected from deletion")
+	if err := cmd.MarkFlagRequired("protected"); err != nil {
+		panic(err) // unreachable: the flag was just registered.
+	}
+	cmd.Flags().StringVarP(&output, "output", "o", "text", "Output format. One of: json|text")
+	return cmd
 }
 
-func NewWarehouseDeleteCmd(clientOpts *clientOptions, project *string) *cobra.Command {
-	var force bool
+func newWarehouseStatisticsCmd(opts *clientOptions) *cobra.Command {
+	var (
+		pageSize  int64
+		pageToken string
+		output    string
+	)
 
-	command := cobra.Command{
+	cmd := &cobra.Command{
+		Use:   "statistics WAREHOUSEID",
+		Short: "Get warehouse statistics",
+		Long:  "Get warehouse statistics. Returns ordered statistics entries with table and view counts at each sample timestamp.",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := cmd.Context()
+			c, err := newClient(ctx, opts)
+			if err != nil {
+				return err
+			}
+
+			req := c.WarehouseAPI.GetWarehouseStatistics(ctx, args[0]).PageSize(pageSize)
+			if pageToken != "" {
+				req = req.PageToken(pageToken)
+			}
+			resp, _, err := req.Execute()
+			if err != nil {
+				return wrapAPIError("get warehouse statistics", err)
+			}
+
+			switch output {
+			case "json":
+				return printJSON(cmd.OutOrStdout(), resp)
+			case "text":
+				if err := printWarehouseStatistics(cmd.OutOrStdout(), resp.Stats...); err != nil {
+					return err
+				}
+				if resp.NextPageToken != nil {
+					fmt.Fprintf(cmd.OutOrStdout(), "\nNext page token: %s\n", *resp.NextPageToken)
+				}
+				return nil
+			default:
+				return fmt.Errorf("unknown output format: %s", output)
+			}
+		},
+	}
+
+	cmd.Flags().Int64Var(&pageSize, "page-size", 100, "Upper bound on the number of results returned to the client")
+	cmd.Flags().StringVar(&pageToken, "page-token", "", "Pagination token")
+	cmd.Flags().StringVarP(&output, "output", "o", "text", "Output format. One of: json|text")
+	return cmd
+}
+
+func newWarehouseDeleteCmd(opts *clientOptions) *cobra.Command {
+	cmd := &cobra.Command{
 		Use:     "delete WAREHOUSEID",
 		Aliases: []string{"rm"},
-		Short:   "delete a warehouse by id",
-		Example: `  # delete a warehouse by id
-  lkctl warehouse delete 019861a0-6d4e-7bf3-96c6-9aef2d4a2749
-  
-  # force delete a warehouse
-  lkctl warehouse rm 019861a0-6d4e-7bf3-96c6-9aef2d4a2749 --force`,
-		Run: func(cmd *cobra.Command, args []string) {
+		Short:   "Delete a warehouse by id",
+		Args:    cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
-			if len(args) != 1 {
-				cmd.HelpFunc()(cmd, args)
-				os.Exit(1)
+			c, err := newClient(ctx, opts)
+			if err != nil {
+				return err
+			}
+			if _, err := c.WarehouseAPI.DeleteWarehouse(ctx, args[0]).Execute(); err != nil {
+				return wrapAPIError("delete warehouse", err)
+			}
+			fmt.Fprintf(cmd.OutOrStdout(), "Warehouse %s deleted\n", args[0])
+			return nil
+		},
+	}
+	return cmd
+}
+
+func newWarehouseAccessCmd(opts *clientOptions) *cobra.Command {
+	var (
+		access accessOpts
+		output string
+	)
+
+	cmd := &cobra.Command{
+		Use:   "access WAREHOUSEID",
+		Short: "Get warehouse access",
+		Long:  "Get warehouse access. By default, the current user's access on the warehouse is returned.",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if access.user != "" && access.role != "" {
+				return errors.New("--user and --role are mutually exclusive")
 			}
 
-			opt := managementv1.DeleteWarehouseOptions{
-				Force: core.Ptr(force),
+			ctx := cmd.Context()
+			c, err := newClient(ctx, opts)
+			if err != nil {
+				return err
 			}
 
-			_, err := MustCreateClient(ctx, clientOpts).WarehouseV1(*project).Delete(ctx, args[0], &opt)
-			errors.Check(err)
+			req := c.PermissionsOpenfgaAPI.GetWarehouseAccessById(ctx, args[0])
+			if access.user != "" {
+				req = req.PrincipalUser(access.user)
+			}
+			if access.role != "" {
+				req = req.PrincipalRole(access.role)
+			}
+			resp, _, err := req.Execute()
+			if err != nil {
+				return wrapAPIError("get warehouse access", err)
+			}
 
-			fmt.Printf("Warehouse %s deleted\n", args[0])
+			switch output {
+			case "json":
+				return printJSON(cmd.OutOrStdout(), resp)
+			case "text":
+				return printAllowedActions(cmd.OutOrStdout(), resp.AllowedActions)
+			default:
+				return fmt.Errorf("unknown output format: %s", output)
+			}
 		},
 	}
 
-	command.Flags().BoolVar(&force, "force", false, "Force delete the warehouse")
-
-	return &command
+	addAccessFlags(cmd, &access)
+	cmd.Flags().StringVarP(&output, "output", "o", "text", "Output format. One of: json|text")
+	return cmd
 }
 
-func printWarehouses(output string, warehouses ...*managementv1.Warehouse) {
-	if len(warehouses) < 1 {
-		fmt.Println("No warehouses available")
-		return
-	}
+func newWarehouseAssignmentsCmd(opts *clientOptions) *cobra.Command {
+	var (
+		assignments assignmentsOpts
+		output      string
+	)
 
-	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-	if output == "text" {
-		fmt.Fprintf(w, "ID\tNAME\tSTORAGE PROFILE\tDELETE PROFILE\tSTATUS\tPROJECT ID\n")
-		for _, wh := range warehouses {
-			dp := "hard"
-			if wh.DeleteProfile.DeleteProfileSettings.GetDeteProfileType() == profilev1.SoftDeleteProfileType {
-				exp := wh.DeleteProfile.DeleteProfileSettings.(*profilev1.TabularDeleteProfileSoft).ExpirationSeconds
-				dp = fmt.Sprintf("soft (%d)", exp)
+	cmd := &cobra.Command{
+		Use:   "assignments WAREHOUSEID",
+		Short: "Get warehouse assignments",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := cmd.Context()
+			c, err := newClient(ctx, opts)
+			if err != nil {
+				return err
 			}
-			fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\n", wh.ID, wh.Name, wh.StorageProfile.StorageSettings.GetStorageFamily(), dp, wh.Status, wh.ProjectID)
+
+			req := c.PermissionsOpenfgaAPI.GetWarehouseAssignmentsById(ctx, args[0])
+			if len(assignments.relations) > 0 {
+				rels := make([]managementv1.WarehouseRelation, 0, len(assignments.relations))
+				for _, r := range assignments.relations {
+					rels = append(rels, managementv1.WarehouseRelation(r))
+				}
+				req = req.Relations(rels)
+			}
+			resp, _, err := req.Execute()
+			if err != nil {
+				return wrapAPIError("get warehouse assignments", err)
+			}
+
+			switch output {
+			case "json":
+				return printJSON(cmd.OutOrStdout(), resp)
+			case "text":
+				return printAssignments(cmd.OutOrStdout(), resp.Assignments...)
+			default:
+				return fmt.Errorf("unknown output format: %s", output)
+			}
+		},
+	}
+
+	addAssignmentsFlags(cmd, &assignments)
+	cmd.Flags().StringVarP(&output, "output", "o", "text", "Output format. One of: json|text")
+	return cmd
+}
+
+func newWarehouseGrantCmd(opts *clientOptions) *cobra.Command {
+	var (
+		users       []string
+		roles       []string
+		assignments []string
+	)
+
+	cmd := &cobra.Command{
+		Use:     "grant WAREHOUSEID",
+		Aliases: []string{"assign"},
+		Short:   "Add warehouse assignments",
+		Example: `  # Grant ownership to a user
+  lkctl warehouse grant 0198618c-5be8-7a82-a0b9-1076c9dd12f0 --users 11111111-2222-3333-4444-555555555555 --assignments ownership
+
+  # Grant describe to a role
+  lkctl warehouse grant 0198618c-5be8-7a82-a0b9-1076c9dd12f0 --roles 11111111-2222-3333-4444-555555555555 --assignments describe`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			set, err := buildAssignmentSet[managementv1.WarehouseAssignment](assignments, users, roles)
+			if err != nil {
+				return err
+			}
+			req := managementv1.NewUpdateWarehouseAssignmentsRequest()
+			req.Writes = set
+
+			ctx := cmd.Context()
+			c, err := newClient(ctx, opts)
+			if err != nil {
+				return err
+			}
+			if _, err := c.PermissionsOpenfgaAPI.UpdateWarehouseAssignmentsById(ctx, args[0]).UpdateWarehouseAssignmentsRequest(*req).Execute(); err != nil {
+				return wrapAPIError("update warehouse assignments", err)
+			}
+			fmt.Fprintln(cmd.OutOrStdout(), "Warehouse permissions updated")
+			return nil
+		},
+	}
+
+	cmd.Flags().StringSliceVar(&users, "users", nil, "Grant access to users; repeat or comma-separate for multiple")
+	cmd.Flags().StringSliceVar(&roles, "roles", nil, "Grant access to roles; repeat or comma-separate for multiple")
+	cmd.Flags().StringSliceVar(&assignments, "assignments", nil, "Assignment relations to apply; repeat or comma-separate for multiple")
+	if err := cmd.MarkFlagRequired("assignments"); err != nil {
+		panic(err) // unreachable: the flag was just registered.
+	}
+	return cmd
+}
+
+func newWarehouseRevokeCmd(opts *clientOptions) *cobra.Command {
+	var (
+		users       []string
+		roles       []string
+		assignments []string
+	)
+
+	cmd := &cobra.Command{
+		Use:     "revoke WAREHOUSEID",
+		Aliases: []string{"unassign"},
+		Short:   "Remove warehouse assignments",
+		Example: `  # Revoke ownership from a user
+  lkctl warehouse revoke 0198618c-5be8-7a82-a0b9-1076c9dd12f0 --users 11111111-2222-3333-4444-555555555555 --assignments ownership
+
+  # Revoke describe from a role
+  lkctl warehouse revoke 0198618c-5be8-7a82-a0b9-1076c9dd12f0 --roles 11111111-2222-3333-4444-555555555555 --assignments describe`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			set, err := buildAssignmentSet[managementv1.WarehouseAssignment](assignments, users, roles)
+			if err != nil {
+				return err
+			}
+			req := managementv1.NewUpdateWarehouseAssignmentsRequest()
+			req.Deletes = set
+
+			ctx := cmd.Context()
+			c, err := newClient(ctx, opts)
+			if err != nil {
+				return err
+			}
+			if _, err := c.PermissionsOpenfgaAPI.UpdateWarehouseAssignmentsById(ctx, args[0]).UpdateWarehouseAssignmentsRequest(*req).Execute(); err != nil {
+				return wrapAPIError("update warehouse assignments", err)
+			}
+			fmt.Fprintln(cmd.OutOrStdout(), "Warehouse permissions updated")
+			return nil
+		},
+	}
+
+	cmd.Flags().StringSliceVar(&users, "users", nil, "Revoke access from users; repeat or comma-separate for multiple")
+	cmd.Flags().StringSliceVar(&roles, "roles", nil, "Revoke access from roles; repeat or comma-separate for multiple")
+	cmd.Flags().StringSliceVar(&assignments, "assignments", nil, "Assignment relations to remove; repeat or comma-separate for multiple")
+	if err := cmd.MarkFlagRequired("assignments"); err != nil {
+		panic(err) // unreachable: the flag was just registered.
+	}
+	return cmd
+}
+
+func printWarehouses(w io.Writer, output string, warehouses ...managementv1.GetWarehouseResponse) error {
+	if len(warehouses) == 0 {
+		_, err := fmt.Fprintln(w, "No warehouses available")
+		return err
+	}
+
+	switch output {
+	case "text":
+		tw := tabwriter.NewWriter(w, 0, 0, 2, ' ', 0)
+		fmt.Fprintln(tw, "ID\tNAME\tSTORAGE\tSTATUS\tPROJECT ID")
+		for i := range warehouses {
+			wh := &warehouses[i]
+			fmt.Fprintf(tw, "%s\t%s\t%s\t%s\t%s\n",
+				wh.WarehouseId, wh.Name, storageFamily(wh.StorageProfile), wh.Status, wh.ProjectId)
 		}
-		w.Flush()
+		return tw.Flush()
+	default:
+		return fmt.Errorf("unknown output format: %s", output)
 	}
 }
 
-func printWarehouse(warehouse *managementv1.Warehouse) {
-	if warehouse == nil {
-		fmt.Println("Warehouse not found")
-		return
+func printWarehouseStatistics(w io.Writer, stats ...managementv1.WarehouseStatistics) error {
+	if len(stats) == 0 {
+		_, err := fmt.Fprintln(w, "No statistics available")
+		return err
 	}
 
-	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-	switch warehouse.StorageProfile.StorageSettings.GetStorageFamily() {
-	case profilev1.StorageFamilyS3:
-		sp, ok := warehouse.StorageProfile.AsS3()
-		if !ok {
-			log.Fatal("could not unmarshal warehouse storage profile")
-		}
-		fmt.Fprintf(w, "ID\tNAME\tSTORAGE PROFILE\tBUCKET\tREGION\tSTS ENABLED\tALTERNATIVE PROTOCOLS\tASSUME ROLE\tKMS KEY\tENPOINT\tPREFIX\tPATH STYLE\tPUSH S3 DISABLED\tREMOTE SIGNING\tSTS ROLE\tSTS TOKEN VALIDITY\tSTATUS\tPROJECT ID\n")
-		fmt.Fprintf(w, "%s", warehouse.ID)
-		fmt.Fprintf(w, "\t%s", warehouse.Name)
-		fmt.Fprintf(w, "\t%s", warehouse.StorageProfile.StorageSettings.GetStorageFamily())
-		fmt.Fprintf(w, "\t%s", sp.Bucket)
-		fmt.Fprintf(w, "\t%s", sp.Region)
-		fmt.Fprintf(w, "\t%t", sp.STSEnabled)
-		if sp.AllowAlternativeProtocols != nil {
-			fmt.Fprintf(w, "\t%t", *sp.AllowAlternativeProtocols)
-		} else {
-			fmt.Fprintf(w, "\t%t", false)
-		}
-		fmt.Fprintf(w, "\t%s", FormatPString(sp.AssumeRoleARN))
-		fmt.Fprintf(w, "\t%s", FormatPString(sp.AWSKMSKeyARN))
-		fmt.Fprintf(w, "\t%s", FormatPString(sp.Endpoint))
-		fmt.Fprintf(w, "\t%s", FormatPString(sp.KeyPrefix))
-		if sp.PathStyleAccess != nil {
-			fmt.Fprintf(w, "\t%t", *sp.PathStyleAccess)
-		} else {
-			fmt.Fprintf(w, "\t%s", "")
-		}
-		if sp.PushS3DeleteDisabled != nil {
-			fmt.Fprintf(w, "\t%t", *sp.PushS3DeleteDisabled)
-		} else {
-			fmt.Fprintf(w, "\t%s", "")
-		}
-		if sp.RemoteSigningURLStyle != nil {
-			fmt.Fprintf(w, "\t%s", *sp.RemoteSigningURLStyle)
-		} else {
-			fmt.Fprintf(w, "\t%s", "")
-		}
-		fmt.Fprintf(w, "\t%s", FormatPString(sp.STSRoleARN))
-		fmt.Fprintf(w, "\t%d", sp.STSTokenValiditySeconds)
-		fmt.Fprintf(w, "\t%s", warehouse.Status)
-		fmt.Fprintf(w, "\t%s", warehouse.ProjectID)
-		fmt.Fprintf(w, "\n")
-	case profilev1.StorageFamilyGCS:
-		sp, ok := warehouse.StorageProfile.AsGCS()
-		if !ok {
-			log.Fatal("could not unmarshal warehouse storage profile")
-		}
-		fmt.Fprintf(w, "ID\tNAME\tSTORAGE PROFILE\tBUCKET\tPREFIX\tSTATUS\tPROJECT ID\n")
-		fmt.Fprintf(w, "%s", warehouse.ID)
-		fmt.Fprintf(w, "\t%s", warehouse.Name)
-		fmt.Fprintf(w, "\t%s", sp.GetStorageFamily())
-		fmt.Fprintf(w, "\t%s", sp.Bucket)
-		fmt.Fprintf(w, "\t%s", FormatPString(sp.KeyPrefix))
-		fmt.Fprintf(w, "\t%s", warehouse.Status)
-		fmt.Fprintf(w, "\t%s", warehouse.ProjectID)
-		fmt.Fprintf(w, "\n")
-	case profilev1.StorageFamilyADLS:
-		sp, ok := warehouse.StorageProfile.AsADLS()
-		if !ok {
-			log.Fatal("could not unmarshal warehouse storage profile")
-		}
-		fmt.Fprintf(w, "ID\tNAME\tSTORAGE PROFILE\tACCOUNT NAME\tFILESYSTEM\tALLOW ALTERNATIVE PROTOCOLS\tAUTHORITY HOST\tHOST\tKEY PREFIX\tSAS TOKEN VALIDITY\tSTATUS\tPROJECT ID\n")
-		fmt.Fprintf(w, "%s", warehouse.ID)
-		fmt.Fprintf(w, "\t%s", warehouse.Name)
-		fmt.Fprintf(w, "\t%s", sp.GetStorageFamily())
-		fmt.Fprintf(w, "\t%s", sp.AccountName)
-		fmt.Fprintf(w, "\t%s", sp.Filesystem)
-		if sp.AllowAlternativeProtocols != nil {
-			fmt.Fprintf(w, "\t%t", *sp.AllowAlternativeProtocols)
-		} else {
-			fmt.Fprintf(w, "\t%t", false)
-		}
-		fmt.Fprintf(w, "\t%s", FormatPString(sp.AuthorityHost))
-		fmt.Fprintf(w, "\t%s", FormatPString(sp.Host))
-		fmt.Fprintf(w, "\t%s", FormatPString(sp.KeyPrefix))
-		fmt.Fprintf(w, "\t%d", sp.SASTokenValiditySeconds)
-		fmt.Fprintf(w, "\t%s", warehouse.Status)
-		fmt.Fprintf(w, "\t%s", warehouse.ProjectID)
-		fmt.Fprintf(w, "\n")
-	default:
-		log.Fatalf("unknown storage profile %s", warehouse.StorageProfile.StorageSettings.GetStorageFamily())
+	tw := tabwriter.NewWriter(w, 0, 0, 2, ' ', 0)
+	fmt.Fprintln(tw, "TIMESTAMP\tTABLES\tVIEWS\tUPDATED AT")
+	for _, s := range stats {
+		fmt.Fprintf(tw, "%s\t%d\t%d\t%s\n",
+			s.Timestamp.Format(time.RFC3339), s.NumberOfTables, s.NumberOfViews, s.UpdatedAt.Format(time.RFC3339))
 	}
-	w.Flush()
+	return tw.Flush()
+}
+
+// storageFamily returns "s3", "gcs", or "adls" depending on which variant of
+// the StorageProfile union is populated. Falls back to "unknown".
+func storageFamily(sp managementv1.StorageProfile) string {
+	switch {
+	case sp.StorageProfileS3 != nil:
+		return "s3"
+	case sp.StorageProfileGcs != nil:
+		return "gcs"
+	case sp.StorageProfileAdls != nil:
+		return "adls"
+	default:
+		return "unknown"
+	}
 }

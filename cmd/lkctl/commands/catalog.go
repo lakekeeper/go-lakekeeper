@@ -1,18 +1,21 @@
 package commands
 
 import (
-	"github.com/sirupsen/logrus"
+	"errors"
+
 	"github.com/spf13/cobra"
 )
 
-func NewCatalogCmd(_ *clientOptions) *cobra.Command {
-	command := cobra.Command{
+// newCatalogCmd returns a placeholder for the future Iceberg catalog
+// integration. The real surface delegates to apache/iceberg-go via
+// client.CatalogV1; until the CLI ergonomics are designed, the command exists
+// only to reserve the verb.
+func newCatalogCmd() *cobra.Command {
+	return &cobra.Command{
 		Use:   "catalog",
-		Short: "Interacts with catalogs (not implemented)",
-		Run: func(_ *cobra.Command, _ []string) {
-			logrus.Fatal("catalog command is not implemented")
+		Short: "Interact with the Iceberg catalog (not implemented)",
+		RunE: func(*cobra.Command, []string) error {
+			return errors.New("catalog command is not implemented")
 		},
 	}
-
-	return &command
 }

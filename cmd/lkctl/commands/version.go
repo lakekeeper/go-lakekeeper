@@ -3,105 +3,114 @@ package commands
 import (
 	"context"
 	"fmt"
-	"log"
-
-	"github.com/lakekeeper/go-lakekeeper/cmd/lkctl/errors"
-	"github.com/lakekeeper/go-lakekeeper/pkg/version"
 
 	"github.com/spf13/cobra"
+
+	"github.com/lakekeeper/go-lakekeeper/pkg/version"
 )
 
-func NewVersionCmd(clientOpts *clientOptions) *cobra.Command {
+const cliName = "lkctl"
+
+// newVersionCmd returns the `lkctl version` command. It prints client and
+// (optionally) server version information.
+func newVersionCmd(opts *clientOptions) *cobra.Command {
 	var (
-		short  bool
-		client bool
-		output string
+		short      bool
+		clientOnly bool
+		output     string
 	)
 
-	command := cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "version",
 		Short: "Print version information",
-		Example: `  # Print the full version of client and server to stdout
+		Example: `  # Print full client and server version
   lkctl version
 
-  # Print only full version of the client - no connection to server will be made
+  # Print only the client version (no server connection)
   lkctl version --client
 
-  # Print the full version of client and server in JSON format
-  lkctl version
-
-  # Print only client and server core version strings in YAML format
-  lkctl version --short`,
-		Run: func(cmd *cobra.Command, _ []string) {
+  # Print client and server version as JSON
+  lkctl version -o json`,
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			ctx := cmd.Context()
+			if ctx == nil {
+				ctx = context.Background()
+			}
 
 			cv := version.GetVersion()
+
 			switch output {
 			case "json":
-				v := make(map[string]any)
-
+				v := map[string]any{}
 				if short {
 					v["client"] = map[string]string{cliName: cv.Version}
 				} else {
 					v["client"] = cv
 				}
-
-				if !client {
-					sv := getServerVersion(ctx, clientOpts)
-
+				if !clientOnly {
+					sv, err := getServerVersion(ctx, opts)
+					if err != nil {
+						return err
+					}
 					if short {
 						v["server"] = map[string]string{"lakekeeper": sv}
 					} else {
 						v["server"] = sv
 					}
 				}
-
-				err := PrintResource(v, output)
-				errors.Check(err)
+				return printJSON(cmd.OutOrStdout(), v)
 			case "text", "short", "":
-				fmt.Fprint(cmd.OutOrStdout(), printClientVersion(&cv, short || (output == "short")))
-				if !client {
-					sv := getServerVersion(ctx, clientOpts)
+				fmt.Fprint(cmd.OutOrStdout(), printClientVersion(&cv, short || output == "short"))
+				if !clientOnly {
+					sv, err := getServerVersion(ctx, opts)
+					if err != nil {
+						return err
+					}
 					fmt.Fprint(cmd.OutOrStdout(), printServerVersion(sv))
 				}
+				return nil
 			default:
-				log.Fatalf("unknown output format: %s", output)
+				return fmt.Errorf("unknown output format: %s", output)
 			}
 		},
 	}
-	command.Flags().StringVarP(&output, "output", "o", "text", "Output format. One of: json|text|short")
-	command.Flags().BoolVar(&short, "short", false, "print just the version number")
-	command.Flags().BoolVar(&client, "client", false, "client version only (no server required)")
-	return &command
+
+	cmd.Flags().StringVarP(&output, "output", "o", "text", "Output format. One of: json|text|short")
+	cmd.Flags().BoolVar(&short, "short", false, "Print just the version number")
+	cmd.Flags().BoolVar(&clientOnly, "client", false, "Only print the client version (no server required)")
+	return cmd
 }
 
-func getServerVersion(ctx context.Context, opts *clientOptions) string {
-	info, _, err := MustCreateClient(ctx, opts).ServerV1().Info(ctx)
-	errors.Check(err)
-
-	return info.Version
+func getServerVersion(ctx context.Context, opts *clientOptions) (string, error) {
+	c, err := newClient(ctx, opts)
+	if err != nil {
+		return "", err
+	}
+	info, _, err := c.ServerAPI.GetServerInfo(ctx).Execute()
+	if err != nil {
+		return "", wrapAPIError("server info", err)
+	}
+	return info.Version, nil
 }
 
 func printClientVersion(v *version.Version, short bool) string {
 	if short {
-		return fmt.Sprintf("lkctl: %s\n", v.Version)
+		return fmt.Sprintf("%s: %s\n", cliName, v.Version)
 	}
 
-	output := fmt.Sprintf("%s: %s\n", cliName, v)
-
-	output += fmt.Sprintf("  BuildDate: %s\n", v.BuildDate)
-	output += fmt.Sprintf("  GitCommit: %s\n", v.GitCommit)
-	output += fmt.Sprintf("  GitTreeState: %s\n", v.GitTreeState)
+	out := fmt.Sprintf("%s: %s\n", cliName, v)
+	out += fmt.Sprintf("  BuildDate: %s\n", v.BuildDate)
+	out += fmt.Sprintf("  GitCommit: %s\n", v.GitCommit)
+	out += fmt.Sprintf("  GitTreeState: %s\n", v.GitTreeState)
 	if v.GitTag != "" {
-		output += fmt.Sprintf("  GitTag: %s\n", v.GitTag)
+		out += fmt.Sprintf("  GitTag: %s\n", v.GitTag)
 	}
-	output += fmt.Sprintf("  GoVersion: %s\n", v.GoVersion)
-	output += fmt.Sprintf("  Compiler: %s\n", v.Compiler)
-	output += fmt.Sprintf("  Platform: %s\n", v.Platform)
-
-	return output
+	out += fmt.Sprintf("  GoVersion: %s\n", v.GoVersion)
+	out += fmt.Sprintf("  Compiler: %s\n", v.Compiler)
+	out += fmt.Sprintf("  Platform: %s\n", v.Platform)
+	return out
 }
 
 func printServerVersion(v string) string {
-	return fmt.Sprintf("%s: %s\n", "lakekeeper", v)
+	return fmt.Sprintf("lakekeeper: %s\n", v)
 }

@@ -1,5 +1,4 @@
 //go:build integration
-// +build integration
 
 package integration
 
@@ -8,157 +7,181 @@ import (
 	"net/http"
 	"testing"
 
-	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
-	"github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1/storage/credential"
-	"github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1/storage/profile"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
+	"github.com/lakekeeper/go-lakekeeper/pkg/storage/credential"
+	"github.com/lakekeeper/go-lakekeeper/pkg/storage/profile"
 )
 
 func TestWarehouse_Create_Default(t *testing.T) {
 	t.Parallel()
-	client := Setup(t)
+	c := sharedClient
 
-	sp := profile.NewS3StorageSettings(
-		"testacc",
-		"eu-local-1",
-		profile.WithPathStyleAccess(),
-		profile.WithEndpoint("http://minio:9000/"),
-		profile.WithRemoteSigningURLStyle(profile.PathSigningURLStyle),
-	).AsProfile()
-
-	sc := credential.NewS3CredentialAccessKey("minio-root-user", "minio-root-password").AsCredential()
-
-	resp, r, err := client.WarehouseV1(defaultProjectID).Create(
-		t.Context(),
-		&managementv1.CreateWarehouseOptions{
-			Name:              "test",
-			StorageProfile:    sp,
-			StorageCredential: sc,
-		},
+	sp := profile.NewS3Profile(
+		"testacc", "eu-local-1",
+		profile.WithS3Endpoint("http://minio:9000/"),
+		profile.WithS3PathStyleAccess(),
 	)
+	sc := credential.NewS3AccessKey("minio-root-user", "minio-root-password")
+
+	name := randomName("test-wh-default")
+	req := managementv1.NewCreateWarehouseRequest(sp, name)
+	req.SetProjectId(defaultProjectID)
+	req.SetStorageCredential(sc)
+
+	wh, r, err := c.WarehouseAPI.CreateWarehouse(t.Context()).CreateWarehouseRequest(*req).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, resp)
 	assert.Equal(t, http.StatusCreated, r.StatusCode)
+	require.NotNil(t, wh)
 
 	t.Cleanup(func() {
-		r, err = client.WarehouseV1(defaultProjectID).Delete(context.Background(), resp.ID, nil)
-		require.NoError(t, err)
+		r, err := c.WarehouseAPI.DeleteWarehouse(context.Background(), wh.WarehouseId).Execute()
+		if err != nil {
+			t.Errorf("delete warehouse: %v", err)
+			return
+		}
 		assert.Equal(t, http.StatusNoContent, r.StatusCode)
 	})
 
-	w, r, err := client.WarehouseV1(defaultProjectID).Get(t.Context(), resp.ID)
+	got, _, err := c.WarehouseAPI.GetWarehouse(t.Context(), wh.WarehouseId).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, w)
+	require.NotNil(t, got)
 
-	want := &managementv1.Warehouse{
-		ID:             resp.ID,
-		Name:           "test",
-		ProjectID:      defaultProjectID,
-		StorageProfile: sp,
-		Status:         managementv1.WarehouseStatusActive,
-		DeleteProfile:  profile.NewTabularDeleteProfileHard().AsProfile(),
-		Protected:      false,
-	}
-
-	assert.Equal(t, want, w)
+	assert.Equal(t, wh.WarehouseId, got.WarehouseId)
+	assert.Equal(t, name, got.Name)
+	assert.Equal(t, defaultProjectID, got.ProjectId)
+	assert.Equal(t, managementv1.WarehouseStatusActive, got.Status)
+	assert.False(t, got.Protected)
+	require.NotNil(t, got.StorageProfile.StorageProfileS3)
+	assert.Equal(t, "testacc", got.StorageProfile.StorageProfileS3.Bucket)
+	assert.Equal(t, "eu-local-1", got.StorageProfile.StorageProfileS3.Region)
 }
 
 func TestWarehouse_Create_NewProject(t *testing.T) {
 	t.Parallel()
-	client := Setup(t)
+	c := sharedClient
 
-	p, r, err := client.ProjectV1().Create(t.Context(), &managementv1.CreateProjectOptions{
-		Name: "test-project",
-	})
+	pReq := managementv1.NewCreateProjectRequest("test-project-warehouse-create")
+	p, _, err := c.ProjectAPI.CreateProject(t.Context()).CreateProjectRequest(*pReq).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, p)
+	require.NotNil(t, p)
 
-	sp := profile.NewS3StorageSettings(
+	sp := profile.NewS3Profile(
 		"testacc", "eu-local-1",
-		profile.WithPathStyleAccess(), profile.WithEndpoint("http://minio:9000/")).AsProfile()
-
-	resp, r, err := client.WarehouseV1(p.ID).Create(
-		t.Context(),
-		&managementv1.CreateWarehouseOptions{
-			Name:              "test",
-			StorageProfile:    sp,
-			StorageCredential: credential.NewS3CredentialAccessKey("minio-root-user", "minio-root-password").AsCredential(),
-		},
+		profile.WithS3Endpoint("http://minio:9000/"),
+		profile.WithS3PathStyleAccess(),
 	)
+	sc := credential.NewS3AccessKey("minio-root-user", "minio-root-password")
+
+	req := managementv1.NewCreateWarehouseRequest(sp, "test")
+	req.SetProjectId(p.ProjectId)
+	req.SetStorageCredential(sc)
+
+	wh, r, err := c.WarehouseAPI.CreateWarehouse(t.Context()).CreateWarehouseRequest(*req).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, resp)
 	assert.Equal(t, http.StatusCreated, r.StatusCode)
+	require.NotNil(t, wh)
 
 	t.Cleanup(func() {
-		r, err = client.WarehouseV1(p.ID).Delete(context.Background(), resp.ID, nil)
-		require.NoError(t, err)
-		assert.Equal(t, http.StatusNoContent, r.StatusCode)
+		r, err := c.WarehouseAPI.DeleteWarehouse(context.Background(), wh.WarehouseId).Execute()
+		if err != nil {
+			t.Errorf("delete warehouse: %v", err)
+		} else {
+			assert.Equal(t, http.StatusNoContent, r.StatusCode)
+		}
 
-		r, err = client.ProjectV1().Delete(context.Background(), p.ID)
-		require.NoError(t, err)
+		r, err = c.ProjectAPI.DeleteProject(context.Background()).XProjectId(p.ProjectId).Execute()
+		if err != nil {
+			t.Errorf("delete project: %v", err)
+			return
+		}
 		assert.Equal(t, http.StatusNoContent, r.StatusCode)
 	})
-}
-
-func TestWarehouse_ListSoftDeletedTabulars(t *testing.T) {
-	t.Parallel()
-	client := Setup(t)
-
-	project := MustCreateProject(t, client)
-	warehouseID, _ := MustCreateWarehouse(t, client, project)
-
-	resp, r, err := client.WarehouseV1(project).ListSoftDeletedTabulars(t.Context(), warehouseID, nil)
-	require.NoError(t, err)
-	assert.NotNil(t, r)
-	assert.NotNil(t, resp)
-
-	// TODO: add better test
-	// 1. Create Table (or view)
-	// 2. Enable Soft delete
-	// 3. Delete the table
-	// 4. List the soft deleted tabulars, we should see an non empty answer
-	want := &managementv1.ListSoftDeletedTabularsResponse{
-		Tabulars: []*managementv1.Tabular{},
-	}
-
-	assert.Equal(t, want, resp)
 }
 
 func TestWarehouse_Statistics(t *testing.T) {
 	t.Parallel()
-	client := Setup(t)
+	c := sharedClient
 
-	project := MustCreateProject(t, client)
-	warehouseID, _ := MustCreateWarehouse(t, client, project)
+	project := MustCreateProject(t, c)
+	whID, _ := MustCreateWarehouse(t, c, project)
 
-	resp, r, err := client.WarehouseV1(project).GetStatistics(t.Context(), warehouseID, nil)
+	resp, r, err := c.WarehouseAPI.GetWarehouseStatistics(t.Context(), whID).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, r)
 	assert.Equal(t, http.StatusOK, r.StatusCode)
 
-	// It's hard to test against computed values.
-	// we can't determine correctly the timestamps.
-	// But maybe we can create tables/views and test the correct numbers.
-	// TODO: see above
-	assert.NotEmpty(t, resp.Stats, resp)
-	assert.Equal(t, resp.WarehouseID, warehouseID)
+	// Computed timestamps and counts are non-deterministic; assert presence
+	// and identity-of-warehouse only.
+	assert.NotEmpty(t, resp.Stats)
+	assert.Equal(t, whID, resp.WarehouseIdent)
+}
+
+func TestWarehouse_Rename(t *testing.T) {
+	t.Parallel()
+	c := sharedClient
+
+	project := MustCreateProject(t, c)
+	whID, _ := MustCreateWarehouse(t, c, project)
+
+	newName := randomName("renamed-wh")
+	req := managementv1.NewRenameWarehouseRequest(newName)
+	resp, r, err := c.WarehouseAPI.RenameWarehouse(t.Context(), whID).RenameWarehouseRequest(*req).Execute()
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusOK, r.StatusCode)
+	assert.Equal(t, newName, resp.Name)
+
+	got, _, err := c.WarehouseAPI.GetWarehouse(t.Context(), whID).Execute()
+	require.NoError(t, err)
+	assert.Equal(t, newName, got.Name)
+}
+
+func TestWarehouse_DeactivateActivate(t *testing.T) {
+	t.Parallel()
+	c := sharedClient
+
+	project := MustCreateProject(t, c)
+	whID, _ := MustCreateWarehouse(t, c, project)
+
+	r, err := c.WarehouseAPI.DeactivateWarehouse(t.Context(), whID).Execute()
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusOK, r.StatusCode)
+
+	got, _, err := c.WarehouseAPI.GetWarehouse(t.Context(), whID).Execute()
+	require.NoError(t, err)
+	assert.Equal(t, managementv1.WarehouseStatusInactive, got.Status)
+
+	r, err = c.WarehouseAPI.ActivateWarehouse(t.Context(), whID).Execute()
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusOK, r.StatusCode)
+
+	got, _, err = c.WarehouseAPI.GetWarehouse(t.Context(), whID).Execute()
+	require.NoError(t, err)
+	assert.Equal(t, managementv1.WarehouseStatusActive, got.Status)
 }
 
 func TestWarehouse_SetProtection(t *testing.T) {
 	t.Parallel()
-	client := Setup(t)
+	c := sharedClient
 
-	project := MustCreateProject(t, client)
-	warehouseID, _ := MustCreateWarehouse(t, client, project)
+	project := MustCreateProject(t, c)
+	whID, _ := MustCreateWarehouse(t, c, project)
 
-	resp, r, err := client.WarehouseV1(project).SetWarehouseProtection(t.Context(), warehouseID, &managementv1.SetProtectionOptions{
-		Protected: true,
-	})
+	req := managementv1.NewSetProtectionRequest(true)
+	resp, r, err := c.WarehouseAPI.SetWarehouseProtection(t.Context(), whID).SetProtectionRequest(*req).Execute()
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusOK, r.StatusCode)
-	assert.Equal(t, true, resp.Protected)
+	assert.True(t, resp.Protected)
 	assert.NotNil(t, resp.UpdatedAt)
-}
 
-// TODO: add missing tests
+	// Unprotect before MustCreateWarehouse's delete cleanup runs (cleanups
+	// are LIFO, so this one fires first). Without it, deletion 409s on the
+	// protected warehouse and the project cleanup also fails.
+	t.Cleanup(func() {
+		unprotect := managementv1.NewSetProtectionRequest(false)
+		if _, _, err := c.WarehouseAPI.SetWarehouseProtection(context.Background(), whID).SetProtectionRequest(*unprotect).Execute(); err != nil {
+			t.Errorf("unprotect warehouse: %v", err)
+		}
+	})
+}

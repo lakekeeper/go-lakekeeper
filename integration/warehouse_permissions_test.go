@@ -1,323 +1,199 @@
 //go:build integration
-// +build integration
 
+// Tests here all scope their writes to freshly-created warehouses, so they
+// are nominally safe to parallelize. They are kept serial for now to match
+// the rest of the *_permissions_test.go files (see e.g.
+// server_permissions_test.go for the shared-resource cases that *cannot* be
+// parallelized) — flip this once the helper invariants are tightened.
 package integration
 
 import (
 	"net/http"
 	"testing"
 
-	permissionv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1/permission"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
+	"github.com/lakekeeper/go-lakekeeper/pkg/permissions"
 )
 
 func TestPermissions_Warehouse_GetAuthzProps(t *testing.T) {
-	client := Setup(t)
+	c := sharedClient
 
-	project := MustCreateProject(t, client)
-	wh, _ := MustCreateWarehouse(t, client, project)
+	project := MustCreateProject(t, c)
+	wh, _ := MustCreateWarehouse(t, c, project)
 
-	resp, r, err := client.PermissionV1().WarehousePermission().GetAuthzProperties(t.Context(), wh, nil)
+	resp, r, err := c.PermissionsOpenfgaAPI.GetWarehouseById(t.Context(), wh).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, resp)
 	assert.Equal(t, http.StatusOK, r.StatusCode)
-
-	want := &permissionv1.GetWarehouseAuthzPropertiesResponse{
-		ManagedAccess: false,
-	}
-
-	assert.Equal(t, want, resp)
+	assert.False(t, resp.ManagedAccess)
 }
 
 func TestPermissions_Warehouse_SetManagedAccess(t *testing.T) {
-	client := Setup(t)
+	c := sharedClient
 
-	project := MustCreateProject(t, client)
-	wh, _ := MustCreateWarehouse(t, client, project)
+	project := MustCreateProject(t, c)
+	wh, _ := MustCreateWarehouse(t, c, project)
 
-	resp, r, err := client.PermissionV1().WarehousePermission().GetAuthzProperties(t.Context(), wh, nil)
+	resp, r, err := c.PermissionsOpenfgaAPI.GetWarehouseById(t.Context(), wh).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, resp)
+	assert.Equal(t, http.StatusOK, r.StatusCode)
+	assert.False(t, resp.ManagedAccess)
+
+	setReq := managementv1.NewSetManagedAccessRequest(true)
+	r, err = c.PermissionsOpenfgaAPI.SetWarehouseManagedAccess(t.Context(), wh).SetManagedAccessRequest(*setReq).Execute()
+	require.NoError(t, err)
 	assert.Equal(t, http.StatusOK, r.StatusCode)
 
-	want := &permissionv1.GetWarehouseAuthzPropertiesResponse{
-		ManagedAccess: false,
-	}
-
-	// set the managed access to true
-	r, err = client.PermissionV1().WarehousePermission().SetManagedAccess(t.Context(), wh, &permissionv1.SetWarehouseManagedAccessOptions{
-		ManagedAccess: true,
-	})
+	resp, _, err = c.PermissionsOpenfgaAPI.GetWarehouseById(t.Context(), wh).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, resp)
-	assert.Equal(t, http.StatusOK, r.StatusCode)
-
-	want = &permissionv1.GetWarehouseAuthzPropertiesResponse{
-		ManagedAccess: true,
-	}
-
-	resp, r, err = client.PermissionV1().WarehousePermission().GetAuthzProperties(t.Context(), wh, nil)
-	require.NoError(t, err)
-	assert.NotNil(t, resp)
-	assert.Equal(t, http.StatusOK, r.StatusCode)
-
-	assert.Equal(t, want, resp)
+	assert.True(t, resp.ManagedAccess)
 }
 
 func TestPermissions_Warehouse_GetAccess(t *testing.T) {
-	client := Setup(t)
+	c := sharedClient
 
-	project := MustCreateProject(t, client)
-	wh, _ := MustCreateWarehouse(t, client, project)
+	project := MustCreateProject(t, c)
+	wh, _ := MustCreateWarehouse(t, c, project)
 
-	resp, r, err := client.PermissionV1().WarehousePermission().GetAccess(t.Context(), wh, nil)
+	resp, r, err := c.PermissionsOpenfgaAPI.GetWarehouseAccessById(t.Context(), wh).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, resp)
 	assert.Equal(t, http.StatusOK, r.StatusCode)
 
-	// User should have all permissions on the project
-	want := []permissionv1.WarehouseAction{
-		permissionv1.CreateNamespace,
-		permissionv1.DeleteWarehouse,
-		permissionv1.ModifyStorage,
-		permissionv1.ModifyStorageCredential,
-		permissionv1.GetConfig,
-		permissionv1.GetMetadata,
-		permissionv1.ListNamespaces,
-		permissionv1.IncludeInList,
-		permissionv1.Deactivate,
-		permissionv1.Activate,
-		permissionv1.Rename,
-		permissionv1.ListDeletedTabulars,
-		permissionv1.ReadWarehouseAssignments,
-		permissionv1.GrantCreate,
-		permissionv1.GrantDescribe,
-		permissionv1.GrantModify,
-		permissionv1.GrantSelect,
-		permissionv1.GrantPassGrants,
-		permissionv1.GrantManageGrants,
-		permissionv1.ChangeOwnership,
-		permissionv1.GetAllTasks,
-		permissionv1.ControlAllTasks,
-		permissionv1.SetWarehouseProtection,
-		permissionv1.GetWarehouseEndpointStatistics,
+	want := []managementv1.WarehouseAction{
+		managementv1.WarehouseActionCreateNamespace,
+		managementv1.WarehouseActionDelete,
+		managementv1.WarehouseActionModifyStorage,
+		managementv1.WarehouseActionModifyStorageCredential,
+		managementv1.WarehouseActionGetConfig,
+		managementv1.WarehouseActionGetMetadata,
+		managementv1.WarehouseActionListNamespaces,
+		managementv1.WarehouseActionIncludeInList,
+		managementv1.WarehouseActionDeactivate,
+		managementv1.WarehouseActionActivate,
+		managementv1.WarehouseActionRename,
+		managementv1.WarehouseActionListDeletedTabulars,
+		managementv1.WarehouseActionReadAssignments,
+		managementv1.WarehouseActionGrantCreate,
+		managementv1.WarehouseActionGrantDescribe,
+		managementv1.WarehouseActionGrantModify,
+		managementv1.WarehouseActionGrantSelect,
+		managementv1.WarehouseActionGrantPassGrants,
+		managementv1.WarehouseActionGrantManageGrants,
+		managementv1.WarehouseActionChangeOwnership,
+		managementv1.WarehouseActionGetAllTasks,
+		managementv1.WarehouseActionControlAllTasks,
+		managementv1.WarehouseActionSetProtection,
+		managementv1.WarehouseActionGetEndpointStatistics,
 	}
-
 	assert.Subset(t, want, resp.AllowedActions)
 }
 
 func TestPermissions_Warehouse_GetAssignments(t *testing.T) {
-	client := Setup(t)
+	c := sharedClient
 
-	project := MustCreateProject(t, client)
-	wh, _ := MustCreateWarehouse(t, client, project)
+	project := MustCreateProject(t, c)
+	wh, _ := MustCreateWarehouse(t, c, project)
 
-	resp, r, err := client.PermissionV1().WarehousePermission().GetAssignments(t.Context(), wh, nil)
+	resp, r, err := c.PermissionsOpenfgaAPI.GetWarehouseAssignmentsById(t.Context(), wh).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, resp)
 	assert.Equal(t, http.StatusOK, r.StatusCode)
 
-	// User should have all permissions on the project
-	want := &permissionv1.GetWarehouseAssignmentsResponse{
-		Assignments: []*permissionv1.WarehouseAssignment{
-			{
-				Assignee: permissionv1.UserOrRole{
-					Type:  permissionv1.UserType,
-					Value: adminID,
-				},
-				Assignment: permissionv1.OwnershipWarehouseAssignment,
-			},
-		},
-	}
-
-	assert.Equal(t, want, resp)
+	assert.ElementsMatch(t,
+		[]permissions.AssignmentRow{{PrincipalType: "user", PrincipalID: adminID, Relation: "ownership"}},
+		describeAssignments(t, resp.Assignments),
+	)
 }
 
 func TestPermissions_Warehouse_Update(t *testing.T) {
-	client := Setup(t)
+	c := sharedClient
 
-	project := MustCreateProject(t, client)
-	wh, _ := MustCreateWarehouse(t, client, project)
+	project := MustCreateProject(t, c)
+	wh, _ := MustCreateWarehouse(t, c, project)
+	user := MustProvisionUser(t, c)
 
-	user := MustProvisionUser(t, client)
-
-	resp, _, err := client.PermissionV1().WarehousePermission().GetAssignments(t.Context(), wh, nil)
+	resp, _, err := c.PermissionsOpenfgaAPI.GetWarehouseAssignmentsById(t.Context(), wh).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, resp)
+	assert.ElementsMatch(t,
+		[]permissions.AssignmentRow{{PrincipalType: "user", PrincipalID: adminID, Relation: "ownership"}},
+		describeAssignments(t, resp.Assignments),
+	)
 
-	// initial permissions
-	want := &permissionv1.GetWarehouseAssignmentsResponse{
-		Assignments: []*permissionv1.WarehouseAssignment{
-			{
-				Assignee: permissionv1.UserOrRole{
-					Type:  permissionv1.UserType,
-					Value: adminID,
-				},
-				Assignment: permissionv1.OwnershipWarehouseAssignment,
-			},
-		},
-	}
+	addReq := managementv1.NewUpdateWarehouseAssignmentsRequest()
+	addReq.Writes = append(addReq.Writes, userAssignment[managementv1.WarehouseAssignment](t, "describe", user.Id))
 
-	assert.Equal(t, want, resp)
-
-	// adding permission
-	r, err := client.PermissionV1().WarehousePermission().Update(t.Context(), wh, &permissionv1.UpdateWarehousePermissionsOptions{
-		Writes: []*permissionv1.WarehouseAssignment{
-			{
-				Assignee: permissionv1.UserOrRole{
-					Type:  permissionv1.UserType,
-					Value: user.ID,
-				},
-				Assignment: permissionv1.DescribeWarehouseAssignment,
-			},
-		},
-	})
-
+	r, err := c.PermissionsOpenfgaAPI.UpdateWarehouseAssignmentsById(t.Context(), wh).UpdateWarehouseAssignmentsRequest(*addReq).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, r)
 	assert.Equal(t, http.StatusNoContent, r.StatusCode)
 
-	resp, _, err = client.PermissionV1().WarehousePermission().GetAssignments(t.Context(), wh, nil)
+	resp, _, err = c.PermissionsOpenfgaAPI.GetWarehouseAssignmentsById(t.Context(), wh).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, resp)
-
-	// permission added
-	want = &permissionv1.GetWarehouseAssignmentsResponse{
-		Assignments: []*permissionv1.WarehouseAssignment{
-			{
-				Assignee: permissionv1.UserOrRole{
-					Type:  permissionv1.UserType,
-					Value: adminID,
-				},
-				Assignment: permissionv1.OwnershipWarehouseAssignment,
-			},
-			{
-				Assignee: permissionv1.UserOrRole{
-					Type:  permissionv1.UserType,
-					Value: user.ID,
-				},
-				Assignment: permissionv1.DescribeWarehouseAssignment,
-			},
+	assert.ElementsMatch(t,
+		[]permissions.AssignmentRow{
+			{PrincipalType: "user", PrincipalID: adminID, Relation: "ownership"},
+			{PrincipalType: "user", PrincipalID: user.Id, Relation: "describe"},
 		},
-	}
+		describeAssignments(t, resp.Assignments),
+	)
 
-	assert.Equal(t, want, resp)
+	delReq := managementv1.NewUpdateWarehouseAssignmentsRequest()
+	delReq.Deletes = append(delReq.Deletes, userAssignment[managementv1.WarehouseAssignment](t, "describe", user.Id))
 
-	// removing permission
-	r, err = client.PermissionV1().WarehousePermission().Update(t.Context(), wh, &permissionv1.UpdateWarehousePermissionsOptions{
-		Deletes: []*permissionv1.WarehouseAssignment{
-			{
-				Assignee: permissionv1.UserOrRole{
-					Type:  permissionv1.UserType,
-					Value: user.ID,
-				},
-				Assignment: permissionv1.DescribeWarehouseAssignment,
-			},
-		},
-	})
-
+	r, err = c.PermissionsOpenfgaAPI.UpdateWarehouseAssignmentsById(t.Context(), wh).UpdateWarehouseAssignmentsRequest(*delReq).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, r)
 	assert.Equal(t, http.StatusNoContent, r.StatusCode)
 
-	resp, _, err = client.PermissionV1().WarehousePermission().GetAssignments(t.Context(), wh, nil)
+	resp, _, err = c.PermissionsOpenfgaAPI.GetWarehouseAssignmentsById(t.Context(), wh).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, resp)
-
-	// permission deleted
-	want = &permissionv1.GetWarehouseAssignmentsResponse{
-		Assignments: []*permissionv1.WarehouseAssignment{
-			{
-				Assignee: permissionv1.UserOrRole{
-					Type:  permissionv1.UserType,
-					Value: adminID,
-				},
-				Assignment: permissionv1.OwnershipWarehouseAssignment,
-			},
-		},
-	}
-
-	assert.Equal(t, want, resp)
+	assert.ElementsMatch(t,
+		[]permissions.AssignmentRow{{PrincipalType: "user", PrincipalID: adminID, Relation: "ownership"}},
+		describeAssignments(t, resp.Assignments),
+	)
 }
 
 func TestPermissions_Warehouse_SameAdd(t *testing.T) {
-	client := Setup(t)
+	c := sharedClient
 
-	user := MustProvisionUser(t, client)
+	user := MustProvisionUser(t, c)
+	project := MustCreateProject(t, c)
+	wh, _ := MustCreateWarehouse(t, c, project)
 
-	project := MustCreateProject(t, client)
-	wh, _ := MustCreateWarehouse(t, client, project)
+	req := managementv1.NewUpdateWarehouseAssignmentsRequest()
+	req.Writes = append(req.Writes, userAssignment[managementv1.WarehouseAssignment](t, "modify", user.Id))
 
-	opt := &permissionv1.UpdateWarehousePermissionsOptions{
-		Writes: []*permissionv1.WarehouseAssignment{
-			{
-				Assignee: permissionv1.UserOrRole{
-					Type:  permissionv1.UserType,
-					Value: user.ID,
-				},
-				Assignment: permissionv1.ModifyWarehouseAssignment,
-			},
-		},
-	}
-
-	// adding permission
-	r, err := client.PermissionV1().WarehousePermission().Update(t.Context(), wh, opt)
-
+	r, err := c.PermissionsOpenfgaAPI.UpdateWarehouseAssignmentsById(t.Context(), wh).UpdateWarehouseAssignmentsRequest(*req).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, r)
 	assert.Equal(t, http.StatusNoContent, r.StatusCode)
 
-	// adding same permission
-	r, err = client.PermissionV1().WarehousePermission().Update(t.Context(), wh, opt)
-
-	require.ErrorContains(t, err, "TupleAlreadyExistsError")
+	r, err = c.PermissionsOpenfgaAPI.UpdateWarehouseAssignmentsById(t.Context(), wh).UpdateWarehouseAssignmentsRequest(*req).Execute()
+	require.Error(t, err)
+	require.NotNil(t, r)
+	assert.Equal(t, http.StatusConflict, r.StatusCode)
+	assert.Contains(t, errorBody(err), "TupleAlreadyExistsError")
 }
 
 func TestPermissions_Warehouse_Add_Role(t *testing.T) {
-	client := Setup(t)
+	c := sharedClient
 
-	project := MustCreateProject(t, client)
-	wh, _ := MustCreateWarehouse(t, client, project)
-	role := MustCreateRole(t, client, project)
+	project := MustCreateProject(t, c)
+	wh, _ := MustCreateWarehouse(t, c, project)
+	role := MustCreateRole(t, c, project)
 
-	r, err := client.PermissionV1().WarehousePermission().Update(t.Context(), wh, &permissionv1.UpdateWarehousePermissionsOptions{
-		Writes: []*permissionv1.WarehouseAssignment{
-			{
-				Assignee: permissionv1.UserOrRole{
-					Type:  permissionv1.RoleType,
-					Value: role.ID,
-				},
-				Assignment: permissionv1.DescribeWarehouseAssignment,
-			},
-		},
-	})
+	addReq := managementv1.NewUpdateWarehouseAssignmentsRequest()
+	addReq.Writes = append(addReq.Writes, roleAssignment[managementv1.WarehouseAssignment](t, "describe", role.Id))
+
+	r, err := c.PermissionsOpenfgaAPI.UpdateWarehouseAssignmentsById(t.Context(), wh).UpdateWarehouseAssignmentsRequest(*addReq).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, r)
 	assert.Equal(t, http.StatusNoContent, r.StatusCode)
 
-	resp, r, err := client.PermissionV1().WarehousePermission().GetAssignments(t.Context(), wh, nil)
+	resp, _, err := c.PermissionsOpenfgaAPI.GetWarehouseAssignmentsById(t.Context(), wh).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, r)
-
-	want := &permissionv1.GetWarehouseAssignmentsResponse{
-		Assignments: []*permissionv1.WarehouseAssignment{
-			{
-				Assignee: permissionv1.UserOrRole{
-					Type:  permissionv1.UserType,
-					Value: adminID,
-				},
-				Assignment: permissionv1.OwnershipWarehouseAssignment,
-			},
-			{
-				Assignee: permissionv1.UserOrRole{
-					Type:  permissionv1.RoleType,
-					Value: role.ID,
-				},
-				Assignment: permissionv1.DescribeWarehouseAssignment,
-			},
+	assert.ElementsMatch(t,
+		[]permissions.AssignmentRow{
+			{PrincipalType: "user", PrincipalID: adminID, Relation: "ownership"},
+			{PrincipalType: "role", PrincipalID: role.Id, Relation: "describe"},
 		},
-	}
-
-	assert.Equal(t, want, resp)
+		describeAssignments(t, resp.Assignments),
+	)
 }

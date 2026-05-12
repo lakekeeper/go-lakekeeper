@@ -1,330 +1,199 @@
 //go:build integration
-// +build integration
 
+// Tests in this file write to assignment graphs on the *default project*
+// (a shared process-wide resource) and assert exact assignment sets. They
+// are deliberately serial — adding t.Parallel() would race the ElementsMatch
+// checks. New tests that target a freshly-created project are safe to
+// parallelize; ones that touch defaultProjectID are not.
 package integration
 
 import (
+	"context"
 	"net/http"
 	"testing"
 
-	permissionv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1/permission"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
+	"github.com/lakekeeper/go-lakekeeper/pkg/permissions"
 )
 
-func TestPermissions_Project_GetAccess(t *testing.T) {
-	client := Setup(t)
+// projectAdminRow is the AssignmentRow shape for the auto-granted admin
+// assignment that bootstrap puts on the default project.
+func projectAdminRow() permissions.AssignmentRow {
+	return permissions.AssignmentRow{PrincipalType: "user", PrincipalID: adminID, Relation: "project_admin"}
+}
 
-	resp, r, err := client.PermissionV1().ProjectPermission().GetAccess(t.Context(), defaultProjectID, nil)
+func TestPermissions_Project_GetAccess(t *testing.T) {
+	c := sharedClient
+
+	resp, r, err := c.PermissionsOpenfgaAPI.GetProjectAccessById(t.Context(), defaultProjectID).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, resp)
 	assert.Equal(t, http.StatusOK, r.StatusCode)
 
-	// User should have all permissions on the project
-	want := []permissionv1.ProjectAction{
-		permissionv1.CreateWarehouse,
-		permissionv1.DeleteProject,
-		permissionv1.RenameProject,
-		permissionv1.ListWarehouses,
-		permissionv1.CreateRole,
-		permissionv1.ListRoles,
-		permissionv1.SearchRoles,
-		permissionv1.ReadProjectAssignments,
-		permissionv1.GrantProjectRoleCreator,
-		permissionv1.GrantProjectCreate,
-		permissionv1.GrantProjectDescribe,
-		permissionv1.GrantProjectModify,
-		permissionv1.GrantProjectSelet,
-		permissionv1.GrantProjectAdmin,
-		permissionv1.GrantSecurityAdmin,
-		permissionv1.GrantDataAdmin,
-		permissionv1.GetProjectEndpointStatistics,
+	want := []managementv1.ProjectAction{
+		managementv1.ProjectActionCreateWarehouse,
+		managementv1.ProjectActionDelete,
+		managementv1.ProjectActionRename,
+		managementv1.ProjectActionListWarehouses,
+		managementv1.ProjectActionCreateRole,
+		managementv1.ProjectActionListRoles,
+		managementv1.ProjectActionSearchRoles,
+		managementv1.ProjectActionReadAssignments,
+		managementv1.ProjectActionGrantRoleCreator,
+		managementv1.ProjectActionGrantCreate,
+		managementv1.ProjectActionGrantDescribe,
+		managementv1.ProjectActionGrantModify,
+		managementv1.ProjectActionGrantSelect,
+		managementv1.ProjectActionGrantProjectAdmin,
+		managementv1.ProjectActionGrantSecurityAdmin,
+		managementv1.ProjectActionGrantDataAdmin,
+		managementv1.ProjectActionGetEndpointStatistics,
 	}
-
 	assert.Subset(t, want, resp.AllowedActions)
 }
 
 func TestPermissions_Project_GetAssignments(t *testing.T) {
-	client := Setup(t)
+	c := sharedClient
 
-	resp, r, err := client.PermissionV1().ProjectPermission().GetAssignments(t.Context(), defaultProjectID, nil)
+	resp, r, err := c.PermissionsOpenfgaAPI.GetProjectAssignmentsById(t.Context(), defaultProjectID).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, resp)
 	assert.Equal(t, http.StatusOK, r.StatusCode)
 
-	// User should have all permissions on the project
-	want := &permissionv1.GetProjectAssignmentsResponse{
-		Assignments: []*permissionv1.ProjectAssignment{
-			{
-				Assignee: permissionv1.UserOrRole{
-					Type:  permissionv1.UserType,
-					Value: adminID,
-				},
-				Assignment: permissionv1.AdminProjectAssignment,
-			},
-		},
-		ProjectID: defaultProjectID,
-	}
-
-	assert.Equal(t, want, resp)
+	assert.Equal(t, defaultProjectID, resp.ProjectId)
+	assert.ElementsMatch(t,
+		[]permissions.AssignmentRow{projectAdminRow()},
+		describeAssignments(t, resp.Assignments),
+	)
 }
 
 func TestPermissions_Project_Update(t *testing.T) {
-	client := Setup(t)
+	c := sharedClient
 
-	user := MustProvisionUser(t, client)
+	user := MustProvisionUser(t, c)
 
-	resp, _, err := client.PermissionV1().ProjectPermission().GetAssignments(t.Context(), defaultProjectID, nil)
+	resp, _, err := c.PermissionsOpenfgaAPI.GetProjectAssignmentsById(t.Context(), defaultProjectID).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, resp)
+	assert.ElementsMatch(t,
+		[]permissions.AssignmentRow{projectAdminRow()},
+		describeAssignments(t, resp.Assignments),
+	)
 
-	// initial permissions
-	want := &permissionv1.GetProjectAssignmentsResponse{
-		Assignments: []*permissionv1.ProjectAssignment{
-			{
-				Assignee: permissionv1.UserOrRole{
-					Type:  permissionv1.UserType,
-					Value: adminID,
-				},
-				Assignment: permissionv1.AdminProjectAssignment,
-			},
-		},
-		ProjectID: defaultProjectID,
-	}
+	addReq := managementv1.NewUpdateProjectAssignmentsRequest()
+	addReq.Writes = append(addReq.Writes, userAssignment[managementv1.ProjectAssignment](t, "select", user.Id))
 
-	assert.Equal(t, want, resp)
-
-	// adding permission
-	r, err := client.PermissionV1().ProjectPermission().Update(t.Context(), defaultProjectID, &permissionv1.UpdateProjectPermissionsOptions{
-		Writes: []*permissionv1.ProjectAssignment{
-			{
-				Assignee: permissionv1.UserOrRole{
-					Type:  permissionv1.UserType,
-					Value: user.ID,
-				},
-				Assignment: permissionv1.SelectProjectAssignment,
-			},
-		},
-	})
-
+	r, err := c.PermissionsOpenfgaAPI.UpdateProjectAssignmentsById(t.Context(), defaultProjectID).UpdateProjectAssignmentsRequest(*addReq).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, r)
 	assert.Equal(t, http.StatusNoContent, r.StatusCode)
 
-	resp, _, err = client.PermissionV1().ProjectPermission().GetAssignments(t.Context(), defaultProjectID, nil)
+	resp, _, err = c.PermissionsOpenfgaAPI.GetProjectAssignmentsById(t.Context(), defaultProjectID).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, resp)
-
-	// permission added
-	want = &permissionv1.GetProjectAssignmentsResponse{
-		Assignments: []*permissionv1.ProjectAssignment{
-			{
-				Assignee: permissionv1.UserOrRole{
-					Type:  permissionv1.UserType,
-					Value: adminID,
-				},
-				Assignment: permissionv1.AdminProjectAssignment,
-			},
-			{
-				Assignee: permissionv1.UserOrRole{
-					Type:  permissionv1.UserType,
-					Value: user.ID,
-				},
-				Assignment: permissionv1.SelectProjectAssignment,
-			},
+	assert.ElementsMatch(t,
+		[]permissions.AssignmentRow{
+			projectAdminRow(),
+			{PrincipalType: "user", PrincipalID: user.Id, Relation: "select"},
 		},
-		ProjectID: defaultProjectID,
-	}
+		describeAssignments(t, resp.Assignments),
+	)
 
-	assert.Equal(t, want, resp)
+	delReq := managementv1.NewUpdateProjectAssignmentsRequest()
+	delReq.Deletes = append(delReq.Deletes, userAssignment[managementv1.ProjectAssignment](t, "select", user.Id))
 
-	// removing permission
-	r, err = client.PermissionV1().ProjectPermission().Update(t.Context(), defaultProjectID, &permissionv1.UpdateProjectPermissionsOptions{
-		Deletes: []*permissionv1.ProjectAssignment{
-			{
-				Assignee: permissionv1.UserOrRole{
-					Type:  permissionv1.UserType,
-					Value: user.ID,
-				},
-				Assignment: permissionv1.SelectProjectAssignment,
-			},
-		},
-	})
-
+	r, err = c.PermissionsOpenfgaAPI.UpdateProjectAssignmentsById(t.Context(), defaultProjectID).UpdateProjectAssignmentsRequest(*delReq).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, r)
 	assert.Equal(t, http.StatusNoContent, r.StatusCode)
 
-	resp, _, err = client.PermissionV1().ProjectPermission().GetAssignments(t.Context(), defaultProjectID, nil)
+	resp, _, err = c.PermissionsOpenfgaAPI.GetProjectAssignmentsById(t.Context(), defaultProjectID).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, resp)
-
-	// permission deleted
-	want = &permissionv1.GetProjectAssignmentsResponse{
-		Assignments: []*permissionv1.ProjectAssignment{
-			{
-				Assignee: permissionv1.UserOrRole{
-					Type:  permissionv1.UserType,
-					Value: adminID,
-				},
-				Assignment: permissionv1.AdminProjectAssignment,
-			},
-		},
-		ProjectID: defaultProjectID,
-	}
-
-	assert.Equal(t, want, resp)
+	assert.ElementsMatch(t,
+		[]permissions.AssignmentRow{projectAdminRow()},
+		describeAssignments(t, resp.Assignments),
+	)
 }
 
 func TestPermissions_Project_SameAdd(t *testing.T) {
-	client := Setup(t)
+	c := sharedClient
 
-	user := MustProvisionUser(t, client)
+	user := MustProvisionUser(t, c)
 
-	opt := &permissionv1.UpdateProjectPermissionsOptions{
-		Writes: []*permissionv1.ProjectAssignment{
-			{
-				Assignee: permissionv1.UserOrRole{
-					Type:  permissionv1.UserType,
-					Value: user.ID,
-				},
-				Assignment: permissionv1.ModifyProjectAssignment,
-			},
-		},
-	}
+	req := managementv1.NewUpdateProjectAssignmentsRequest()
+	req.Writes = append(req.Writes, userAssignment[managementv1.ProjectAssignment](t, "modify", user.Id))
 
-	// adding permission
-	r, err := client.PermissionV1().ProjectPermission().Update(t.Context(), defaultProjectID, opt)
-
+	r, err := c.PermissionsOpenfgaAPI.UpdateProjectAssignmentsById(t.Context(), defaultProjectID).UpdateProjectAssignmentsRequest(*req).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, r)
 	assert.Equal(t, http.StatusNoContent, r.StatusCode)
+	// defaultProjectID is a shared resource; undo the write so other tests
+	// asserting exact assignment sets don't see a leftover tuple. Cleanups
+	// run LIFO, so this fires before MustProvisionUser's user-delete cleanup.
+	t.Cleanup(func() {
+		delReq := managementv1.NewUpdateProjectAssignmentsRequest()
+		delReq.Deletes = append(delReq.Deletes, userAssignment[managementv1.ProjectAssignment](t, "modify", user.Id))
+		if _, err := c.PermissionsOpenfgaAPI.UpdateProjectAssignmentsById(context.Background(), defaultProjectID).UpdateProjectAssignmentsRequest(*delReq).Execute(); err != nil {
+			t.Errorf("undo project assignment: %v", err)
+		}
+	})
 
-	// adding same permission
-	r, err = client.PermissionV1().ProjectPermission().Update(t.Context(), defaultProjectID, opt)
-
-	require.ErrorContains(t, err, "TupleAlreadyExistsError")
+	r, err = c.PermissionsOpenfgaAPI.UpdateProjectAssignmentsById(t.Context(), defaultProjectID).UpdateProjectAssignmentsRequest(*req).Execute()
+	require.Error(t, err)
+	require.NotNil(t, r)
+	assert.Equal(t, http.StatusConflict, r.StatusCode)
+	assert.Contains(t, errorBody(err), "TupleAlreadyExistsError")
 }
 
 func TestPermissions_Project_Add_NewProject(t *testing.T) {
-	client := Setup(t)
+	c := sharedClient
 
-	user := MustProvisionUser(t, client)
+	user := MustProvisionUser(t, c)
+	projectID := MustCreateProject(t, c)
 
-	projectID := MustCreateProject(t, client)
-
-	resp, r, err := client.PermissionV1().ProjectPermission().GetAssignments(t.Context(), projectID, nil)
+	resp, r, err := c.PermissionsOpenfgaAPI.GetProjectAssignmentsById(t.Context(), projectID).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, resp)
 	assert.Equal(t, http.StatusOK, r.StatusCode)
+	assert.Equal(t, projectID, resp.ProjectId)
+	assert.ElementsMatch(t,
+		[]permissions.AssignmentRow{{PrincipalType: "user", PrincipalID: adminID, Relation: "project_admin"}},
+		describeAssignments(t, resp.Assignments),
+	)
 
-	// only creator should have assignments on new project
-	want := &permissionv1.GetProjectAssignmentsResponse{
-		Assignments: []*permissionv1.ProjectAssignment{
-			{
-				Assignee: permissionv1.UserOrRole{
-					Type:  permissionv1.UserType,
-					Value: adminID,
-				},
-				Assignment: permissionv1.AdminProjectAssignment,
-			},
-		},
-		ProjectID: projectID,
-	}
+	addReq := managementv1.NewUpdateProjectAssignmentsRequest()
+	addReq.Writes = append(addReq.Writes, userAssignment[managementv1.ProjectAssignment](t, "modify", user.Id))
 
-	assert.Equal(t, want, resp)
-
-	opt := &permissionv1.UpdateProjectPermissionsOptions{
-		Writes: []*permissionv1.ProjectAssignment{
-			{
-				Assignee: permissionv1.UserOrRole{
-					Type:  permissionv1.UserType,
-					Value: user.ID,
-				},
-				Assignment: permissionv1.ModifyProjectAssignment,
-			},
-		},
-	}
-
-	// adding permission
-	r, err = client.PermissionV1().ProjectPermission().Update(t.Context(), projectID, opt)
+	r, err = c.PermissionsOpenfgaAPI.UpdateProjectAssignmentsById(t.Context(), projectID).UpdateProjectAssignmentsRequest(*addReq).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, r)
 	assert.Equal(t, http.StatusNoContent, r.StatusCode)
 
-	resp, r, err = client.PermissionV1().ProjectPermission().GetAssignments(t.Context(), projectID, nil)
+	resp, _, err = c.PermissionsOpenfgaAPI.GetProjectAssignmentsById(t.Context(), projectID).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, resp)
-	assert.Equal(t, http.StatusOK, r.StatusCode)
-
-	// we should have the created assignments for the new user
-	want = &permissionv1.GetProjectAssignmentsResponse{
-		Assignments: []*permissionv1.ProjectAssignment{
-			{
-				Assignee: permissionv1.UserOrRole{
-					Type:  permissionv1.UserType,
-					Value: adminID,
-				},
-				Assignment: permissionv1.AdminProjectAssignment,
-			},
-			{
-				Assignee: permissionv1.UserOrRole{
-					Type:  permissionv1.UserType,
-					Value: user.ID,
-				},
-				Assignment: permissionv1.ModifyProjectAssignment,
-			},
+	assert.ElementsMatch(t,
+		[]permissions.AssignmentRow{
+			{PrincipalType: "user", PrincipalID: adminID, Relation: "project_admin"},
+			{PrincipalType: "user", PrincipalID: user.Id, Relation: "modify"},
 		},
-		ProjectID: projectID,
-	}
-
-	assert.Equal(t, want, resp)
+		describeAssignments(t, resp.Assignments),
+	)
 }
 
 func TestPermissions_Project_Add_Role(t *testing.T) {
-	client := Setup(t)
+	c := sharedClient
 
-	project := MustCreateProject(t, client)
-	role := MustCreateRole(t, client, project)
+	projectID := MustCreateProject(t, c)
+	role := MustCreateRole(t, c, projectID)
 
-	r, err := client.PermissionV1().ProjectPermission().Update(t.Context(), project, &permissionv1.UpdateProjectPermissionsOptions{
-		Writes: []*permissionv1.ProjectAssignment{
-			{
-				Assignee: permissionv1.UserOrRole{
-					Type:  permissionv1.RoleType,
-					Value: role.ID,
-				},
-				Assignment: permissionv1.DescribeProjectAssignment,
-			},
-		},
-	})
+	addReq := managementv1.NewUpdateProjectAssignmentsRequest()
+	addReq.Writes = append(addReq.Writes, roleAssignment[managementv1.ProjectAssignment](t, "describe", role.Id))
+
+	r, err := c.PermissionsOpenfgaAPI.UpdateProjectAssignmentsById(t.Context(), projectID).UpdateProjectAssignmentsRequest(*addReq).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, r)
 	assert.Equal(t, http.StatusNoContent, r.StatusCode)
 
-	resp, r, err := client.PermissionV1().ProjectPermission().GetAssignments(t.Context(), project, nil)
+	resp, _, err := c.PermissionsOpenfgaAPI.GetProjectAssignmentsById(t.Context(), projectID).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, r)
-
-	want := &permissionv1.GetProjectAssignmentsResponse{
-		Assignments: []*permissionv1.ProjectAssignment{
-			{
-				Assignee: permissionv1.UserOrRole{
-					Type:  permissionv1.UserType,
-					Value: adminID,
-				},
-				Assignment: permissionv1.AdminProjectAssignment,
-			},
-			{
-				Assignee: permissionv1.UserOrRole{
-					Type:  permissionv1.RoleType,
-					Value: role.ID,
-				},
-				Assignment: permissionv1.DescribeProjectAssignment,
-			},
+	assert.ElementsMatch(t,
+		[]permissions.AssignmentRow{
+			{PrincipalType: "user", PrincipalID: adminID, Relation: "project_admin"},
+			{PrincipalType: "role", PrincipalID: role.Id, Relation: "describe"},
 		},
-		ProjectID: project,
-	}
-
-	assert.Equal(t, want, resp)
+		describeAssignments(t, resp.Assignments),
+	)
 }

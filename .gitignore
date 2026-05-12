@@ -41,3 +41,21 @@ target/
 
 # MacOS
 .DS_Store
+
+# Claude Code — per-user artifacts (team-shared parts of .claude/ stay tracked)
+.claude/worktrees/
+.claude/settings.local.json
+.claude/.credentials.json
+CLAUDE.local.md
+
+# OpenAPI spec preprocessing artefacts (regenerated each `make generate`)
+*.processed.yaml
+# Stray binary from `go build ./api/openapi/preprocess/` run at repo root.
+# The Makefile invokes the preprocessor via `go run`, not `go build`, so
+# this file is never produced by the build itself — only by ad-hoc local
+# invocations. Tracked-out so it can't accidentally land in a commit.
+/preprocess
+
+# E2E harness artefacts
+dist/lkctl-e2e
+e2e/kind/.kubeconfig

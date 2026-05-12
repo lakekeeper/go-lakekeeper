@@ -62,6 +62,18 @@ Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md) to help create 
 - Use clear and descriptive commit messages.
 - Follow the [Effective Go](https://golang.org/doc/effective_go.html) guidelines.
 
+## Regenerating the API client
+
+The Management API client (`pkg/apis/management/v1/`) is generated from
+the upstream OpenAPI spec — **do not hand-edit any file in that
+directory.** The full regeneration workflow, including the OpenAPI
+preprocessor and the generated/manual file boundary, is documented in
+[docs/GENERATION.md](docs/GENERATION.md). The short version:
+
+```sh
+make generate
+```
+
 ## Testing
 
 Run all tests before opening a PR:

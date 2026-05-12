@@ -1,162 +1,243 @@
 # Authentication
 
-`go-lakekeeper` uses a pluggable `AuthSource` interface so that any credential mechanism can be swapped without changing application code. The `pkg/core` package defines the interface and ships three ready-made implementations.
+This guide walks from "which auth flow do I want?" to a working setup on
+both `lkctl` and the Go SDK. For the underlying reference material:
 
-## The `AuthSource` Interface
+- SDK: see [PACKAGES.md `pkg/core` Authentication](PACKAGES.md#authentication)
+  for the `AuthSource` interface, all three implementations, and the OAuth2
+  sequence diagram.
+- CLI: see [CLI.md Global flags & environment variables](CLI.md#global-flags--environment-variables)
+  for the full flag table and per-mode invocations.
+
+## Overview
+
+`AuthSource` ([`pkg/core/auth.go`](../pkg/core/auth.go)) is the single
+abstraction both surfaces consume. `lkctl` selects an implementation from
+`--auth-mode`; the SDK accepts one directly via
+`client.NewWithAuthSource`. Three implementations ship in `pkg/core`:
+`OAuthClientCredentialsAuthSource`, `AccessTokenAuthSource`,
+`K8sServiceAccountAuthSource`. Each one's `Init` validates eagerly so a
+misconfigured token URL, empty bearer, or unreadable service-account
+token surfaces at `client.NewWithAuthSource` rather than at the first
+request.
+
+The umbrella package adds two convenience constructors that hide the
+two-line `core.*AuthSource{}` + `client.NewWithAuthSource` setup for the
+common cases:
 
 ```go
-type AuthSource interface {
-    Init(context.Context) error
-    Header(context.Context) (key, value string, err error)
-    GetToken(context.Context) (string, error)
-}
+import "github.com/lakekeeper/go-lakekeeper/pkg/lakekeeper"
+
+// OAuth client-credentials in one call
+c, err := lakekeeper.NewOAuthClientCredentials(ctx, baseURL, tokenURL, clientID, clientSecret, []string{"lakekeeper"})
+
+// Kubernetes service account, default token path
+c, err := lakekeeper.NewK8sServiceAccount(ctx, baseURL, "")
+
+// Bearer token (the umbrella's lakekeeper.New is the shortest path)
+c, err := lakekeeper.New(ctx, baseURL, token)
 ```
 
-| Method | Called | Purpose |
-|---|---|---|
-| `Init` | Once, lazily on the first `Do()` call (`sync.Once`) | One-time setup — e.g. reading a file from disk |
-| `Header` | Every request | Returns the `Authorization` header key+value to inject |
-| `GetToken` | On demand | Returns a raw access token string; used by `CatalogV1()` to pass a token to `apache/iceberg-go` |
+## Choosing a flow
 
----
+| Scenario | Mode |
+|---|---|
+| Production service with an OIDC IdP (Keycloak, Dex, …) | `oauth2` |
+| Short-lived script, CI job, manual testing | `token` |
+| Workload running inside a Kubernetes pod | `k8s` |
+| Custom token logic (refresh token, device flow, …) | implement `AuthSource` directly (SDK only) |
 
-## `OAuthTokenSource` — OAuth 2.0 Client Credentials
+The remaining sections show each flow on the CLI and the SDK side by side.
 
-The most common production choice. Wraps any `golang.org/x/oauth2.TokenSource`, which handles token caching and silent renewal automatically.
+## OAuth2 client credentials
+
+The default mode. Tokens are obtained from an OIDC token endpoint and
+re-fetched transparently when expired by `golang.org/x/oauth2`.
+
+**CLI** — see [CLI.md auth-mode examples](CLI.md#auth-mode-examples) for
+the full flag table:
+
+```sh
+export LAKEKEEPER_BASE_URL=http://localhost:8181
+# LAKEKEEPER_AUTH_MODE=oauth2 is the default — no need to set it
+export LAKEKEEPER_TOKEN_URL=http://localhost:30080/realms/iceberg/protocol/openid-connect/token
+export LAKEKEEPER_CLIENT_ID=<your-client-id>
+export LAKEKEEPER_CLIENT_SECRET=<your-client-secret>
+export LAKEKEEPER_SCOPE=lakekeeper
+
+lkctl whoami        # smoke test
+```
+
+**SDK** — see [PACKAGES.md `OAuthClientCredentialsAuthSource`](PACKAGES.md#oauthclientcredentialsauthsource--oauth-20-client-credentials)
+for the sequence diagram and full reference. The umbrella package's
+`NewOAuthClientCredentials` is the shortest path:
+
+```go
+import "github.com/lakekeeper/go-lakekeeper/pkg/lakekeeper"
+
+c, err := lakekeeper.NewOAuthClientCredentials(ctx,
+    "http://localhost:8181",
+    "http://localhost:30080/realms/iceberg/protocol/openid-connect/token",
+    "<your-client-id>", "<your-client-secret>",
+    []string{"lakekeeper"})
+```
+
+If you need to pass a pre-built `oauth2.TokenSource` (e.g. for an
+auth-code or device-flow source), drop down to the underlying type:
 
 ```go
 import (
     "golang.org/x/oauth2/clientcredentials"
+
+    "github.com/lakekeeper/go-lakekeeper/pkg/client"
     "github.com/lakekeeper/go-lakekeeper/pkg/core"
-    lakekeeper "github.com/lakekeeper/go-lakekeeper/pkg/client"
 )
 
-cfg := &clientcredentials.Config{
-    ClientID:     "my-client",
-    ClientSecret: "my-secret",
-    TokenURL:     "https://keycloak.example.com/realms/iceberg/protocol/openid-connect/token",
-    Scopes:       []string{"lakekeeper"},
-}
-
-as := &core.OAuthTokenSource{TokenSource: cfg.TokenSource(ctx)}
-client, err := lakekeeper.NewAuthSourceClient(ctx, as, "https://lakekeeper.example.com")
+cfg := &clientcredentials.Config{ /* ... */ }
+as := &core.OAuthClientCredentialsAuthSource{TokenSource: cfg.TokenSource(ctx)}
+c, err := client.NewWithAuthSource(ctx, baseURL, as)
 ```
 
-### Flow
+## Static access token
 
-```mermaid
-sequenceDiagram
-    participant App
-    participant OAuthTS as core.OAuthTokenSource
-    participant oauth2 as golang.org/x/oauth2
-    participant Keycloak as Keycloak / OIDC IdP
+Use when a bearer token is obtained out-of-band (CI secret, manual
+impersonation, scripted tests). Renewal is the caller's problem — once
+the token expires, requests return 401. For long-running processes, use
+OAuth2 instead.
 
-    App->>OAuthTS: Header(ctx)
-    OAuthTS->>oauth2: TokenSource.Token()
-    alt token not cached or expired
-        oauth2->>Keycloak: POST /token<br/>grant_type=client_credentials<br/>client_id + client_secret
-        Keycloak-->>oauth2: {"access_token": "…", "expires_in": 300}
-        Note over oauth2: Token cached until expiry
-    end
-    oauth2-->>OAuthTS: *oauth2.Token
-    OAuthTS-->>App: "Authorization", "Bearer <access_token>"
+**CLI** — see [CLI.md static-access-token example](CLI.md#auth-mode-examples):
+
+```sh
+export LAKEKEEPER_BASE_URL=http://localhost:8181
+export LAKEKEEPER_AUTH_MODE=token
+export LAKEKEEPER_ACCESS_TOKEN=<your-bearer-token>
+
+lkctl whoami        # smoke test
 ```
 
-**Notes:**
-- Token renewal is handled transparently by `golang.org/x/oauth2`. No manual refresh logic is needed.
-- In the integration-test stack, the token endpoint is Keycloak at `http://localhost:30080/realms/iceberg/protocol/openid-connect/token`. Any OIDC-compliant IdP works in production.
-- The scope `lakekeeper` is the default; adjust to match your IdP's Lakekeeper audience.
-
----
-
-## `AccessTokenAuthSource` — Static Bearer Token
-
-For short-lived scripts, tests, or environments where a token is obtained out-of-band.
+**SDK** — see [PACKAGES.md `AccessTokenAuthSource`](PACKAGES.md#accesstokenauthsource--static-bearer-token):
 
 ```go
 as := &core.AccessTokenAuthSource{Token: "eyJhbGci..."}
-client, err := lakekeeper.NewAuthSourceClient(ctx, as, baseURL)
+c, err := client.NewWithAuthSource(ctx, baseURL, as)
+
+// Equivalent shorthand:
+c, err := client.New(ctx, baseURL, "eyJhbGci...")
 ```
 
-Or use the convenience constructor:
+## Kubernetes service account
+
+For workloads running inside a pod whose projected service-account token
+is accepted by the Lakekeeper server. The default token path
+(`/var/run/secrets/kubernetes.io/serviceaccount/token`, see
+[`pkg/core/auth.go:16`](../pkg/core/auth.go)) covers the standard
+projected-volume mount; override only for non-default mounts (e.g.
+audience-scoped tokens). **The token file is re-read on every request**, so
+the kubelet's hourly rotation is picked up without process restart.
+
+**CLI** — see [CLI.md k8s example](CLI.md#auth-mode-examples):
+
+```sh
+export LAKEKEEPER_BASE_URL=http://lakekeeper.lakekeeper.svc:8181
+export LAKEKEEPER_AUTH_MODE=k8s
+# --k8s-token-path / LAKEKEEPER_K8S_TOKEN_PATH only needed for non-default mounts
+
+lkctl whoami        # smoke test
+```
+
+**SDK** — the umbrella's `NewK8sServiceAccount` is the shortest path:
 
 ```go
-client, err := lakekeeper.NewClient(ctx, "eyJhbGci...", baseURL)
+import "github.com/lakekeeper/go-lakekeeper/pkg/lakekeeper"
+
+// Default token path
+c, err := lakekeeper.NewK8sServiceAccount(ctx, baseURL, "")
+
+// Custom path (e.g. audience-scoped projected token)
+c, err = lakekeeper.NewK8sServiceAccount(ctx, baseURL, "/var/run/secrets/lakekeeper/token")
 ```
 
-### Flow
-
-```mermaid
-sequenceDiagram
-    participant App
-    participant StaticAS as core.AccessTokenAuthSource
-
-    App->>StaticAS: Header(ctx)
-    StaticAS-->>App: "Authorization", "Bearer <static-token>"
-    Note over App: Token never refreshed.<br/>Caller is responsible for<br/>providing a valid token.
-```
-
-**Notes:**
-- `Init` is a no-op.
-- There is no expiry handling — if the token expires, requests will return 401. Use `OAuthTokenSource` for long-running processes.
-
----
-
-## `K8sServiceAccountAuthSource` — Kubernetes Service Account
-
-For workloads running inside a Kubernetes cluster. The projected service account token is mounted by the kubelet and read once at startup.
+The lower-level shape, when you need to pass extra `client.Option`s or
+share an existing `core.AuthSource` across multiple clients:
 
 ```go
-// Default token path: /var/run/secrets/kubernetes.io/serviceaccount/token
-as := &core.K8sServiceAccountAuthSource{}
+import (
+    "github.com/lakekeeper/go-lakekeeper/pkg/client"
+    "github.com/lakekeeper/go-lakekeeper/pkg/core"
+)
 
-// Or specify a custom path (e.g. for audience-scoped tokens)
-path := "/var/run/secrets/lakekeeper/token"
-as := &core.K8sServiceAccountAuthSource{ServiceAccountTokenPath: &path}
-
-client, err := lakekeeper.NewAuthSourceClient(ctx, as, baseURL)
+as := &core.K8sServiceAccountAuthSource{}  // default path
+c, err := client.NewWithAuthSource(ctx, baseURL, as)
 ```
 
-### Flow
+## Bootstrap
 
-```mermaid
-sequenceDiagram
-    participant Pod
-    participant K8sAS as core.K8sServiceAccountAuthSource
-    participant File as Projected token file<br/>/var/run/secrets/…/token
-    participant Lakekeeper
+Bootstrap is auth-adjacent: until a Lakekeeper server is bootstrapped,
+the only operation it accepts is `POST /management/v1/bootstrap`. The
+first authenticated principal that calls bootstrap becomes the
+server's operator. Both `lkctl` and the SDK can perform this once during
+setup — pick whichever surface owns your provisioning flow.
 
-    Pod->>K8sAS: Init(ctx) [sync.Once on first Do()]
-    K8sAS->>File: os.ReadFile(tokenPath)
-    File-->>K8sAS: k8s SA JWT (string)
-    Note over K8sAS: Token stored in memory.<br/>Not re-read after init.
+**CLI** — explicit, or auto-bootstrap via the global flag (see
+[CLI.md `lkctl server`](CLI.md#lkctl-server)):
 
-    loop Every request
-        Pod->>K8sAS: Header(ctx)
-        K8sAS-->>Pod: "Authorization", "Bearer <k8s-jwt>"
-        Pod->>Lakekeeper: API request
-        Note over Lakekeeper: Lakekeeper validates the JWT<br/>against its OIDC discovery endpoint
-    end
+```sh
+# Explicit one-shot
+lkctl server bootstrap --accept-terms-of-use --as-operator
+
+# Or have any command bootstrap-on-first-run
+lkctl project list --bootstrap   # equivalent to LAKEKEEPER_BOOTSTRAP=true
 ```
 
-**Notes:**
-- The token is read from disk exactly once (`sync.Once`). If the kubelet rotates the projected token, the process must restart to pick up the new token.
-- This implementation does **not** exchange the token with an IdP — it sends the raw k8s JWT directly. Lakekeeper must be configured to trust your cluster's OIDC issuer.
-- For audience-scoped tokens (recommended), configure a `ServiceAccountToken` volume with a specific audience matching your Lakekeeper OIDC client.
+**SDK** — `client.WithInitialBootstrap` (see
+[PACKAGES.md client options](PACKAGES.md#options)):
 
----
+```go
+import (
+    managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
+    "github.com/lakekeeper/go-lakekeeper/pkg/client"
+    "github.com/lakekeeper/go-lakekeeper/pkg/core"
+)
 
-## Choosing an `AuthSource`
+c, err := client.NewWithAuthSource(ctx, baseURL, as,
+    client.WithInitialBootstrap(
+        true,                                       // acceptTermsOfUse
+        true,                                       // isOperator
+        core.Ptr(managementv1.UserTypeApplication), // userType (optional)
+    ),
+)
+```
 
-| Scenario | Recommended `AuthSource` |
-|---|---|
-| Production service with an OIDC IdP (Keycloak, Dex, etc.) | `OAuthTokenSource` with `clientcredentials.Config` |
-| Short-lived script or manual testing | `AccessTokenAuthSource` |
-| Workload running inside Kubernetes | `K8sServiceAccountAuthSource` |
-| Custom token logic (refresh token, device flow, etc.) | Implement `AuthSource` directly |
+`acceptTermsOfUse=false` makes the option a no-op. If the server is
+already bootstrapped, the option is also a no-op — it's safe to leave
+on across restarts.
 
----
+## Environment variables reference
 
-## CLI Authentication
+The CLI honours these variables (names in
+[`pkg/common/env.go`](../pkg/common/env.go), defaults in
+[`pkg/common/defaults.go`](../pkg/common/defaults.go); K8s token-path
+default in [`pkg/core/auth.go`](../pkg/core/auth.go)). The SDK does
+**not** read the environment — pass values explicitly to the
+constructors, or reuse the same `pkg/common` constants if you want
+symmetric behaviour in your own binaries.
 
-The `lkctl` CLI always uses OAuth 2.0 client credentials. Credentials are read from flags or environment variables — see [CLI.md](CLI.md) for the full reference.
+| Var | Default | Used by | Notes |
+|---|---|---|---|
+| `LAKEKEEPER_BASE_URL` | `http://localhost:8181` | CLI | SDK takes baseURL as a `New*` argument |
+| `LAKEKEEPER_AUTH_MODE` | `oauth2` | CLI | SDK selects mode by `AuthSource` type |
+| `LAKEKEEPER_TOKEN_URL` | _(none)_ | CLI | OAuth2 only |
+| `LAKEKEEPER_CLIENT_ID` | _(none)_ | CLI | OAuth2 only |
+| `LAKEKEEPER_CLIENT_SECRET` | _(none)_ | CLI | OAuth2 only |
+| `LAKEKEEPER_SCOPE` | `lakekeeper` | CLI | OAuth2 only; space-separated |
+| `LAKEKEEPER_ACCESS_TOKEN` | _(none)_ | CLI | Token mode only |
+| `LAKEKEEPER_K8S_TOKEN_PATH` | `/var/run/secrets/kubernetes.io/serviceaccount/token` | CLI | K8s mode only |
+| `LAKEKEEPER_BOOTSTRAP` | `false` | CLI | Auto-bootstrap on first run |
+
+## See also
+
+- [AUTHORIZATION.md](AUTHORIZATION.md) — once authenticated, how grants,
+  roles, and access checks work
+- [PACKAGES.md `pkg/core`](PACKAGES.md#pkgcore) — `AuthSource` interface
+  and the three shipped implementations
+- [CLI.md](CLI.md) — full `lkctl` command reference

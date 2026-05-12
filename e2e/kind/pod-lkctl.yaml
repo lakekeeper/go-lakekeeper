@@ -1,0 +1,52 @@
+# lkctl-runner pod: the kind backend `kubectl exec`s into this pod for every
+# CLI invocation. Two consequences of this layout:
+#
+#   1. The projected SA token sits at the standard path
+#      /var/run/secrets/kubernetes.io/serviceaccount/token, so
+#      `lkctl --auth-mode k8s` works without any flag override.
+#   2. The pod stays alive for the entire suite (`sleep infinity`); the
+#      teardown trap in run.sh deletes it explicitly.
+#
+# The token's audience is set to `lakekeeper` to match
+# LAKEKEEPER__OPENID_AUDIENCE in values.yaml.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: lkctl-runner
+  namespace: default
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: lkctl-runner
+  namespace: default
+  labels:
+    app: lkctl-runner
+spec:
+  serviceAccountName: lkctl-runner
+  restartPolicy: Never
+  containers:
+    - name: lkctl
+      image: localhost/lkctl-e2e:dev
+      imagePullPolicy: IfNotPresent
+      # Override the lkctl entrypoint so the pod stays up across kubectl exec
+      # calls; tests then invoke `lkctl ...` via kubectl exec.
+      command: ["/bin/sh", "-c", "sleep infinity"]
+      env:
+        # Used by the in-pod bootstrap step in run.sh. Tests pass --base-url
+        # explicitly via LAKEKEEPER_BASE_URL exported on the host, so this
+        # default only needs to satisfy the bootstrap call.
+        - name: LAKEKEEPER_BASE_URL
+          value: "http://lakekeeper.default.svc.cluster.local:8181"
+      volumeMounts:
+        - name: sa-token
+          mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+          readOnly: true
+  volumes:
+    - name: sa-token
+      projected:
+        sources:
+          - serviceAccountToken:
+              path: token
+              audience: lakekeeper
+              expirationSeconds: 3600

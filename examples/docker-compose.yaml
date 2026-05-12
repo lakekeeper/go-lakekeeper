@@ -6,8 +6,8 @@ services:
     entrypoint: sh
     command: ["/init.sh"]
     environment:
-      - LAKEKEEPER_SERVER=http://lakekeeper:8181
-      - LAKEKEEPER_AUTH_URL=http://keycloak:8080/realms/iceberg/protocol/openid-connect/token
+      - LAKEKEEPER_BASE_URL=http://lakekeeper:8181
+      - LAKEKEEPER_TOKEN_URL=http://keycloak:8080/realms/iceberg/protocol/openid-connect/token
       - LAKEKEEPER_CLIENT_ID=spark
       - LAKEKEEPER_CLIENT_SECRET=2OR3eRvYfSZzzZ16MlPd95jhLnOaLM52
     volumes:

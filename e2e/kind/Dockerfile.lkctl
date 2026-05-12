@@ -1,0 +1,13 @@
+# Runner image for the lkctl E2E suite under kind.
+#
+# We need a base with a shell so the runner pod can `sleep infinity` while
+# `kubectl exec`s drive the CLI; that rules out distroless/static. Alpine
+# is small (~7 MB), has sh+sleep, and is widely cached in CI.
+#
+# The host build produces dist/lkctl (via go build) before this Dockerfile
+# is invoked; we COPY the artefact in rather than running a second
+# toolchain in the image.
+FROM alpine:3.20
+RUN apk add --no-cache ca-certificates
+COPY dist/lkctl /usr/local/bin/lkctl
+ENTRYPOINT ["/usr/local/bin/lkctl"]

@@ -1,10 +1,13 @@
 # lkctl — CLI Reference
 
-`lkctl` is the command-line interface for Lakekeeper. It is currently in **preview**; the command surface may change before a stable release.
+`lkctl` is the command-line interface for Lakekeeper. It is currently in
+**preview**; the command surface may change before a stable release.
 
 ## Installation
 
-Download a pre-built binary from the [Releases page](https://github.com/lakekeeper/go-lakekeeper/releases/latest), or run via Docker:
+Download a pre-built binary from the
+[Releases page](https://github.com/lakekeeper/go-lakekeeper/releases/latest),
+or run via Docker:
 
 ```sh
 docker run --rm quay.io/lakekeeper/lkctl version
@@ -25,40 +28,89 @@ Other useful make targets:
 | `make validate` | `go vet` + `golangci-lint` (no build) |
 | `make test` | Unit tests under `./pkg/…` with coverage |
 | `make test-integration` | Spin up Lakekeeper + Keycloak + MinIO + OpenFGA via docker-compose and run integration tests |
+| `make test-e2e-compose` | E2E suite for `lkctl` itself, against the docker-compose stack (build tag `e2e_cli`). See [`e2e/`](../e2e/) |
+| `make test-e2e-kind` | E2E suite for `lkctl --auth-mode k8s` against a real kind cluster. See [`e2e/kind/`](../e2e/kind/) |
+| `make generate` | Regenerate the Management API client from the OpenAPI spec — see [GENERATION.md](GENERATION.md) |
 | `make snapshot` | goreleaser snapshot (multi-arch, no publish) |
 | `make clean` | Tear down compose stack and remove build artefacts |
 
 ---
 
-## Global Flags & Environment Variables
+## Global flags & environment variables
 
-Every `lkctl` command accepts these persistent flags. Environment variables or a `.env` file in the working directory can replace all flags.
+Every `lkctl` command accepts these persistent flags. Environment
+variables or a `.env` file in the working directory replace any flag.
 
 | Flag | Env variable | Default | Description |
 |---|---|---|---|
-| `--server` | `LAKEKEEPER_SERVER` | `http://localhost:8181` | Lakekeeper base URL |
-| `--auth-url` | `LAKEKEEPER_AUTH_URL` | _(none)_ | OAuth2 token endpoint |
-| `--client-id` | `LAKEKEEPER_CLIENT_ID` | _(none)_ | OAuth2 `client_id` |
-| `--client-secret` | `LAKEKEEPER_CLIENT_SECRET` | _(none)_ | OAuth2 `client_secret` |
-| `--scopes` | `LAKEKEEPER_SCOPE` | `lakekeeper` | Space-separated OAuth2 scopes |
+| `--base-url` | `LAKEKEEPER_BASE_URL` | `http://localhost:8181` | Lakekeeper base URL |
+| `--auth-mode` | `LAKEKEEPER_AUTH_MODE` | `oauth2` | Auth mode: `oauth2`, `token`, or `k8s` |
+| `--token-url` | `LAKEKEEPER_TOKEN_URL` | _(none)_ | OAuth2 token endpoint (`auth-mode=oauth2`) |
+| `--client-id` | `LAKEKEEPER_CLIENT_ID` | _(none)_ | OAuth2 `client_id` (`auth-mode=oauth2`) |
+| `--client-secret` | `LAKEKEEPER_CLIENT_SECRET` | _(none)_ | OAuth2 `client_secret` (`auth-mode=oauth2`) |
+| `--scopes` | `LAKEKEEPER_SCOPE` | `lakekeeper` | Space-separated OAuth2 scopes (`auth-mode=oauth2`) |
+| `--access-token` | `LAKEKEEPER_ACCESS_TOKEN` | _(none)_ | Static bearer token (`auth-mode=token`) |
+| `--k8s-token-path` | `LAKEKEEPER_K8S_TOKEN_PATH` | `/var/run/secrets/kubernetes.io/serviceaccount/token` | Service-account token file (`auth-mode=k8s`) |
 | `--bootstrap` | `LAKEKEEPER_BOOTSTRAP` | `false` | Auto-bootstrap server on startup |
 | `--debug` | _(none)_ | `false` | Enable debug logging |
 
-Example with environment variables:
+### Auth mode examples
+
+For a guide-level walkthrough that pairs each flow with the equivalent
+Go SDK setup — and a reference table of every auth-related environment
+variable — see [AUTHENTICATION.md](AUTHENTICATION.md).
+
+**OAuth2 client credentials** (default — used by the integration stack):
 
 ```sh
-export LAKEKEEPER_SERVER=http://localhost:8181
-export LAKEKEEPER_AUTH_URL=http://localhost:30080/realms/iceberg/protocol/openid-connect/token
-export LAKEKEEPER_CLIENT_ID=spark
-export LAKEKEEPER_CLIENT_SECRET=2OR3eRvYfSZzzZ16MlPd95jhLnOaLM
+export LAKEKEEPER_BASE_URL=http://localhost:8181
+export LAKEKEEPER_TOKEN_URL=http://localhost:30080/realms/iceberg/protocol/openid-connect/token
+export LAKEKEEPER_CLIENT_ID=<your-client-id>
+export LAKEKEEPER_CLIENT_SECRET=<your-client-secret>
 export LAKEKEEPER_SCOPE=lakekeeper
+```
+
+**Static access token** — when you already hold a bearer token (CI, short-lived
+credentials, scripted impersonation):
+
+```sh
+export LAKEKEEPER_BASE_URL=http://localhost:8181
+export LAKEKEEPER_AUTH_MODE=token
+export LAKEKEEPER_ACCESS_TOKEN=<your-bearer-token>
+```
+
+**Kubernetes service account** — when running `lkctl` from inside a pod whose
+projected service-account token is accepted by the Lakekeeper server. The
+default path is the standard projected-volume mount; override via
+`--k8s-token-path` only if your pod uses a non-default location.
+
+```sh
+export LAKEKEEPER_BASE_URL=http://lakekeeper.lakekeeper.svc:8181
+export LAKEKEEPER_AUTH_MODE=k8s
 ```
 
 ---
 
-> **Note:** `lkctl catalog` exists as a placeholder but is not yet implemented — it exits with a fatal error. Use `client.CatalogV1()` from the Go SDK for catalog operations.
+## Command tree
 
-## Commands
+Top-level commands (and their aliases):
+
+| Command | Alias | Purpose |
+|---|---|---|
+| `server` | `srv` | Server info, bootstrap, and server-level permissions |
+| `project` | `proj` | Manage projects and their permissions |
+| `warehouse` | `wh` | Manage warehouses (project-scoped) and their permissions |
+| `role` | _(none)_ | Manage roles (project-scoped) and their permissions |
+| `user` | _(none)_ | Manage users |
+| `whoami` | _(none)_ | Print the authenticated principal |
+| `version` | _(none)_ | Print version, commit, build date |
+| `catalog` | _(none)_ | Placeholder — not yet implemented; use `client.CatalogV1` from the SDK |
+
+The grant / revoke / access / assignments verbs follow the same shape
+across `server`, `project`, `warehouse`, and `role`. Read this section
+once for `project` and the others should feel familiar. For the
+underlying authorization model, the assignment-value reference, and an
+end-to-end CLI ↔ SDK workflow, see [AUTHORIZATION.md](AUTHORIZATION.md).
 
 ### `lkctl server`
 
@@ -71,9 +123,13 @@ lkctl server bootstrap --accept-terms-of-use --as-operator
 
 # Or auto-bootstrap via the global flag (bootstraps if needed, then runs the command)
 lkctl project list --bootstrap
-```
 
----
+# Server-level permissions (no resource ID — server is implicit)
+lkctl server access
+lkctl server assignments
+lkctl server grant   --users <USER-ID> --assignments admin
+lkctl server revoke  --users <USER-ID> --assignments admin
+```
 
 ### `lkctl project`
 
@@ -93,24 +149,25 @@ lkctl project rename <PROJECT-ID> new-name
 # Delete a project
 lkctl project delete <PROJECT-ID>
 
-# Show allowed actions for the current user on a project
-lkctl project access <PROJECT-ID>
-
-# List role/user assignments on a project
-lkctl project assignments <PROJECT-ID>
-
-# Grant a role or user access to a project
-lkctl project grant <PROJECT-ID> --user <USER-ID> --relations project_admin
+# Permissions — PROJECT-ID is optional and defaults to the bootstrap project
+lkctl project access      [PROJECT-ID]                 # show allowed actions for the current user
+lkctl project access      [PROJECT-ID] --user <ID>     # or for a specific user
+lkctl project assignments [PROJECT-ID]                 # list assignments
+lkctl project grant       [PROJECT-ID] --users <U> --assignments project_admin
+lkctl project revoke      [PROJECT-ID] --roles <R> --assignments select
 ```
 
----
+`grant` and `revoke` accept `--users`, `--roles`, and `--assignments` as
+repeatable / comma-separated string slices. `--user` / `--role` are
+mutually exclusive on the singular `access` command.
 
 ### `lkctl warehouse`
 
-Warehouses are project-scoped. Use `--project` / `-p` to specify the project UUID.
+Warehouses are project-scoped. Use `--project` / `-p` to specify the
+project UUID.
 
 ```sh
-# List warehouses in a project
+# List warehouses in a project (filter with --status active|inactive, repeatable)
 lkctl warehouse list --project <PROJECT-ID>
 
 # Get a specific warehouse
@@ -122,11 +179,27 @@ lkctl warehouse create "my-warehouse" -f warehouse-config.json --project <PROJEC
 # Create from stdin
 cat warehouse-config.json | lkctl warehouse create "my-warehouse" -f - --project <PROJECT-ID>
 
-# Delete a warehouse
-lkctl warehouse delete <WAREHOUSE-ID> --project <PROJECT-ID>
+# Lifecycle
+lkctl warehouse rename     <WAREHOUSE-ID> "new-name" --project <PROJECT-ID>
+lkctl warehouse activate   <WAREHOUSE-ID>            --project <PROJECT-ID>
+lkctl warehouse deactivate <WAREHOUSE-ID>            --project <PROJECT-ID>
+lkctl warehouse delete     <WAREHOUSE-ID>            --project <PROJECT-ID>
+
+# Protection (boolean, blocks delete while true)
+lkctl warehouse set-protection <WAREHOUSE-ID> --protected=true  --project <PROJECT-ID>
+
+# Statistics (paginated; --page-size, --page-token)
+lkctl warehouse statistics <WAREHOUSE-ID> --project <PROJECT-ID>
+
+# Permissions
+lkctl warehouse access      <WAREHOUSE-ID>
+lkctl warehouse assignments <WAREHOUSE-ID>
+lkctl warehouse grant       <WAREHOUSE-ID> --users <U> --assignments ownership
+lkctl warehouse revoke      <WAREHOUSE-ID> --roles <R> --assignments describe
 ```
 
-The `-f` flag accepts a JSON file that maps to `managementv1.CreateWarehouseOptions`. Example config:
+The `-f` flag for `create` accepts a JSON file that maps to
+`managementv1.CreateWarehouseRequest`. Example config:
 
 ```json
 {
@@ -136,8 +209,6 @@ The `-f` flag accepts a JSON file that maps to `managementv1.CreateWarehouseOpti
 }
 ```
 
----
-
 ### `lkctl role`
 
 Roles are project-scoped. Use `--project` / `-p`.
@@ -146,26 +217,18 @@ Roles are project-scoped. Use `--project` / `-p`.
 # List roles
 lkctl role list --project <PROJECT-ID>
 
-# Get a role
-lkctl role get <ROLE-ID>
+# Get / create / update / delete
+lkctl role get    <ROLE-ID>
+lkctl role create "New Role" --description "Optional description"
+lkctl role update <ROLE-ID> "New Name" --description "Updated description"
+lkctl role delete <ROLE-ID>
 
-# Create a role
-lkctl role create new-role --description "My role" --project <PROJECT-ID>
-
-# Update a role
-lkctl role update <ROLE-ID> --name updated-name
-
-# Delete a role
-lkctl role delete <ROLE-ID> --project <PROJECT-ID>
-
-# Assign a role to a user
-lkctl role grant <ROLE-ID> --user <USER-ID> --relations assignee
-
-# List assignments for a role
+# Permissions
+lkctl role access      <ROLE-ID>
 lkctl role assignments <ROLE-ID>
+lkctl role grant       <ROLE-ID> --users <U> --assignments assignee   # alias: role assign
+lkctl role revoke      <ROLE-ID> --roles <R> --assignments ownership  # alias: role unassign
 ```
-
----
 
 ### `lkctl user`
 
@@ -176,44 +239,42 @@ lkctl user list
 # Get a user
 lkctl user get <USER-ID>
 
-# Create / provision a user
-lkctl user create
+# Create / provision a user — USERID NAME USERTYPE
+lkctl user create oidc~d223d88c-85b6-4859-b5c5-27f3825e47f6 "Peter Cold" human
+lkctl user create kubernetes~... "Service Account" application --email me@example.com --update
 
 # Delete a user
 lkctl user delete <USER-ID>
 ```
 
----
+`USERTYPE` is one of `human` or `application`. Use `--update` to upsert
+when the user already exists.
 
-### `lkctl version`
-
-```sh
-lkctl version
-# Output: version, commit, date, tree state
-```
-
----
-
-### `lkctl whoami`
+### `lkctl version` / `lkctl whoami`
 
 ```sh
-lkctl whoami
-# Returns the identity of the authenticated principal
+lkctl version       # version, commit, date, tree state
+lkctl whoami        # the identity of the authenticated principal
 ```
 
 ---
 
 ## Pagination
 
-Commands that return lists accept `--limit` (default 100) and `--token` (page token from a previous response) for pagination:
+`list` subcommands accept `--limit` (default 100), `--token` (page token),
+and `--name` (server-side name filter):
 
 ```sh
 lkctl project list --limit 10
 lkctl project list --limit 10 --token <next-page-token>
 ```
 
+`warehouse statistics` is paginated separately with `--page-size` and
+`--page-token`.
+
 ---
 
-## Output Format
+## Output format
 
-Most commands support `--output json` (default for machine-readable output). Assignment listings use a tab-formatted table. Raw ID values (e.g., from `project create`) are printed as plain strings suitable for shell capture.
+Most commands accept `--output` / `-o`, with `text` (default) and `json`
+supported. A few list commands additionally support `wide`.

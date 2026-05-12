@@ -1,490 +1,463 @@
 package commands
 
 import (
-	"context"
+	"errors"
 	"fmt"
-	"os"
+	"io"
 	"text/tabwriter"
+	"time"
 
 	"github.com/google/uuid"
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
-	"github.com/lakekeeper/go-lakekeeper/cmd/lkctl/errors"
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
-	permissionv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1/permission"
-	"github.com/lakekeeper/go-lakekeeper/pkg/core"
 )
 
-func NewRoleCmd(clientOptions *clientOptions) *cobra.Command {
+func newRoleCmd(opts *clientOptions) *cobra.Command {
 	var project string
 
-	command := cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "role",
 		Short: "Manage roles",
-		Run: func(cmd *cobra.Command, args []string) {
-			cmd.HelpFunc()(cmd, args)
+		RunE: func(cmd *cobra.Command, _ []string) error {
+			return cmd.Help()
 		},
 	}
 
-	command.PersistentFlags().StringVarP(&project, "project", "p", uuid.Nil.String(), "Select a project")
+	cmd.PersistentFlags().StringVarP(&project, "project", "p", uuid.Nil.String(), "Select a project")
 
-	command.AddCommand(NewRoleListCmd(clientOptions, &project))
-	command.AddCommand(NewRoleGetCmd(clientOptions, &project))
-	command.AddCommand(NewRoleCreateCmd(clientOptions, &project))
-	command.AddCommand(NewRoleDeleteCmd(clientOptions, &project))
-	command.AddCommand(NewRoleUpdateCmd(clientOptions, &project))
-	command.AddCommand(NewRoleAccessCmd(clientOptions, &project))
-	command.AddCommand(NewRoleAssignmentsCmd(clientOptions, &project))
-	command.AddCommand(NewRoleGrantCmd(clientOptions, &project))
+	cmd.AddCommand(newRoleListCmd(opts, &project))
+	cmd.AddCommand(newRoleGetCmd(opts, &project))
+	cmd.AddCommand(newRoleCreateCmd(opts, &project))
+	cmd.AddCommand(newRoleUpdateCmd(opts, &project))
+	cmd.AddCommand(newRoleDeleteCmd(opts, &project))
+	cmd.AddCommand(newRoleAccessCmd(opts))
+	cmd.AddCommand(newRoleAssignmentsCmd(opts))
+	cmd.AddCommand(newRoleGrantCmd(opts))
+	cmd.AddCommand(newRoleRevokeCmd(opts))
 
-	return &command
+	return cmd
 }
 
-func NewRoleListCmd(clientOptions *clientOptions, project *string) *cobra.Command {
+func newRoleListCmd(opts *clientOptions, project *string) *cobra.Command {
 	var (
 		listOpts listOpts
-
-		output string
+		output   string
 	)
 
-	command := cobra.Command{
+	cmd := &cobra.Command{
 		Use:     "list",
-		Short:   "List available roles",
 		Aliases: []string{"ls"},
-		Example: `  # List available roles
-  lkctl role ls`,
-		Run: func(cmd *cobra.Command, _ []string) {
+		Short:   "List available roles",
+		Args:    cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			ctx := cmd.Context()
-
-			opt := managementv1.ListRolesOptions{
-				ProjectID: project,
-				ListOptions: managementv1.ListOptions{
-					PageSize: core.Ptr(listOpts.limit),
-				},
+			c, err := newClient(ctx, opts)
+			if err != nil {
+				return err
 			}
 
+			req := c.RoleAPI.ListRoles(ctx).XProjectId(*project).PageSize(listOpts.limit)
 			if listOpts.token != "" {
-				opt.PageToken = core.Ptr(listOpts.token)
+				req = req.PageToken(listOpts.token)
 			}
 
+			resp, _, err := req.Execute()
+			if err != nil {
+				return wrapAPIError("list roles", err)
+			}
+
+			roles := resp.Roles
 			if listOpts.name != "" {
-				opt.Name = core.Ptr(listOpts.name)
+				filtered := make([]managementv1.Role, 0, len(roles))
+				for i := range roles {
+					if roles[i].Name == listOpts.name {
+						filtered = append(filtered, roles[i])
+					}
+				}
+				roles = filtered
 			}
-
-			resp, _, err := MustCreateClient(ctx, clientOptions).RoleV1(*project).List(ctx, &opt)
-			errors.Check(err)
 
 			switch output {
-			case "text", "wide":
-				if len(resp.Roles) == 0 {
-					fmt.Println("No roles available")
-					return
-				}
-				w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-				fmt.Fprint(w, "ID\tNAME\tPROJECT ID\tCREATED AT\tUPDATED AT")
-				if output == "wide" {
-					fmt.Fprint(w, "\tDESCRIPTION")
-				}
-				fmt.Fprint(w, "\n")
-				for _, r := range resp.Roles {
-					fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s", r.ID, r.Name, r.ProjectID, r.CreatedAt, FormatPString(r.UpdatedAt))
-					if output == "wide" {
-						fmt.Fprintf(w, "\t%s", FormatPString(r.Description))
-					}
-					fmt.Fprint(w, "\n")
-				}
-				w.Flush()
-
-				fmt.Println()
-
-				if resp.NextPageToken != nil {
-					fmt.Printf("Next page token: %s\n", *resp.NextPageToken)
-				}
 			case "json":
-				err := PrintResource(resp.Roles, output)
-				errors.Check(err)
+				return printJSON(cmd.OutOrStdout(), roles)
+			case "text", "wide":
+				if len(roles) == 0 {
+					fmt.Fprintln(cmd.OutOrStdout(), "No roles available")
+					return nil
+				}
+				if err := printRoles(cmd.OutOrStdout(), output, roles...); err != nil {
+					return err
+				}
+				if resp.NextPageToken != nil {
+					fmt.Fprintf(cmd.OutOrStdout(), "\nNext page token: %s\n", *resp.NextPageToken)
+				}
+				return nil
 			default:
-				log.Fatalf("unknown output format %s\n", output)
+				return fmt.Errorf("unknown output format: %s", output)
 			}
 		},
 	}
 
-	AddListFlags(&command, &listOpts)
-	command.Flags().StringVarP(&output, "output", "o", "text", "Output format. One of: json|text|wide")
-
-	return &command
+	addListFlags(cmd, &listOpts)
+	cmd.Flags().StringVarP(&output, "output", "o", "text", "Output format. One of: json|text|wide")
+	return cmd
 }
 
-func NewRoleGetCmd(clientOptions *clientOptions, project *string) *cobra.Command {
+func newRoleGetCmd(opts *clientOptions, project *string) *cobra.Command {
 	var output string
 
-	command := cobra.Command{
-		Use:   "get",
+	cmd := &cobra.Command{
+		Use:   "get ROLEID",
 		Short: "Get a role by id",
-		Example: `  # Get a role by id
-  lkctl role get 01986184-3cb1-7526-a98c-72fecfe97731`,
-		Run: func(cmd *cobra.Command, args []string) {
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
-
-			if len(args) != 1 {
-				cmd.HelpFunc()(cmd, args)
-				os.Exit(1)
+			c, err := newClient(ctx, opts)
+			if err != nil {
+				return err
 			}
 
-			resp, _, err := MustCreateClient(ctx, clientOptions).RoleV1(*project).Get(ctx, args[0])
-			errors.Check(err)
+			role, _, err := c.RoleAPI.GetRole(ctx, args[0]).XProjectId(*project).Execute()
+			if err != nil {
+				return wrapAPIError("get role", err)
+			}
 
 			switch output {
-			case "text", "wide":
-				w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-				fmt.Fprint(w, "ID\tNAME\tPROJECT ID\tCREATED AT\tUPDATED AT")
-				if output == "wide" {
-					fmt.Fprint(w, "\tDESCRIPTION")
-				}
-				fmt.Fprintf(w, "\n")
-				fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s", resp.ID, resp.Name, resp.ProjectID, resp.CreatedAt, FormatPString(resp.UpdatedAt))
-				if output == "wide" {
-					fmt.Fprintf(w, "\t%s", PrintNil(resp.Description))
-				}
-				fmt.Fprintf(w, "\n")
-				w.Flush()
 			case "json":
-				err = PrintResource(resp, output)
-				errors.Check(err)
+				return printJSON(cmd.OutOrStdout(), role)
+			case "text", "wide":
+				return printRoles(cmd.OutOrStdout(), output, *role)
 			default:
-				log.Fatalf("unknown output format %s\n", output)
+				return fmt.Errorf("unknown output format: %s", output)
 			}
 		},
 	}
 
-	command.Flags().StringVarP(&output, "output", "o", "text", "Output format. One of: json|text|wide")
-
-	return &command
+	cmd.Flags().StringVarP(&output, "output", "o", "text", "Output format. One of: json|text|wide")
+	return cmd
 }
 
-func NewRoleCreateCmd(clientOpts *clientOptions, project *string) *cobra.Command {
+func newRoleCreateCmd(opts *clientOptions, project *string) *cobra.Command {
 	var (
 		output      string
 		description string
 	)
-	command := cobra.Command{
+
+	cmd := &cobra.Command{
 		Use:     "create ROLENAME",
-		Short:   "Create a new role",
 		Aliases: []string{"add"},
-		Example: `  # Create a new role
+		Short:   "Create a new role",
+		Example: `  # Create a role
   lkctl role create "New Role"
 
-  # Create a new role with a description
+  # Create a role with a description
   lkctl role create "New Role" --description "With a description"`,
-		Run: func(cmd *cobra.Command, args []string) {
-			if len(args) != 1 {
-				cmd.HelpFunc()(cmd, args)
-				os.Exit(1)
-			}
-
-			err := createRole(cmd.Context(), clientOpts, args[0], *project, description, output)
-			errors.Check(err)
-		},
-	}
-
-	command.Flags().StringVar(&description, "description", "", "Add a description to the role")
-	command.Flags().StringVarP(&output, "output", "o", "text", "Output format. One of: json|text")
-
-	return &command
-}
-
-func NewRoleDeleteCmd(clientOpts *clientOptions, project *string) *cobra.Command {
-	command := cobra.Command{
-		Use:     "delete ROLEID",
-		Short:   "Delete a role by id",
-		Aliases: []string{"rm"},
-		Example: `  # Delete role
-  lkctl role rm 01986184-3cb1-7526-a98c-72fecfe97731`,
-		Run: func(cmd *cobra.Command, args []string) {
-			if len(args) != 1 {
-				cmd.HelpFunc()(cmd, args)
-				os.Exit(1)
-			}
-
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
-			_, err := MustCreateClient(ctx, clientOpts).RoleV1(*project).Delete(ctx, args[0])
-			errors.Check(err)
+			c, err := newClient(ctx, opts)
+			if err != nil {
+				return err
+			}
 
-			fmt.Printf("Role %s deleted\n", args[0])
+			req := managementv1.NewCreateRoleRequest(args[0])
+			if description != "" {
+				req.SetDescription(description)
+			}
+			role, _, err := c.RoleAPI.CreateRole(ctx).XProjectId(*project).CreateRoleRequest(*req).Execute()
+			if err != nil {
+				return wrapAPIError("create role", err)
+			}
+
+			switch output {
+			case "text":
+				fmt.Fprintf(cmd.OutOrStdout(), "Role %s created with id %s\n", args[0], role.Id)
+				return nil
+			case "json":
+				return printJSON(cmd.OutOrStdout(), role)
+			default:
+				return fmt.Errorf("unknown output format: %s", output)
+			}
 		},
 	}
 
-	return &command
+	cmd.Flags().StringVar(&description, "description", "", "Description of the role")
+	cmd.Flags().StringVarP(&output, "output", "o", "text", "Output format. One of: json|text")
+	return cmd
 }
 
-func NewRoleUpdateCmd(clientOpts *clientOptions, project *string) *cobra.Command {
+func newRoleUpdateCmd(opts *clientOptions, project *string) *cobra.Command {
 	var (
 		output      string
 		description string
 	)
-	command := cobra.Command{
-		Use:   "update ROLEID ROLENAME",
-		Short: "Update role",
-		Example: `  # Update role
-  lkctl role update 01986184-3cb1-7526-a98c-72fecfe97731 "Updated Name" --description "Updated Description"
 
-  # Update role and delete its description
-  lkctl role update 01986184-3cb1-7526-a98c-72fecfe97731 "Updated Name"`,
-		Run: func(cmd *cobra.Command, args []string) {
-			if len(args) != 2 {
-				cmd.HelpFunc()(cmd, args)
-				os.Exit(1)
+	cmd := &cobra.Command{
+		Use:   "update ROLEID ROLENAME",
+		Short: "Update a role",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := cmd.Context()
+			c, err := newClient(ctx, opts)
+			if err != nil {
+				return err
 			}
 
-			err := updateRole(cmd.Context(), clientOpts, args[0], *project, args[1], description, output)
-			errors.Check(err)
+			req := managementv1.NewUpdateRoleRequest(args[1])
+			if description != "" {
+				req.SetDescription(description)
+			}
+			role, _, err := c.RoleAPI.UpdateRole(ctx, args[0]).XProjectId(*project).UpdateRoleRequest(*req).Execute()
+			if err != nil {
+				return wrapAPIError("update role", err)
+			}
+
+			switch output {
+			case "text":
+				fmt.Fprintf(cmd.OutOrStdout(), "Role %s updated\n", args[0])
+				return nil
+			case "json":
+				return printJSON(cmd.OutOrStdout(), role)
+			default:
+				return fmt.Errorf("unknown output format: %s", output)
+			}
 		},
 	}
 
-	command.Flags().StringVar(&description, "description", "", "Add a description to the role")
-	command.Flags().StringVarP(&output, "output", "o", "text", "Output format. One of: json|text")
-
-	return &command
+	cmd.Flags().StringVar(&description, "description", "", "Updated description for the role; empty leaves it unchanged")
+	cmd.Flags().StringVarP(&output, "output", "o", "text", "Output format. One of: json|text")
+	return cmd
 }
 
-func NewRoleAccessCmd(clientOpts *clientOptions, _ *string) *cobra.Command {
-	var (
-		accessOpts accessOpts
+func newRoleDeleteCmd(opts *clientOptions, project *string) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "delete ROLEID",
+		Aliases: []string{"rm"},
+		Short:   "Delete a role by id",
+		Args:    cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := cmd.Context()
+			c, err := newClient(ctx, opts)
+			if err != nil {
+				return err
+			}
+			if _, err := c.RoleAPI.DeleteRole(ctx, args[0]).XProjectId(*project).Execute(); err != nil {
+				return wrapAPIError("delete role", err)
+			}
+			fmt.Fprintf(cmd.OutOrStdout(), "Role %s deleted\n", args[0])
+			return nil
+		},
+	}
+	return cmd
+}
 
+func newRoleAccessCmd(opts *clientOptions) *cobra.Command {
+	var (
+		access accessOpts
 		output string
 	)
 
-	command := cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "access ROLEID",
 		Short: "Get role access",
-		Long:  "Get role access. By default, current user's access is returned",
-		Example: `  # Get role access
-  lkctl role access 01986184-3cb1-7526-a98c-72fecfe97731
-
-  # Get role access for a specific user
-  lkctl role access 01986184-3cb1-7526-a98c-72fecfe97731 --user oidc~0198618c-5be8-7a82-a0b9-1076c9dd12`,
-		Run: func(cmd *cobra.Command, args []string) {
-			if len(args) != 1 {
-				cmd.HelpFunc()(cmd, args)
-				os.Exit(1)
+		Long:  "Get role access. By default, the current user's access is returned.",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if access.user != "" && access.role != "" {
+				return errors.New("--user and --role are mutually exclusive")
 			}
-
 			ctx := cmd.Context()
-			if accessOpts.role != "" && accessOpts.user != "" {
-				log.Fatal("you only can filter by user OR role, both were supplied")
+			c, err := newClient(ctx, opts)
+			if err != nil {
+				return err
 			}
 
-			opt := permissionv1.GetRoleAccessOptions{}
-
-			if accessOpts.user != "" {
-				opt.PrincipalUser = core.Ptr(accessOpts.user)
+			req := c.PermissionsOpenfgaAPI.GetAuthorizerRoleActions(ctx, args[0])
+			if access.user != "" {
+				req = req.PrincipalUser(access.user)
 			}
-
-			if accessOpts.role != "" {
-				opt.PrincipalRole = core.Ptr(accessOpts.role)
+			if access.role != "" {
+				req = req.PrincipalRole(access.role)
 			}
-
-			resp, _, err := MustCreateClient(ctx, clientOpts).PermissionV1().RolePermission().GetAccess(ctx, args[0], &opt)
-			errors.Check(err)
+			resp, _, err := req.Execute()
+			if err != nil {
+				return wrapAPIError("get role access", err)
+			}
 
 			switch output {
-			case "text":
-				if len(resp.AllowedActions) == 0 {
-					fmt.Println("No access")
-					return
-				}
-				w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-				fmt.Fprintf(w, "ALLOWED ACTIONS\n")
-				for _, a := range resp.AllowedActions {
-					fmt.Fprintf(w, "%s\n", a)
-				}
-				w.Flush()
 			case "json":
-				err := PrintResource(resp, output)
-				errors.Check(err)
+				return printJSON(cmd.OutOrStdout(), resp)
+			case "text":
+				return printAllowedActions(cmd.OutOrStdout(), resp.AllowedActions)
 			default:
-				log.Fatalf("unknown output format %s\n", output)
+				return fmt.Errorf("unknown output format: %s", output)
 			}
 		},
 	}
 
-	AddAccessFlags(&command, &accessOpts)
-	command.Flags().StringVarP(&output, "output", "o", "text", "Output format. One of: json|text")
-
-	return &command
+	addAccessFlags(cmd, &access)
+	cmd.Flags().StringVarP(&output, "output", "o", "text", "Output format. One of: json|text")
+	return cmd
 }
 
-func NewRoleAssignmentsCmd(clientOpts *clientOptions, _ *string) *cobra.Command {
+func newRoleAssignmentsCmd(opts *clientOptions) *cobra.Command {
 	var (
-		assignmentsOpts assignmentsOpts
-
-		output string
+		assignments assignmentsOpts
+		output      string
 	)
 
-	command := cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "assignments ROLEID",
 		Short: "Get role assignments",
-		Example: `  # Get default role assignments
-  lkctl role assignments 01986184-3cb1-7526-a98c-72fecfe97731
-
-  # Filter by assignment type
-  lkctl role assignments 01986184-3cb1-7526-a98c-72fecfe97731 --relations ownership
-
-  # Filter by multiple assignment types
-  lkctl role assignments 01986184-3cb1-7526-a98c-72fecfe97731 --relations ownership --relations assignee`,
-		Run: func(cmd *cobra.Command, args []string) {
-			if len(args) != 1 {
-				cmd.HelpFunc()(cmd, args)
-				os.Exit(1)
-			}
-
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
-
-			var relations []permissionv1.RoleAssignmentType
-			for _, v := range assignmentsOpts.relations {
-				relations = append(relations, permissionv1.RoleAssignmentType(v))
+			c, err := newClient(ctx, opts)
+			if err != nil {
+				return err
 			}
 
-			opt := permissionv1.GetRoleAssignmentsOptions{
-				Relations: relations,
+			req := c.PermissionsOpenfgaAPI.GetRoleAssignmentsById(ctx, args[0])
+			if len(assignments.relations) > 0 {
+				rels := make([]managementv1.RoleRelation, 0, len(assignments.relations))
+				for _, r := range assignments.relations {
+					rels = append(rels, managementv1.RoleRelation(r))
+				}
+				req = req.Relations(rels)
 			}
 
-			resp, _, err := MustCreateClient(ctx, clientOpts).PermissionV1().RolePermission().GetAssignments(ctx, args[0], &opt)
-			errors.Check(err)
+			resp, _, err := req.Execute()
+			if err != nil {
+				return wrapAPIError("get role assignments", err)
+			}
 
 			switch output {
-			case "text":
-				PrintAssignments(resp.Assignments...)
 			case "json":
-				err := PrintResource(resp, output)
-				errors.Check(err)
+				return printJSON(cmd.OutOrStdout(), resp)
+			case "text":
+				return printAssignments(cmd.OutOrStdout(), resp.Assignments...)
+			default:
+				return fmt.Errorf("unknown output format: %s", output)
 			}
 		},
 	}
 
-	AddAssignmentsFlags(&command, &assignmentsOpts)
-	command.Flags().StringVarP(&output, "output", "o", "text", "Output format. One of: json|text")
-
-	return &command
+	addAssignmentsFlags(cmd, &assignments)
+	cmd.Flags().StringVarP(&output, "output", "o", "text", "Output format. One of: json|text")
+	return cmd
 }
 
-func NewRoleGrantCmd(clientOpts *clientOptions, _ *string) *cobra.Command {
+func newRoleGrantCmd(opts *clientOptions) *cobra.Command {
 	var (
-		users []string
-		roles []string
-
+		users       []string
+		roles       []string
 		assignments []string
 	)
 
-	command := cobra.Command{
+	cmd := &cobra.Command{
 		Use:     "grant ROLEID",
-		Short:   "add role assignments",
 		Aliases: []string{"assign"},
-		Run: func(cmd *cobra.Command, args []string) {
-			if len(args) != 1 {
-				cmd.HelpFunc()(cmd, args)
-				os.Exit(1)
+		Short:   "Add role assignments",
+		Args:    cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			set, err := buildAssignmentSet[managementv1.RoleAssignment](assignments, users, roles)
+			if err != nil {
+				return err
 			}
-
-			opt := permissionv1.UpdateRolePermissionsOptions{}
-			assignees := []permissionv1.UserOrRole{}
-			if len(assignments) < 1 {
-				log.Fatal("you must set at lest one assignment")
-			}
-			if len(users) < 1 && len(roles) < 1 {
-				log.Fatal("you must set at least one user or role")
-			}
-			for _, v := range users {
-				assignees = append(assignees, permissionv1.UserOrRole{
-					Type:  permissionv1.UserType,
-					Value: v,
-				})
-			}
-
-			for _, v := range roles {
-				assignees = append(assignees, permissionv1.UserOrRole{
-					Type:  permissionv1.RoleType,
-					Value: v,
-				})
-			}
-
-			for _, assignee := range assignees {
-				for _, assignment := range assignments {
-					opt.Writes = append(opt.Writes, &permissionv1.RoleAssignment{
-						Assignee:   assignee,
-						Assignment: permissionv1.RoleAssignmentType(assignment),
-					})
-				}
-			}
+			req := managementv1.NewUpdateRoleAssignmentsRequest()
+			req.Writes = set
 
 			ctx := cmd.Context()
-			c := MustCreateClient(ctx, clientOpts).PermissionV1().RolePermission()
-
-			_, err := c.Update(cmd.Context(), args[0], &opt)
-			errors.Check(err)
-
-			fmt.Println("Role permissions updated")
+			c, err := newClient(ctx, opts)
+			if err != nil {
+				return err
+			}
+			if _, err := c.PermissionsOpenfgaAPI.UpdateRoleAssignmentsById(ctx, args[0]).UpdateRoleAssignmentsRequest(*req).Execute(); err != nil {
+				return wrapAPIError("update role assignments", err)
+			}
+			fmt.Fprintln(cmd.OutOrStdout(), "Role permissions updated")
+			return nil
 		},
 	}
 
-	command.Flags().StringSliceVar(&users, "users", []string{}, "Grant access to users; can be repeated multiple times to add multiple users")
-	command.Flags().StringSliceVar(&roles, "roles", []string{}, "Grant access to roles; can be repeated multiple times to add multiple roles")
-	command.Flags().StringSliceVar(&assignments, "assignments", []string{}, "Assignments to use; can be repeated multiple times to add multiple assignments")
-
-	err := command.MarkFlagRequired("assignments")
-	errors.Check(err)
-
-	return &command
+	cmd.Flags().StringSliceVar(&users, "users", nil, "Grant access to users; repeat or comma-separate for multiple")
+	cmd.Flags().StringSliceVar(&roles, "roles", nil, "Grant access to roles; repeat or comma-separate for multiple")
+	cmd.Flags().StringSliceVar(&assignments, "assignments", nil, "Assignment relations to apply; repeat or comma-separate for multiple")
+	if err := cmd.MarkFlagRequired("assignments"); err != nil {
+		panic(err) // unreachable: the flag was just registered.
+	}
+	return cmd
 }
 
-func createRole(ctx context.Context, clientOpts *clientOptions, name, project, description, output string) error {
-	opt := managementv1.CreateRoleOptions{
-		Name:      name,
-		ProjectID: core.Ptr(project),
+func newRoleRevokeCmd(opts *clientOptions) *cobra.Command {
+	var (
+		users       []string
+		roles       []string
+		assignments []string
+	)
+
+	cmd := &cobra.Command{
+		Use:     "revoke ROLEID",
+		Aliases: []string{"unassign"},
+		Short:   "Remove role assignments",
+		Example: `  # Revoke ownership from a user
+  lkctl role revoke 0198618c-5be8-7a82-a0b9-1076c9dd12f0 --users 11111111-2222-3333-4444-555555555555 --assignments ownership
+
+  # Revoke assignee from a role
+  lkctl role revoke 0198618c-5be8-7a82-a0b9-1076c9dd12f0 --roles 11111111-2222-3333-4444-555555555555 --assignments assignee`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			set, err := buildAssignmentSet[managementv1.RoleAssignment](assignments, users, roles)
+			if err != nil {
+				return err
+			}
+			req := managementv1.NewUpdateRoleAssignmentsRequest()
+			req.Deletes = set
+
+			ctx := cmd.Context()
+			c, err := newClient(ctx, opts)
+			if err != nil {
+				return err
+			}
+			if _, err := c.PermissionsOpenfgaAPI.UpdateRoleAssignmentsById(ctx, args[0]).UpdateRoleAssignmentsRequest(*req).Execute(); err != nil {
+				return wrapAPIError("update role assignments", err)
+			}
+			fmt.Fprintln(cmd.OutOrStdout(), "Role permissions updated")
+			return nil
+		},
 	}
 
-	if description != "" {
-		opt.Description = core.Ptr(description)
+	cmd.Flags().StringSliceVar(&users, "users", nil, "Revoke access from users; repeat or comma-separate for multiple")
+	cmd.Flags().StringSliceVar(&roles, "roles", nil, "Revoke access from roles; repeat or comma-separate for multiple")
+	cmd.Flags().StringSliceVar(&assignments, "assignments", nil, "Assignment relations to remove; repeat or comma-separate for multiple")
+	if err := cmd.MarkFlagRequired("assignments"); err != nil {
+		panic(err) // unreachable: the flag was just registered.
 	}
-
-	resp, _, err := MustCreateClient(ctx, clientOpts).RoleV1(project).Create(ctx, &opt)
-	if err != nil {
-		return err
-	}
-
-	switch output {
-	case "text":
-		fmt.Printf("Role %s created with id %s\n", name, resp.ID)
-		return nil
-	case "json":
-		return PrintResource(resp, output)
-	default:
-		return fmt.Errorf("unknown output format: %s", output)
-	}
+	return cmd
 }
 
-func updateRole(ctx context.Context, clientOpts *clientOptions, id, project, name, description, output string) error {
-	opt := managementv1.UpdateRoleOptions{
-		Name: name,
+func printRoles(w io.Writer, output string, roles ...managementv1.Role) error {
+	tw := tabwriter.NewWriter(w, 0, 0, 2, ' ', 0)
+	if output == "wide" {
+		fmt.Fprintln(tw, "ID\tNAME\tPROJECT ID\tCREATED AT\tUPDATED AT\tDESCRIPTION")
+		for i := range roles {
+			r := &roles[i]
+			fmt.Fprintf(tw, "%s\t%s\t%s\t%s\t%s\t%s\n",
+				r.Id, r.Name, r.ProjectId,
+				r.CreatedAt.Format(time.RFC3339),
+				formatTimePtr(r.UpdatedAt),
+				formatStringPtr(r.Description))
+		}
+	} else {
+		fmt.Fprintln(tw, "ID\tNAME\tPROJECT ID\tCREATED AT\tUPDATED AT")
+		for i := range roles {
+			r := &roles[i]
+			fmt.Fprintf(tw, "%s\t%s\t%s\t%s\t%s\n",
+				r.Id, r.Name, r.ProjectId,
+				r.CreatedAt.Format(time.RFC3339),
+				formatTimePtr(r.UpdatedAt))
+		}
 	}
-
-	if description != "" {
-		opt.Description = core.Ptr(description)
-	}
-
-	resp, _, err := MustCreateClient(ctx, clientOpts).RoleV1(project).Update(ctx, id, &opt)
-	if err != nil {
-		return err
-	}
-
-	switch output {
-	case "text":
-		fmt.Printf("Role %s updated\n", id)
-		return nil
-	case "json":
-		return PrintResource(resp, output)
-	default:
-		return fmt.Errorf("unknown output format: %s", output)
-	}
+	return tw.Flush()
 }

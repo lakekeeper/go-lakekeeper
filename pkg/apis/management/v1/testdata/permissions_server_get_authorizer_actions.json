@@ -1,6 +1,0 @@
-{
-    "allowed-actions": [
-        "grant_admin",
-        "read_assignments"
-    ]
-}

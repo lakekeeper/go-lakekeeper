@@ -1,299 +1,211 @@
 //go:build integration
-// +build integration
 
+// Tests in this file mutate the *server-level* assignment graph, which is a
+// process-wide shared resource. They are deliberately serial: they assert
+// exact assignment sets, so two parallel writers would race and flake the
+// ElementsMatch checks. Do not add t.Parallel() here without first
+// rewriting the assertions to be relative-set-aware.
 package integration
 
 import (
+	"context"
 	"net/http"
 	"testing"
 
-	permissionv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1/permission"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
+	"github.com/lakekeeper/go-lakekeeper/pkg/permissions"
 )
 
 func TestPermissions_Server_GetAccess(t *testing.T) {
-	client := Setup(t)
+	c := sharedClient
 
-	resp, r, err := client.PermissionV1().ServerPermission().GetAccess(t.Context(), nil)
+	resp, r, err := c.PermissionsOpenfgaAPI.GetServerAccess(t.Context()).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, resp)
 	assert.Equal(t, http.StatusOK, r.StatusCode)
 
-	// User should have all permissions on the server
-	want := []permissionv1.ServerAction{
-		permissionv1.CreateProject,
-		permissionv1.UpdateUsers,
-		permissionv1.DeleteUsers,
-		permissionv1.ListUsers,
-		permissionv1.GrantServerAdmin,
-		permissionv1.ProvisionUsers,
-		permissionv1.ReadAssignments,
+	want := []managementv1.ServerAction{
+		managementv1.ServerActionCreateProject,
+		managementv1.ServerActionUpdateUsers,
+		managementv1.ServerActionDeleteUsers,
+		managementv1.ServerActionListUsers,
+		managementv1.ServerActionGrantAdmin,
+		managementv1.ServerActionProvisionUsers,
+		managementv1.ServerActionReadAssignments,
 	}
-
 	assert.Subset(t, want, resp.AllowedActions)
 }
 
 func TestPermissions_Server_GetAssignments(t *testing.T) {
-	client := Setup(t)
+	c := sharedClient
 
-	resp, r, err := client.PermissionV1().ServerPermission().GetAssignments(t.Context(), nil)
+	resp, r, err := c.PermissionsOpenfgaAPI.GetServerAssignments(t.Context()).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, resp)
 	assert.Equal(t, http.StatusOK, r.StatusCode)
 
-	// User should have all permissions on the server
-	want := &permissionv1.GetServerAssignmentsResponse{
-		Assignments: []*permissionv1.ServerAssignment{
-			{
-				Assignee: permissionv1.UserOrRole{
-					Type:  permissionv1.UserType,
-					Value: adminID,
-				},
-				Assignment: permissionv1.OperatorServerAssignment,
-			},
-		},
-	}
-
-	assert.Equal(t, want, resp)
+	want := []permissions.AssignmentRow{{
+		PrincipalType: "user",
+		PrincipalID:   adminID,
+		Relation:      "operator",
+	}}
+	assert.ElementsMatch(t, want, describeAssignments(t, resp.Assignments))
 }
 
 func TestPermissions_Server_Update(t *testing.T) {
-	client := Setup(t)
+	c := sharedClient
 
-	user := MustProvisionUser(t, client)
+	user := MustProvisionUser(t, c)
 
-	resp, _, err := client.PermissionV1().ServerPermission().GetAssignments(t.Context(), nil)
+	resp, _, err := c.PermissionsOpenfgaAPI.GetServerAssignments(t.Context()).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, resp)
+	assert.ElementsMatch(t,
+		[]permissions.AssignmentRow{{PrincipalType: "user", PrincipalID: adminID, Relation: "operator"}},
+		describeAssignments(t, resp.Assignments),
+	)
 
-	// initial permissions
-	want := &permissionv1.GetServerAssignmentsResponse{
-		Assignments: []*permissionv1.ServerAssignment{
-			{
-				Assignee: permissionv1.UserOrRole{
-					Type:  permissionv1.UserType,
-					Value: adminID,
-				},
-				Assignment: permissionv1.OperatorServerAssignment,
-			},
-		},
-	}
+	// add admin assignment for the new user
+	addReq := managementv1.NewUpdateServerAssignmentsRequest()
+	addReq.Writes = append(addReq.Writes, userAssignment[managementv1.ServerAssignment](t, "admin", user.Id))
 
-	assert.Equal(t, want, resp)
-
-	// adding permission
-	r, err := client.PermissionV1().ServerPermission().Update(t.Context(), &permissionv1.UpdateServerPermissionsOptions{
-		Writes: []*permissionv1.ServerAssignment{
-			{
-				Assignee: permissionv1.UserOrRole{
-					Type:  permissionv1.UserType,
-					Value: user.ID,
-				},
-				Assignment: permissionv1.AdminServerAssignment,
-			},
-		},
-	})
-
+	r, err := c.PermissionsOpenfgaAPI.UpdateServerAssignments(t.Context()).UpdateServerAssignmentsRequest(*addReq).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, r)
 	assert.Equal(t, http.StatusNoContent, r.StatusCode)
 
-	resp, _, err = client.PermissionV1().ServerPermission().GetAssignments(t.Context(), nil)
+	resp, _, err = c.PermissionsOpenfgaAPI.GetServerAssignments(t.Context()).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, resp)
-
-	// permission added
-	want = &permissionv1.GetServerAssignmentsResponse{
-		Assignments: []*permissionv1.ServerAssignment{
-			{
-				Assignee: permissionv1.UserOrRole{
-					Type:  permissionv1.UserType,
-					Value: user.ID,
-				},
-				Assignment: permissionv1.AdminServerAssignment,
-			},
-			{
-				Assignee: permissionv1.UserOrRole{
-					Type:  permissionv1.UserType,
-					Value: adminID,
-				},
-				Assignment: permissionv1.OperatorServerAssignment,
-			},
+	assert.ElementsMatch(t,
+		[]permissions.AssignmentRow{
+			{PrincipalType: "user", PrincipalID: adminID, Relation: "operator"},
+			{PrincipalType: "user", PrincipalID: user.Id, Relation: "admin"},
 		},
-	}
+		describeAssignments(t, resp.Assignments),
+	)
 
-	assert.Equal(t, want, resp)
+	// remove the admin assignment
+	delReq := managementv1.NewUpdateServerAssignmentsRequest()
+	delReq.Deletes = append(delReq.Deletes, userAssignment[managementv1.ServerAssignment](t, "admin", user.Id))
 
-	// removing permission
-	r, err = client.PermissionV1().ServerPermission().Update(t.Context(), &permissionv1.UpdateServerPermissionsOptions{
-		Deletes: []*permissionv1.ServerAssignment{
-			{
-				Assignee: permissionv1.UserOrRole{
-					Type:  permissionv1.UserType,
-					Value: user.ID,
-				},
-				Assignment: permissionv1.AdminServerAssignment,
-			},
-		},
-	})
-
+	r, err = c.PermissionsOpenfgaAPI.UpdateServerAssignments(t.Context()).UpdateServerAssignmentsRequest(*delReq).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, r)
 	assert.Equal(t, http.StatusNoContent, r.StatusCode)
 
-	resp, _, err = client.PermissionV1().ServerPermission().GetAssignments(t.Context(), nil)
+	resp, _, err = c.PermissionsOpenfgaAPI.GetServerAssignments(t.Context()).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, resp)
-
-	// permission deleted
-	want = &permissionv1.GetServerAssignmentsResponse{
-		Assignments: []*permissionv1.ServerAssignment{
-			{
-				Assignee: permissionv1.UserOrRole{
-					Type:  permissionv1.UserType,
-					Value: adminID,
-				},
-				Assignment: permissionv1.OperatorServerAssignment,
-			},
-		},
-	}
-
-	assert.Equal(t, want, resp)
+	assert.ElementsMatch(t,
+		[]permissions.AssignmentRow{{PrincipalType: "user", PrincipalID: adminID, Relation: "operator"}},
+		describeAssignments(t, resp.Assignments),
+	)
 }
 
 func TestPermissions_Server_SameAdd(t *testing.T) {
-	client := Setup(t)
+	c := sharedClient
 
-	user := MustProvisionUser(t, client)
+	user := MustProvisionUser(t, c)
 
-	opt := &permissionv1.UpdateServerPermissionsOptions{
-		Writes: []*permissionv1.ServerAssignment{
-			{
-				Assignee: permissionv1.UserOrRole{
-					Type:  permissionv1.UserType,
-					Value: user.ID,
-				},
-				Assignment: permissionv1.OperatorServerAssignment,
-			},
-		},
-	}
+	req := managementv1.NewUpdateServerAssignmentsRequest()
+	req.Writes = append(req.Writes, userAssignment[managementv1.ServerAssignment](t, "operator", user.Id))
 
-	// adding permission
-	r, err := client.PermissionV1().ServerPermission().Update(t.Context(), opt)
-
+	r, err := c.PermissionsOpenfgaAPI.UpdateServerAssignments(t.Context()).UpdateServerAssignmentsRequest(*req).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, r)
 	assert.Equal(t, http.StatusNoContent, r.StatusCode)
+	// Server is a shared resource; undo the write so other tests asserting
+	// exact assignment sets don't see a leftover tuple. Cleanups run LIFO,
+	// so this fires before MustProvisionUser's user-delete cleanup.
+	t.Cleanup(func() {
+		delReq := managementv1.NewUpdateServerAssignmentsRequest()
+		delReq.Deletes = append(delReq.Deletes, userAssignment[managementv1.ServerAssignment](t, "operator", user.Id))
+		if _, err := c.PermissionsOpenfgaAPI.UpdateServerAssignments(context.Background()).UpdateServerAssignmentsRequest(*delReq).Execute(); err != nil {
+			t.Errorf("undo server assignment: %v", err)
+		}
+	})
 
-	// adding same permission
-	r, err = client.PermissionV1().ServerPermission().Update(t.Context(), opt)
-
-	require.ErrorContains(t, err, "TupleAlreadyExistsError")
+	// re-applying the same write fails on the server
+	r, err = c.PermissionsOpenfgaAPI.UpdateServerAssignments(t.Context()).UpdateServerAssignmentsRequest(*req).Execute()
+	require.Error(t, err)
+	require.NotNil(t, r)
+	assert.Equal(t, http.StatusConflict, r.StatusCode)
+	assert.Contains(t, errorBody(err), "TupleAlreadyExistsError")
 }
 
 func TestPermissions_Server_GetAccess_UserFilter(t *testing.T) {
-	client := Setup(t)
+	c := sharedClient
 
-	user := MustProvisionUser(t, client)
+	user := MustProvisionUser(t, c)
 
-	opt := permissionv1.GetServerAccessOptions{
-		PrincipalUser: &user.ID,
-	}
-
-	resp, _, err := client.PermissionV1().ServerPermission().GetAccess(t.Context(), &opt)
+	// fresh user has no allowed actions on the server
+	resp, _, err := c.PermissionsOpenfgaAPI.GetServerAccess(t.Context()).PrincipalUser(user.Id).Execute()
 	require.NoError(t, err)
+	assert.Empty(t, resp.AllowedActions)
 
-	// initial permissions
-	want := &permissionv1.GetServerAccessResponse{
-		AllowedActions: []permissionv1.ServerAction{},
-	}
-
-	assert.Equal(t, want, resp)
-
-	// add user permission
-	_, err = client.PermissionV1().ServerPermission().Update(t.Context(), &permissionv1.UpdateServerPermissionsOptions{
-		Writes: []*permissionv1.ServerAssignment{
-			{
-				Assignee: permissionv1.UserOrRole{
-					Type:  permissionv1.UserType,
-					Value: user.ID,
-				},
-				Assignment: permissionv1.AdminServerAssignment,
-			},
-		},
+	// granting admin should expand the allowed-actions set
+	addReq := managementv1.NewUpdateServerAssignmentsRequest()
+	addReq.Writes = append(addReq.Writes, userAssignment[managementv1.ServerAssignment](t, "admin", user.Id))
+	_, err = c.PermissionsOpenfgaAPI.UpdateServerAssignments(t.Context()).UpdateServerAssignmentsRequest(*addReq).Execute()
+	require.NoError(t, err)
+	// Server is shared; remove the tuple so this suite is re-runnable
+	// against an already-up stack. Cleanups run LIFO, so this fires before
+	// MustProvisionUser's user-delete cleanup — the tuple's principal is
+	// still valid at delete time.
+	t.Cleanup(func() {
+		delReq := managementv1.NewUpdateServerAssignmentsRequest()
+		delReq.Deletes = append(delReq.Deletes, userAssignment[managementv1.ServerAssignment](t, "admin", user.Id))
+		if _, err := c.PermissionsOpenfgaAPI.UpdateServerAssignments(context.Background()).UpdateServerAssignmentsRequest(*delReq).Execute(); err != nil {
+			t.Errorf("undo server admin assignment: %v", err)
+		}
 	})
+
+	resp, _, err = c.PermissionsOpenfgaAPI.GetServerAccess(t.Context()).PrincipalUser(user.Id).Execute()
 	require.NoError(t, err)
 
-	resp, _, err = client.PermissionV1().ServerPermission().GetAccess(t.Context(), &opt)
-	require.NoError(t, err)
-	assert.NotNil(t, resp)
-
-	// updated permissions
-	want = &permissionv1.GetServerAccessResponse{
-		AllowedActions: []permissionv1.ServerAction{
-			permissionv1.CreateProject,
-			permissionv1.UpdateUsers,
-			permissionv1.DeleteUsers,
-			permissionv1.ListUsers,
-			permissionv1.GrantServerAdmin,
-			permissionv1.ProvisionUsers,
-			permissionv1.ReadAssignments,
-		},
+	want := []managementv1.ServerAction{
+		managementv1.ServerActionCreateProject,
+		managementv1.ServerActionUpdateUsers,
+		managementv1.ServerActionDeleteUsers,
+		managementv1.ServerActionListUsers,
+		managementv1.ServerActionGrantAdmin,
+		managementv1.ServerActionProvisionUsers,
+		managementv1.ServerActionReadAssignments,
 	}
-
-	assert.Equal(t, want, resp)
+	assert.Subset(t, want, resp.AllowedActions)
 }
 
 func TestPermissions_Server_GetAccess_RoleFilter(t *testing.T) {
-	client := Setup(t)
+	c := sharedClient
 
-	role := MustCreateRole(t, client, defaultProjectID)
+	role := MustCreateRole(t, c, defaultProjectID)
 
-	opt := permissionv1.GetServerAccessOptions{
-		PrincipalRole: &role.ID,
-	}
-
-	resp, _, err := client.PermissionV1().ServerPermission().GetAccess(t.Context(), &opt)
+	// fresh role has no allowed actions on the server
+	resp, _, err := c.PermissionsOpenfgaAPI.GetServerAccess(t.Context()).PrincipalRole(role.Id).Execute()
 	require.NoError(t, err)
+	assert.Empty(t, resp.AllowedActions)
 
-	// initial permissions
-	want := &permissionv1.GetServerAccessResponse{
-		AllowedActions: []permissionv1.ServerAction{},
-	}
-
-	assert.Equal(t, want, resp)
-
-	// add user permission
-	_, err = client.PermissionV1().ServerPermission().Update(t.Context(), &permissionv1.UpdateServerPermissionsOptions{
-		Writes: []*permissionv1.ServerAssignment{
-			{
-				Assignee: permissionv1.UserOrRole{
-					Type:  permissionv1.RoleType,
-					Value: role.ID,
-				},
-				Assignment: permissionv1.AdminServerAssignment,
-			},
-		},
+	// granting admin should expand the allowed-actions set
+	addReq := managementv1.NewUpdateServerAssignmentsRequest()
+	addReq.Writes = append(addReq.Writes, roleAssignment[managementv1.ServerAssignment](t, "admin", role.Id))
+	_, err = c.PermissionsOpenfgaAPI.UpdateServerAssignments(t.Context()).UpdateServerAssignmentsRequest(*addReq).Execute()
+	require.NoError(t, err)
+	// Server is shared; see UserFilter test for cleanup rationale.
+	t.Cleanup(func() {
+		delReq := managementv1.NewUpdateServerAssignmentsRequest()
+		delReq.Deletes = append(delReq.Deletes, roleAssignment[managementv1.ServerAssignment](t, "admin", role.Id))
+		if _, err := c.PermissionsOpenfgaAPI.UpdateServerAssignments(context.Background()).UpdateServerAssignmentsRequest(*delReq).Execute(); err != nil {
+			t.Errorf("undo server admin assignment: %v", err)
+		}
 	})
+
+	resp, _, err = c.PermissionsOpenfgaAPI.GetServerAccess(t.Context()).PrincipalRole(role.Id).Execute()
 	require.NoError(t, err)
 
-	resp, _, err = client.PermissionV1().ServerPermission().GetAccess(t.Context(), &opt)
-	require.NoError(t, err)
-	assert.NotNil(t, resp)
-
-	// updated permissions
-	want = &permissionv1.GetServerAccessResponse{
-		AllowedActions: []permissionv1.ServerAction{
-			permissionv1.CreateProject,
-			permissionv1.UpdateUsers,
-			permissionv1.DeleteUsers,
-			permissionv1.ListUsers,
-			permissionv1.GrantServerAdmin,
-			permissionv1.ProvisionUsers,
-			permissionv1.ReadAssignments,
-		},
+	want := []managementv1.ServerAction{
+		managementv1.ServerActionCreateProject,
+		managementv1.ServerActionUpdateUsers,
+		managementv1.ServerActionDeleteUsers,
+		managementv1.ServerActionListUsers,
+		managementv1.ServerActionGrantAdmin,
+		managementv1.ServerActionProvisionUsers,
+		managementv1.ServerActionReadAssignments,
 	}
-
-	assert.Equal(t, want, resp)
+	assert.Subset(t, want, resp.AllowedActions)
 }

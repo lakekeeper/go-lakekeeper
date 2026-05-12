@@ -1,0 +1,42 @@
+packageName: managementv1
+packageVersion: 1.0.0
+
+# Embed the generated code inside the existing module instead of producing a
+# standalone Go SDK. Skips go.mod/go.sum/README emission and uses package-local
+# imports.
+withGoMod: false
+isGoSubmodule: true
+
+# Polymorphism / oneOf handling. Lakekeeper's storage profile and credential
+# types are oneOf unions; the discriminator lookup makes them ergonomic.
+useOneOfDiscriminatorLookup: true
+
+# Use the Go-idiomatic constant names supplied per-schema by the preprocessor's
+# `x-enum-varnames` pass (e.g. `S3FlavorAws` rather than the default
+# `S3FLAVOR_AWS`). The preprocessor synthesises a unique varname for every
+# value so disabling enum-class prefixing can't cause cross-enum collisions
+# on shared values like `create`, `delete`, `select`.
+enumClassPrefix: false
+
+# Drop per-leaf-struct MarshalJSON. The default Go encoder on the struct's
+# json tags produces byte-identical wire format (each optional field carries
+# `omitempty`), and the oneOf/Nullable wrappers' MarshalJSON come from
+# different templates and are unaffected. Saves ~8 lines per model file.
+generateMarshalJSON: false
+
+# Keep per-leaf-struct UnmarshalJSON. It enforces required-property presence
+# on inbound responses, catching a server that drops a field schema-required
+# clients depend on. The DisallowUnknownFields-on-strict-decode side effect
+# is acceptable because Lakekeeper does not introduce unknown fields without
+# a spec bump that the SDK regenerates against.
+generateUnmarshalJSON: true
+
+# Keep the file footprint small — we expose the generated client through the
+# pkg/client facade, so the additional XxxAPIService interface variants are not
+# needed.
+generateInterfaces: false
+
+# Hidden files openapi-generator drops next to the output. Committed so that
+# regeneration produces a stable diff.
+gitUserId: lakekeeper
+gitRepoId: go-lakekeeper

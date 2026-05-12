@@ -1,25 +1,26 @@
 //go:build integration
-// +build integration
 
 package integration
 
 import (
-	"context"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 )
 
+// TestCatalog_Basic exercises the Iceberg REST catalog delegation in
+// pkg/client.CatalogV1: it must succeed for warehouses on both the default
+// project and on a freshly-created project.
 func TestCatalog_Basic(t *testing.T) {
-	client := Setup(t)
+	c := sharedClient
 
-	project := MustCreateProject(t, client)
+	project := MustCreateProject(t, c)
 
-	_, warehouseDefault := MustCreateWarehouse(t, client, defaultProjectID)
-	_, err := client.CatalogV1(context.Background(), defaultProjectID, warehouseDefault)
+	_, defaultWh := MustCreateWarehouse(t, c, defaultProjectID)
+	_, err := c.CatalogV1(t.Context(), defaultProjectID, defaultWh)
 	require.NoError(t, err)
 
-	_, warehouseProject := MustCreateWarehouse(t, client, project)
-	_, err = client.CatalogV1(context.Background(), project, warehouseProject)
+	_, projectWh := MustCreateWarehouse(t, c, project)
+	_, err = c.CatalogV1(t.Context(), project, projectWh)
 	require.NoError(t, err)
 }

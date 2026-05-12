@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/lakekeeper/go-lakekeeper/cmd/lkctl/commands"
@@ -12,8 +13,8 @@ func main() {
 	command.SilenceErrors = true
 	command.SilenceUsage = true
 
-	err := command.Execute()
-	if err != nil {
+	if err := command.Execute(); err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)
 	}
 }

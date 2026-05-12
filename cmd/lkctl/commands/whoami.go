@@ -1,36 +1,42 @@
 package commands
 
 import (
-	log "github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
+	"fmt"
 
-	"github.com/lakekeeper/go-lakekeeper/cmd/lkctl/errors"
+	"github.com/spf13/cobra"
 )
 
-func NewWhoamiCmd(clientOptions *clientOptions) *cobra.Command {
+// newWhoamiCmd returns `lkctl whoami`, which prints the user identified by
+// the access token currently in use.
+func newWhoamiCmd(opts *clientOptions) *cobra.Command {
 	var output string
 
-	command := cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "whoami",
 		Short: "Print the current user",
-		Run: func(cmd *cobra.Command, _ []string) {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			ctx := cmd.Context()
-			resp, _, err := MustCreateClient(ctx, clientOptions).UserV1().Whoami(ctx)
-			errors.Check(err)
+
+			c, err := newClient(ctx, opts)
+			if err != nil {
+				return err
+			}
+			user, _, err := c.UserAPI.Whoami(ctx).Execute()
+			if err != nil {
+				return wrapAPIError("whoami", err)
+			}
 
 			switch output {
 			case "json":
-				err := PrintResource(resp, output)
-				errors.Check(err)
-			case "test", "wide":
-				printUsers(output, nil, resp)
+				return printJSON(cmd.OutOrStdout(), user)
+			case "text", "wide":
+				return printUsers(cmd.OutOrStdout(), output, nil, user)
 			default:
-				log.Fatalf("unknown output format: %s", output)
+				return fmt.Errorf("unknown output format: %s", output)
 			}
 		},
 	}
 
-	command.Flags().StringVarP(&output, "output", "o", "text", "Output format. One of: json|text|wide")
-
-	return &command
+	cmd.Flags().StringVarP(&output, "output", "o", "text", "Output format. One of: json|text|wide")
+	return cmd
 }

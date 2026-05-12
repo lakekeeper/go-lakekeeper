@@ -1,5 +1,4 @@
 //go:build integration
-// +build integration
 
 package integration
 
@@ -8,138 +7,95 @@ import (
 	"net/http"
 	"testing"
 
-	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
 )
 
 func TestProject_Create(t *testing.T) {
-	client := Setup(t)
+	c := sharedClient
 
-	resp, r, err := client.ProjectV1().Create(t.Context(), &managementv1.CreateProjectOptions{
-		Name: "test-project",
-	})
-
+	req := managementv1.NewCreateProjectRequest(randomName("test-project"))
+	resp, r, err := c.ProjectAPI.CreateProject(t.Context()).CreateProjectRequest(*req).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, r)
 	assert.Equal(t, http.StatusCreated, r.StatusCode)
-	assert.NotEmpty(t, resp.ID)
+	assert.NotEmpty(t, resp.ProjectId)
 
 	t.Cleanup(func() {
-		r, err = client.ProjectV1().Delete(context.Background(), resp.ID)
+		r, err := c.ProjectAPI.DeleteProject(context.Background()).XProjectId(resp.ProjectId).Execute()
 		if err != nil {
-			t.Fatalf("could not delete project, %v", err)
+			t.Errorf("delete project: %v", err)
+			return
 		}
 		assert.Equal(t, http.StatusNoContent, r.StatusCode)
 	})
 }
 
 func TestProject_Rename(t *testing.T) {
-	client := Setup(t)
+	c := sharedClient
 
-	resp, r, err := client.ProjectV1().Create(t.Context(), &managementv1.CreateProjectOptions{
-		Name: "test-project-2",
-	})
-
+	req := managementv1.NewCreateProjectRequest(randomName("test-project"))
+	created, r, err := c.ProjectAPI.CreateProject(t.Context()).CreateProjectRequest(*req).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, r)
-	assert.NotNil(t, resp)
 	assert.Equal(t, http.StatusCreated, r.StatusCode)
-	assert.NotEmpty(t, resp.ID)
+	assert.NotEmpty(t, created.ProjectId)
 
 	t.Cleanup(func() {
-		r, err = client.ProjectV1().Delete(context.Background(), resp.ID)
+		r, err := c.ProjectAPI.DeleteProject(context.Background()).XProjectId(created.ProjectId).Execute()
 		if err != nil {
-			t.Fatalf("could not delete project, %v", err)
+			t.Errorf("delete project: %v", err)
+			return
 		}
 		assert.Equal(t, http.StatusNoContent, r.StatusCode)
 	})
 
-	r, err = client.ProjectV1().Rename(t.Context(), resp.ID, &managementv1.RenameProjectOptions{
-		NewName: "test-project-renamed",
-	})
-
+	renamed := randomName("test-project-renamed")
+	rename := managementv1.NewRenameProjectRequest(renamed)
+	r, err = c.ProjectAPI.RenameProject(t.Context()).XProjectId(created.ProjectId).RenameProjectRequest(*rename).Execute()
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusOK, r.StatusCode)
 
-	project, r, err := client.ProjectV1().Get(t.Context(), resp.ID)
-
+	got, r, err := c.ProjectAPI.GetProject(t.Context()).XProjectId(created.ProjectId).Execute()
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusOK, r.StatusCode)
-	assert.Equal(t, "test-project-renamed", project.Name)
+	assert.Equal(t, renamed, got.ProjectName)
 }
 
 func TestProject_Delete(t *testing.T) {
-	client := Setup(t)
+	c := sharedClient
 
-	project, r, err := client.ProjectV1().Create(t.Context(), &managementv1.CreateProjectOptions{
-		Name: "test-project-3",
-	})
-
+	req := managementv1.NewCreateProjectRequest(randomName("test-project"))
+	created, r, err := c.ProjectAPI.CreateProject(t.Context()).CreateProjectRequest(*req).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, r)
 	assert.Equal(t, http.StatusCreated, r.StatusCode)
-	assert.NotEmpty(t, project.ID)
+	assert.NotEmpty(t, created.ProjectId)
 
-	r, err = client.ProjectV1().Delete(t.Context(), project.ID)
-
+	r, err = c.ProjectAPI.DeleteProject(t.Context()).XProjectId(created.ProjectId).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, r)
 	assert.Equal(t, http.StatusNoContent, r.StatusCode)
 
-	p, r, err := client.ProjectV1().Get(t.Context(), project.ID)
-
-	// Lakekeeper API sends 403 when trying to read a non existent object
-	require.ErrorContains(t, err, "Forbidden")
-	assert.NotNil(t, r)
-	assert.Nil(t, p)
+	got, r, err := c.ProjectAPI.GetProject(t.Context()).XProjectId(created.ProjectId).Execute()
+	// Lakekeeper currently returns 403 for reads of a deleted/non-existent
+	// project; accept 404 too so a future server-side fix doesn't break us.
+	require.Error(t, err)
+	require.NotNil(t, r)
+	assert.Contains(t, []int{http.StatusForbidden, http.StatusNotFound}, r.StatusCode)
+	assert.Nil(t, got)
 }
 
 func TestProject_List(t *testing.T) {
-	client := Setup(t)
+	c := sharedClient
 
-	resp, r, err := client.ProjectV1().List(t.Context())
-
-	want := &managementv1.ListProjectsResponse{
-		Projects: []*managementv1.Project{
-			{
-				ID:   defaultProjectID,
-				Name: "Default Project",
-			},
-		},
-	}
-
+	resp, r, err := c.ProjectAPI.ListProjects(t.Context()).Execute()
 	require.NoError(t, err)
-	assert.NotNil(t, r)
 	assert.Equal(t, http.StatusOK, r.StatusCode)
 
-	assert.Equal(t, want, resp)
+	// Other tests run concurrently and may have a project of their own visible
+	// at this moment; only assert the default project is present, not that
+	// it's the only one.
+	assert.Contains(t, resp.Projects, managementv1.GetProjectResponse{
+		ProjectId:   defaultProjectID,
+		ProjectName: "Default Project",
+	})
 }
-
-// APIStatistics gives 0 called endpoints because when tests are run,
-// no endpoints are being called before this test (or the call comes too fast).
-//
-// TODO: this integration test needs to be fixed
-//
-// func TestProject_GetAPIStatistics(t *testing.T) {
-// 	client := Setup(t)
-//
-// 	resp, r, err := client.ProjectV1().GetAPIStatistics(defaultProjectID, &v1.GetAPIStatisticsOptions{
-// 		Warehouse: struct {
-// 			Type string  `json:"type"`
-// 			ID   *string `json:"id,omitempty"`
-// 		}{
-// 			Type: "all",
-// 		},
-// 	})
-//
-// 	require.NoError(t, err)
-// 	assert.NotNil(t, r)
-// 	assert.Equal(t, http.StatusOK, r.StatusCode)
-//
-// 	assert.IsType(t, &v1.GetAPIStatisticsResponse{}, resp)
-// 	assert.NotEmpty(t, resp.CalledEnpoints)
-// 	assert.NotEmpty(t, resp.NextPageToken)
-// 	assert.NotEmpty(t, resp.PreviousPageToken)
-// 	assert.NotEmpty(t, resp.Timestamps)
-// }
