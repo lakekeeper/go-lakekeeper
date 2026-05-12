@@ -73,10 +73,10 @@ func TestWarehouseGrantRevoke(t *testing.T) {
 		"--assignments", "describe",
 	)
 
-	// --relations is intentionally omitted; see project_test.go for the
-	// generator-config mismatch behind that decision.
+	// --relations exercises server-side filtering on the CSV-encoded form.
 	out := runOK(t,
 		"warehouse", "assignments", whID,
+		"--relations", "describe",
 		"--output", "json",
 	)
 	require.Contains(t, string(out), user)
@@ -102,6 +102,7 @@ func TestWarehouseGrantRevoke(t *testing.T) {
 	// after revoke, the assignments listing no longer mentions the user
 	postOut := runOK(t,
 		"warehouse", "assignments", whID,
+		"--relations", "describe",
 		"--output", "json",
 	)
 	assert.NotContains(t, string(postOut), user)

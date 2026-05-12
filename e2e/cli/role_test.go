@@ -39,10 +39,10 @@ func TestRoleGrantAssigneeToUser(t *testing.T) {
 		"--assignments", "assignee",
 	)
 
-	// --relations is intentionally omitted; see project_test.go for the
-	// generator-config mismatch behind that decision.
+	// --relations exercises server-side filtering on the CSV-encoded form.
 	out := runOK(t,
 		"role", "assignments", roleID,
+		"--relations", "assignee",
 		"--output", "json",
 	)
 	require.Contains(t, string(out), user)

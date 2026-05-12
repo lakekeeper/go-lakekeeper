@@ -70,16 +70,10 @@ func TestProjectGrantRevoke(t *testing.T) {
 		"--assignments", "project_admin",
 	)
 
-	// assignments lists it.
-	//
-	// We deliberately omit --relations: the generated client emits
-	// ?relations=foo&relations=bar (explode=true), but the server
-	// expects a single CSV-encoded value (style=form, explode=false).
-	// Filtering happens server-side once that mismatch is fixed in the
-	// generator config; for now we read the unfiltered list and check
-	// the user is present anywhere in the response.
+	// --relations exercises server-side filtering on the CSV-encoded form.
 	assignOut := runOK(t,
 		"project", "assignments",
+		"--relations", "project_admin",
 		"--output", "json",
 	)
 	require.Contains(t, string(assignOut), user, "expected assignment for user %s in %s", user, assignOut)
