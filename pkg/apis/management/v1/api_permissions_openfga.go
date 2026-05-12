@@ -16,7 +16,6 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"reflect"
 	"strings"
 )
 
@@ -1202,15 +1201,7 @@ func (a *PermissionsOpenfgaAPIService) GetNamespaceAssignmentsByIdExecute(r ApiG
 	localVarFormParams := url.Values{}
 
 	if r.relations != nil {
-		t := *r.relations
-		if reflect.TypeOf(t).Kind() == reflect.Slice {
-			s := reflect.ValueOf(t)
-			for i := 0; i < s.Len(); i++ {
-				parameterAddToHeaderOrQuery(localVarQueryParams, "relations", s.Index(i).Interface(), "form", "multi")
-			}
-		} else {
-			parameterAddToHeaderOrQuery(localVarQueryParams, "relations", t, "form", "multi")
-		}
+		parameterAddToHeaderOrQuery(localVarQueryParams, "relations", r.relations, "deepObject", "csv")
 	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
@@ -1674,15 +1665,7 @@ func (a *PermissionsOpenfgaAPIService) GetProjectAssignmentsExecute(r ApiGetProj
 	localVarFormParams := url.Values{}
 
 	if r.relations != nil {
-		t := *r.relations
-		if reflect.TypeOf(t).Kind() == reflect.Slice {
-			s := reflect.ValueOf(t)
-			for i := 0; i < s.Len(); i++ {
-				parameterAddToHeaderOrQuery(localVarQueryParams, "relations", s.Index(i).Interface(), "form", "multi")
-			}
-		} else {
-			parameterAddToHeaderOrQuery(localVarQueryParams, "relations", t, "form", "multi")
-		}
+		parameterAddToHeaderOrQuery(localVarQueryParams, "relations", r.relations, "deepObject", "csv")
 	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
@@ -1800,15 +1783,7 @@ func (a *PermissionsOpenfgaAPIService) GetProjectAssignmentsByIdExecute(r ApiGet
 	localVarFormParams := url.Values{}
 
 	if r.relations != nil {
-		t := *r.relations
-		if reflect.TypeOf(t).Kind() == reflect.Slice {
-			s := reflect.ValueOf(t)
-			for i := 0; i < s.Len(); i++ {
-				parameterAddToHeaderOrQuery(localVarQueryParams, "relations", s.Index(i).Interface(), "form", "multi")
-			}
-		} else {
-			parameterAddToHeaderOrQuery(localVarQueryParams, "relations", t, "form", "multi")
-		}
+		parameterAddToHeaderOrQuery(localVarQueryParams, "relations", r.relations, "deepObject", "csv")
 	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
@@ -2029,15 +2004,7 @@ func (a *PermissionsOpenfgaAPIService) GetRoleAssignmentsByIdExecute(r ApiGetRol
 	localVarFormParams := url.Values{}
 
 	if r.relations != nil {
-		t := *r.relations
-		if reflect.TypeOf(t).Kind() == reflect.Slice {
-			s := reflect.ValueOf(t)
-			for i := 0; i < s.Len(); i++ {
-				parameterAddToHeaderOrQuery(localVarQueryParams, "relations", s.Index(i).Interface(), "form", "multi")
-			}
-		} else {
-			parameterAddToHeaderOrQuery(localVarQueryParams, "relations", t, "form", "multi")
-		}
+		parameterAddToHeaderOrQuery(localVarQueryParams, "relations", r.relations, "deepObject", "csv")
 	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
@@ -2270,15 +2237,7 @@ func (a *PermissionsOpenfgaAPIService) GetServerAssignmentsExecute(r ApiGetServe
 	localVarFormParams := url.Values{}
 
 	if r.relations != nil {
-		t := *r.relations
-		if reflect.TypeOf(t).Kind() == reflect.Slice {
-			s := reflect.ValueOf(t)
-			for i := 0; i < s.Len(); i++ {
-				parameterAddToHeaderOrQuery(localVarQueryParams, "relations", s.Index(i).Interface(), "form", "multi")
-			}
-		} else {
-			parameterAddToHeaderOrQuery(localVarQueryParams, "relations", t, "form", "multi")
-		}
+		parameterAddToHeaderOrQuery(localVarQueryParams, "relations", r.relations, "deepObject", "csv")
 	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
@@ -2527,15 +2486,7 @@ func (a *PermissionsOpenfgaAPIService) GetTableAssignmentsByIdExecute(r ApiGetTa
 	localVarFormParams := url.Values{}
 
 	if r.relations != nil {
-		t := *r.relations
-		if reflect.TypeOf(t).Kind() == reflect.Slice {
-			s := reflect.ValueOf(t)
-			for i := 0; i < s.Len(); i++ {
-				parameterAddToHeaderOrQuery(localVarQueryParams, "relations", s.Index(i).Interface(), "form", "multi")
-			}
-		} else {
-			parameterAddToHeaderOrQuery(localVarQueryParams, "relations", t, "form", "multi")
-		}
+		parameterAddToHeaderOrQuery(localVarQueryParams, "relations", r.relations, "deepObject", "csv")
 	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
@@ -2784,15 +2735,7 @@ func (a *PermissionsOpenfgaAPIService) GetViewAssignmentsByIdExecute(r ApiGetVie
 	localVarFormParams := url.Values{}
 
 	if r.relations != nil {
-		t := *r.relations
-		if reflect.TypeOf(t).Kind() == reflect.Slice {
-			s := reflect.ValueOf(t)
-			for i := 0; i < s.Len(); i++ {
-				parameterAddToHeaderOrQuery(localVarQueryParams, "relations", s.Index(i).Interface(), "form", "multi")
-			}
-		} else {
-			parameterAddToHeaderOrQuery(localVarQueryParams, "relations", t, "form", "multi")
-		}
+		parameterAddToHeaderOrQuery(localVarQueryParams, "relations", r.relations, "deepObject", "csv")
 	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
@@ -3033,15 +2976,7 @@ func (a *PermissionsOpenfgaAPIService) GetWarehouseAssignmentsByIdExecute(r ApiG
 	localVarFormParams := url.Values{}
 
 	if r.relations != nil {
-		t := *r.relations
-		if reflect.TypeOf(t).Kind() == reflect.Slice {
-			s := reflect.ValueOf(t)
-			for i := 0; i < s.Len(); i++ {
-				parameterAddToHeaderOrQuery(localVarQueryParams, "relations", s.Index(i).Interface(), "form", "multi")
-			}
-		} else {
-			parameterAddToHeaderOrQuery(localVarQueryParams, "relations", t, "form", "multi")
-		}
+		parameterAddToHeaderOrQuery(localVarQueryParams, "relations", r.relations, "deepObject", "csv")
 	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
