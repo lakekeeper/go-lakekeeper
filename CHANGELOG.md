@@ -1,5 +1,47 @@
 # Changelog
 
+## [0.1.0](https://github.com/lakekeeper/go-lakekeeper/compare/v0.0.23...v0.1.0) (2026-05-12)
+
+
+### ⚠ BREAKING CHANGES
+
+* replace hand-written Management API with code-generated client
+* the Management API client surface is replaced. client.NewClient(...) becomes client.New(...) / client.NewWithAuthSource(...); ProjectV1().Create(...)-style call sites become ProjectAPI.CreateProject(ctx).CreateProjectRequest(req).Execute() and similarly across every resource. pkg/apis/management/v1/storage/{profile,credential} is removed (use pkg/storage); permissionv1 constants are now flat under managementv1; lkctl warehouse delete --force is removed; cmd/lkctl/errors is removed. See PR #7 description for the migration map.
+
+### Features
+
+* **ci:** run the lkctl E2E suite (compose + kind) on every PR and in the nightly job ([2539046](https://github.com/lakekeeper/go-lakekeeper/commit/253904653401eaa14bc3c7db9af67ce446acbc7f))
+* **cli:** add --auth-mode access-token and kubernetes-sa, alongside the default oauth2 client-credentials flow ([2539046](https://github.com/lakekeeper/go-lakekeeper/commit/253904653401eaa14bc3c7db9af67ce446acbc7f))
+* **client:** mirror the same response-body wrapping in the pkg/client facade ([2539046](https://github.com/lakekeeper/go-lakekeeper/commit/253904653401eaa14bc3c7db9af67ce446acbc7f))
+* **cli:** include the server response body (truncated at 1 KiB) in API errors so RFC 7807 problems surface to operators ([2539046](https://github.com/lakekeeper/go-lakekeeper/commit/253904653401eaa14bc3c7db9af67ce446acbc7f))
+* **cli:** reintroduce lkctl commands (project, role, server, user, warehouse, version, whoami) on the generated client ([2539046](https://github.com/lakekeeper/go-lakekeeper/commit/253904653401eaa14bc3c7db9af67ce446acbc7f))
+* **e2e:** add lkctl end-to-end harness covering compose and kind backends, gated by build tag e2e_cli ([2539046](https://github.com/lakekeeper/go-lakekeeper/commit/253904653401eaa14bc3c7db9af67ce446acbc7f))
+* **permissions:** extract BuildAssignment / DescribeAssignment helpers shared by lkctl and integration ([2539046](https://github.com/lakekeeper/go-lakekeeper/commit/253904653401eaa14bc3c7db9af67ce446acbc7f))
+* replace hand-written Management API with code-generated client ([2539046](https://github.com/lakekeeper/go-lakekeeper/commit/253904653401eaa14bc3c7db9af67ce446acbc7f))
+* **storage:** add functional-option builders for S3, GCS, ADLS profiles and eight credential variants ([2539046](https://github.com/lakekeeper/go-lakekeeper/commit/253904653401eaa14bc3c7db9af67ce446acbc7f))
+
+
+### Bug Fixes
+
+* **cli:** print errors to stderr before exiting non-zero (previously swallowed by SilenceErrors) ([2539046](https://github.com/lakekeeper/go-lakekeeper/commit/253904653401eaa14bc3c7db9af67ce446acbc7f))
+* **generate:** force bracket notation on relations[] query parameters so the axum/serde_urlencoded backend accepts them ([2539046](https://github.com/lakekeeper/go-lakekeeper/commit/253904653401eaa14bc3c7db9af67ce446acbc7f))
+* **openapi:** extend preprocessor to also fix all seven *Assignment schemas via hierarchical-expansion fallback ([2539046](https://github.com/lakekeeper/go-lakekeeper/commit/253904653401eaa14bc3c7db9af67ce446acbc7f))
+* **openapi:** preprocess spec to fix StorageCredential round-trip (single-tier oneOf + discriminator, eight clean leaf types) ([2539046](https://github.com/lakekeeper/go-lakekeeper/commit/253904653401eaa14bc3c7db9af67ce446acbc7f))
+* **openapi:** tolerate Lakekeeper v0.10.4 servers that pre-date the lakekeeper-version field rename ([2539046](https://github.com/lakekeeper/go-lakekeeper/commit/253904653401eaa14bc3c7db9af67ce446acbc7f))
+
+
+### Documentation
+
+* add docs/AUTHENTICATION.md and docs/AUTHORIZATION.md covering CLI and SDK flows end-to-end ([2539046](https://github.com/lakekeeper/go-lakekeeper/commit/253904653401eaa14bc3c7db9af67ce446acbc7f))
+* add docs/GENERATION.md describing the OpenAPI preprocessor + generator pipeline ([2539046](https://github.com/lakekeeper/go-lakekeeper/commit/253904653401eaa14bc3c7db9af67ce446acbc7f))
+* **readme:** add a Lakekeeper compatibility matrix; v0.12.0 is the minimum for client 0.1.x ([2539046](https://github.com/lakekeeper/go-lakekeeper/commit/253904653401eaa14bc3c7db9af67ce446acbc7f))
+* rewrite ARCHITECTURE.md and PACKAGES.md around the AuthRoundTripper / generated APIClient ([2539046](https://github.com/lakekeeper/go-lakekeeper/commit/253904653401eaa14bc3c7db9af67ce446acbc7f))
+
+
+### Miscellaneous Chores
+
+* add Discipline section to CLAUDE.md naming key skills ([#5](https://github.com/lakekeeper/go-lakekeeper/issues/5)) ([72106a8](https://github.com/lakekeeper/go-lakekeeper/commit/72106a8fd8cb64f9cdf8e49ffc15679c71ddd77a))
+
 ## [0.0.23](https://github.com/lakekeeper/go-lakekeeper/releases/tag/v0.0.23) (2026-04-29)
 
 Initial release on the `lakekeeper/go-lakekeeper` repository following migration from `baptistegh/go-lakekeeper`. No source-level changes versus the prior `v0.0.23` release on the source repo — the version is held to preserve SemVer continuity. See entries below for the full release history under `baptistegh/go-lakekeeper`.
