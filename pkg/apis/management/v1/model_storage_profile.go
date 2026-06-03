@@ -46,58 +46,86 @@ func StorageProfileS3AsStorageProfile(v *StorageProfileS3) StorageProfile {
 // Unmarshal JSON data into one of the pointers in the struct
 func (dst *StorageProfile) UnmarshalJSON(data []byte) error {
 	var err error
-	match := 0
-	// try to unmarshal data into StorageProfileAdls
-	err = json.Unmarshal(data, &dst.StorageProfileAdls)
-	if err == nil {
-		jsonStorageProfileAdls, _ := json.Marshal(dst.StorageProfileAdls)
-		if string(jsonStorageProfileAdls) == "{}" { // empty struct
+	// use discriminator value to speed up the lookup
+	var jsonDict map[string]interface{}
+	err = newStrictDecoder(data).Decode(&jsonDict)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal JSON into map for the discriminator lookup")
+	}
+
+	// check if the discriminator value is 'adls'
+	if jsonDict["type"] == "adls" {
+		// try to unmarshal JSON data into StorageProfileAdls
+		err = json.Unmarshal(data, &dst.StorageProfileAdls)
+		if err == nil {
+			return nil // data stored in dst.StorageProfileAdls, return on the first match
+		} else {
 			dst.StorageProfileAdls = nil
-		} else {
-			match++
+			return fmt.Errorf("failed to unmarshal StorageProfile as StorageProfileAdls: %s", err.Error())
 		}
-	} else {
-		dst.StorageProfileAdls = nil
 	}
 
-	// try to unmarshal data into StorageProfileGcs
-	err = json.Unmarshal(data, &dst.StorageProfileGcs)
-	if err == nil {
-		jsonStorageProfileGcs, _ := json.Marshal(dst.StorageProfileGcs)
-		if string(jsonStorageProfileGcs) == "{}" { // empty struct
+	// check if the discriminator value is 'gcs'
+	if jsonDict["type"] == "gcs" {
+		// try to unmarshal JSON data into StorageProfileGcs
+		err = json.Unmarshal(data, &dst.StorageProfileGcs)
+		if err == nil {
+			return nil // data stored in dst.StorageProfileGcs, return on the first match
+		} else {
 			dst.StorageProfileGcs = nil
-		} else {
-			match++
+			return fmt.Errorf("failed to unmarshal StorageProfile as StorageProfileGcs: %s", err.Error())
 		}
-	} else {
-		dst.StorageProfileGcs = nil
 	}
 
-	// try to unmarshal data into StorageProfileS3
-	err = json.Unmarshal(data, &dst.StorageProfileS3)
-	if err == nil {
-		jsonStorageProfileS3, _ := json.Marshal(dst.StorageProfileS3)
-		if string(jsonStorageProfileS3) == "{}" { // empty struct
+	// check if the discriminator value is 's3'
+	if jsonDict["type"] == "s3" {
+		// try to unmarshal JSON data into StorageProfileS3
+		err = json.Unmarshal(data, &dst.StorageProfileS3)
+		if err == nil {
+			return nil // data stored in dst.StorageProfileS3, return on the first match
+		} else {
 			dst.StorageProfileS3 = nil
-		} else {
-			match++
+			return fmt.Errorf("failed to unmarshal StorageProfile as StorageProfileS3: %s", err.Error())
 		}
-	} else {
-		dst.StorageProfileS3 = nil
 	}
 
-	if match > 1 { // more than 1 match
-		// reset to nil
-		dst.StorageProfileAdls = nil
-		dst.StorageProfileGcs = nil
-		dst.StorageProfileS3 = nil
-
-		return fmt.Errorf("data matches more than one schema in oneOf(StorageProfile)")
-	} else if match == 1 {
-		return nil // exactly one match
-	} else { // no match
-		return fmt.Errorf("data failed to match schemas in oneOf(StorageProfile)")
+	// check if the discriminator value is 'StorageProfileAdls'
+	if jsonDict["type"] == "StorageProfileAdls" {
+		// try to unmarshal JSON data into StorageProfileAdls
+		err = json.Unmarshal(data, &dst.StorageProfileAdls)
+		if err == nil {
+			return nil // data stored in dst.StorageProfileAdls, return on the first match
+		} else {
+			dst.StorageProfileAdls = nil
+			return fmt.Errorf("failed to unmarshal StorageProfile as StorageProfileAdls: %s", err.Error())
+		}
 	}
+
+	// check if the discriminator value is 'StorageProfileGcs'
+	if jsonDict["type"] == "StorageProfileGcs" {
+		// try to unmarshal JSON data into StorageProfileGcs
+		err = json.Unmarshal(data, &dst.StorageProfileGcs)
+		if err == nil {
+			return nil // data stored in dst.StorageProfileGcs, return on the first match
+		} else {
+			dst.StorageProfileGcs = nil
+			return fmt.Errorf("failed to unmarshal StorageProfile as StorageProfileGcs: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'StorageProfileS3'
+	if jsonDict["type"] == "StorageProfileS3" {
+		// try to unmarshal JSON data into StorageProfileS3
+		err = json.Unmarshal(data, &dst.StorageProfileS3)
+		if err == nil {
+			return nil // data stored in dst.StorageProfileS3, return on the first match
+		} else {
+			dst.StorageProfileS3 = nil
+			return fmt.Errorf("failed to unmarshal StorageProfile as StorageProfileS3: %s", err.Error())
+		}
+	}
+
+	return nil
 }
 
 // Marshal data from the first non-nil pointers in the struct to JSON

@@ -128,7 +128,6 @@ func (o *ViewAssignmentSelectUser) UnmarshalJSON(data []byte) (err error) {
 	varViewAssignmentSelectUser := _ViewAssignmentSelectUser{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varViewAssignmentSelectUser)
 
 	if err != nil {

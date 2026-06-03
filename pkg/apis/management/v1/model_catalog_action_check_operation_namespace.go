@@ -99,7 +99,6 @@ func (o *CatalogActionCheckOperationNamespace) UnmarshalJSON(data []byte) (err e
 	varCatalogActionCheckOperationNamespace := _CatalogActionCheckOperationNamespace{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varCatalogActionCheckOperationNamespace)
 
 	if err != nil {

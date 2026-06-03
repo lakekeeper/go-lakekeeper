@@ -44,7 +44,8 @@ func (v *RoleRelation) UnmarshalJSON(src []byte) error {
 		}
 	}
 
-	return fmt.Errorf("%+v is not a valid RoleRelation", value)
+	*v = enumTypeValue
+	return nil
 }
 
 // NewRoleRelationFromValue returns a pointer to a valid RoleRelation

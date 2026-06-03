@@ -17,127 +17,165 @@ import (
 
 // ControlTaskAction - struct for ControlTaskAction
 type ControlTaskAction struct {
-	ControlTaskActionOneOf  *ControlTaskActionOneOf
-	ControlTaskActionOneOf1 *ControlTaskActionOneOf1
-	ControlTaskActionOneOf2 *ControlTaskActionOneOf2
-	ControlTaskActionOneOf3 *ControlTaskActionOneOf3
+	ControlTaskActionCancel *ControlTaskActionCancel
+	ControlTaskActionRunAt  *ControlTaskActionRunAt
+	ControlTaskActionRunNow *ControlTaskActionRunNow
+	ControlTaskActionStop   *ControlTaskActionStop
 }
 
-// ControlTaskActionOneOfAsControlTaskAction is a convenience function that returns ControlTaskActionOneOf wrapped in ControlTaskAction
-func ControlTaskActionOneOfAsControlTaskAction(v *ControlTaskActionOneOf) ControlTaskAction {
+// ControlTaskActionCancelAsControlTaskAction is a convenience function that returns ControlTaskActionCancel wrapped in ControlTaskAction
+func ControlTaskActionCancelAsControlTaskAction(v *ControlTaskActionCancel) ControlTaskAction {
 	return ControlTaskAction{
-		ControlTaskActionOneOf: v,
+		ControlTaskActionCancel: v,
 	}
 }
 
-// ControlTaskActionOneOf1AsControlTaskAction is a convenience function that returns ControlTaskActionOneOf1 wrapped in ControlTaskAction
-func ControlTaskActionOneOf1AsControlTaskAction(v *ControlTaskActionOneOf1) ControlTaskAction {
+// ControlTaskActionRunAtAsControlTaskAction is a convenience function that returns ControlTaskActionRunAt wrapped in ControlTaskAction
+func ControlTaskActionRunAtAsControlTaskAction(v *ControlTaskActionRunAt) ControlTaskAction {
 	return ControlTaskAction{
-		ControlTaskActionOneOf1: v,
+		ControlTaskActionRunAt: v,
 	}
 }
 
-// ControlTaskActionOneOf2AsControlTaskAction is a convenience function that returns ControlTaskActionOneOf2 wrapped in ControlTaskAction
-func ControlTaskActionOneOf2AsControlTaskAction(v *ControlTaskActionOneOf2) ControlTaskAction {
+// ControlTaskActionRunNowAsControlTaskAction is a convenience function that returns ControlTaskActionRunNow wrapped in ControlTaskAction
+func ControlTaskActionRunNowAsControlTaskAction(v *ControlTaskActionRunNow) ControlTaskAction {
 	return ControlTaskAction{
-		ControlTaskActionOneOf2: v,
+		ControlTaskActionRunNow: v,
 	}
 }
 
-// ControlTaskActionOneOf3AsControlTaskAction is a convenience function that returns ControlTaskActionOneOf3 wrapped in ControlTaskAction
-func ControlTaskActionOneOf3AsControlTaskAction(v *ControlTaskActionOneOf3) ControlTaskAction {
+// ControlTaskActionStopAsControlTaskAction is a convenience function that returns ControlTaskActionStop wrapped in ControlTaskAction
+func ControlTaskActionStopAsControlTaskAction(v *ControlTaskActionStop) ControlTaskAction {
 	return ControlTaskAction{
-		ControlTaskActionOneOf3: v,
+		ControlTaskActionStop: v,
 	}
 }
 
 // Unmarshal JSON data into one of the pointers in the struct
 func (dst *ControlTaskAction) UnmarshalJSON(data []byte) error {
 	var err error
-	match := 0
-	// try to unmarshal data into ControlTaskActionOneOf
-	err = json.Unmarshal(data, &dst.ControlTaskActionOneOf)
-	if err == nil {
-		jsonControlTaskActionOneOf, _ := json.Marshal(dst.ControlTaskActionOneOf)
-		if string(jsonControlTaskActionOneOf) == "{}" { // empty struct
-			dst.ControlTaskActionOneOf = nil
+	// use discriminator value to speed up the lookup
+	var jsonDict map[string]interface{}
+	err = newStrictDecoder(data).Decode(&jsonDict)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal JSON into map for the discriminator lookup")
+	}
+
+	// check if the discriminator value is 'cancel'
+	if jsonDict["action-type"] == "cancel" {
+		// try to unmarshal JSON data into ControlTaskActionCancel
+		err = json.Unmarshal(data, &dst.ControlTaskActionCancel)
+		if err == nil {
+			return nil // data stored in dst.ControlTaskActionCancel, return on the first match
 		} else {
-			match++
+			dst.ControlTaskActionCancel = nil
+			return fmt.Errorf("failed to unmarshal ControlTaskAction as ControlTaskActionCancel: %s", err.Error())
 		}
-	} else {
-		dst.ControlTaskActionOneOf = nil
 	}
 
-	// try to unmarshal data into ControlTaskActionOneOf1
-	err = json.Unmarshal(data, &dst.ControlTaskActionOneOf1)
-	if err == nil {
-		jsonControlTaskActionOneOf1, _ := json.Marshal(dst.ControlTaskActionOneOf1)
-		if string(jsonControlTaskActionOneOf1) == "{}" { // empty struct
-			dst.ControlTaskActionOneOf1 = nil
+	// check if the discriminator value is 'run-at'
+	if jsonDict["action-type"] == "run-at" {
+		// try to unmarshal JSON data into ControlTaskActionRunAt
+		err = json.Unmarshal(data, &dst.ControlTaskActionRunAt)
+		if err == nil {
+			return nil // data stored in dst.ControlTaskActionRunAt, return on the first match
 		} else {
-			match++
+			dst.ControlTaskActionRunAt = nil
+			return fmt.Errorf("failed to unmarshal ControlTaskAction as ControlTaskActionRunAt: %s", err.Error())
 		}
-	} else {
-		dst.ControlTaskActionOneOf1 = nil
 	}
 
-	// try to unmarshal data into ControlTaskActionOneOf2
-	err = json.Unmarshal(data, &dst.ControlTaskActionOneOf2)
-	if err == nil {
-		jsonControlTaskActionOneOf2, _ := json.Marshal(dst.ControlTaskActionOneOf2)
-		if string(jsonControlTaskActionOneOf2) == "{}" { // empty struct
-			dst.ControlTaskActionOneOf2 = nil
+	// check if the discriminator value is 'run-now'
+	if jsonDict["action-type"] == "run-now" {
+		// try to unmarshal JSON data into ControlTaskActionRunNow
+		err = json.Unmarshal(data, &dst.ControlTaskActionRunNow)
+		if err == nil {
+			return nil // data stored in dst.ControlTaskActionRunNow, return on the first match
 		} else {
-			match++
+			dst.ControlTaskActionRunNow = nil
+			return fmt.Errorf("failed to unmarshal ControlTaskAction as ControlTaskActionRunNow: %s", err.Error())
 		}
-	} else {
-		dst.ControlTaskActionOneOf2 = nil
 	}
 
-	// try to unmarshal data into ControlTaskActionOneOf3
-	err = json.Unmarshal(data, &dst.ControlTaskActionOneOf3)
-	if err == nil {
-		jsonControlTaskActionOneOf3, _ := json.Marshal(dst.ControlTaskActionOneOf3)
-		if string(jsonControlTaskActionOneOf3) == "{}" { // empty struct
-			dst.ControlTaskActionOneOf3 = nil
+	// check if the discriminator value is 'stop'
+	if jsonDict["action-type"] == "stop" {
+		// try to unmarshal JSON data into ControlTaskActionStop
+		err = json.Unmarshal(data, &dst.ControlTaskActionStop)
+		if err == nil {
+			return nil // data stored in dst.ControlTaskActionStop, return on the first match
 		} else {
-			match++
+			dst.ControlTaskActionStop = nil
+			return fmt.Errorf("failed to unmarshal ControlTaskAction as ControlTaskActionStop: %s", err.Error())
 		}
-	} else {
-		dst.ControlTaskActionOneOf3 = nil
 	}
 
-	if match > 1 { // more than 1 match
-		// reset to nil
-		dst.ControlTaskActionOneOf = nil
-		dst.ControlTaskActionOneOf1 = nil
-		dst.ControlTaskActionOneOf2 = nil
-		dst.ControlTaskActionOneOf3 = nil
-
-		return fmt.Errorf("data matches more than one schema in oneOf(ControlTaskAction)")
-	} else if match == 1 {
-		return nil // exactly one match
-	} else { // no match
-		return fmt.Errorf("data failed to match schemas in oneOf(ControlTaskAction)")
+	// check if the discriminator value is 'ControlTaskActionCancel'
+	if jsonDict["action-type"] == "ControlTaskActionCancel" {
+		// try to unmarshal JSON data into ControlTaskActionCancel
+		err = json.Unmarshal(data, &dst.ControlTaskActionCancel)
+		if err == nil {
+			return nil // data stored in dst.ControlTaskActionCancel, return on the first match
+		} else {
+			dst.ControlTaskActionCancel = nil
+			return fmt.Errorf("failed to unmarshal ControlTaskAction as ControlTaskActionCancel: %s", err.Error())
+		}
 	}
+
+	// check if the discriminator value is 'ControlTaskActionRunAt'
+	if jsonDict["action-type"] == "ControlTaskActionRunAt" {
+		// try to unmarshal JSON data into ControlTaskActionRunAt
+		err = json.Unmarshal(data, &dst.ControlTaskActionRunAt)
+		if err == nil {
+			return nil // data stored in dst.ControlTaskActionRunAt, return on the first match
+		} else {
+			dst.ControlTaskActionRunAt = nil
+			return fmt.Errorf("failed to unmarshal ControlTaskAction as ControlTaskActionRunAt: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'ControlTaskActionRunNow'
+	if jsonDict["action-type"] == "ControlTaskActionRunNow" {
+		// try to unmarshal JSON data into ControlTaskActionRunNow
+		err = json.Unmarshal(data, &dst.ControlTaskActionRunNow)
+		if err == nil {
+			return nil // data stored in dst.ControlTaskActionRunNow, return on the first match
+		} else {
+			dst.ControlTaskActionRunNow = nil
+			return fmt.Errorf("failed to unmarshal ControlTaskAction as ControlTaskActionRunNow: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'ControlTaskActionStop'
+	if jsonDict["action-type"] == "ControlTaskActionStop" {
+		// try to unmarshal JSON data into ControlTaskActionStop
+		err = json.Unmarshal(data, &dst.ControlTaskActionStop)
+		if err == nil {
+			return nil // data stored in dst.ControlTaskActionStop, return on the first match
+		} else {
+			dst.ControlTaskActionStop = nil
+			return fmt.Errorf("failed to unmarshal ControlTaskAction as ControlTaskActionStop: %s", err.Error())
+		}
+	}
+
+	return nil
 }
 
 // Marshal data from the first non-nil pointers in the struct to JSON
 func (src ControlTaskAction) MarshalJSON() ([]byte, error) {
-	if src.ControlTaskActionOneOf != nil {
-		return json.Marshal(&src.ControlTaskActionOneOf)
+	if src.ControlTaskActionCancel != nil {
+		return json.Marshal(&src.ControlTaskActionCancel)
 	}
 
-	if src.ControlTaskActionOneOf1 != nil {
-		return json.Marshal(&src.ControlTaskActionOneOf1)
+	if src.ControlTaskActionRunAt != nil {
+		return json.Marshal(&src.ControlTaskActionRunAt)
 	}
 
-	if src.ControlTaskActionOneOf2 != nil {
-		return json.Marshal(&src.ControlTaskActionOneOf2)
+	if src.ControlTaskActionRunNow != nil {
+		return json.Marshal(&src.ControlTaskActionRunNow)
 	}
 
-	if src.ControlTaskActionOneOf3 != nil {
-		return json.Marshal(&src.ControlTaskActionOneOf3)
+	if src.ControlTaskActionStop != nil {
+		return json.Marshal(&src.ControlTaskActionStop)
 	}
 
 	return nil, nil // no data in oneOf schemas
@@ -148,20 +186,20 @@ func (obj *ControlTaskAction) GetActualInstance() interface{} {
 	if obj == nil {
 		return nil
 	}
-	if obj.ControlTaskActionOneOf != nil {
-		return obj.ControlTaskActionOneOf
+	if obj.ControlTaskActionCancel != nil {
+		return obj.ControlTaskActionCancel
 	}
 
-	if obj.ControlTaskActionOneOf1 != nil {
-		return obj.ControlTaskActionOneOf1
+	if obj.ControlTaskActionRunAt != nil {
+		return obj.ControlTaskActionRunAt
 	}
 
-	if obj.ControlTaskActionOneOf2 != nil {
-		return obj.ControlTaskActionOneOf2
+	if obj.ControlTaskActionRunNow != nil {
+		return obj.ControlTaskActionRunNow
 	}
 
-	if obj.ControlTaskActionOneOf3 != nil {
-		return obj.ControlTaskActionOneOf3
+	if obj.ControlTaskActionStop != nil {
+		return obj.ControlTaskActionStop
 	}
 
 	// all schemas are nil

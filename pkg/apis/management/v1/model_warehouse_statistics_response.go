@@ -166,7 +166,6 @@ func (o *WarehouseStatisticsResponse) UnmarshalJSON(data []byte) (err error) {
 	varWarehouseStatisticsResponse := _WarehouseStatisticsResponse{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varWarehouseStatisticsResponse)
 
 	if err != nil {

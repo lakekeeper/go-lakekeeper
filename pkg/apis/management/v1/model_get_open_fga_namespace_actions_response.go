@@ -99,7 +99,6 @@ func (o *GetOpenFGANamespaceActionsResponse) UnmarshalJSON(data []byte) (err err
 	varGetOpenFGANamespaceActionsResponse := _GetOpenFGANamespaceActionsResponse{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varGetOpenFGANamespaceActionsResponse)
 
 	if err != nil {

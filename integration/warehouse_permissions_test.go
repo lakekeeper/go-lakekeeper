@@ -87,7 +87,7 @@ func TestPermissions_Warehouse_GetAccess(t *testing.T) {
 		managementv1.WarehouseActionSetProtection,
 		managementv1.WarehouseActionGetEndpointStatistics,
 	}
-	assert.Subset(t, want, resp.AllowedActions)
+	assertAllowedActionsSubset(t, want, resp.AllowedActions, managementv1.AllowedWarehouseActionEnumValues)
 }
 
 func TestPermissions_Warehouse_GetAssignments(t *testing.T) {

@@ -17,387 +17,525 @@ import (
 
 // LakekeeperProjectAction - struct for LakekeeperProjectAction
 type LakekeeperProjectAction struct {
-	LakekeeperNamespaceActionOneOf11 *LakekeeperNamespaceActionOneOf11
-	LakekeeperNamespaceActionOneOf3  *LakekeeperNamespaceActionOneOf3
-	LakekeeperNamespaceActionOneOf5  *LakekeeperNamespaceActionOneOf5
-	LakekeeperProjectActionOneOf     *LakekeeperProjectActionOneOf
-	LakekeeperProjectActionOneOf1    *LakekeeperProjectActionOneOf1
-	LakekeeperProjectActionOneOf10   *LakekeeperProjectActionOneOf10
-	LakekeeperProjectActionOneOf2    *LakekeeperProjectActionOneOf2
-	LakekeeperProjectActionOneOf3    *LakekeeperProjectActionOneOf3
-	LakekeeperProjectActionOneOf4    *LakekeeperProjectActionOneOf4
-	LakekeeperProjectActionOneOf5    *LakekeeperProjectActionOneOf5
-	LakekeeperProjectActionOneOf6    *LakekeeperProjectActionOneOf6
-	LakekeeperProjectActionOneOf7    *LakekeeperProjectActionOneOf7
-	LakekeeperProjectActionOneOf8    *LakekeeperProjectActionOneOf8
-	LakekeeperProjectActionOneOf9    *LakekeeperProjectActionOneOf9
+	LakekeeperProjectActionControlProjectTasks   *LakekeeperProjectActionControlProjectTasks
+	LakekeeperProjectActionCreateRole            *LakekeeperProjectActionCreateRole
+	LakekeeperProjectActionCreateWarehouse       *LakekeeperProjectActionCreateWarehouse
+	LakekeeperProjectActionDelete                *LakekeeperProjectActionDelete
+	LakekeeperProjectActionGetEndpointStatistics *LakekeeperProjectActionGetEndpointStatistics
+	LakekeeperProjectActionGetMetadata           *LakekeeperProjectActionGetMetadata
+	LakekeeperProjectActionGetProjectTasks       *LakekeeperProjectActionGetProjectTasks
+	LakekeeperProjectActionGetTaskQueueConfig    *LakekeeperProjectActionGetTaskQueueConfig
+	LakekeeperProjectActionIncludeInList         *LakekeeperProjectActionIncludeInList
+	LakekeeperProjectActionListRoles             *LakekeeperProjectActionListRoles
+	LakekeeperProjectActionListWarehouses        *LakekeeperProjectActionListWarehouses
+	LakekeeperProjectActionModifyTaskQueueConfig *LakekeeperProjectActionModifyTaskQueueConfig
+	LakekeeperProjectActionRename                *LakekeeperProjectActionRename
+	LakekeeperProjectActionSearchRoles           *LakekeeperProjectActionSearchRoles
 }
 
-// LakekeeperNamespaceActionOneOf11AsLakekeeperProjectAction is a convenience function that returns LakekeeperNamespaceActionOneOf11 wrapped in LakekeeperProjectAction
-func LakekeeperNamespaceActionOneOf11AsLakekeeperProjectAction(v *LakekeeperNamespaceActionOneOf11) LakekeeperProjectAction {
+// LakekeeperProjectActionControlProjectTasksAsLakekeeperProjectAction is a convenience function that returns LakekeeperProjectActionControlProjectTasks wrapped in LakekeeperProjectAction
+func LakekeeperProjectActionControlProjectTasksAsLakekeeperProjectAction(v *LakekeeperProjectActionControlProjectTasks) LakekeeperProjectAction {
 	return LakekeeperProjectAction{
-		LakekeeperNamespaceActionOneOf11: v,
+		LakekeeperProjectActionControlProjectTasks: v,
 	}
 }
 
-// LakekeeperNamespaceActionOneOf3AsLakekeeperProjectAction is a convenience function that returns LakekeeperNamespaceActionOneOf3 wrapped in LakekeeperProjectAction
-func LakekeeperNamespaceActionOneOf3AsLakekeeperProjectAction(v *LakekeeperNamespaceActionOneOf3) LakekeeperProjectAction {
+// LakekeeperProjectActionCreateRoleAsLakekeeperProjectAction is a convenience function that returns LakekeeperProjectActionCreateRole wrapped in LakekeeperProjectAction
+func LakekeeperProjectActionCreateRoleAsLakekeeperProjectAction(v *LakekeeperProjectActionCreateRole) LakekeeperProjectAction {
 	return LakekeeperProjectAction{
-		LakekeeperNamespaceActionOneOf3: v,
+		LakekeeperProjectActionCreateRole: v,
 	}
 }
 
-// LakekeeperNamespaceActionOneOf5AsLakekeeperProjectAction is a convenience function that returns LakekeeperNamespaceActionOneOf5 wrapped in LakekeeperProjectAction
-func LakekeeperNamespaceActionOneOf5AsLakekeeperProjectAction(v *LakekeeperNamespaceActionOneOf5) LakekeeperProjectAction {
+// LakekeeperProjectActionCreateWarehouseAsLakekeeperProjectAction is a convenience function that returns LakekeeperProjectActionCreateWarehouse wrapped in LakekeeperProjectAction
+func LakekeeperProjectActionCreateWarehouseAsLakekeeperProjectAction(v *LakekeeperProjectActionCreateWarehouse) LakekeeperProjectAction {
 	return LakekeeperProjectAction{
-		LakekeeperNamespaceActionOneOf5: v,
+		LakekeeperProjectActionCreateWarehouse: v,
 	}
 }
 
-// LakekeeperProjectActionOneOfAsLakekeeperProjectAction is a convenience function that returns LakekeeperProjectActionOneOf wrapped in LakekeeperProjectAction
-func LakekeeperProjectActionOneOfAsLakekeeperProjectAction(v *LakekeeperProjectActionOneOf) LakekeeperProjectAction {
+// LakekeeperProjectActionDeleteAsLakekeeperProjectAction is a convenience function that returns LakekeeperProjectActionDelete wrapped in LakekeeperProjectAction
+func LakekeeperProjectActionDeleteAsLakekeeperProjectAction(v *LakekeeperProjectActionDelete) LakekeeperProjectAction {
 	return LakekeeperProjectAction{
-		LakekeeperProjectActionOneOf: v,
+		LakekeeperProjectActionDelete: v,
 	}
 }
 
-// LakekeeperProjectActionOneOf1AsLakekeeperProjectAction is a convenience function that returns LakekeeperProjectActionOneOf1 wrapped in LakekeeperProjectAction
-func LakekeeperProjectActionOneOf1AsLakekeeperProjectAction(v *LakekeeperProjectActionOneOf1) LakekeeperProjectAction {
+// LakekeeperProjectActionGetEndpointStatisticsAsLakekeeperProjectAction is a convenience function that returns LakekeeperProjectActionGetEndpointStatistics wrapped in LakekeeperProjectAction
+func LakekeeperProjectActionGetEndpointStatisticsAsLakekeeperProjectAction(v *LakekeeperProjectActionGetEndpointStatistics) LakekeeperProjectAction {
 	return LakekeeperProjectAction{
-		LakekeeperProjectActionOneOf1: v,
+		LakekeeperProjectActionGetEndpointStatistics: v,
 	}
 }
 
-// LakekeeperProjectActionOneOf10AsLakekeeperProjectAction is a convenience function that returns LakekeeperProjectActionOneOf10 wrapped in LakekeeperProjectAction
-func LakekeeperProjectActionOneOf10AsLakekeeperProjectAction(v *LakekeeperProjectActionOneOf10) LakekeeperProjectAction {
+// LakekeeperProjectActionGetMetadataAsLakekeeperProjectAction is a convenience function that returns LakekeeperProjectActionGetMetadata wrapped in LakekeeperProjectAction
+func LakekeeperProjectActionGetMetadataAsLakekeeperProjectAction(v *LakekeeperProjectActionGetMetadata) LakekeeperProjectAction {
 	return LakekeeperProjectAction{
-		LakekeeperProjectActionOneOf10: v,
+		LakekeeperProjectActionGetMetadata: v,
 	}
 }
 
-// LakekeeperProjectActionOneOf2AsLakekeeperProjectAction is a convenience function that returns LakekeeperProjectActionOneOf2 wrapped in LakekeeperProjectAction
-func LakekeeperProjectActionOneOf2AsLakekeeperProjectAction(v *LakekeeperProjectActionOneOf2) LakekeeperProjectAction {
+// LakekeeperProjectActionGetProjectTasksAsLakekeeperProjectAction is a convenience function that returns LakekeeperProjectActionGetProjectTasks wrapped in LakekeeperProjectAction
+func LakekeeperProjectActionGetProjectTasksAsLakekeeperProjectAction(v *LakekeeperProjectActionGetProjectTasks) LakekeeperProjectAction {
 	return LakekeeperProjectAction{
-		LakekeeperProjectActionOneOf2: v,
+		LakekeeperProjectActionGetProjectTasks: v,
 	}
 }
 
-// LakekeeperProjectActionOneOf3AsLakekeeperProjectAction is a convenience function that returns LakekeeperProjectActionOneOf3 wrapped in LakekeeperProjectAction
-func LakekeeperProjectActionOneOf3AsLakekeeperProjectAction(v *LakekeeperProjectActionOneOf3) LakekeeperProjectAction {
+// LakekeeperProjectActionGetTaskQueueConfigAsLakekeeperProjectAction is a convenience function that returns LakekeeperProjectActionGetTaskQueueConfig wrapped in LakekeeperProjectAction
+func LakekeeperProjectActionGetTaskQueueConfigAsLakekeeperProjectAction(v *LakekeeperProjectActionGetTaskQueueConfig) LakekeeperProjectAction {
 	return LakekeeperProjectAction{
-		LakekeeperProjectActionOneOf3: v,
+		LakekeeperProjectActionGetTaskQueueConfig: v,
 	}
 }
 
-// LakekeeperProjectActionOneOf4AsLakekeeperProjectAction is a convenience function that returns LakekeeperProjectActionOneOf4 wrapped in LakekeeperProjectAction
-func LakekeeperProjectActionOneOf4AsLakekeeperProjectAction(v *LakekeeperProjectActionOneOf4) LakekeeperProjectAction {
+// LakekeeperProjectActionIncludeInListAsLakekeeperProjectAction is a convenience function that returns LakekeeperProjectActionIncludeInList wrapped in LakekeeperProjectAction
+func LakekeeperProjectActionIncludeInListAsLakekeeperProjectAction(v *LakekeeperProjectActionIncludeInList) LakekeeperProjectAction {
 	return LakekeeperProjectAction{
-		LakekeeperProjectActionOneOf4: v,
+		LakekeeperProjectActionIncludeInList: v,
 	}
 }
 
-// LakekeeperProjectActionOneOf5AsLakekeeperProjectAction is a convenience function that returns LakekeeperProjectActionOneOf5 wrapped in LakekeeperProjectAction
-func LakekeeperProjectActionOneOf5AsLakekeeperProjectAction(v *LakekeeperProjectActionOneOf5) LakekeeperProjectAction {
+// LakekeeperProjectActionListRolesAsLakekeeperProjectAction is a convenience function that returns LakekeeperProjectActionListRoles wrapped in LakekeeperProjectAction
+func LakekeeperProjectActionListRolesAsLakekeeperProjectAction(v *LakekeeperProjectActionListRoles) LakekeeperProjectAction {
 	return LakekeeperProjectAction{
-		LakekeeperProjectActionOneOf5: v,
+		LakekeeperProjectActionListRoles: v,
 	}
 }
 
-// LakekeeperProjectActionOneOf6AsLakekeeperProjectAction is a convenience function that returns LakekeeperProjectActionOneOf6 wrapped in LakekeeperProjectAction
-func LakekeeperProjectActionOneOf6AsLakekeeperProjectAction(v *LakekeeperProjectActionOneOf6) LakekeeperProjectAction {
+// LakekeeperProjectActionListWarehousesAsLakekeeperProjectAction is a convenience function that returns LakekeeperProjectActionListWarehouses wrapped in LakekeeperProjectAction
+func LakekeeperProjectActionListWarehousesAsLakekeeperProjectAction(v *LakekeeperProjectActionListWarehouses) LakekeeperProjectAction {
 	return LakekeeperProjectAction{
-		LakekeeperProjectActionOneOf6: v,
+		LakekeeperProjectActionListWarehouses: v,
 	}
 }
 
-// LakekeeperProjectActionOneOf7AsLakekeeperProjectAction is a convenience function that returns LakekeeperProjectActionOneOf7 wrapped in LakekeeperProjectAction
-func LakekeeperProjectActionOneOf7AsLakekeeperProjectAction(v *LakekeeperProjectActionOneOf7) LakekeeperProjectAction {
+// LakekeeperProjectActionModifyTaskQueueConfigAsLakekeeperProjectAction is a convenience function that returns LakekeeperProjectActionModifyTaskQueueConfig wrapped in LakekeeperProjectAction
+func LakekeeperProjectActionModifyTaskQueueConfigAsLakekeeperProjectAction(v *LakekeeperProjectActionModifyTaskQueueConfig) LakekeeperProjectAction {
 	return LakekeeperProjectAction{
-		LakekeeperProjectActionOneOf7: v,
+		LakekeeperProjectActionModifyTaskQueueConfig: v,
 	}
 }
 
-// LakekeeperProjectActionOneOf8AsLakekeeperProjectAction is a convenience function that returns LakekeeperProjectActionOneOf8 wrapped in LakekeeperProjectAction
-func LakekeeperProjectActionOneOf8AsLakekeeperProjectAction(v *LakekeeperProjectActionOneOf8) LakekeeperProjectAction {
+// LakekeeperProjectActionRenameAsLakekeeperProjectAction is a convenience function that returns LakekeeperProjectActionRename wrapped in LakekeeperProjectAction
+func LakekeeperProjectActionRenameAsLakekeeperProjectAction(v *LakekeeperProjectActionRename) LakekeeperProjectAction {
 	return LakekeeperProjectAction{
-		LakekeeperProjectActionOneOf8: v,
+		LakekeeperProjectActionRename: v,
 	}
 }
 
-// LakekeeperProjectActionOneOf9AsLakekeeperProjectAction is a convenience function that returns LakekeeperProjectActionOneOf9 wrapped in LakekeeperProjectAction
-func LakekeeperProjectActionOneOf9AsLakekeeperProjectAction(v *LakekeeperProjectActionOneOf9) LakekeeperProjectAction {
+// LakekeeperProjectActionSearchRolesAsLakekeeperProjectAction is a convenience function that returns LakekeeperProjectActionSearchRoles wrapped in LakekeeperProjectAction
+func LakekeeperProjectActionSearchRolesAsLakekeeperProjectAction(v *LakekeeperProjectActionSearchRoles) LakekeeperProjectAction {
 	return LakekeeperProjectAction{
-		LakekeeperProjectActionOneOf9: v,
+		LakekeeperProjectActionSearchRoles: v,
 	}
 }
 
 // Unmarshal JSON data into one of the pointers in the struct
 func (dst *LakekeeperProjectAction) UnmarshalJSON(data []byte) error {
 	var err error
-	match := 0
-	// try to unmarshal data into LakekeeperNamespaceActionOneOf11
-	err = json.Unmarshal(data, &dst.LakekeeperNamespaceActionOneOf11)
-	if err == nil {
-		jsonLakekeeperNamespaceActionOneOf11, _ := json.Marshal(dst.LakekeeperNamespaceActionOneOf11)
-		if string(jsonLakekeeperNamespaceActionOneOf11) == "{}" { // empty struct
-			dst.LakekeeperNamespaceActionOneOf11 = nil
+	// use discriminator value to speed up the lookup
+	var jsonDict map[string]interface{}
+	err = newStrictDecoder(data).Decode(&jsonDict)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal JSON into map for the discriminator lookup")
+	}
+
+	// check if the discriminator value is 'control_project_tasks'
+	if jsonDict["action"] == "control_project_tasks" {
+		// try to unmarshal JSON data into LakekeeperProjectActionControlProjectTasks
+		err = json.Unmarshal(data, &dst.LakekeeperProjectActionControlProjectTasks)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperProjectActionControlProjectTasks, return on the first match
 		} else {
-			match++
+			dst.LakekeeperProjectActionControlProjectTasks = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperProjectAction as LakekeeperProjectActionControlProjectTasks: %s", err.Error())
 		}
-	} else {
-		dst.LakekeeperNamespaceActionOneOf11 = nil
 	}
 
-	// try to unmarshal data into LakekeeperNamespaceActionOneOf3
-	err = json.Unmarshal(data, &dst.LakekeeperNamespaceActionOneOf3)
-	if err == nil {
-		jsonLakekeeperNamespaceActionOneOf3, _ := json.Marshal(dst.LakekeeperNamespaceActionOneOf3)
-		if string(jsonLakekeeperNamespaceActionOneOf3) == "{}" { // empty struct
-			dst.LakekeeperNamespaceActionOneOf3 = nil
+	// check if the discriminator value is 'create_role'
+	if jsonDict["action"] == "create_role" {
+		// try to unmarshal JSON data into LakekeeperProjectActionCreateRole
+		err = json.Unmarshal(data, &dst.LakekeeperProjectActionCreateRole)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperProjectActionCreateRole, return on the first match
 		} else {
-			match++
+			dst.LakekeeperProjectActionCreateRole = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperProjectAction as LakekeeperProjectActionCreateRole: %s", err.Error())
 		}
-	} else {
-		dst.LakekeeperNamespaceActionOneOf3 = nil
 	}
 
-	// try to unmarshal data into LakekeeperNamespaceActionOneOf5
-	err = json.Unmarshal(data, &dst.LakekeeperNamespaceActionOneOf5)
-	if err == nil {
-		jsonLakekeeperNamespaceActionOneOf5, _ := json.Marshal(dst.LakekeeperNamespaceActionOneOf5)
-		if string(jsonLakekeeperNamespaceActionOneOf5) == "{}" { // empty struct
-			dst.LakekeeperNamespaceActionOneOf5 = nil
+	// check if the discriminator value is 'create_warehouse'
+	if jsonDict["action"] == "create_warehouse" {
+		// try to unmarshal JSON data into LakekeeperProjectActionCreateWarehouse
+		err = json.Unmarshal(data, &dst.LakekeeperProjectActionCreateWarehouse)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperProjectActionCreateWarehouse, return on the first match
 		} else {
-			match++
+			dst.LakekeeperProjectActionCreateWarehouse = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperProjectAction as LakekeeperProjectActionCreateWarehouse: %s", err.Error())
 		}
-	} else {
-		dst.LakekeeperNamespaceActionOneOf5 = nil
 	}
 
-	// try to unmarshal data into LakekeeperProjectActionOneOf
-	err = json.Unmarshal(data, &dst.LakekeeperProjectActionOneOf)
-	if err == nil {
-		jsonLakekeeperProjectActionOneOf, _ := json.Marshal(dst.LakekeeperProjectActionOneOf)
-		if string(jsonLakekeeperProjectActionOneOf) == "{}" { // empty struct
-			dst.LakekeeperProjectActionOneOf = nil
+	// check if the discriminator value is 'delete'
+	if jsonDict["action"] == "delete" {
+		// try to unmarshal JSON data into LakekeeperProjectActionDelete
+		err = json.Unmarshal(data, &dst.LakekeeperProjectActionDelete)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperProjectActionDelete, return on the first match
 		} else {
-			match++
+			dst.LakekeeperProjectActionDelete = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperProjectAction as LakekeeperProjectActionDelete: %s", err.Error())
 		}
-	} else {
-		dst.LakekeeperProjectActionOneOf = nil
 	}
 
-	// try to unmarshal data into LakekeeperProjectActionOneOf1
-	err = json.Unmarshal(data, &dst.LakekeeperProjectActionOneOf1)
-	if err == nil {
-		jsonLakekeeperProjectActionOneOf1, _ := json.Marshal(dst.LakekeeperProjectActionOneOf1)
-		if string(jsonLakekeeperProjectActionOneOf1) == "{}" { // empty struct
-			dst.LakekeeperProjectActionOneOf1 = nil
+	// check if the discriminator value is 'get_endpoint_statistics'
+	if jsonDict["action"] == "get_endpoint_statistics" {
+		// try to unmarshal JSON data into LakekeeperProjectActionGetEndpointStatistics
+		err = json.Unmarshal(data, &dst.LakekeeperProjectActionGetEndpointStatistics)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperProjectActionGetEndpointStatistics, return on the first match
 		} else {
-			match++
+			dst.LakekeeperProjectActionGetEndpointStatistics = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperProjectAction as LakekeeperProjectActionGetEndpointStatistics: %s", err.Error())
 		}
-	} else {
-		dst.LakekeeperProjectActionOneOf1 = nil
 	}
 
-	// try to unmarshal data into LakekeeperProjectActionOneOf10
-	err = json.Unmarshal(data, &dst.LakekeeperProjectActionOneOf10)
-	if err == nil {
-		jsonLakekeeperProjectActionOneOf10, _ := json.Marshal(dst.LakekeeperProjectActionOneOf10)
-		if string(jsonLakekeeperProjectActionOneOf10) == "{}" { // empty struct
-			dst.LakekeeperProjectActionOneOf10 = nil
+	// check if the discriminator value is 'get_metadata'
+	if jsonDict["action"] == "get_metadata" {
+		// try to unmarshal JSON data into LakekeeperProjectActionGetMetadata
+		err = json.Unmarshal(data, &dst.LakekeeperProjectActionGetMetadata)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperProjectActionGetMetadata, return on the first match
 		} else {
-			match++
+			dst.LakekeeperProjectActionGetMetadata = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperProjectAction as LakekeeperProjectActionGetMetadata: %s", err.Error())
 		}
-	} else {
-		dst.LakekeeperProjectActionOneOf10 = nil
 	}
 
-	// try to unmarshal data into LakekeeperProjectActionOneOf2
-	err = json.Unmarshal(data, &dst.LakekeeperProjectActionOneOf2)
-	if err == nil {
-		jsonLakekeeperProjectActionOneOf2, _ := json.Marshal(dst.LakekeeperProjectActionOneOf2)
-		if string(jsonLakekeeperProjectActionOneOf2) == "{}" { // empty struct
-			dst.LakekeeperProjectActionOneOf2 = nil
+	// check if the discriminator value is 'get_project_tasks'
+	if jsonDict["action"] == "get_project_tasks" {
+		// try to unmarshal JSON data into LakekeeperProjectActionGetProjectTasks
+		err = json.Unmarshal(data, &dst.LakekeeperProjectActionGetProjectTasks)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperProjectActionGetProjectTasks, return on the first match
 		} else {
-			match++
+			dst.LakekeeperProjectActionGetProjectTasks = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperProjectAction as LakekeeperProjectActionGetProjectTasks: %s", err.Error())
 		}
-	} else {
-		dst.LakekeeperProjectActionOneOf2 = nil
 	}
 
-	// try to unmarshal data into LakekeeperProjectActionOneOf3
-	err = json.Unmarshal(data, &dst.LakekeeperProjectActionOneOf3)
-	if err == nil {
-		jsonLakekeeperProjectActionOneOf3, _ := json.Marshal(dst.LakekeeperProjectActionOneOf3)
-		if string(jsonLakekeeperProjectActionOneOf3) == "{}" { // empty struct
-			dst.LakekeeperProjectActionOneOf3 = nil
+	// check if the discriminator value is 'get_task_queue_config'
+	if jsonDict["action"] == "get_task_queue_config" {
+		// try to unmarshal JSON data into LakekeeperProjectActionGetTaskQueueConfig
+		err = json.Unmarshal(data, &dst.LakekeeperProjectActionGetTaskQueueConfig)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperProjectActionGetTaskQueueConfig, return on the first match
 		} else {
-			match++
+			dst.LakekeeperProjectActionGetTaskQueueConfig = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperProjectAction as LakekeeperProjectActionGetTaskQueueConfig: %s", err.Error())
 		}
-	} else {
-		dst.LakekeeperProjectActionOneOf3 = nil
 	}
 
-	// try to unmarshal data into LakekeeperProjectActionOneOf4
-	err = json.Unmarshal(data, &dst.LakekeeperProjectActionOneOf4)
-	if err == nil {
-		jsonLakekeeperProjectActionOneOf4, _ := json.Marshal(dst.LakekeeperProjectActionOneOf4)
-		if string(jsonLakekeeperProjectActionOneOf4) == "{}" { // empty struct
-			dst.LakekeeperProjectActionOneOf4 = nil
+	// check if the discriminator value is 'include_in_list'
+	if jsonDict["action"] == "include_in_list" {
+		// try to unmarshal JSON data into LakekeeperProjectActionIncludeInList
+		err = json.Unmarshal(data, &dst.LakekeeperProjectActionIncludeInList)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperProjectActionIncludeInList, return on the first match
 		} else {
-			match++
+			dst.LakekeeperProjectActionIncludeInList = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperProjectAction as LakekeeperProjectActionIncludeInList: %s", err.Error())
 		}
-	} else {
-		dst.LakekeeperProjectActionOneOf4 = nil
 	}
 
-	// try to unmarshal data into LakekeeperProjectActionOneOf5
-	err = json.Unmarshal(data, &dst.LakekeeperProjectActionOneOf5)
-	if err == nil {
-		jsonLakekeeperProjectActionOneOf5, _ := json.Marshal(dst.LakekeeperProjectActionOneOf5)
-		if string(jsonLakekeeperProjectActionOneOf5) == "{}" { // empty struct
-			dst.LakekeeperProjectActionOneOf5 = nil
+	// check if the discriminator value is 'list_roles'
+	if jsonDict["action"] == "list_roles" {
+		// try to unmarshal JSON data into LakekeeperProjectActionListRoles
+		err = json.Unmarshal(data, &dst.LakekeeperProjectActionListRoles)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperProjectActionListRoles, return on the first match
 		} else {
-			match++
+			dst.LakekeeperProjectActionListRoles = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperProjectAction as LakekeeperProjectActionListRoles: %s", err.Error())
 		}
-	} else {
-		dst.LakekeeperProjectActionOneOf5 = nil
 	}
 
-	// try to unmarshal data into LakekeeperProjectActionOneOf6
-	err = json.Unmarshal(data, &dst.LakekeeperProjectActionOneOf6)
-	if err == nil {
-		jsonLakekeeperProjectActionOneOf6, _ := json.Marshal(dst.LakekeeperProjectActionOneOf6)
-		if string(jsonLakekeeperProjectActionOneOf6) == "{}" { // empty struct
-			dst.LakekeeperProjectActionOneOf6 = nil
+	// check if the discriminator value is 'list_warehouses'
+	if jsonDict["action"] == "list_warehouses" {
+		// try to unmarshal JSON data into LakekeeperProjectActionListWarehouses
+		err = json.Unmarshal(data, &dst.LakekeeperProjectActionListWarehouses)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperProjectActionListWarehouses, return on the first match
 		} else {
-			match++
+			dst.LakekeeperProjectActionListWarehouses = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperProjectAction as LakekeeperProjectActionListWarehouses: %s", err.Error())
 		}
-	} else {
-		dst.LakekeeperProjectActionOneOf6 = nil
 	}
 
-	// try to unmarshal data into LakekeeperProjectActionOneOf7
-	err = json.Unmarshal(data, &dst.LakekeeperProjectActionOneOf7)
-	if err == nil {
-		jsonLakekeeperProjectActionOneOf7, _ := json.Marshal(dst.LakekeeperProjectActionOneOf7)
-		if string(jsonLakekeeperProjectActionOneOf7) == "{}" { // empty struct
-			dst.LakekeeperProjectActionOneOf7 = nil
+	// check if the discriminator value is 'modify_task_queue_config'
+	if jsonDict["action"] == "modify_task_queue_config" {
+		// try to unmarshal JSON data into LakekeeperProjectActionModifyTaskQueueConfig
+		err = json.Unmarshal(data, &dst.LakekeeperProjectActionModifyTaskQueueConfig)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperProjectActionModifyTaskQueueConfig, return on the first match
 		} else {
-			match++
+			dst.LakekeeperProjectActionModifyTaskQueueConfig = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperProjectAction as LakekeeperProjectActionModifyTaskQueueConfig: %s", err.Error())
 		}
-	} else {
-		dst.LakekeeperProjectActionOneOf7 = nil
 	}
 
-	// try to unmarshal data into LakekeeperProjectActionOneOf8
-	err = json.Unmarshal(data, &dst.LakekeeperProjectActionOneOf8)
-	if err == nil {
-		jsonLakekeeperProjectActionOneOf8, _ := json.Marshal(dst.LakekeeperProjectActionOneOf8)
-		if string(jsonLakekeeperProjectActionOneOf8) == "{}" { // empty struct
-			dst.LakekeeperProjectActionOneOf8 = nil
+	// check if the discriminator value is 'rename'
+	if jsonDict["action"] == "rename" {
+		// try to unmarshal JSON data into LakekeeperProjectActionRename
+		err = json.Unmarshal(data, &dst.LakekeeperProjectActionRename)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperProjectActionRename, return on the first match
 		} else {
-			match++
+			dst.LakekeeperProjectActionRename = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperProjectAction as LakekeeperProjectActionRename: %s", err.Error())
 		}
-	} else {
-		dst.LakekeeperProjectActionOneOf8 = nil
 	}
 
-	// try to unmarshal data into LakekeeperProjectActionOneOf9
-	err = json.Unmarshal(data, &dst.LakekeeperProjectActionOneOf9)
-	if err == nil {
-		jsonLakekeeperProjectActionOneOf9, _ := json.Marshal(dst.LakekeeperProjectActionOneOf9)
-		if string(jsonLakekeeperProjectActionOneOf9) == "{}" { // empty struct
-			dst.LakekeeperProjectActionOneOf9 = nil
+	// check if the discriminator value is 'search_roles'
+	if jsonDict["action"] == "search_roles" {
+		// try to unmarshal JSON data into LakekeeperProjectActionSearchRoles
+		err = json.Unmarshal(data, &dst.LakekeeperProjectActionSearchRoles)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperProjectActionSearchRoles, return on the first match
 		} else {
-			match++
+			dst.LakekeeperProjectActionSearchRoles = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperProjectAction as LakekeeperProjectActionSearchRoles: %s", err.Error())
 		}
-	} else {
-		dst.LakekeeperProjectActionOneOf9 = nil
 	}
 
-	if match > 1 { // more than 1 match
-		// reset to nil
-		dst.LakekeeperNamespaceActionOneOf11 = nil
-		dst.LakekeeperNamespaceActionOneOf3 = nil
-		dst.LakekeeperNamespaceActionOneOf5 = nil
-		dst.LakekeeperProjectActionOneOf = nil
-		dst.LakekeeperProjectActionOneOf1 = nil
-		dst.LakekeeperProjectActionOneOf10 = nil
-		dst.LakekeeperProjectActionOneOf2 = nil
-		dst.LakekeeperProjectActionOneOf3 = nil
-		dst.LakekeeperProjectActionOneOf4 = nil
-		dst.LakekeeperProjectActionOneOf5 = nil
-		dst.LakekeeperProjectActionOneOf6 = nil
-		dst.LakekeeperProjectActionOneOf7 = nil
-		dst.LakekeeperProjectActionOneOf8 = nil
-		dst.LakekeeperProjectActionOneOf9 = nil
-
-		return fmt.Errorf("data matches more than one schema in oneOf(LakekeeperProjectAction)")
-	} else if match == 1 {
-		return nil // exactly one match
-	} else { // no match
-		return fmt.Errorf("data failed to match schemas in oneOf(LakekeeperProjectAction)")
+	// check if the discriminator value is 'LakekeeperProjectActionControlProjectTasks'
+	if jsonDict["action"] == "LakekeeperProjectActionControlProjectTasks" {
+		// try to unmarshal JSON data into LakekeeperProjectActionControlProjectTasks
+		err = json.Unmarshal(data, &dst.LakekeeperProjectActionControlProjectTasks)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperProjectActionControlProjectTasks, return on the first match
+		} else {
+			dst.LakekeeperProjectActionControlProjectTasks = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperProjectAction as LakekeeperProjectActionControlProjectTasks: %s", err.Error())
+		}
 	}
+
+	// check if the discriminator value is 'LakekeeperProjectActionCreateRole'
+	if jsonDict["action"] == "LakekeeperProjectActionCreateRole" {
+		// try to unmarshal JSON data into LakekeeperProjectActionCreateRole
+		err = json.Unmarshal(data, &dst.LakekeeperProjectActionCreateRole)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperProjectActionCreateRole, return on the first match
+		} else {
+			dst.LakekeeperProjectActionCreateRole = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperProjectAction as LakekeeperProjectActionCreateRole: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'LakekeeperProjectActionCreateWarehouse'
+	if jsonDict["action"] == "LakekeeperProjectActionCreateWarehouse" {
+		// try to unmarshal JSON data into LakekeeperProjectActionCreateWarehouse
+		err = json.Unmarshal(data, &dst.LakekeeperProjectActionCreateWarehouse)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperProjectActionCreateWarehouse, return on the first match
+		} else {
+			dst.LakekeeperProjectActionCreateWarehouse = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperProjectAction as LakekeeperProjectActionCreateWarehouse: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'LakekeeperProjectActionDelete'
+	if jsonDict["action"] == "LakekeeperProjectActionDelete" {
+		// try to unmarshal JSON data into LakekeeperProjectActionDelete
+		err = json.Unmarshal(data, &dst.LakekeeperProjectActionDelete)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperProjectActionDelete, return on the first match
+		} else {
+			dst.LakekeeperProjectActionDelete = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperProjectAction as LakekeeperProjectActionDelete: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'LakekeeperProjectActionGetEndpointStatistics'
+	if jsonDict["action"] == "LakekeeperProjectActionGetEndpointStatistics" {
+		// try to unmarshal JSON data into LakekeeperProjectActionGetEndpointStatistics
+		err = json.Unmarshal(data, &dst.LakekeeperProjectActionGetEndpointStatistics)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperProjectActionGetEndpointStatistics, return on the first match
+		} else {
+			dst.LakekeeperProjectActionGetEndpointStatistics = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperProjectAction as LakekeeperProjectActionGetEndpointStatistics: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'LakekeeperProjectActionGetMetadata'
+	if jsonDict["action"] == "LakekeeperProjectActionGetMetadata" {
+		// try to unmarshal JSON data into LakekeeperProjectActionGetMetadata
+		err = json.Unmarshal(data, &dst.LakekeeperProjectActionGetMetadata)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperProjectActionGetMetadata, return on the first match
+		} else {
+			dst.LakekeeperProjectActionGetMetadata = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperProjectAction as LakekeeperProjectActionGetMetadata: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'LakekeeperProjectActionGetProjectTasks'
+	if jsonDict["action"] == "LakekeeperProjectActionGetProjectTasks" {
+		// try to unmarshal JSON data into LakekeeperProjectActionGetProjectTasks
+		err = json.Unmarshal(data, &dst.LakekeeperProjectActionGetProjectTasks)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperProjectActionGetProjectTasks, return on the first match
+		} else {
+			dst.LakekeeperProjectActionGetProjectTasks = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperProjectAction as LakekeeperProjectActionGetProjectTasks: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'LakekeeperProjectActionGetTaskQueueConfig'
+	if jsonDict["action"] == "LakekeeperProjectActionGetTaskQueueConfig" {
+		// try to unmarshal JSON data into LakekeeperProjectActionGetTaskQueueConfig
+		err = json.Unmarshal(data, &dst.LakekeeperProjectActionGetTaskQueueConfig)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperProjectActionGetTaskQueueConfig, return on the first match
+		} else {
+			dst.LakekeeperProjectActionGetTaskQueueConfig = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperProjectAction as LakekeeperProjectActionGetTaskQueueConfig: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'LakekeeperProjectActionIncludeInList'
+	if jsonDict["action"] == "LakekeeperProjectActionIncludeInList" {
+		// try to unmarshal JSON data into LakekeeperProjectActionIncludeInList
+		err = json.Unmarshal(data, &dst.LakekeeperProjectActionIncludeInList)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperProjectActionIncludeInList, return on the first match
+		} else {
+			dst.LakekeeperProjectActionIncludeInList = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperProjectAction as LakekeeperProjectActionIncludeInList: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'LakekeeperProjectActionListRoles'
+	if jsonDict["action"] == "LakekeeperProjectActionListRoles" {
+		// try to unmarshal JSON data into LakekeeperProjectActionListRoles
+		err = json.Unmarshal(data, &dst.LakekeeperProjectActionListRoles)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperProjectActionListRoles, return on the first match
+		} else {
+			dst.LakekeeperProjectActionListRoles = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperProjectAction as LakekeeperProjectActionListRoles: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'LakekeeperProjectActionListWarehouses'
+	if jsonDict["action"] == "LakekeeperProjectActionListWarehouses" {
+		// try to unmarshal JSON data into LakekeeperProjectActionListWarehouses
+		err = json.Unmarshal(data, &dst.LakekeeperProjectActionListWarehouses)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperProjectActionListWarehouses, return on the first match
+		} else {
+			dst.LakekeeperProjectActionListWarehouses = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperProjectAction as LakekeeperProjectActionListWarehouses: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'LakekeeperProjectActionModifyTaskQueueConfig'
+	if jsonDict["action"] == "LakekeeperProjectActionModifyTaskQueueConfig" {
+		// try to unmarshal JSON data into LakekeeperProjectActionModifyTaskQueueConfig
+		err = json.Unmarshal(data, &dst.LakekeeperProjectActionModifyTaskQueueConfig)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperProjectActionModifyTaskQueueConfig, return on the first match
+		} else {
+			dst.LakekeeperProjectActionModifyTaskQueueConfig = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperProjectAction as LakekeeperProjectActionModifyTaskQueueConfig: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'LakekeeperProjectActionRename'
+	if jsonDict["action"] == "LakekeeperProjectActionRename" {
+		// try to unmarshal JSON data into LakekeeperProjectActionRename
+		err = json.Unmarshal(data, &dst.LakekeeperProjectActionRename)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperProjectActionRename, return on the first match
+		} else {
+			dst.LakekeeperProjectActionRename = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperProjectAction as LakekeeperProjectActionRename: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'LakekeeperProjectActionSearchRoles'
+	if jsonDict["action"] == "LakekeeperProjectActionSearchRoles" {
+		// try to unmarshal JSON data into LakekeeperProjectActionSearchRoles
+		err = json.Unmarshal(data, &dst.LakekeeperProjectActionSearchRoles)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperProjectActionSearchRoles, return on the first match
+		} else {
+			dst.LakekeeperProjectActionSearchRoles = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperProjectAction as LakekeeperProjectActionSearchRoles: %s", err.Error())
+		}
+	}
+
+	return nil
 }
 
 // Marshal data from the first non-nil pointers in the struct to JSON
 func (src LakekeeperProjectAction) MarshalJSON() ([]byte, error) {
-	if src.LakekeeperNamespaceActionOneOf11 != nil {
-		return json.Marshal(&src.LakekeeperNamespaceActionOneOf11)
+	if src.LakekeeperProjectActionControlProjectTasks != nil {
+		return json.Marshal(&src.LakekeeperProjectActionControlProjectTasks)
 	}
 
-	if src.LakekeeperNamespaceActionOneOf3 != nil {
-		return json.Marshal(&src.LakekeeperNamespaceActionOneOf3)
+	if src.LakekeeperProjectActionCreateRole != nil {
+		return json.Marshal(&src.LakekeeperProjectActionCreateRole)
 	}
 
-	if src.LakekeeperNamespaceActionOneOf5 != nil {
-		return json.Marshal(&src.LakekeeperNamespaceActionOneOf5)
+	if src.LakekeeperProjectActionCreateWarehouse != nil {
+		return json.Marshal(&src.LakekeeperProjectActionCreateWarehouse)
 	}
 
-	if src.LakekeeperProjectActionOneOf != nil {
-		return json.Marshal(&src.LakekeeperProjectActionOneOf)
+	if src.LakekeeperProjectActionDelete != nil {
+		return json.Marshal(&src.LakekeeperProjectActionDelete)
 	}
 
-	if src.LakekeeperProjectActionOneOf1 != nil {
-		return json.Marshal(&src.LakekeeperProjectActionOneOf1)
+	if src.LakekeeperProjectActionGetEndpointStatistics != nil {
+		return json.Marshal(&src.LakekeeperProjectActionGetEndpointStatistics)
 	}
 
-	if src.LakekeeperProjectActionOneOf10 != nil {
-		return json.Marshal(&src.LakekeeperProjectActionOneOf10)
+	if src.LakekeeperProjectActionGetMetadata != nil {
+		return json.Marshal(&src.LakekeeperProjectActionGetMetadata)
 	}
 
-	if src.LakekeeperProjectActionOneOf2 != nil {
-		return json.Marshal(&src.LakekeeperProjectActionOneOf2)
+	if src.LakekeeperProjectActionGetProjectTasks != nil {
+		return json.Marshal(&src.LakekeeperProjectActionGetProjectTasks)
 	}
 
-	if src.LakekeeperProjectActionOneOf3 != nil {
-		return json.Marshal(&src.LakekeeperProjectActionOneOf3)
+	if src.LakekeeperProjectActionGetTaskQueueConfig != nil {
+		return json.Marshal(&src.LakekeeperProjectActionGetTaskQueueConfig)
 	}
 
-	if src.LakekeeperProjectActionOneOf4 != nil {
-		return json.Marshal(&src.LakekeeperProjectActionOneOf4)
+	if src.LakekeeperProjectActionIncludeInList != nil {
+		return json.Marshal(&src.LakekeeperProjectActionIncludeInList)
 	}
 
-	if src.LakekeeperProjectActionOneOf5 != nil {
-		return json.Marshal(&src.LakekeeperProjectActionOneOf5)
+	if src.LakekeeperProjectActionListRoles != nil {
+		return json.Marshal(&src.LakekeeperProjectActionListRoles)
 	}
 
-	if src.LakekeeperProjectActionOneOf6 != nil {
-		return json.Marshal(&src.LakekeeperProjectActionOneOf6)
+	if src.LakekeeperProjectActionListWarehouses != nil {
+		return json.Marshal(&src.LakekeeperProjectActionListWarehouses)
 	}
 
-	if src.LakekeeperProjectActionOneOf7 != nil {
-		return json.Marshal(&src.LakekeeperProjectActionOneOf7)
+	if src.LakekeeperProjectActionModifyTaskQueueConfig != nil {
+		return json.Marshal(&src.LakekeeperProjectActionModifyTaskQueueConfig)
 	}
 
-	if src.LakekeeperProjectActionOneOf8 != nil {
-		return json.Marshal(&src.LakekeeperProjectActionOneOf8)
+	if src.LakekeeperProjectActionRename != nil {
+		return json.Marshal(&src.LakekeeperProjectActionRename)
 	}
 
-	if src.LakekeeperProjectActionOneOf9 != nil {
-		return json.Marshal(&src.LakekeeperProjectActionOneOf9)
+	if src.LakekeeperProjectActionSearchRoles != nil {
+		return json.Marshal(&src.LakekeeperProjectActionSearchRoles)
 	}
 
 	return nil, nil // no data in oneOf schemas
@@ -408,60 +546,60 @@ func (obj *LakekeeperProjectAction) GetActualInstance() interface{} {
 	if obj == nil {
 		return nil
 	}
-	if obj.LakekeeperNamespaceActionOneOf11 != nil {
-		return obj.LakekeeperNamespaceActionOneOf11
+	if obj.LakekeeperProjectActionControlProjectTasks != nil {
+		return obj.LakekeeperProjectActionControlProjectTasks
 	}
 
-	if obj.LakekeeperNamespaceActionOneOf3 != nil {
-		return obj.LakekeeperNamespaceActionOneOf3
+	if obj.LakekeeperProjectActionCreateRole != nil {
+		return obj.LakekeeperProjectActionCreateRole
 	}
 
-	if obj.LakekeeperNamespaceActionOneOf5 != nil {
-		return obj.LakekeeperNamespaceActionOneOf5
+	if obj.LakekeeperProjectActionCreateWarehouse != nil {
+		return obj.LakekeeperProjectActionCreateWarehouse
 	}
 
-	if obj.LakekeeperProjectActionOneOf != nil {
-		return obj.LakekeeperProjectActionOneOf
+	if obj.LakekeeperProjectActionDelete != nil {
+		return obj.LakekeeperProjectActionDelete
 	}
 
-	if obj.LakekeeperProjectActionOneOf1 != nil {
-		return obj.LakekeeperProjectActionOneOf1
+	if obj.LakekeeperProjectActionGetEndpointStatistics != nil {
+		return obj.LakekeeperProjectActionGetEndpointStatistics
 	}
 
-	if obj.LakekeeperProjectActionOneOf10 != nil {
-		return obj.LakekeeperProjectActionOneOf10
+	if obj.LakekeeperProjectActionGetMetadata != nil {
+		return obj.LakekeeperProjectActionGetMetadata
 	}
 
-	if obj.LakekeeperProjectActionOneOf2 != nil {
-		return obj.LakekeeperProjectActionOneOf2
+	if obj.LakekeeperProjectActionGetProjectTasks != nil {
+		return obj.LakekeeperProjectActionGetProjectTasks
 	}
 
-	if obj.LakekeeperProjectActionOneOf3 != nil {
-		return obj.LakekeeperProjectActionOneOf3
+	if obj.LakekeeperProjectActionGetTaskQueueConfig != nil {
+		return obj.LakekeeperProjectActionGetTaskQueueConfig
 	}
 
-	if obj.LakekeeperProjectActionOneOf4 != nil {
-		return obj.LakekeeperProjectActionOneOf4
+	if obj.LakekeeperProjectActionIncludeInList != nil {
+		return obj.LakekeeperProjectActionIncludeInList
 	}
 
-	if obj.LakekeeperProjectActionOneOf5 != nil {
-		return obj.LakekeeperProjectActionOneOf5
+	if obj.LakekeeperProjectActionListRoles != nil {
+		return obj.LakekeeperProjectActionListRoles
 	}
 
-	if obj.LakekeeperProjectActionOneOf6 != nil {
-		return obj.LakekeeperProjectActionOneOf6
+	if obj.LakekeeperProjectActionListWarehouses != nil {
+		return obj.LakekeeperProjectActionListWarehouses
 	}
 
-	if obj.LakekeeperProjectActionOneOf7 != nil {
-		return obj.LakekeeperProjectActionOneOf7
+	if obj.LakekeeperProjectActionModifyTaskQueueConfig != nil {
+		return obj.LakekeeperProjectActionModifyTaskQueueConfig
 	}
 
-	if obj.LakekeeperProjectActionOneOf8 != nil {
-		return obj.LakekeeperProjectActionOneOf8
+	if obj.LakekeeperProjectActionRename != nil {
+		return obj.LakekeeperProjectActionRename
 	}
 
-	if obj.LakekeeperProjectActionOneOf9 != nil {
-		return obj.LakekeeperProjectActionOneOf9
+	if obj.LakekeeperProjectActionSearchRoles != nil {
+		return obj.LakekeeperProjectActionSearchRoles
 	}
 
 	// all schemas are nil

@@ -569,7 +569,6 @@ func (o *ServerInfo) UnmarshalJSON(data []byte) (err error) {
 	varServerInfo := _ServerInfo{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varServerInfo)
 
 	if err != nil {

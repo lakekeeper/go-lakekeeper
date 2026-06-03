@@ -128,7 +128,6 @@ func (o *ServerAssignmentOperatorRole) UnmarshalJSON(data []byte) (err error) {
 	varServerAssignmentOperatorRole := _ServerAssignmentOperatorRole{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varServerAssignmentOperatorRole)
 
 	if err != nil {

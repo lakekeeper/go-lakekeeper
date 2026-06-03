@@ -46,7 +46,8 @@ func (v *AzCredentialType) UnmarshalJSON(src []byte) error {
 		}
 	}
 
-	return fmt.Errorf("%+v is not a valid AzCredentialType", value)
+	*v = enumTypeValue
+	return nil
 }
 
 // NewAzCredentialTypeFromValue returns a pointer to a valid AzCredentialType

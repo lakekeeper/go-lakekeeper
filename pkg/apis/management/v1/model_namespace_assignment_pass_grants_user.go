@@ -128,7 +128,6 @@ func (o *NamespaceAssignmentPassGrantsUser) UnmarshalJSON(data []byte) (err erro
 	varNamespaceAssignmentPassGrantsUser := _NamespaceAssignmentPassGrantsUser{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varNamespaceAssignmentPassGrantsUser)
 
 	if err != nil {

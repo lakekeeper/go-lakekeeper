@@ -100,7 +100,6 @@ func (o *ListProjectsResponse) UnmarshalJSON(data []byte) (err error) {
 	varListProjectsResponse := _ListProjectsResponse{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varListProjectsResponse)
 
 	if err != nil {

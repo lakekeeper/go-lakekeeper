@@ -99,7 +99,6 @@ func (o *GetRoleAssignmentsResponse) UnmarshalJSON(data []byte) (err error) {
 	varGetRoleAssignmentsResponse := _GetRoleAssignmentsResponse{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varGetRoleAssignmentsResponse)
 
 	if err != nil {

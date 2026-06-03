@@ -17,75 +17,93 @@ import (
 
 // WarehouseTaskEntityId - struct for WarehouseTaskEntityId
 type WarehouseTaskEntityId struct {
-	WarehouseTaskEntityIdOneOf  *WarehouseTaskEntityIdOneOf
-	WarehouseTaskEntityIdOneOf1 *WarehouseTaskEntityIdOneOf1
+	WarehouseTaskEntityIdTable *WarehouseTaskEntityIdTable
+	WarehouseTaskEntityIdView  *WarehouseTaskEntityIdView
 }
 
-// WarehouseTaskEntityIdOneOfAsWarehouseTaskEntityId is a convenience function that returns WarehouseTaskEntityIdOneOf wrapped in WarehouseTaskEntityId
-func WarehouseTaskEntityIdOneOfAsWarehouseTaskEntityId(v *WarehouseTaskEntityIdOneOf) WarehouseTaskEntityId {
+// WarehouseTaskEntityIdTableAsWarehouseTaskEntityId is a convenience function that returns WarehouseTaskEntityIdTable wrapped in WarehouseTaskEntityId
+func WarehouseTaskEntityIdTableAsWarehouseTaskEntityId(v *WarehouseTaskEntityIdTable) WarehouseTaskEntityId {
 	return WarehouseTaskEntityId{
-		WarehouseTaskEntityIdOneOf: v,
+		WarehouseTaskEntityIdTable: v,
 	}
 }
 
-// WarehouseTaskEntityIdOneOf1AsWarehouseTaskEntityId is a convenience function that returns WarehouseTaskEntityIdOneOf1 wrapped in WarehouseTaskEntityId
-func WarehouseTaskEntityIdOneOf1AsWarehouseTaskEntityId(v *WarehouseTaskEntityIdOneOf1) WarehouseTaskEntityId {
+// WarehouseTaskEntityIdViewAsWarehouseTaskEntityId is a convenience function that returns WarehouseTaskEntityIdView wrapped in WarehouseTaskEntityId
+func WarehouseTaskEntityIdViewAsWarehouseTaskEntityId(v *WarehouseTaskEntityIdView) WarehouseTaskEntityId {
 	return WarehouseTaskEntityId{
-		WarehouseTaskEntityIdOneOf1: v,
+		WarehouseTaskEntityIdView: v,
 	}
 }
 
 // Unmarshal JSON data into one of the pointers in the struct
 func (dst *WarehouseTaskEntityId) UnmarshalJSON(data []byte) error {
 	var err error
-	match := 0
-	// try to unmarshal data into WarehouseTaskEntityIdOneOf
-	err = json.Unmarshal(data, &dst.WarehouseTaskEntityIdOneOf)
-	if err == nil {
-		jsonWarehouseTaskEntityIdOneOf, _ := json.Marshal(dst.WarehouseTaskEntityIdOneOf)
-		if string(jsonWarehouseTaskEntityIdOneOf) == "{}" { // empty struct
-			dst.WarehouseTaskEntityIdOneOf = nil
+	// use discriminator value to speed up the lookup
+	var jsonDict map[string]interface{}
+	err = newStrictDecoder(data).Decode(&jsonDict)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal JSON into map for the discriminator lookup")
+	}
+
+	// check if the discriminator value is 'table'
+	if jsonDict["type"] == "table" {
+		// try to unmarshal JSON data into WarehouseTaskEntityIdTable
+		err = json.Unmarshal(data, &dst.WarehouseTaskEntityIdTable)
+		if err == nil {
+			return nil // data stored in dst.WarehouseTaskEntityIdTable, return on the first match
 		} else {
-			match++
+			dst.WarehouseTaskEntityIdTable = nil
+			return fmt.Errorf("failed to unmarshal WarehouseTaskEntityId as WarehouseTaskEntityIdTable: %s", err.Error())
 		}
-	} else {
-		dst.WarehouseTaskEntityIdOneOf = nil
 	}
 
-	// try to unmarshal data into WarehouseTaskEntityIdOneOf1
-	err = json.Unmarshal(data, &dst.WarehouseTaskEntityIdOneOf1)
-	if err == nil {
-		jsonWarehouseTaskEntityIdOneOf1, _ := json.Marshal(dst.WarehouseTaskEntityIdOneOf1)
-		if string(jsonWarehouseTaskEntityIdOneOf1) == "{}" { // empty struct
-			dst.WarehouseTaskEntityIdOneOf1 = nil
+	// check if the discriminator value is 'view'
+	if jsonDict["type"] == "view" {
+		// try to unmarshal JSON data into WarehouseTaskEntityIdView
+		err = json.Unmarshal(data, &dst.WarehouseTaskEntityIdView)
+		if err == nil {
+			return nil // data stored in dst.WarehouseTaskEntityIdView, return on the first match
 		} else {
-			match++
+			dst.WarehouseTaskEntityIdView = nil
+			return fmt.Errorf("failed to unmarshal WarehouseTaskEntityId as WarehouseTaskEntityIdView: %s", err.Error())
 		}
-	} else {
-		dst.WarehouseTaskEntityIdOneOf1 = nil
 	}
 
-	if match > 1 { // more than 1 match
-		// reset to nil
-		dst.WarehouseTaskEntityIdOneOf = nil
-		dst.WarehouseTaskEntityIdOneOf1 = nil
-
-		return fmt.Errorf("data matches more than one schema in oneOf(WarehouseTaskEntityId)")
-	} else if match == 1 {
-		return nil // exactly one match
-	} else { // no match
-		return fmt.Errorf("data failed to match schemas in oneOf(WarehouseTaskEntityId)")
+	// check if the discriminator value is 'WarehouseTaskEntityIdTable'
+	if jsonDict["type"] == "WarehouseTaskEntityIdTable" {
+		// try to unmarshal JSON data into WarehouseTaskEntityIdTable
+		err = json.Unmarshal(data, &dst.WarehouseTaskEntityIdTable)
+		if err == nil {
+			return nil // data stored in dst.WarehouseTaskEntityIdTable, return on the first match
+		} else {
+			dst.WarehouseTaskEntityIdTable = nil
+			return fmt.Errorf("failed to unmarshal WarehouseTaskEntityId as WarehouseTaskEntityIdTable: %s", err.Error())
+		}
 	}
+
+	// check if the discriminator value is 'WarehouseTaskEntityIdView'
+	if jsonDict["type"] == "WarehouseTaskEntityIdView" {
+		// try to unmarshal JSON data into WarehouseTaskEntityIdView
+		err = json.Unmarshal(data, &dst.WarehouseTaskEntityIdView)
+		if err == nil {
+			return nil // data stored in dst.WarehouseTaskEntityIdView, return on the first match
+		} else {
+			dst.WarehouseTaskEntityIdView = nil
+			return fmt.Errorf("failed to unmarshal WarehouseTaskEntityId as WarehouseTaskEntityIdView: %s", err.Error())
+		}
+	}
+
+	return nil
 }
 
 // Marshal data from the first non-nil pointers in the struct to JSON
 func (src WarehouseTaskEntityId) MarshalJSON() ([]byte, error) {
-	if src.WarehouseTaskEntityIdOneOf != nil {
-		return json.Marshal(&src.WarehouseTaskEntityIdOneOf)
+	if src.WarehouseTaskEntityIdTable != nil {
+		return json.Marshal(&src.WarehouseTaskEntityIdTable)
 	}
 
-	if src.WarehouseTaskEntityIdOneOf1 != nil {
-		return json.Marshal(&src.WarehouseTaskEntityIdOneOf1)
+	if src.WarehouseTaskEntityIdView != nil {
+		return json.Marshal(&src.WarehouseTaskEntityIdView)
 	}
 
 	return nil, nil // no data in oneOf schemas
@@ -96,12 +114,12 @@ func (obj *WarehouseTaskEntityId) GetActualInstance() interface{} {
 	if obj == nil {
 		return nil
 	}
-	if obj.WarehouseTaskEntityIdOneOf != nil {
-		return obj.WarehouseTaskEntityIdOneOf
+	if obj.WarehouseTaskEntityIdTable != nil {
+		return obj.WarehouseTaskEntityIdTable
 	}
 
-	if obj.WarehouseTaskEntityIdOneOf1 != nil {
-		return obj.WarehouseTaskEntityIdOneOf1
+	if obj.WarehouseTaskEntityIdView != nil {
+		return obj.WarehouseTaskEntityIdView
 	}
 
 	// all schemas are nil

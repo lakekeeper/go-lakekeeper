@@ -135,7 +135,6 @@ func (o *GetTaskLogCleanupConfig) UnmarshalJSON(data []byte) (err error) {
 	varGetTaskLogCleanupConfig := _GetTaskLogCleanupConfig{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varGetTaskLogCleanupConfig)
 
 	if err != nil {

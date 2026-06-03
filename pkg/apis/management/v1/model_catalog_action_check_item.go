@@ -185,7 +185,6 @@ func (o *CatalogActionCheckItem) UnmarshalJSON(data []byte) (err error) {
 	varCatalogActionCheckItem := _CatalogActionCheckItem{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varCatalogActionCheckItem)
 
 	if err != nil {

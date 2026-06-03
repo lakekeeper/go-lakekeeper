@@ -99,7 +99,6 @@ func (o *StorageLayoutOneOf) UnmarshalJSON(data []byte) (err error) {
 	varStorageLayoutOneOf := _StorageLayoutOneOf{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varStorageLayoutOneOf)
 
 	if err != nil {

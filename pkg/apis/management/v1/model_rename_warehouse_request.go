@@ -100,7 +100,6 @@ func (o *RenameWarehouseRequest) UnmarshalJSON(data []byte) (err error) {
 	varRenameWarehouseRequest := _RenameWarehouseRequest{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varRenameWarehouseRequest)
 
 	if err != nil {

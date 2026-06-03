@@ -185,7 +185,6 @@ func (o *GetEndpointStatisticsRequest) UnmarshalJSON(data []byte) (err error) {
 	varGetEndpointStatisticsRequest := _GetEndpointStatisticsRequest{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varGetEndpointStatisticsRequest)
 
 	if err != nil {

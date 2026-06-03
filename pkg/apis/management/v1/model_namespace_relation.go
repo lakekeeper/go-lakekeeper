@@ -54,7 +54,8 @@ func (v *NamespaceRelation) UnmarshalJSON(src []byte) error {
 		}
 	}
 
-	return fmt.Errorf("%+v is not a valid NamespaceRelation", value)
+	*v = enumTypeValue
+	return nil
 }
 
 // NewNamespaceRelationFromValue returns a pointer to a valid NamespaceRelation

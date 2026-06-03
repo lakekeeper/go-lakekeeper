@@ -239,7 +239,6 @@ func (o *StorageProfileGcs) UnmarshalJSON(data []byte) (err error) {
 	varStorageProfileGcs := _StorageProfileGcs{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varStorageProfileGcs)
 
 	if err != nil {

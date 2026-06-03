@@ -100,7 +100,6 @@ func (o *CheckResponse) UnmarshalJSON(data []byte) (err error) {
 	varCheckResponse := _CheckResponse{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varCheckResponse)
 
 	if err != nil {

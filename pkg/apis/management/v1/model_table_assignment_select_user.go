@@ -128,7 +128,6 @@ func (o *TableAssignmentSelectUser) UnmarshalJSON(data []byte) (err error) {
 	varTableAssignmentSelectUser := _TableAssignmentSelectUser{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varTableAssignmentSelectUser)
 
 	if err != nil {

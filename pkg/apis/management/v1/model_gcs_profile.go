@@ -222,7 +222,6 @@ func (o *GcsProfile) UnmarshalJSON(data []byte) (err error) {
 	varGcsProfile := _GcsProfile{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varGcsProfile)
 
 	if err != nil {

@@ -99,7 +99,6 @@ func (o *GetTableAccessResponse) UnmarshalJSON(data []byte) (err error) {
 	varGetTableAccessResponse := _GetTableAccessResponse{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varGetTableAccessResponse)
 
 	if err != nil {

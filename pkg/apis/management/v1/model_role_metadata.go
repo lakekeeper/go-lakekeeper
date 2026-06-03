@@ -245,7 +245,6 @@ func (o *RoleMetadata) UnmarshalJSON(data []byte) (err error) {
 	varRoleMetadata := _RoleMetadata{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varRoleMetadata)
 
 	if err != nil {

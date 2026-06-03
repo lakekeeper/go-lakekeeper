@@ -99,7 +99,6 @@ func (o *GetOpenFGAWarehouseActionsResponse) UnmarshalJSON(data []byte) (err err
 	varGetOpenFGAWarehouseActionsResponse := _GetOpenFGAWarehouseActionsResponse{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varGetOpenFGAWarehouseActionsResponse)
 
 	if err != nil {

@@ -251,7 +251,6 @@ func (o *CreateWarehouseRequest) UnmarshalJSON(data []byte) (err error) {
 	varCreateWarehouseRequest := _CreateWarehouseRequest{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varCreateWarehouseRequest)
 
 	if err != nil {

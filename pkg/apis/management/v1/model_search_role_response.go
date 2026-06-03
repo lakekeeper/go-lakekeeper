@@ -100,7 +100,6 @@ func (o *SearchRoleResponse) UnmarshalJSON(data []byte) (err error) {
 	varSearchRoleResponse := _SearchRoleResponse{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varSearchRoleResponse)
 
 	if err != nil {

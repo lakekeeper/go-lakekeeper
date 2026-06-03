@@ -100,7 +100,6 @@ func (o *StorageLayoutFlat) UnmarshalJSON(data []byte) (err error) {
 	varStorageLayoutFlat := _StorageLayoutFlat{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varStorageLayoutFlat)
 
 	if err != nil {

@@ -54,7 +54,8 @@ func (v *OpenFGANamespaceAction) UnmarshalJSON(src []byte) error {
 		}
 	}
 
-	return fmt.Errorf("%+v is not a valid OpenFGANamespaceAction", value)
+	*v = enumTypeValue
+	return nil
 }
 
 // NewOpenFGANamespaceActionFromValue returns a pointer to a valid OpenFGANamespaceAction

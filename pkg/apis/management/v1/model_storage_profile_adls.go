@@ -416,7 +416,6 @@ func (o *StorageProfileAdls) UnmarshalJSON(data []byte) (err error) {
 	varStorageProfileAdls := _StorageProfileAdls{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varStorageProfileAdls)
 
 	if err != nil {

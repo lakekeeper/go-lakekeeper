@@ -156,7 +156,6 @@ func (o *TabularIdentOrUuidOneOf1) UnmarshalJSON(data []byte) (err error) {
 	varTabularIdentOrUuidOneOf1 := _TabularIdentOrUuidOneOf1{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varTabularIdentOrUuidOneOf1)
 
 	if err != nil {

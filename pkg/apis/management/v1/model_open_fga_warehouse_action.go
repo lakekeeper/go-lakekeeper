@@ -56,7 +56,8 @@ func (v *OpenFGAWarehouseAction) UnmarshalJSON(src []byte) error {
 		}
 	}
 
-	return fmt.Errorf("%+v is not a valid OpenFGAWarehouseAction", value)
+	*v = enumTypeValue
+	return nil
 }
 
 // NewOpenFGAWarehouseActionFromValue returns a pointer to a valid OpenFGAWarehouseAction

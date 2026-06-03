@@ -44,7 +44,8 @@ func (v *TabularType) UnmarshalJSON(src []byte) error {
 		}
 	}
 
-	return fmt.Errorf("%+v is not a valid TabularType", value)
+	*v = enumTypeValue
+	return nil
 }
 
 // NewTabularTypeFromValue returns a pointer to a valid TabularType

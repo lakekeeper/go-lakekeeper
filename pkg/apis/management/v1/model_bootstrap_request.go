@@ -259,7 +259,6 @@ func (o *BootstrapRequest) UnmarshalJSON(data []byte) (err error) {
 	varBootstrapRequest := _BootstrapRequest{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varBootstrapRequest)
 
 	if err != nil {

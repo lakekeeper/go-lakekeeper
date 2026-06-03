@@ -127,7 +127,6 @@ func (o *AzCredentialSharedAccessKey) UnmarshalJSON(data []byte) (err error) {
 	varAzCredentialSharedAccessKey := _AzCredentialSharedAccessKey{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varAzCredentialSharedAccessKey)
 
 	if err != nil {

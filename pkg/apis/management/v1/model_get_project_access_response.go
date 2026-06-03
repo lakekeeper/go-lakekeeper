@@ -99,7 +99,6 @@ func (o *GetProjectAccessResponse) UnmarshalJSON(data []byte) (err error) {
 	varGetProjectAccessResponse := _GetProjectAccessResponse{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varGetProjectAccessResponse)
 
 	if err != nil {

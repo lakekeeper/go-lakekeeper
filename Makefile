@@ -182,6 +182,8 @@ generate: ## Regenerate Go bindings from OpenAPI specs.
 		-o /local/$(MANAGEMENT_API_OUTPUT) \
 		--global-property=apiDocs=false,apiTests=false,modelDocs=false,modelTests=false
 	@rm -f $(OPENAPI_DIR)/management-open-api.processed.yaml
+	@echo === postprocessing generated tree to relax unknown-field decoding
+	@$(GO) run ./api/openapi/postprocess $(SELF_DIR)/$(MANAGEMENT_API_OUTPUT)
 	@echo === goimports on generated tree
 	@$(GO) run golang.org/x/tools/cmd/goimports -w $(SELF_DIR)/$(MANAGEMENT_API_OUTPUT)
 	@$(GO) mod tidy

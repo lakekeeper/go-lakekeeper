@@ -46,7 +46,8 @@ func (v *S3CredentialType) UnmarshalJSON(src []byte) error {
 		}
 	}
 
-	return fmt.Errorf("%+v is not a valid S3CredentialType", value)
+	*v = enumTypeValue
+	return nil
 }
 
 // NewS3CredentialTypeFromValue returns a pointer to a valid S3CredentialType

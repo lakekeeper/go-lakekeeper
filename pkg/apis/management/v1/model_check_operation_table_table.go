@@ -212,7 +212,6 @@ func (o *CheckOperationTableTable) UnmarshalJSON(data []byte) (err error) {
 	varCheckOperationTableTable := _CheckOperationTableTable{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varCheckOperationTableTable)
 
 	if err != nil {

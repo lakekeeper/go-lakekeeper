@@ -379,7 +379,6 @@ func (o *GcsServiceKey) UnmarshalJSON(data []byte) (err error) {
 	varGcsServiceKey := _GcsServiceKey{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varGcsServiceKey)
 
 	if err != nil {

@@ -44,7 +44,8 @@ func (v *GcsCredentialType) UnmarshalJSON(src []byte) error {
 		}
 	}
 
-	return fmt.Errorf("%+v is not a valid GcsCredentialType", value)
+	*v = enumTypeValue
+	return nil
 }
 
 // NewGcsCredentialTypeFromValue returns a pointer to a valid GcsCredentialType

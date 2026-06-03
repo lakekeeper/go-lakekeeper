@@ -299,7 +299,6 @@ func (o *EndpointStatistic) UnmarshalJSON(data []byte) (err error) {
 	varEndpointStatistic := _EndpointStatistic{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varEndpointStatistic)
 
 	if err != nil {

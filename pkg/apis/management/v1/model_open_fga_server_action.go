@@ -44,7 +44,8 @@ func (v *OpenFGAServerAction) UnmarshalJSON(src []byte) error {
 		}
 	}
 
-	return fmt.Errorf("%+v is not a valid OpenFGAServerAction", value)
+	*v = enumTypeValue
+	return nil
 }
 
 // NewOpenFGAServerActionFromValue returns a pointer to a valid OpenFGAServerAction

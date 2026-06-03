@@ -211,7 +211,6 @@ func (o *StorageCredentialClientCredentials) UnmarshalJSON(data []byte) (err err
 	varStorageCredentialClientCredentials := _StorageCredentialClientCredentials{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varStorageCredentialClientCredentials)
 
 	if err != nil {

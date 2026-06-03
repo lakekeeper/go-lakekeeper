@@ -99,7 +99,6 @@ func (o *GetWarehouseAccessResponse) UnmarshalJSON(data []byte) (err error) {
 	varGetWarehouseAccessResponse := _GetWarehouseAccessResponse{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varGetWarehouseAccessResponse)
 
 	if err != nil {

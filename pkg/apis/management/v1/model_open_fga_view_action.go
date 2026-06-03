@@ -54,7 +54,8 @@ func (v *OpenFGAViewAction) UnmarshalJSON(src []byte) error {
 		}
 	}
 
-	return fmt.Errorf("%+v is not a valid OpenFGAViewAction", value)
+	*v = enumTypeValue
+	return nil
 }
 
 // NewOpenFGAViewActionFromValue returns a pointer to a valid OpenFGAViewAction

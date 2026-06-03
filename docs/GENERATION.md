@@ -103,6 +103,41 @@ types.
 This is what unlocks the correct wire format for `StorageCredential` (commit
 `cb74e97`) and the `*Assignment` families (commit `372cdc9`).
 
+Discrimination also covers **flat** unions whose members are
+`allOf([{$ref|inline}, {prop: single-enum}])` with no nested oneOf — e.g.
+`StorageProfile` and `TabularDeleteProfile`. The transformation is attempted for
+every oneOf (not just expandable ones) and rolls back any schema it can't
+cleanly discriminate, so this is generic: a future union of the same shape is
+picked up with no code change. Unions referenced as a building block
+(`allOf[0].$ref`) inside another union's members are skipped in the flat pass —
+they're consumed by their parent's cartesian expansion, and discriminating them
+first would break that.
+
+## The postprocessor
+
+Located at [`api/openapi/postprocess/`](../api/openapi/postprocess/); runs in
+`make generate` after the generator and before goimports/gofmt. It applies two
+forward-compat relaxations to the generated tree so a client built against an
+older spec keeps working against a newer Lakekeeper (additive server changes
+must not break decoding):
+
+- **Strip `decoder.DisallowUnknownFields()`** from model `UnmarshalJSON`s, so
+  responses carrying a field the SDK's spec predates (e.g. latest-main's
+  `allowed-format-versions` on the warehouse object) decode instead of erroring.
+  The required-property presence check (a separate phase) and the oneOf
+  discriminator dispatch are untouched; `newStrictDecoder` in `utils.go` (used
+  only for the discriminator-lookup map) is preserved.
+- **Relax enum validation** — rewrite each enum `UnmarshalJSON`'s
+  `return fmt.Errorf("%+v is not a valid X", value)` to store the value and
+  return nil. A newer server's enum value (e.g. the `set_format_version_policy`
+  `WarehouseAction`) is preserved as the raw string rather than failing the whole
+  response; callers compare against the generated `AllowedXEnumValues`.
+
+This pairs with discriminator decode: relaxing strict decoding is only safe
+because unions no longer rely on `DisallowUnknownFields` to disambiguate
+variants. The integration `*_GetAccess` tests treat unknown (newer-than-spec)
+actions as logged, not failures (see `assertAllowedActionsSubset`).
+
 The preprocessor also runs two ergonomic passes that the generator alone
 cannot deliver:
 
@@ -139,6 +174,6 @@ choices, with the intent behind each:
 | `useOneOfDiscriminatorLookup` | `true` | Lets the generator emit unambiguous unmarshal logic when the preprocessor adds a `discriminator` block |
 | `enumClassPrefix` | `false` | Pairs with the preprocessor's `x-enum-varnames` injection; without this, the prefix would stack and produce names like `S3FLAVOR_S3FlavorAws` |
 | `generateMarshalJSON` | `false` | Default Go encoding via the struct's `json:` tags is byte-identical to the custom `ToMap`-driven `MarshalJSON` (every optional field carries `omitempty`). Saves ~8 lines per model file with no wire-format change |
-| `generateUnmarshalJSON` | `true` | Kept on so inbound responses still error on a missing required field. The price is rejecting payloads with unknown fields (`DisallowUnknownFields`); we accept that because Lakekeeper does not introduce unknown fields without a spec bump that the SDK regenerates against |
+| `generateUnmarshalJSON` | `true` | Kept on for the required-field presence check and the oneOf discriminator dispatch. Its `DisallowUnknownFields` side effect (and the strict enum-value validation) is the wrong posture for a client library, so the **postprocessor** strips it after generation — see below. Net result: required checks + discriminator decode retained, additive server fields/enum values tolerated |
 | `generateInterfaces` | `false` | We expose the generated client through `pkg/client`, so the additional `XxxAPI` interface variants are not needed |
 | `withGoMod`, `isGoSubmodule` | `false`, `true` | Embed the generated package inside this module instead of producing a standalone Go SDK |

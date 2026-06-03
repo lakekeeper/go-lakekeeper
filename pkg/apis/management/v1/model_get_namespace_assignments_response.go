@@ -99,7 +99,6 @@ func (o *GetNamespaceAssignmentsResponse) UnmarshalJSON(data []byte) (err error)
 	varGetNamespaceAssignmentsResponse := _GetNamespaceAssignmentsResponse{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varGetNamespaceAssignmentsResponse)
 
 	if err != nil {

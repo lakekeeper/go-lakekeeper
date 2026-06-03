@@ -100,7 +100,6 @@ func (o *SetProtectionRequest) UnmarshalJSON(data []byte) (err error) {
 	varSetProtectionRequest := _SetProtectionRequest{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varSetProtectionRequest)
 
 	if err != nil {

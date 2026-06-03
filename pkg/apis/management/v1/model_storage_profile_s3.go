@@ -777,7 +777,6 @@ func (o *StorageProfileS3) UnmarshalJSON(data []byte) (err error) {
 	varStorageProfileS3 := _StorageProfileS3{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varStorageProfileS3)
 
 	if err != nil {

@@ -99,7 +99,6 @@ func (o *SetManagedAccessRequest) UnmarshalJSON(data []byte) (err error) {
 	varSetManagedAccessRequest := _SetManagedAccessRequest{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varSetManagedAccessRequest)
 
 	if err != nil {

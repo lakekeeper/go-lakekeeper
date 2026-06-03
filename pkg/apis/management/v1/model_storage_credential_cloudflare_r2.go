@@ -243,7 +243,6 @@ func (o *StorageCredentialCloudflareR2) UnmarshalJSON(data []byte) (err error) {
 	varStorageCredentialCloudflareR2 := _StorageCredentialCloudflareR2{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varStorageCredentialCloudflareR2)
 
 	if err != nil {

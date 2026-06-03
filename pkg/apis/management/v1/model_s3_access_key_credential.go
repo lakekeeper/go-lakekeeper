@@ -163,7 +163,6 @@ func (o *S3AccessKeyCredential) UnmarshalJSON(data []byte) (err error) {
 	varS3AccessKeyCredential := _S3AccessKeyCredential{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varS3AccessKeyCredential)
 
 	if err != nil {

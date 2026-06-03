@@ -24,11 +24,18 @@ enumClassPrefix: false
 # different templates and are unaffected. Saves ~8 lines per model file.
 generateMarshalJSON: false
 
-# Keep per-leaf-struct UnmarshalJSON. It enforces required-property presence
-# on inbound responses, catching a server that drops a field schema-required
-# clients depend on. The DisallowUnknownFields-on-strict-decode side effect
-# is acceptable because Lakekeeper does not introduce unknown fields without
-# a spec bump that the SDK regenerates against.
+# Keep per-leaf-struct UnmarshalJSON. It enforces required-property presence on
+# inbound responses (catching a server that drops a field clients depend on) and
+# supplies the oneOf discriminator dispatch. Its one undesirable side effect —
+# strict decoding via decoder.DisallowUnknownFields(), which rejects responses
+# carrying a field the SDK's spec doesn't know about — is the wrong posture for a
+# client library (Lakekeeper adds fields between releases, e.g. latest-main's
+# `allowed-format-versions` on the warehouse object after v0.12.3). The
+# `api/openapi/postprocess` step in `make generate` strips those
+# DisallowUnknownFields() calls after generation, so additive server fields are
+# tolerated while the required-property check and discriminator dispatch remain.
+# Unions decode by discriminator (enum) or required-field presence — neither
+# depends on strict unknown-field rejection. See docs/GENERATION.md.
 generateUnmarshalJSON: true
 
 # Keep the file footprint small — we expose the generated client through the

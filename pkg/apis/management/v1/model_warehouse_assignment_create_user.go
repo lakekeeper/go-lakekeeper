@@ -128,7 +128,6 @@ func (o *WarehouseAssignmentCreateUser) UnmarshalJSON(data []byte) (err error) {
 	varWarehouseAssignmentCreateUser := _WarehouseAssignmentCreateUser{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varWarehouseAssignmentCreateUser)
 
 	if err != nil {

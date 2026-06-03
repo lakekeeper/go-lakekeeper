@@ -183,7 +183,6 @@ func (o *AzCredentialClientCredentials) UnmarshalJSON(data []byte) (err error) {
 	varAzCredentialClientCredentials := _AzCredentialClientCredentials{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varAzCredentialClientCredentials)
 
 	if err != nil {

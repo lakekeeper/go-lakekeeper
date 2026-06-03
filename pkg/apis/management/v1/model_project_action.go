@@ -74,7 +74,8 @@ func (v *ProjectAction) UnmarshalJSON(src []byte) error {
 		}
 	}
 
-	return fmt.Errorf("%+v is not a valid ProjectAction", value)
+	*v = enumTypeValue
+	return nil
 }
 
 // NewProjectActionFromValue returns a pointer to a valid ProjectAction

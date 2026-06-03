@@ -17,101 +17,129 @@ import (
 
 // WarehouseTaskEntityFilter - struct for WarehouseTaskEntityFilter
 type WarehouseTaskEntityFilter struct {
-	WarehouseTaskEntityFilterOneOf  *WarehouseTaskEntityFilterOneOf
-	WarehouseTaskEntityFilterOneOf1 *WarehouseTaskEntityFilterOneOf1
-	WarehouseTaskEntityFilterOneOf2 *WarehouseTaskEntityFilterOneOf2
+	WarehouseTaskEntityFilterTable     *WarehouseTaskEntityFilterTable
+	WarehouseTaskEntityFilterView      *WarehouseTaskEntityFilterView
+	WarehouseTaskEntityFilterWarehouse *WarehouseTaskEntityFilterWarehouse
 }
 
-// WarehouseTaskEntityFilterOneOfAsWarehouseTaskEntityFilter is a convenience function that returns WarehouseTaskEntityFilterOneOf wrapped in WarehouseTaskEntityFilter
-func WarehouseTaskEntityFilterOneOfAsWarehouseTaskEntityFilter(v *WarehouseTaskEntityFilterOneOf) WarehouseTaskEntityFilter {
+// WarehouseTaskEntityFilterTableAsWarehouseTaskEntityFilter is a convenience function that returns WarehouseTaskEntityFilterTable wrapped in WarehouseTaskEntityFilter
+func WarehouseTaskEntityFilterTableAsWarehouseTaskEntityFilter(v *WarehouseTaskEntityFilterTable) WarehouseTaskEntityFilter {
 	return WarehouseTaskEntityFilter{
-		WarehouseTaskEntityFilterOneOf: v,
+		WarehouseTaskEntityFilterTable: v,
 	}
 }
 
-// WarehouseTaskEntityFilterOneOf1AsWarehouseTaskEntityFilter is a convenience function that returns WarehouseTaskEntityFilterOneOf1 wrapped in WarehouseTaskEntityFilter
-func WarehouseTaskEntityFilterOneOf1AsWarehouseTaskEntityFilter(v *WarehouseTaskEntityFilterOneOf1) WarehouseTaskEntityFilter {
+// WarehouseTaskEntityFilterViewAsWarehouseTaskEntityFilter is a convenience function that returns WarehouseTaskEntityFilterView wrapped in WarehouseTaskEntityFilter
+func WarehouseTaskEntityFilterViewAsWarehouseTaskEntityFilter(v *WarehouseTaskEntityFilterView) WarehouseTaskEntityFilter {
 	return WarehouseTaskEntityFilter{
-		WarehouseTaskEntityFilterOneOf1: v,
+		WarehouseTaskEntityFilterView: v,
 	}
 }
 
-// WarehouseTaskEntityFilterOneOf2AsWarehouseTaskEntityFilter is a convenience function that returns WarehouseTaskEntityFilterOneOf2 wrapped in WarehouseTaskEntityFilter
-func WarehouseTaskEntityFilterOneOf2AsWarehouseTaskEntityFilter(v *WarehouseTaskEntityFilterOneOf2) WarehouseTaskEntityFilter {
+// WarehouseTaskEntityFilterWarehouseAsWarehouseTaskEntityFilter is a convenience function that returns WarehouseTaskEntityFilterWarehouse wrapped in WarehouseTaskEntityFilter
+func WarehouseTaskEntityFilterWarehouseAsWarehouseTaskEntityFilter(v *WarehouseTaskEntityFilterWarehouse) WarehouseTaskEntityFilter {
 	return WarehouseTaskEntityFilter{
-		WarehouseTaskEntityFilterOneOf2: v,
+		WarehouseTaskEntityFilterWarehouse: v,
 	}
 }
 
 // Unmarshal JSON data into one of the pointers in the struct
 func (dst *WarehouseTaskEntityFilter) UnmarshalJSON(data []byte) error {
 	var err error
-	match := 0
-	// try to unmarshal data into WarehouseTaskEntityFilterOneOf
-	err = json.Unmarshal(data, &dst.WarehouseTaskEntityFilterOneOf)
-	if err == nil {
-		jsonWarehouseTaskEntityFilterOneOf, _ := json.Marshal(dst.WarehouseTaskEntityFilterOneOf)
-		if string(jsonWarehouseTaskEntityFilterOneOf) == "{}" { // empty struct
-			dst.WarehouseTaskEntityFilterOneOf = nil
+	// use discriminator value to speed up the lookup
+	var jsonDict map[string]interface{}
+	err = newStrictDecoder(data).Decode(&jsonDict)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal JSON into map for the discriminator lookup")
+	}
+
+	// check if the discriminator value is 'table'
+	if jsonDict["type"] == "table" {
+		// try to unmarshal JSON data into WarehouseTaskEntityFilterTable
+		err = json.Unmarshal(data, &dst.WarehouseTaskEntityFilterTable)
+		if err == nil {
+			return nil // data stored in dst.WarehouseTaskEntityFilterTable, return on the first match
 		} else {
-			match++
+			dst.WarehouseTaskEntityFilterTable = nil
+			return fmt.Errorf("failed to unmarshal WarehouseTaskEntityFilter as WarehouseTaskEntityFilterTable: %s", err.Error())
 		}
-	} else {
-		dst.WarehouseTaskEntityFilterOneOf = nil
 	}
 
-	// try to unmarshal data into WarehouseTaskEntityFilterOneOf1
-	err = json.Unmarshal(data, &dst.WarehouseTaskEntityFilterOneOf1)
-	if err == nil {
-		jsonWarehouseTaskEntityFilterOneOf1, _ := json.Marshal(dst.WarehouseTaskEntityFilterOneOf1)
-		if string(jsonWarehouseTaskEntityFilterOneOf1) == "{}" { // empty struct
-			dst.WarehouseTaskEntityFilterOneOf1 = nil
+	// check if the discriminator value is 'view'
+	if jsonDict["type"] == "view" {
+		// try to unmarshal JSON data into WarehouseTaskEntityFilterView
+		err = json.Unmarshal(data, &dst.WarehouseTaskEntityFilterView)
+		if err == nil {
+			return nil // data stored in dst.WarehouseTaskEntityFilterView, return on the first match
 		} else {
-			match++
+			dst.WarehouseTaskEntityFilterView = nil
+			return fmt.Errorf("failed to unmarshal WarehouseTaskEntityFilter as WarehouseTaskEntityFilterView: %s", err.Error())
 		}
-	} else {
-		dst.WarehouseTaskEntityFilterOneOf1 = nil
 	}
 
-	// try to unmarshal data into WarehouseTaskEntityFilterOneOf2
-	err = json.Unmarshal(data, &dst.WarehouseTaskEntityFilterOneOf2)
-	if err == nil {
-		jsonWarehouseTaskEntityFilterOneOf2, _ := json.Marshal(dst.WarehouseTaskEntityFilterOneOf2)
-		if string(jsonWarehouseTaskEntityFilterOneOf2) == "{}" { // empty struct
-			dst.WarehouseTaskEntityFilterOneOf2 = nil
+	// check if the discriminator value is 'warehouse'
+	if jsonDict["type"] == "warehouse" {
+		// try to unmarshal JSON data into WarehouseTaskEntityFilterWarehouse
+		err = json.Unmarshal(data, &dst.WarehouseTaskEntityFilterWarehouse)
+		if err == nil {
+			return nil // data stored in dst.WarehouseTaskEntityFilterWarehouse, return on the first match
 		} else {
-			match++
+			dst.WarehouseTaskEntityFilterWarehouse = nil
+			return fmt.Errorf("failed to unmarshal WarehouseTaskEntityFilter as WarehouseTaskEntityFilterWarehouse: %s", err.Error())
 		}
-	} else {
-		dst.WarehouseTaskEntityFilterOneOf2 = nil
 	}
 
-	if match > 1 { // more than 1 match
-		// reset to nil
-		dst.WarehouseTaskEntityFilterOneOf = nil
-		dst.WarehouseTaskEntityFilterOneOf1 = nil
-		dst.WarehouseTaskEntityFilterOneOf2 = nil
-
-		return fmt.Errorf("data matches more than one schema in oneOf(WarehouseTaskEntityFilter)")
-	} else if match == 1 {
-		return nil // exactly one match
-	} else { // no match
-		return fmt.Errorf("data failed to match schemas in oneOf(WarehouseTaskEntityFilter)")
+	// check if the discriminator value is 'WarehouseTaskEntityFilterTable'
+	if jsonDict["type"] == "WarehouseTaskEntityFilterTable" {
+		// try to unmarshal JSON data into WarehouseTaskEntityFilterTable
+		err = json.Unmarshal(data, &dst.WarehouseTaskEntityFilterTable)
+		if err == nil {
+			return nil // data stored in dst.WarehouseTaskEntityFilterTable, return on the first match
+		} else {
+			dst.WarehouseTaskEntityFilterTable = nil
+			return fmt.Errorf("failed to unmarshal WarehouseTaskEntityFilter as WarehouseTaskEntityFilterTable: %s", err.Error())
+		}
 	}
+
+	// check if the discriminator value is 'WarehouseTaskEntityFilterView'
+	if jsonDict["type"] == "WarehouseTaskEntityFilterView" {
+		// try to unmarshal JSON data into WarehouseTaskEntityFilterView
+		err = json.Unmarshal(data, &dst.WarehouseTaskEntityFilterView)
+		if err == nil {
+			return nil // data stored in dst.WarehouseTaskEntityFilterView, return on the first match
+		} else {
+			dst.WarehouseTaskEntityFilterView = nil
+			return fmt.Errorf("failed to unmarshal WarehouseTaskEntityFilter as WarehouseTaskEntityFilterView: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'WarehouseTaskEntityFilterWarehouse'
+	if jsonDict["type"] == "WarehouseTaskEntityFilterWarehouse" {
+		// try to unmarshal JSON data into WarehouseTaskEntityFilterWarehouse
+		err = json.Unmarshal(data, &dst.WarehouseTaskEntityFilterWarehouse)
+		if err == nil {
+			return nil // data stored in dst.WarehouseTaskEntityFilterWarehouse, return on the first match
+		} else {
+			dst.WarehouseTaskEntityFilterWarehouse = nil
+			return fmt.Errorf("failed to unmarshal WarehouseTaskEntityFilter as WarehouseTaskEntityFilterWarehouse: %s", err.Error())
+		}
+	}
+
+	return nil
 }
 
 // Marshal data from the first non-nil pointers in the struct to JSON
 func (src WarehouseTaskEntityFilter) MarshalJSON() ([]byte, error) {
-	if src.WarehouseTaskEntityFilterOneOf != nil {
-		return json.Marshal(&src.WarehouseTaskEntityFilterOneOf)
+	if src.WarehouseTaskEntityFilterTable != nil {
+		return json.Marshal(&src.WarehouseTaskEntityFilterTable)
 	}
 
-	if src.WarehouseTaskEntityFilterOneOf1 != nil {
-		return json.Marshal(&src.WarehouseTaskEntityFilterOneOf1)
+	if src.WarehouseTaskEntityFilterView != nil {
+		return json.Marshal(&src.WarehouseTaskEntityFilterView)
 	}
 
-	if src.WarehouseTaskEntityFilterOneOf2 != nil {
-		return json.Marshal(&src.WarehouseTaskEntityFilterOneOf2)
+	if src.WarehouseTaskEntityFilterWarehouse != nil {
+		return json.Marshal(&src.WarehouseTaskEntityFilterWarehouse)
 	}
 
 	return nil, nil // no data in oneOf schemas
@@ -122,16 +150,16 @@ func (obj *WarehouseTaskEntityFilter) GetActualInstance() interface{} {
 	if obj == nil {
 		return nil
 	}
-	if obj.WarehouseTaskEntityFilterOneOf != nil {
-		return obj.WarehouseTaskEntityFilterOneOf
+	if obj.WarehouseTaskEntityFilterTable != nil {
+		return obj.WarehouseTaskEntityFilterTable
 	}
 
-	if obj.WarehouseTaskEntityFilterOneOf1 != nil {
-		return obj.WarehouseTaskEntityFilterOneOf1
+	if obj.WarehouseTaskEntityFilterView != nil {
+		return obj.WarehouseTaskEntityFilterView
 	}
 
-	if obj.WarehouseTaskEntityFilterOneOf2 != nil {
-		return obj.WarehouseTaskEntityFilterOneOf2
+	if obj.WarehouseTaskEntityFilterWarehouse != nil {
+		return obj.WarehouseTaskEntityFilterWarehouse
 	}
 
 	// all schemas are nil

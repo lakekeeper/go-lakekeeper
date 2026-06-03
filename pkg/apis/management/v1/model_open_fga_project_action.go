@@ -58,7 +58,8 @@ func (v *OpenFGAProjectAction) UnmarshalJSON(src []byte) error {
 		}
 	}
 
-	return fmt.Errorf("%+v is not a valid OpenFGAProjectAction", value)
+	*v = enumTypeValue
+	return nil
 }
 
 // NewOpenFGAProjectActionFromValue returns a pointer to a valid OpenFGAProjectAction

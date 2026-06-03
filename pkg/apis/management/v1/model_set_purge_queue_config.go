@@ -135,7 +135,6 @@ func (o *SetPurgeQueueConfig) UnmarshalJSON(data []byte) (err error) {
 	varSetPurgeQueueConfig := _SetPurgeQueueConfig{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varSetPurgeQueueConfig)
 
 	if err != nil {

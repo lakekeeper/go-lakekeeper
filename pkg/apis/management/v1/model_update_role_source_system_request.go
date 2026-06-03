@@ -129,7 +129,6 @@ func (o *UpdateRoleSourceSystemRequest) UnmarshalJSON(data []byte) (err error) {
 	varUpdateRoleSourceSystemRequest := _UpdateRoleSourceSystemRequest{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varUpdateRoleSourceSystemRequest)
 
 	if err != nil {
