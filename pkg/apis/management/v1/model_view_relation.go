@@ -52,7 +52,8 @@ func (v *ViewRelation) UnmarshalJSON(src []byte) error {
 		}
 	}
 
-	return fmt.Errorf("%+v is not a valid ViewRelation", value)
+	*v = enumTypeValue
+	return nil
 }
 
 // NewViewRelationFromValue returns a pointer to a valid ViewRelation

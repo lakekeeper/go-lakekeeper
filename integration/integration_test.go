@@ -11,11 +11,13 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"slices"
 	"strings"
 	"testing"
 
 	"github.com/google/uuid"
 	"github.com/joho/godotenv"
+	"github.com/stretchr/testify/assert"
 	"golang.org/x/oauth2/clientcredentials"
 
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
@@ -208,13 +210,36 @@ func MustCreateWarehouse(t *testing.T, c *client.Client, projectID string) (stri
 	return wh.WarehouseId, name
 }
 
-// *_GetAccess tests use assert.Subset(t, want, resp.AllowedActions), which
-// checks resp.AllowedActions ⊆ want. This is deliberate:
-//   - server-side additions (a new action appearing in resp) FAIL the test —
-//     surfaced as news that should be reviewed and reflected in `want`.
-//   - server-side removals (an action disappearing from resp) PASS — server
-//     deprecations don't break the suite. If strict equality is needed for a
-//     specific case, use assert.ElementsMatch.
+// *_GetAccess tests assert allowed actions via assertAllowedActionsSubset,
+// which partitions the server's actions into those KNOWN to this SDK version
+// (present in the generated Allowed<T>EnumValues) and those it doesn't yet name.
+// Semantics, by design:
+//   - KNOWN actions must satisfy known ⊆ want. A newly *supported* action (one
+//     in our enum but missing from `want`) FAILS — surfaced as news that should
+//     be reviewed and reflected in `want`. This tripwire is meaningful on the
+//     pinned/floor Lakekeeper (test.yml v0.12.0), where every action is known.
+//   - UNKNOWN actions (a server newer than our spec, e.g. latest-main's
+//     `set_format_version_policy`) are LOGGED, not failed. We can't add them to
+//     `want` without the enum constant, which only ships with a release; failing
+//     on them would make the latest-main canary permanently, unactionably red.
+//   - server-side removals PASS — deprecations don't break the suite. For strict
+//     equality use assert.ElementsMatch.
+//
+// This pairs with the SDK's forward-compat decode: unknown enum values no longer
+// crash decoding (see api/openapi/postprocess), they surface here as logged,
+// not-yet-named actions.
+func assertAllowedActionsSubset[T comparable](t *testing.T, want, got, known []T) {
+	t.Helper()
+	supported := make([]T, 0, len(got))
+	for _, a := range got {
+		if slices.Contains(known, a) {
+			supported = append(supported, a)
+			continue
+		}
+		t.Logf("server returned action %v unknown to this SDK version (newer server?); not asserted against want", a)
+	}
+	assert.Subset(t, want, supported)
+}
 
 // userAssignment constructs a generated *Assignment union value for a given
 // relation tied to a user principal. Called from the test goroutine, so

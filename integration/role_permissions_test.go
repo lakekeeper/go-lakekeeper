@@ -32,7 +32,7 @@ func TestPermissions_Role_GetAccess(t *testing.T) {
 	// GetAuthorizerRoleActions reports the OpenFGA-level action set, which is
 	// narrower than the deprecated GetRoleAccessById's RoleAction set —
 	// no delete/update/read since those are entity-level CRUD that fan out
-	// to other action types in the new model. (For the assert.Subset
+	// to other action types in the new model. (For the assertAllowedActionsSubset
 	// convention shared by all *_GetAccess tests, see integration_test.go.)
 	want := []managementv1.OpenFGARoleAction{
 		managementv1.OpenFGARoleActionAssume,
@@ -40,7 +40,7 @@ func TestPermissions_Role_GetAccess(t *testing.T) {
 		managementv1.OpenFGARoleActionCanChangeOwnership,
 		managementv1.OpenFGARoleActionReadAssignments,
 	}
-	assert.Subset(t, want, resp.AllowedActions)
+	assertAllowedActionsSubset(t, want, resp.AllowedActions, managementv1.AllowedOpenFGARoleActionEnumValues)
 }
 
 func TestPermissions_Role_GetAssignments(t *testing.T) {

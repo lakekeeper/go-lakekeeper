@@ -17,101 +17,129 @@ import (
 
 // LakekeeperUserAction - struct for LakekeeperUserAction
 type LakekeeperUserAction struct {
-	LakekeeperNamespaceActionOneOf3 *LakekeeperNamespaceActionOneOf3
-	LakekeeperRoleActionOneOf       *LakekeeperRoleActionOneOf
-	LakekeeperRoleActionOneOf2      *LakekeeperRoleActionOneOf2
+	LakekeeperUserActionDelete *LakekeeperUserActionDelete
+	LakekeeperUserActionRead   *LakekeeperUserActionRead
+	LakekeeperUserActionUpdate *LakekeeperUserActionUpdate
 }
 
-// LakekeeperNamespaceActionOneOf3AsLakekeeperUserAction is a convenience function that returns LakekeeperNamespaceActionOneOf3 wrapped in LakekeeperUserAction
-func LakekeeperNamespaceActionOneOf3AsLakekeeperUserAction(v *LakekeeperNamespaceActionOneOf3) LakekeeperUserAction {
+// LakekeeperUserActionDeleteAsLakekeeperUserAction is a convenience function that returns LakekeeperUserActionDelete wrapped in LakekeeperUserAction
+func LakekeeperUserActionDeleteAsLakekeeperUserAction(v *LakekeeperUserActionDelete) LakekeeperUserAction {
 	return LakekeeperUserAction{
-		LakekeeperNamespaceActionOneOf3: v,
+		LakekeeperUserActionDelete: v,
 	}
 }
 
-// LakekeeperRoleActionOneOfAsLakekeeperUserAction is a convenience function that returns LakekeeperRoleActionOneOf wrapped in LakekeeperUserAction
-func LakekeeperRoleActionOneOfAsLakekeeperUserAction(v *LakekeeperRoleActionOneOf) LakekeeperUserAction {
+// LakekeeperUserActionReadAsLakekeeperUserAction is a convenience function that returns LakekeeperUserActionRead wrapped in LakekeeperUserAction
+func LakekeeperUserActionReadAsLakekeeperUserAction(v *LakekeeperUserActionRead) LakekeeperUserAction {
 	return LakekeeperUserAction{
-		LakekeeperRoleActionOneOf: v,
+		LakekeeperUserActionRead: v,
 	}
 }
 
-// LakekeeperRoleActionOneOf2AsLakekeeperUserAction is a convenience function that returns LakekeeperRoleActionOneOf2 wrapped in LakekeeperUserAction
-func LakekeeperRoleActionOneOf2AsLakekeeperUserAction(v *LakekeeperRoleActionOneOf2) LakekeeperUserAction {
+// LakekeeperUserActionUpdateAsLakekeeperUserAction is a convenience function that returns LakekeeperUserActionUpdate wrapped in LakekeeperUserAction
+func LakekeeperUserActionUpdateAsLakekeeperUserAction(v *LakekeeperUserActionUpdate) LakekeeperUserAction {
 	return LakekeeperUserAction{
-		LakekeeperRoleActionOneOf2: v,
+		LakekeeperUserActionUpdate: v,
 	}
 }
 
 // Unmarshal JSON data into one of the pointers in the struct
 func (dst *LakekeeperUserAction) UnmarshalJSON(data []byte) error {
 	var err error
-	match := 0
-	// try to unmarshal data into LakekeeperNamespaceActionOneOf3
-	err = json.Unmarshal(data, &dst.LakekeeperNamespaceActionOneOf3)
-	if err == nil {
-		jsonLakekeeperNamespaceActionOneOf3, _ := json.Marshal(dst.LakekeeperNamespaceActionOneOf3)
-		if string(jsonLakekeeperNamespaceActionOneOf3) == "{}" { // empty struct
-			dst.LakekeeperNamespaceActionOneOf3 = nil
+	// use discriminator value to speed up the lookup
+	var jsonDict map[string]interface{}
+	err = newStrictDecoder(data).Decode(&jsonDict)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal JSON into map for the discriminator lookup")
+	}
+
+	// check if the discriminator value is 'delete'
+	if jsonDict["action"] == "delete" {
+		// try to unmarshal JSON data into LakekeeperUserActionDelete
+		err = json.Unmarshal(data, &dst.LakekeeperUserActionDelete)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperUserActionDelete, return on the first match
 		} else {
-			match++
+			dst.LakekeeperUserActionDelete = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperUserAction as LakekeeperUserActionDelete: %s", err.Error())
 		}
-	} else {
-		dst.LakekeeperNamespaceActionOneOf3 = nil
 	}
 
-	// try to unmarshal data into LakekeeperRoleActionOneOf
-	err = json.Unmarshal(data, &dst.LakekeeperRoleActionOneOf)
-	if err == nil {
-		jsonLakekeeperRoleActionOneOf, _ := json.Marshal(dst.LakekeeperRoleActionOneOf)
-		if string(jsonLakekeeperRoleActionOneOf) == "{}" { // empty struct
-			dst.LakekeeperRoleActionOneOf = nil
+	// check if the discriminator value is 'read'
+	if jsonDict["action"] == "read" {
+		// try to unmarshal JSON data into LakekeeperUserActionRead
+		err = json.Unmarshal(data, &dst.LakekeeperUserActionRead)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperUserActionRead, return on the first match
 		} else {
-			match++
+			dst.LakekeeperUserActionRead = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperUserAction as LakekeeperUserActionRead: %s", err.Error())
 		}
-	} else {
-		dst.LakekeeperRoleActionOneOf = nil
 	}
 
-	// try to unmarshal data into LakekeeperRoleActionOneOf2
-	err = json.Unmarshal(data, &dst.LakekeeperRoleActionOneOf2)
-	if err == nil {
-		jsonLakekeeperRoleActionOneOf2, _ := json.Marshal(dst.LakekeeperRoleActionOneOf2)
-		if string(jsonLakekeeperRoleActionOneOf2) == "{}" { // empty struct
-			dst.LakekeeperRoleActionOneOf2 = nil
+	// check if the discriminator value is 'update'
+	if jsonDict["action"] == "update" {
+		// try to unmarshal JSON data into LakekeeperUserActionUpdate
+		err = json.Unmarshal(data, &dst.LakekeeperUserActionUpdate)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperUserActionUpdate, return on the first match
 		} else {
-			match++
+			dst.LakekeeperUserActionUpdate = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperUserAction as LakekeeperUserActionUpdate: %s", err.Error())
 		}
-	} else {
-		dst.LakekeeperRoleActionOneOf2 = nil
 	}
 
-	if match > 1 { // more than 1 match
-		// reset to nil
-		dst.LakekeeperNamespaceActionOneOf3 = nil
-		dst.LakekeeperRoleActionOneOf = nil
-		dst.LakekeeperRoleActionOneOf2 = nil
-
-		return fmt.Errorf("data matches more than one schema in oneOf(LakekeeperUserAction)")
-	} else if match == 1 {
-		return nil // exactly one match
-	} else { // no match
-		return fmt.Errorf("data failed to match schemas in oneOf(LakekeeperUserAction)")
+	// check if the discriminator value is 'LakekeeperUserActionDelete'
+	if jsonDict["action"] == "LakekeeperUserActionDelete" {
+		// try to unmarshal JSON data into LakekeeperUserActionDelete
+		err = json.Unmarshal(data, &dst.LakekeeperUserActionDelete)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperUserActionDelete, return on the first match
+		} else {
+			dst.LakekeeperUserActionDelete = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperUserAction as LakekeeperUserActionDelete: %s", err.Error())
+		}
 	}
+
+	// check if the discriminator value is 'LakekeeperUserActionRead'
+	if jsonDict["action"] == "LakekeeperUserActionRead" {
+		// try to unmarshal JSON data into LakekeeperUserActionRead
+		err = json.Unmarshal(data, &dst.LakekeeperUserActionRead)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperUserActionRead, return on the first match
+		} else {
+			dst.LakekeeperUserActionRead = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperUserAction as LakekeeperUserActionRead: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'LakekeeperUserActionUpdate'
+	if jsonDict["action"] == "LakekeeperUserActionUpdate" {
+		// try to unmarshal JSON data into LakekeeperUserActionUpdate
+		err = json.Unmarshal(data, &dst.LakekeeperUserActionUpdate)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperUserActionUpdate, return on the first match
+		} else {
+			dst.LakekeeperUserActionUpdate = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperUserAction as LakekeeperUserActionUpdate: %s", err.Error())
+		}
+	}
+
+	return nil
 }
 
 // Marshal data from the first non-nil pointers in the struct to JSON
 func (src LakekeeperUserAction) MarshalJSON() ([]byte, error) {
-	if src.LakekeeperNamespaceActionOneOf3 != nil {
-		return json.Marshal(&src.LakekeeperNamespaceActionOneOf3)
+	if src.LakekeeperUserActionDelete != nil {
+		return json.Marshal(&src.LakekeeperUserActionDelete)
 	}
 
-	if src.LakekeeperRoleActionOneOf != nil {
-		return json.Marshal(&src.LakekeeperRoleActionOneOf)
+	if src.LakekeeperUserActionRead != nil {
+		return json.Marshal(&src.LakekeeperUserActionRead)
 	}
 
-	if src.LakekeeperRoleActionOneOf2 != nil {
-		return json.Marshal(&src.LakekeeperRoleActionOneOf2)
+	if src.LakekeeperUserActionUpdate != nil {
+		return json.Marshal(&src.LakekeeperUserActionUpdate)
 	}
 
 	return nil, nil // no data in oneOf schemas
@@ -122,16 +150,16 @@ func (obj *LakekeeperUserAction) GetActualInstance() interface{} {
 	if obj == nil {
 		return nil
 	}
-	if obj.LakekeeperNamespaceActionOneOf3 != nil {
-		return obj.LakekeeperNamespaceActionOneOf3
+	if obj.LakekeeperUserActionDelete != nil {
+		return obj.LakekeeperUserActionDelete
 	}
 
-	if obj.LakekeeperRoleActionOneOf != nil {
-		return obj.LakekeeperRoleActionOneOf
+	if obj.LakekeeperUserActionRead != nil {
+		return obj.LakekeeperUserActionRead
 	}
 
-	if obj.LakekeeperRoleActionOneOf2 != nil {
-		return obj.LakekeeperRoleActionOneOf2
+	if obj.LakekeeperUserActionUpdate != nil {
+		return obj.LakekeeperUserActionUpdate
 	}
 
 	// all schemas are nil

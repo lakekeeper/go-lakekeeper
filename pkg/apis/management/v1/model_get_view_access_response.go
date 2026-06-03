@@ -99,7 +99,6 @@ func (o *GetViewAccessResponse) UnmarshalJSON(data []byte) (err error) {
 	varGetViewAccessResponse := _GetViewAccessResponse{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varGetViewAccessResponse)
 
 	if err != nil {

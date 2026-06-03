@@ -163,7 +163,6 @@ func (o *StorageCredentialAwsSystemIdentity) UnmarshalJSON(data []byte) (err err
 	varStorageCredentialAwsSystemIdentity := _StorageCredentialAwsSystemIdentity{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varStorageCredentialAwsSystemIdentity)
 
 	if err != nil {

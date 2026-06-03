@@ -99,7 +99,6 @@ func (o *GcsCredentialSystemIdentity) UnmarshalJSON(data []byte) (err error) {
 	varGcsCredentialSystemIdentity := _GcsCredentialSystemIdentity{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varGcsCredentialSystemIdentity)
 
 	if err != nil {

@@ -68,7 +68,8 @@ func (v *NamespaceAction) UnmarshalJSON(src []byte) error {
 		}
 	}
 
-	return fmt.Errorf("%+v is not a valid NamespaceAction", value)
+	*v = enumTypeValue
+	return nil
 }
 
 // NewNamespaceActionFromValue returns a pointer to a valid NamespaceAction

@@ -17,335 +17,453 @@ import (
 
 // LakekeeperNamespaceAction - struct for LakekeeperNamespaceAction
 type LakekeeperNamespaceAction struct {
-	LakekeeperNamespaceActionOneOf   *LakekeeperNamespaceActionOneOf
-	LakekeeperNamespaceActionOneOf1  *LakekeeperNamespaceActionOneOf1
-	LakekeeperNamespaceActionOneOf10 *LakekeeperNamespaceActionOneOf10
-	LakekeeperNamespaceActionOneOf11 *LakekeeperNamespaceActionOneOf11
-	LakekeeperNamespaceActionOneOf2  *LakekeeperNamespaceActionOneOf2
-	LakekeeperNamespaceActionOneOf3  *LakekeeperNamespaceActionOneOf3
-	LakekeeperNamespaceActionOneOf4  *LakekeeperNamespaceActionOneOf4
-	LakekeeperNamespaceActionOneOf5  *LakekeeperNamespaceActionOneOf5
-	LakekeeperNamespaceActionOneOf6  *LakekeeperNamespaceActionOneOf6
-	LakekeeperNamespaceActionOneOf7  *LakekeeperNamespaceActionOneOf7
-	LakekeeperNamespaceActionOneOf8  *LakekeeperNamespaceActionOneOf8
-	LakekeeperNamespaceActionOneOf9  *LakekeeperNamespaceActionOneOf9
+	LakekeeperNamespaceActionCreateNamespace  *LakekeeperNamespaceActionCreateNamespace
+	LakekeeperNamespaceActionCreateTable      *LakekeeperNamespaceActionCreateTable
+	LakekeeperNamespaceActionCreateView       *LakekeeperNamespaceActionCreateView
+	LakekeeperNamespaceActionDelete           *LakekeeperNamespaceActionDelete
+	LakekeeperNamespaceActionGetMetadata      *LakekeeperNamespaceActionGetMetadata
+	LakekeeperNamespaceActionIncludeInList    *LakekeeperNamespaceActionIncludeInList
+	LakekeeperNamespaceActionListEverything   *LakekeeperNamespaceActionListEverything
+	LakekeeperNamespaceActionListNamespaces   *LakekeeperNamespaceActionListNamespaces
+	LakekeeperNamespaceActionListTables       *LakekeeperNamespaceActionListTables
+	LakekeeperNamespaceActionListViews        *LakekeeperNamespaceActionListViews
+	LakekeeperNamespaceActionSetProtection    *LakekeeperNamespaceActionSetProtection
+	LakekeeperNamespaceActionUpdateProperties *LakekeeperNamespaceActionUpdateProperties
 }
 
-// LakekeeperNamespaceActionOneOfAsLakekeeperNamespaceAction is a convenience function that returns LakekeeperNamespaceActionOneOf wrapped in LakekeeperNamespaceAction
-func LakekeeperNamespaceActionOneOfAsLakekeeperNamespaceAction(v *LakekeeperNamespaceActionOneOf) LakekeeperNamespaceAction {
+// LakekeeperNamespaceActionCreateNamespaceAsLakekeeperNamespaceAction is a convenience function that returns LakekeeperNamespaceActionCreateNamespace wrapped in LakekeeperNamespaceAction
+func LakekeeperNamespaceActionCreateNamespaceAsLakekeeperNamespaceAction(v *LakekeeperNamespaceActionCreateNamespace) LakekeeperNamespaceAction {
 	return LakekeeperNamespaceAction{
-		LakekeeperNamespaceActionOneOf: v,
+		LakekeeperNamespaceActionCreateNamespace: v,
 	}
 }
 
-// LakekeeperNamespaceActionOneOf1AsLakekeeperNamespaceAction is a convenience function that returns LakekeeperNamespaceActionOneOf1 wrapped in LakekeeperNamespaceAction
-func LakekeeperNamespaceActionOneOf1AsLakekeeperNamespaceAction(v *LakekeeperNamespaceActionOneOf1) LakekeeperNamespaceAction {
+// LakekeeperNamespaceActionCreateTableAsLakekeeperNamespaceAction is a convenience function that returns LakekeeperNamespaceActionCreateTable wrapped in LakekeeperNamespaceAction
+func LakekeeperNamespaceActionCreateTableAsLakekeeperNamespaceAction(v *LakekeeperNamespaceActionCreateTable) LakekeeperNamespaceAction {
 	return LakekeeperNamespaceAction{
-		LakekeeperNamespaceActionOneOf1: v,
+		LakekeeperNamespaceActionCreateTable: v,
 	}
 }
 
-// LakekeeperNamespaceActionOneOf10AsLakekeeperNamespaceAction is a convenience function that returns LakekeeperNamespaceActionOneOf10 wrapped in LakekeeperNamespaceAction
-func LakekeeperNamespaceActionOneOf10AsLakekeeperNamespaceAction(v *LakekeeperNamespaceActionOneOf10) LakekeeperNamespaceAction {
+// LakekeeperNamespaceActionCreateViewAsLakekeeperNamespaceAction is a convenience function that returns LakekeeperNamespaceActionCreateView wrapped in LakekeeperNamespaceAction
+func LakekeeperNamespaceActionCreateViewAsLakekeeperNamespaceAction(v *LakekeeperNamespaceActionCreateView) LakekeeperNamespaceAction {
 	return LakekeeperNamespaceAction{
-		LakekeeperNamespaceActionOneOf10: v,
+		LakekeeperNamespaceActionCreateView: v,
 	}
 }
 
-// LakekeeperNamespaceActionOneOf11AsLakekeeperNamespaceAction is a convenience function that returns LakekeeperNamespaceActionOneOf11 wrapped in LakekeeperNamespaceAction
-func LakekeeperNamespaceActionOneOf11AsLakekeeperNamespaceAction(v *LakekeeperNamespaceActionOneOf11) LakekeeperNamespaceAction {
+// LakekeeperNamespaceActionDeleteAsLakekeeperNamespaceAction is a convenience function that returns LakekeeperNamespaceActionDelete wrapped in LakekeeperNamespaceAction
+func LakekeeperNamespaceActionDeleteAsLakekeeperNamespaceAction(v *LakekeeperNamespaceActionDelete) LakekeeperNamespaceAction {
 	return LakekeeperNamespaceAction{
-		LakekeeperNamespaceActionOneOf11: v,
+		LakekeeperNamespaceActionDelete: v,
 	}
 }
 
-// LakekeeperNamespaceActionOneOf2AsLakekeeperNamespaceAction is a convenience function that returns LakekeeperNamespaceActionOneOf2 wrapped in LakekeeperNamespaceAction
-func LakekeeperNamespaceActionOneOf2AsLakekeeperNamespaceAction(v *LakekeeperNamespaceActionOneOf2) LakekeeperNamespaceAction {
+// LakekeeperNamespaceActionGetMetadataAsLakekeeperNamespaceAction is a convenience function that returns LakekeeperNamespaceActionGetMetadata wrapped in LakekeeperNamespaceAction
+func LakekeeperNamespaceActionGetMetadataAsLakekeeperNamespaceAction(v *LakekeeperNamespaceActionGetMetadata) LakekeeperNamespaceAction {
 	return LakekeeperNamespaceAction{
-		LakekeeperNamespaceActionOneOf2: v,
+		LakekeeperNamespaceActionGetMetadata: v,
 	}
 }
 
-// LakekeeperNamespaceActionOneOf3AsLakekeeperNamespaceAction is a convenience function that returns LakekeeperNamespaceActionOneOf3 wrapped in LakekeeperNamespaceAction
-func LakekeeperNamespaceActionOneOf3AsLakekeeperNamespaceAction(v *LakekeeperNamespaceActionOneOf3) LakekeeperNamespaceAction {
+// LakekeeperNamespaceActionIncludeInListAsLakekeeperNamespaceAction is a convenience function that returns LakekeeperNamespaceActionIncludeInList wrapped in LakekeeperNamespaceAction
+func LakekeeperNamespaceActionIncludeInListAsLakekeeperNamespaceAction(v *LakekeeperNamespaceActionIncludeInList) LakekeeperNamespaceAction {
 	return LakekeeperNamespaceAction{
-		LakekeeperNamespaceActionOneOf3: v,
+		LakekeeperNamespaceActionIncludeInList: v,
 	}
 }
 
-// LakekeeperNamespaceActionOneOf4AsLakekeeperNamespaceAction is a convenience function that returns LakekeeperNamespaceActionOneOf4 wrapped in LakekeeperNamespaceAction
-func LakekeeperNamespaceActionOneOf4AsLakekeeperNamespaceAction(v *LakekeeperNamespaceActionOneOf4) LakekeeperNamespaceAction {
+// LakekeeperNamespaceActionListEverythingAsLakekeeperNamespaceAction is a convenience function that returns LakekeeperNamespaceActionListEverything wrapped in LakekeeperNamespaceAction
+func LakekeeperNamespaceActionListEverythingAsLakekeeperNamespaceAction(v *LakekeeperNamespaceActionListEverything) LakekeeperNamespaceAction {
 	return LakekeeperNamespaceAction{
-		LakekeeperNamespaceActionOneOf4: v,
+		LakekeeperNamespaceActionListEverything: v,
 	}
 }
 
-// LakekeeperNamespaceActionOneOf5AsLakekeeperNamespaceAction is a convenience function that returns LakekeeperNamespaceActionOneOf5 wrapped in LakekeeperNamespaceAction
-func LakekeeperNamespaceActionOneOf5AsLakekeeperNamespaceAction(v *LakekeeperNamespaceActionOneOf5) LakekeeperNamespaceAction {
+// LakekeeperNamespaceActionListNamespacesAsLakekeeperNamespaceAction is a convenience function that returns LakekeeperNamespaceActionListNamespaces wrapped in LakekeeperNamespaceAction
+func LakekeeperNamespaceActionListNamespacesAsLakekeeperNamespaceAction(v *LakekeeperNamespaceActionListNamespaces) LakekeeperNamespaceAction {
 	return LakekeeperNamespaceAction{
-		LakekeeperNamespaceActionOneOf5: v,
+		LakekeeperNamespaceActionListNamespaces: v,
 	}
 }
 
-// LakekeeperNamespaceActionOneOf6AsLakekeeperNamespaceAction is a convenience function that returns LakekeeperNamespaceActionOneOf6 wrapped in LakekeeperNamespaceAction
-func LakekeeperNamespaceActionOneOf6AsLakekeeperNamespaceAction(v *LakekeeperNamespaceActionOneOf6) LakekeeperNamespaceAction {
+// LakekeeperNamespaceActionListTablesAsLakekeeperNamespaceAction is a convenience function that returns LakekeeperNamespaceActionListTables wrapped in LakekeeperNamespaceAction
+func LakekeeperNamespaceActionListTablesAsLakekeeperNamespaceAction(v *LakekeeperNamespaceActionListTables) LakekeeperNamespaceAction {
 	return LakekeeperNamespaceAction{
-		LakekeeperNamespaceActionOneOf6: v,
+		LakekeeperNamespaceActionListTables: v,
 	}
 }
 
-// LakekeeperNamespaceActionOneOf7AsLakekeeperNamespaceAction is a convenience function that returns LakekeeperNamespaceActionOneOf7 wrapped in LakekeeperNamespaceAction
-func LakekeeperNamespaceActionOneOf7AsLakekeeperNamespaceAction(v *LakekeeperNamespaceActionOneOf7) LakekeeperNamespaceAction {
+// LakekeeperNamespaceActionListViewsAsLakekeeperNamespaceAction is a convenience function that returns LakekeeperNamespaceActionListViews wrapped in LakekeeperNamespaceAction
+func LakekeeperNamespaceActionListViewsAsLakekeeperNamespaceAction(v *LakekeeperNamespaceActionListViews) LakekeeperNamespaceAction {
 	return LakekeeperNamespaceAction{
-		LakekeeperNamespaceActionOneOf7: v,
+		LakekeeperNamespaceActionListViews: v,
 	}
 }
 
-// LakekeeperNamespaceActionOneOf8AsLakekeeperNamespaceAction is a convenience function that returns LakekeeperNamespaceActionOneOf8 wrapped in LakekeeperNamespaceAction
-func LakekeeperNamespaceActionOneOf8AsLakekeeperNamespaceAction(v *LakekeeperNamespaceActionOneOf8) LakekeeperNamespaceAction {
+// LakekeeperNamespaceActionSetProtectionAsLakekeeperNamespaceAction is a convenience function that returns LakekeeperNamespaceActionSetProtection wrapped in LakekeeperNamespaceAction
+func LakekeeperNamespaceActionSetProtectionAsLakekeeperNamespaceAction(v *LakekeeperNamespaceActionSetProtection) LakekeeperNamespaceAction {
 	return LakekeeperNamespaceAction{
-		LakekeeperNamespaceActionOneOf8: v,
+		LakekeeperNamespaceActionSetProtection: v,
 	}
 }
 
-// LakekeeperNamespaceActionOneOf9AsLakekeeperNamespaceAction is a convenience function that returns LakekeeperNamespaceActionOneOf9 wrapped in LakekeeperNamespaceAction
-func LakekeeperNamespaceActionOneOf9AsLakekeeperNamespaceAction(v *LakekeeperNamespaceActionOneOf9) LakekeeperNamespaceAction {
+// LakekeeperNamespaceActionUpdatePropertiesAsLakekeeperNamespaceAction is a convenience function that returns LakekeeperNamespaceActionUpdateProperties wrapped in LakekeeperNamespaceAction
+func LakekeeperNamespaceActionUpdatePropertiesAsLakekeeperNamespaceAction(v *LakekeeperNamespaceActionUpdateProperties) LakekeeperNamespaceAction {
 	return LakekeeperNamespaceAction{
-		LakekeeperNamespaceActionOneOf9: v,
+		LakekeeperNamespaceActionUpdateProperties: v,
 	}
 }
 
 // Unmarshal JSON data into one of the pointers in the struct
 func (dst *LakekeeperNamespaceAction) UnmarshalJSON(data []byte) error {
 	var err error
-	match := 0
-	// try to unmarshal data into LakekeeperNamespaceActionOneOf
-	err = json.Unmarshal(data, &dst.LakekeeperNamespaceActionOneOf)
-	if err == nil {
-		jsonLakekeeperNamespaceActionOneOf, _ := json.Marshal(dst.LakekeeperNamespaceActionOneOf)
-		if string(jsonLakekeeperNamespaceActionOneOf) == "{}" { // empty struct
-			dst.LakekeeperNamespaceActionOneOf = nil
+	// use discriminator value to speed up the lookup
+	var jsonDict map[string]interface{}
+	err = newStrictDecoder(data).Decode(&jsonDict)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal JSON into map for the discriminator lookup")
+	}
+
+	// check if the discriminator value is 'create_namespace'
+	if jsonDict["action"] == "create_namespace" {
+		// try to unmarshal JSON data into LakekeeperNamespaceActionCreateNamespace
+		err = json.Unmarshal(data, &dst.LakekeeperNamespaceActionCreateNamespace)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperNamespaceActionCreateNamespace, return on the first match
 		} else {
-			match++
+			dst.LakekeeperNamespaceActionCreateNamespace = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperNamespaceAction as LakekeeperNamespaceActionCreateNamespace: %s", err.Error())
 		}
-	} else {
-		dst.LakekeeperNamespaceActionOneOf = nil
 	}
 
-	// try to unmarshal data into LakekeeperNamespaceActionOneOf1
-	err = json.Unmarshal(data, &dst.LakekeeperNamespaceActionOneOf1)
-	if err == nil {
-		jsonLakekeeperNamespaceActionOneOf1, _ := json.Marshal(dst.LakekeeperNamespaceActionOneOf1)
-		if string(jsonLakekeeperNamespaceActionOneOf1) == "{}" { // empty struct
-			dst.LakekeeperNamespaceActionOneOf1 = nil
+	// check if the discriminator value is 'create_table'
+	if jsonDict["action"] == "create_table" {
+		// try to unmarshal JSON data into LakekeeperNamespaceActionCreateTable
+		err = json.Unmarshal(data, &dst.LakekeeperNamespaceActionCreateTable)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperNamespaceActionCreateTable, return on the first match
 		} else {
-			match++
+			dst.LakekeeperNamespaceActionCreateTable = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperNamespaceAction as LakekeeperNamespaceActionCreateTable: %s", err.Error())
 		}
-	} else {
-		dst.LakekeeperNamespaceActionOneOf1 = nil
 	}
 
-	// try to unmarshal data into LakekeeperNamespaceActionOneOf10
-	err = json.Unmarshal(data, &dst.LakekeeperNamespaceActionOneOf10)
-	if err == nil {
-		jsonLakekeeperNamespaceActionOneOf10, _ := json.Marshal(dst.LakekeeperNamespaceActionOneOf10)
-		if string(jsonLakekeeperNamespaceActionOneOf10) == "{}" { // empty struct
-			dst.LakekeeperNamespaceActionOneOf10 = nil
+	// check if the discriminator value is 'create_view'
+	if jsonDict["action"] == "create_view" {
+		// try to unmarshal JSON data into LakekeeperNamespaceActionCreateView
+		err = json.Unmarshal(data, &dst.LakekeeperNamespaceActionCreateView)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperNamespaceActionCreateView, return on the first match
 		} else {
-			match++
+			dst.LakekeeperNamespaceActionCreateView = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperNamespaceAction as LakekeeperNamespaceActionCreateView: %s", err.Error())
 		}
-	} else {
-		dst.LakekeeperNamespaceActionOneOf10 = nil
 	}
 
-	// try to unmarshal data into LakekeeperNamespaceActionOneOf11
-	err = json.Unmarshal(data, &dst.LakekeeperNamespaceActionOneOf11)
-	if err == nil {
-		jsonLakekeeperNamespaceActionOneOf11, _ := json.Marshal(dst.LakekeeperNamespaceActionOneOf11)
-		if string(jsonLakekeeperNamespaceActionOneOf11) == "{}" { // empty struct
-			dst.LakekeeperNamespaceActionOneOf11 = nil
+	// check if the discriminator value is 'delete'
+	if jsonDict["action"] == "delete" {
+		// try to unmarshal JSON data into LakekeeperNamespaceActionDelete
+		err = json.Unmarshal(data, &dst.LakekeeperNamespaceActionDelete)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperNamespaceActionDelete, return on the first match
 		} else {
-			match++
+			dst.LakekeeperNamespaceActionDelete = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperNamespaceAction as LakekeeperNamespaceActionDelete: %s", err.Error())
 		}
-	} else {
-		dst.LakekeeperNamespaceActionOneOf11 = nil
 	}
 
-	// try to unmarshal data into LakekeeperNamespaceActionOneOf2
-	err = json.Unmarshal(data, &dst.LakekeeperNamespaceActionOneOf2)
-	if err == nil {
-		jsonLakekeeperNamespaceActionOneOf2, _ := json.Marshal(dst.LakekeeperNamespaceActionOneOf2)
-		if string(jsonLakekeeperNamespaceActionOneOf2) == "{}" { // empty struct
-			dst.LakekeeperNamespaceActionOneOf2 = nil
+	// check if the discriminator value is 'get_metadata'
+	if jsonDict["action"] == "get_metadata" {
+		// try to unmarshal JSON data into LakekeeperNamespaceActionGetMetadata
+		err = json.Unmarshal(data, &dst.LakekeeperNamespaceActionGetMetadata)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperNamespaceActionGetMetadata, return on the first match
 		} else {
-			match++
+			dst.LakekeeperNamespaceActionGetMetadata = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperNamespaceAction as LakekeeperNamespaceActionGetMetadata: %s", err.Error())
 		}
-	} else {
-		dst.LakekeeperNamespaceActionOneOf2 = nil
 	}
 
-	// try to unmarshal data into LakekeeperNamespaceActionOneOf3
-	err = json.Unmarshal(data, &dst.LakekeeperNamespaceActionOneOf3)
-	if err == nil {
-		jsonLakekeeperNamespaceActionOneOf3, _ := json.Marshal(dst.LakekeeperNamespaceActionOneOf3)
-		if string(jsonLakekeeperNamespaceActionOneOf3) == "{}" { // empty struct
-			dst.LakekeeperNamespaceActionOneOf3 = nil
+	// check if the discriminator value is 'include_in_list'
+	if jsonDict["action"] == "include_in_list" {
+		// try to unmarshal JSON data into LakekeeperNamespaceActionIncludeInList
+		err = json.Unmarshal(data, &dst.LakekeeperNamespaceActionIncludeInList)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperNamespaceActionIncludeInList, return on the first match
 		} else {
-			match++
+			dst.LakekeeperNamespaceActionIncludeInList = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperNamespaceAction as LakekeeperNamespaceActionIncludeInList: %s", err.Error())
 		}
-	} else {
-		dst.LakekeeperNamespaceActionOneOf3 = nil
 	}
 
-	// try to unmarshal data into LakekeeperNamespaceActionOneOf4
-	err = json.Unmarshal(data, &dst.LakekeeperNamespaceActionOneOf4)
-	if err == nil {
-		jsonLakekeeperNamespaceActionOneOf4, _ := json.Marshal(dst.LakekeeperNamespaceActionOneOf4)
-		if string(jsonLakekeeperNamespaceActionOneOf4) == "{}" { // empty struct
-			dst.LakekeeperNamespaceActionOneOf4 = nil
+	// check if the discriminator value is 'list_everything'
+	if jsonDict["action"] == "list_everything" {
+		// try to unmarshal JSON data into LakekeeperNamespaceActionListEverything
+		err = json.Unmarshal(data, &dst.LakekeeperNamespaceActionListEverything)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperNamespaceActionListEverything, return on the first match
 		} else {
-			match++
+			dst.LakekeeperNamespaceActionListEverything = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperNamespaceAction as LakekeeperNamespaceActionListEverything: %s", err.Error())
 		}
-	} else {
-		dst.LakekeeperNamespaceActionOneOf4 = nil
 	}
 
-	// try to unmarshal data into LakekeeperNamespaceActionOneOf5
-	err = json.Unmarshal(data, &dst.LakekeeperNamespaceActionOneOf5)
-	if err == nil {
-		jsonLakekeeperNamespaceActionOneOf5, _ := json.Marshal(dst.LakekeeperNamespaceActionOneOf5)
-		if string(jsonLakekeeperNamespaceActionOneOf5) == "{}" { // empty struct
-			dst.LakekeeperNamespaceActionOneOf5 = nil
+	// check if the discriminator value is 'list_namespaces'
+	if jsonDict["action"] == "list_namespaces" {
+		// try to unmarshal JSON data into LakekeeperNamespaceActionListNamespaces
+		err = json.Unmarshal(data, &dst.LakekeeperNamespaceActionListNamespaces)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperNamespaceActionListNamespaces, return on the first match
 		} else {
-			match++
+			dst.LakekeeperNamespaceActionListNamespaces = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperNamespaceAction as LakekeeperNamespaceActionListNamespaces: %s", err.Error())
 		}
-	} else {
-		dst.LakekeeperNamespaceActionOneOf5 = nil
 	}
 
-	// try to unmarshal data into LakekeeperNamespaceActionOneOf6
-	err = json.Unmarshal(data, &dst.LakekeeperNamespaceActionOneOf6)
-	if err == nil {
-		jsonLakekeeperNamespaceActionOneOf6, _ := json.Marshal(dst.LakekeeperNamespaceActionOneOf6)
-		if string(jsonLakekeeperNamespaceActionOneOf6) == "{}" { // empty struct
-			dst.LakekeeperNamespaceActionOneOf6 = nil
+	// check if the discriminator value is 'list_tables'
+	if jsonDict["action"] == "list_tables" {
+		// try to unmarshal JSON data into LakekeeperNamespaceActionListTables
+		err = json.Unmarshal(data, &dst.LakekeeperNamespaceActionListTables)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperNamespaceActionListTables, return on the first match
 		} else {
-			match++
+			dst.LakekeeperNamespaceActionListTables = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperNamespaceAction as LakekeeperNamespaceActionListTables: %s", err.Error())
 		}
-	} else {
-		dst.LakekeeperNamespaceActionOneOf6 = nil
 	}
 
-	// try to unmarshal data into LakekeeperNamespaceActionOneOf7
-	err = json.Unmarshal(data, &dst.LakekeeperNamespaceActionOneOf7)
-	if err == nil {
-		jsonLakekeeperNamespaceActionOneOf7, _ := json.Marshal(dst.LakekeeperNamespaceActionOneOf7)
-		if string(jsonLakekeeperNamespaceActionOneOf7) == "{}" { // empty struct
-			dst.LakekeeperNamespaceActionOneOf7 = nil
+	// check if the discriminator value is 'list_views'
+	if jsonDict["action"] == "list_views" {
+		// try to unmarshal JSON data into LakekeeperNamespaceActionListViews
+		err = json.Unmarshal(data, &dst.LakekeeperNamespaceActionListViews)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperNamespaceActionListViews, return on the first match
 		} else {
-			match++
+			dst.LakekeeperNamespaceActionListViews = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperNamespaceAction as LakekeeperNamespaceActionListViews: %s", err.Error())
 		}
-	} else {
-		dst.LakekeeperNamespaceActionOneOf7 = nil
 	}
 
-	// try to unmarshal data into LakekeeperNamespaceActionOneOf8
-	err = json.Unmarshal(data, &dst.LakekeeperNamespaceActionOneOf8)
-	if err == nil {
-		jsonLakekeeperNamespaceActionOneOf8, _ := json.Marshal(dst.LakekeeperNamespaceActionOneOf8)
-		if string(jsonLakekeeperNamespaceActionOneOf8) == "{}" { // empty struct
-			dst.LakekeeperNamespaceActionOneOf8 = nil
+	// check if the discriminator value is 'set_protection'
+	if jsonDict["action"] == "set_protection" {
+		// try to unmarshal JSON data into LakekeeperNamespaceActionSetProtection
+		err = json.Unmarshal(data, &dst.LakekeeperNamespaceActionSetProtection)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperNamespaceActionSetProtection, return on the first match
 		} else {
-			match++
+			dst.LakekeeperNamespaceActionSetProtection = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperNamespaceAction as LakekeeperNamespaceActionSetProtection: %s", err.Error())
 		}
-	} else {
-		dst.LakekeeperNamespaceActionOneOf8 = nil
 	}
 
-	// try to unmarshal data into LakekeeperNamespaceActionOneOf9
-	err = json.Unmarshal(data, &dst.LakekeeperNamespaceActionOneOf9)
-	if err == nil {
-		jsonLakekeeperNamespaceActionOneOf9, _ := json.Marshal(dst.LakekeeperNamespaceActionOneOf9)
-		if string(jsonLakekeeperNamespaceActionOneOf9) == "{}" { // empty struct
-			dst.LakekeeperNamespaceActionOneOf9 = nil
+	// check if the discriminator value is 'update_properties'
+	if jsonDict["action"] == "update_properties" {
+		// try to unmarshal JSON data into LakekeeperNamespaceActionUpdateProperties
+		err = json.Unmarshal(data, &dst.LakekeeperNamespaceActionUpdateProperties)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperNamespaceActionUpdateProperties, return on the first match
 		} else {
-			match++
+			dst.LakekeeperNamespaceActionUpdateProperties = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperNamespaceAction as LakekeeperNamespaceActionUpdateProperties: %s", err.Error())
 		}
-	} else {
-		dst.LakekeeperNamespaceActionOneOf9 = nil
 	}
 
-	if match > 1 { // more than 1 match
-		// reset to nil
-		dst.LakekeeperNamespaceActionOneOf = nil
-		dst.LakekeeperNamespaceActionOneOf1 = nil
-		dst.LakekeeperNamespaceActionOneOf10 = nil
-		dst.LakekeeperNamespaceActionOneOf11 = nil
-		dst.LakekeeperNamespaceActionOneOf2 = nil
-		dst.LakekeeperNamespaceActionOneOf3 = nil
-		dst.LakekeeperNamespaceActionOneOf4 = nil
-		dst.LakekeeperNamespaceActionOneOf5 = nil
-		dst.LakekeeperNamespaceActionOneOf6 = nil
-		dst.LakekeeperNamespaceActionOneOf7 = nil
-		dst.LakekeeperNamespaceActionOneOf8 = nil
-		dst.LakekeeperNamespaceActionOneOf9 = nil
-
-		return fmt.Errorf("data matches more than one schema in oneOf(LakekeeperNamespaceAction)")
-	} else if match == 1 {
-		return nil // exactly one match
-	} else { // no match
-		return fmt.Errorf("data failed to match schemas in oneOf(LakekeeperNamespaceAction)")
+	// check if the discriminator value is 'LakekeeperNamespaceActionCreateNamespace'
+	if jsonDict["action"] == "LakekeeperNamespaceActionCreateNamespace" {
+		// try to unmarshal JSON data into LakekeeperNamespaceActionCreateNamespace
+		err = json.Unmarshal(data, &dst.LakekeeperNamespaceActionCreateNamespace)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperNamespaceActionCreateNamespace, return on the first match
+		} else {
+			dst.LakekeeperNamespaceActionCreateNamespace = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperNamespaceAction as LakekeeperNamespaceActionCreateNamespace: %s", err.Error())
+		}
 	}
+
+	// check if the discriminator value is 'LakekeeperNamespaceActionCreateTable'
+	if jsonDict["action"] == "LakekeeperNamespaceActionCreateTable" {
+		// try to unmarshal JSON data into LakekeeperNamespaceActionCreateTable
+		err = json.Unmarshal(data, &dst.LakekeeperNamespaceActionCreateTable)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperNamespaceActionCreateTable, return on the first match
+		} else {
+			dst.LakekeeperNamespaceActionCreateTable = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperNamespaceAction as LakekeeperNamespaceActionCreateTable: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'LakekeeperNamespaceActionCreateView'
+	if jsonDict["action"] == "LakekeeperNamespaceActionCreateView" {
+		// try to unmarshal JSON data into LakekeeperNamespaceActionCreateView
+		err = json.Unmarshal(data, &dst.LakekeeperNamespaceActionCreateView)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperNamespaceActionCreateView, return on the first match
+		} else {
+			dst.LakekeeperNamespaceActionCreateView = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperNamespaceAction as LakekeeperNamespaceActionCreateView: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'LakekeeperNamespaceActionDelete'
+	if jsonDict["action"] == "LakekeeperNamespaceActionDelete" {
+		// try to unmarshal JSON data into LakekeeperNamespaceActionDelete
+		err = json.Unmarshal(data, &dst.LakekeeperNamespaceActionDelete)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperNamespaceActionDelete, return on the first match
+		} else {
+			dst.LakekeeperNamespaceActionDelete = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperNamespaceAction as LakekeeperNamespaceActionDelete: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'LakekeeperNamespaceActionGetMetadata'
+	if jsonDict["action"] == "LakekeeperNamespaceActionGetMetadata" {
+		// try to unmarshal JSON data into LakekeeperNamespaceActionGetMetadata
+		err = json.Unmarshal(data, &dst.LakekeeperNamespaceActionGetMetadata)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperNamespaceActionGetMetadata, return on the first match
+		} else {
+			dst.LakekeeperNamespaceActionGetMetadata = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperNamespaceAction as LakekeeperNamespaceActionGetMetadata: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'LakekeeperNamespaceActionIncludeInList'
+	if jsonDict["action"] == "LakekeeperNamespaceActionIncludeInList" {
+		// try to unmarshal JSON data into LakekeeperNamespaceActionIncludeInList
+		err = json.Unmarshal(data, &dst.LakekeeperNamespaceActionIncludeInList)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperNamespaceActionIncludeInList, return on the first match
+		} else {
+			dst.LakekeeperNamespaceActionIncludeInList = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperNamespaceAction as LakekeeperNamespaceActionIncludeInList: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'LakekeeperNamespaceActionListEverything'
+	if jsonDict["action"] == "LakekeeperNamespaceActionListEverything" {
+		// try to unmarshal JSON data into LakekeeperNamespaceActionListEverything
+		err = json.Unmarshal(data, &dst.LakekeeperNamespaceActionListEverything)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperNamespaceActionListEverything, return on the first match
+		} else {
+			dst.LakekeeperNamespaceActionListEverything = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperNamespaceAction as LakekeeperNamespaceActionListEverything: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'LakekeeperNamespaceActionListNamespaces'
+	if jsonDict["action"] == "LakekeeperNamespaceActionListNamespaces" {
+		// try to unmarshal JSON data into LakekeeperNamespaceActionListNamespaces
+		err = json.Unmarshal(data, &dst.LakekeeperNamespaceActionListNamespaces)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperNamespaceActionListNamespaces, return on the first match
+		} else {
+			dst.LakekeeperNamespaceActionListNamespaces = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperNamespaceAction as LakekeeperNamespaceActionListNamespaces: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'LakekeeperNamespaceActionListTables'
+	if jsonDict["action"] == "LakekeeperNamespaceActionListTables" {
+		// try to unmarshal JSON data into LakekeeperNamespaceActionListTables
+		err = json.Unmarshal(data, &dst.LakekeeperNamespaceActionListTables)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperNamespaceActionListTables, return on the first match
+		} else {
+			dst.LakekeeperNamespaceActionListTables = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperNamespaceAction as LakekeeperNamespaceActionListTables: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'LakekeeperNamespaceActionListViews'
+	if jsonDict["action"] == "LakekeeperNamespaceActionListViews" {
+		// try to unmarshal JSON data into LakekeeperNamespaceActionListViews
+		err = json.Unmarshal(data, &dst.LakekeeperNamespaceActionListViews)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperNamespaceActionListViews, return on the first match
+		} else {
+			dst.LakekeeperNamespaceActionListViews = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperNamespaceAction as LakekeeperNamespaceActionListViews: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'LakekeeperNamespaceActionSetProtection'
+	if jsonDict["action"] == "LakekeeperNamespaceActionSetProtection" {
+		// try to unmarshal JSON data into LakekeeperNamespaceActionSetProtection
+		err = json.Unmarshal(data, &dst.LakekeeperNamespaceActionSetProtection)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperNamespaceActionSetProtection, return on the first match
+		} else {
+			dst.LakekeeperNamespaceActionSetProtection = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperNamespaceAction as LakekeeperNamespaceActionSetProtection: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'LakekeeperNamespaceActionUpdateProperties'
+	if jsonDict["action"] == "LakekeeperNamespaceActionUpdateProperties" {
+		// try to unmarshal JSON data into LakekeeperNamespaceActionUpdateProperties
+		err = json.Unmarshal(data, &dst.LakekeeperNamespaceActionUpdateProperties)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperNamespaceActionUpdateProperties, return on the first match
+		} else {
+			dst.LakekeeperNamespaceActionUpdateProperties = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperNamespaceAction as LakekeeperNamespaceActionUpdateProperties: %s", err.Error())
+		}
+	}
+
+	return nil
 }
 
 // Marshal data from the first non-nil pointers in the struct to JSON
 func (src LakekeeperNamespaceAction) MarshalJSON() ([]byte, error) {
-	if src.LakekeeperNamespaceActionOneOf != nil {
-		return json.Marshal(&src.LakekeeperNamespaceActionOneOf)
+	if src.LakekeeperNamespaceActionCreateNamespace != nil {
+		return json.Marshal(&src.LakekeeperNamespaceActionCreateNamespace)
 	}
 
-	if src.LakekeeperNamespaceActionOneOf1 != nil {
-		return json.Marshal(&src.LakekeeperNamespaceActionOneOf1)
+	if src.LakekeeperNamespaceActionCreateTable != nil {
+		return json.Marshal(&src.LakekeeperNamespaceActionCreateTable)
 	}
 
-	if src.LakekeeperNamespaceActionOneOf10 != nil {
-		return json.Marshal(&src.LakekeeperNamespaceActionOneOf10)
+	if src.LakekeeperNamespaceActionCreateView != nil {
+		return json.Marshal(&src.LakekeeperNamespaceActionCreateView)
 	}
 
-	if src.LakekeeperNamespaceActionOneOf11 != nil {
-		return json.Marshal(&src.LakekeeperNamespaceActionOneOf11)
+	if src.LakekeeperNamespaceActionDelete != nil {
+		return json.Marshal(&src.LakekeeperNamespaceActionDelete)
 	}
 
-	if src.LakekeeperNamespaceActionOneOf2 != nil {
-		return json.Marshal(&src.LakekeeperNamespaceActionOneOf2)
+	if src.LakekeeperNamespaceActionGetMetadata != nil {
+		return json.Marshal(&src.LakekeeperNamespaceActionGetMetadata)
 	}
 
-	if src.LakekeeperNamespaceActionOneOf3 != nil {
-		return json.Marshal(&src.LakekeeperNamespaceActionOneOf3)
+	if src.LakekeeperNamespaceActionIncludeInList != nil {
+		return json.Marshal(&src.LakekeeperNamespaceActionIncludeInList)
 	}
 
-	if src.LakekeeperNamespaceActionOneOf4 != nil {
-		return json.Marshal(&src.LakekeeperNamespaceActionOneOf4)
+	if src.LakekeeperNamespaceActionListEverything != nil {
+		return json.Marshal(&src.LakekeeperNamespaceActionListEverything)
 	}
 
-	if src.LakekeeperNamespaceActionOneOf5 != nil {
-		return json.Marshal(&src.LakekeeperNamespaceActionOneOf5)
+	if src.LakekeeperNamespaceActionListNamespaces != nil {
+		return json.Marshal(&src.LakekeeperNamespaceActionListNamespaces)
 	}
 
-	if src.LakekeeperNamespaceActionOneOf6 != nil {
-		return json.Marshal(&src.LakekeeperNamespaceActionOneOf6)
+	if src.LakekeeperNamespaceActionListTables != nil {
+		return json.Marshal(&src.LakekeeperNamespaceActionListTables)
 	}
 
-	if src.LakekeeperNamespaceActionOneOf7 != nil {
-		return json.Marshal(&src.LakekeeperNamespaceActionOneOf7)
+	if src.LakekeeperNamespaceActionListViews != nil {
+		return json.Marshal(&src.LakekeeperNamespaceActionListViews)
 	}
 
-	if src.LakekeeperNamespaceActionOneOf8 != nil {
-		return json.Marshal(&src.LakekeeperNamespaceActionOneOf8)
+	if src.LakekeeperNamespaceActionSetProtection != nil {
+		return json.Marshal(&src.LakekeeperNamespaceActionSetProtection)
 	}
 
-	if src.LakekeeperNamespaceActionOneOf9 != nil {
-		return json.Marshal(&src.LakekeeperNamespaceActionOneOf9)
+	if src.LakekeeperNamespaceActionUpdateProperties != nil {
+		return json.Marshal(&src.LakekeeperNamespaceActionUpdateProperties)
 	}
 
 	return nil, nil // no data in oneOf schemas
@@ -356,52 +474,52 @@ func (obj *LakekeeperNamespaceAction) GetActualInstance() interface{} {
 	if obj == nil {
 		return nil
 	}
-	if obj.LakekeeperNamespaceActionOneOf != nil {
-		return obj.LakekeeperNamespaceActionOneOf
+	if obj.LakekeeperNamespaceActionCreateNamespace != nil {
+		return obj.LakekeeperNamespaceActionCreateNamespace
 	}
 
-	if obj.LakekeeperNamespaceActionOneOf1 != nil {
-		return obj.LakekeeperNamespaceActionOneOf1
+	if obj.LakekeeperNamespaceActionCreateTable != nil {
+		return obj.LakekeeperNamespaceActionCreateTable
 	}
 
-	if obj.LakekeeperNamespaceActionOneOf10 != nil {
-		return obj.LakekeeperNamespaceActionOneOf10
+	if obj.LakekeeperNamespaceActionCreateView != nil {
+		return obj.LakekeeperNamespaceActionCreateView
 	}
 
-	if obj.LakekeeperNamespaceActionOneOf11 != nil {
-		return obj.LakekeeperNamespaceActionOneOf11
+	if obj.LakekeeperNamespaceActionDelete != nil {
+		return obj.LakekeeperNamespaceActionDelete
 	}
 
-	if obj.LakekeeperNamespaceActionOneOf2 != nil {
-		return obj.LakekeeperNamespaceActionOneOf2
+	if obj.LakekeeperNamespaceActionGetMetadata != nil {
+		return obj.LakekeeperNamespaceActionGetMetadata
 	}
 
-	if obj.LakekeeperNamespaceActionOneOf3 != nil {
-		return obj.LakekeeperNamespaceActionOneOf3
+	if obj.LakekeeperNamespaceActionIncludeInList != nil {
+		return obj.LakekeeperNamespaceActionIncludeInList
 	}
 
-	if obj.LakekeeperNamespaceActionOneOf4 != nil {
-		return obj.LakekeeperNamespaceActionOneOf4
+	if obj.LakekeeperNamespaceActionListEverything != nil {
+		return obj.LakekeeperNamespaceActionListEverything
 	}
 
-	if obj.LakekeeperNamespaceActionOneOf5 != nil {
-		return obj.LakekeeperNamespaceActionOneOf5
+	if obj.LakekeeperNamespaceActionListNamespaces != nil {
+		return obj.LakekeeperNamespaceActionListNamespaces
 	}
 
-	if obj.LakekeeperNamespaceActionOneOf6 != nil {
-		return obj.LakekeeperNamespaceActionOneOf6
+	if obj.LakekeeperNamespaceActionListTables != nil {
+		return obj.LakekeeperNamespaceActionListTables
 	}
 
-	if obj.LakekeeperNamespaceActionOneOf7 != nil {
-		return obj.LakekeeperNamespaceActionOneOf7
+	if obj.LakekeeperNamespaceActionListViews != nil {
+		return obj.LakekeeperNamespaceActionListViews
 	}
 
-	if obj.LakekeeperNamespaceActionOneOf8 != nil {
-		return obj.LakekeeperNamespaceActionOneOf8
+	if obj.LakekeeperNamespaceActionSetProtection != nil {
+		return obj.LakekeeperNamespaceActionSetProtection
 	}
 
-	if obj.LakekeeperNamespaceActionOneOf9 != nil {
-		return obj.LakekeeperNamespaceActionOneOf9
+	if obj.LakekeeperNamespaceActionUpdateProperties != nil {
+		return obj.LakekeeperNamespaceActionUpdateProperties
 	}
 
 	// all schemas are nil

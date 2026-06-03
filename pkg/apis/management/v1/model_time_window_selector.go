@@ -17,75 +17,93 @@ import (
 
 // TimeWindowSelector - struct for TimeWindowSelector
 type TimeWindowSelector struct {
-	TimeWindowSelectorOneOf  *TimeWindowSelectorOneOf
-	TimeWindowSelectorOneOf1 *TimeWindowSelectorOneOf1
+	TimeWindowSelectorPageToken *TimeWindowSelectorPageToken
+	TimeWindowSelectorWindow    *TimeWindowSelectorWindow
 }
 
-// TimeWindowSelectorOneOfAsTimeWindowSelector is a convenience function that returns TimeWindowSelectorOneOf wrapped in TimeWindowSelector
-func TimeWindowSelectorOneOfAsTimeWindowSelector(v *TimeWindowSelectorOneOf) TimeWindowSelector {
+// TimeWindowSelectorPageTokenAsTimeWindowSelector is a convenience function that returns TimeWindowSelectorPageToken wrapped in TimeWindowSelector
+func TimeWindowSelectorPageTokenAsTimeWindowSelector(v *TimeWindowSelectorPageToken) TimeWindowSelector {
 	return TimeWindowSelector{
-		TimeWindowSelectorOneOf: v,
+		TimeWindowSelectorPageToken: v,
 	}
 }
 
-// TimeWindowSelectorOneOf1AsTimeWindowSelector is a convenience function that returns TimeWindowSelectorOneOf1 wrapped in TimeWindowSelector
-func TimeWindowSelectorOneOf1AsTimeWindowSelector(v *TimeWindowSelectorOneOf1) TimeWindowSelector {
+// TimeWindowSelectorWindowAsTimeWindowSelector is a convenience function that returns TimeWindowSelectorWindow wrapped in TimeWindowSelector
+func TimeWindowSelectorWindowAsTimeWindowSelector(v *TimeWindowSelectorWindow) TimeWindowSelector {
 	return TimeWindowSelector{
-		TimeWindowSelectorOneOf1: v,
+		TimeWindowSelectorWindow: v,
 	}
 }
 
 // Unmarshal JSON data into one of the pointers in the struct
 func (dst *TimeWindowSelector) UnmarshalJSON(data []byte) error {
 	var err error
-	match := 0
-	// try to unmarshal data into TimeWindowSelectorOneOf
-	err = json.Unmarshal(data, &dst.TimeWindowSelectorOneOf)
-	if err == nil {
-		jsonTimeWindowSelectorOneOf, _ := json.Marshal(dst.TimeWindowSelectorOneOf)
-		if string(jsonTimeWindowSelectorOneOf) == "{}" { // empty struct
-			dst.TimeWindowSelectorOneOf = nil
+	// use discriminator value to speed up the lookup
+	var jsonDict map[string]interface{}
+	err = newStrictDecoder(data).Decode(&jsonDict)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal JSON into map for the discriminator lookup")
+	}
+
+	// check if the discriminator value is 'page-token'
+	if jsonDict["type"] == "page-token" {
+		// try to unmarshal JSON data into TimeWindowSelectorPageToken
+		err = json.Unmarshal(data, &dst.TimeWindowSelectorPageToken)
+		if err == nil {
+			return nil // data stored in dst.TimeWindowSelectorPageToken, return on the first match
 		} else {
-			match++
+			dst.TimeWindowSelectorPageToken = nil
+			return fmt.Errorf("failed to unmarshal TimeWindowSelector as TimeWindowSelectorPageToken: %s", err.Error())
 		}
-	} else {
-		dst.TimeWindowSelectorOneOf = nil
 	}
 
-	// try to unmarshal data into TimeWindowSelectorOneOf1
-	err = json.Unmarshal(data, &dst.TimeWindowSelectorOneOf1)
-	if err == nil {
-		jsonTimeWindowSelectorOneOf1, _ := json.Marshal(dst.TimeWindowSelectorOneOf1)
-		if string(jsonTimeWindowSelectorOneOf1) == "{}" { // empty struct
-			dst.TimeWindowSelectorOneOf1 = nil
+	// check if the discriminator value is 'window'
+	if jsonDict["type"] == "window" {
+		// try to unmarshal JSON data into TimeWindowSelectorWindow
+		err = json.Unmarshal(data, &dst.TimeWindowSelectorWindow)
+		if err == nil {
+			return nil // data stored in dst.TimeWindowSelectorWindow, return on the first match
 		} else {
-			match++
+			dst.TimeWindowSelectorWindow = nil
+			return fmt.Errorf("failed to unmarshal TimeWindowSelector as TimeWindowSelectorWindow: %s", err.Error())
 		}
-	} else {
-		dst.TimeWindowSelectorOneOf1 = nil
 	}
 
-	if match > 1 { // more than 1 match
-		// reset to nil
-		dst.TimeWindowSelectorOneOf = nil
-		dst.TimeWindowSelectorOneOf1 = nil
-
-		return fmt.Errorf("data matches more than one schema in oneOf(TimeWindowSelector)")
-	} else if match == 1 {
-		return nil // exactly one match
-	} else { // no match
-		return fmt.Errorf("data failed to match schemas in oneOf(TimeWindowSelector)")
+	// check if the discriminator value is 'TimeWindowSelectorPageToken'
+	if jsonDict["type"] == "TimeWindowSelectorPageToken" {
+		// try to unmarshal JSON data into TimeWindowSelectorPageToken
+		err = json.Unmarshal(data, &dst.TimeWindowSelectorPageToken)
+		if err == nil {
+			return nil // data stored in dst.TimeWindowSelectorPageToken, return on the first match
+		} else {
+			dst.TimeWindowSelectorPageToken = nil
+			return fmt.Errorf("failed to unmarshal TimeWindowSelector as TimeWindowSelectorPageToken: %s", err.Error())
+		}
 	}
+
+	// check if the discriminator value is 'TimeWindowSelectorWindow'
+	if jsonDict["type"] == "TimeWindowSelectorWindow" {
+		// try to unmarshal JSON data into TimeWindowSelectorWindow
+		err = json.Unmarshal(data, &dst.TimeWindowSelectorWindow)
+		if err == nil {
+			return nil // data stored in dst.TimeWindowSelectorWindow, return on the first match
+		} else {
+			dst.TimeWindowSelectorWindow = nil
+			return fmt.Errorf("failed to unmarshal TimeWindowSelector as TimeWindowSelectorWindow: %s", err.Error())
+		}
+	}
+
+	return nil
 }
 
 // Marshal data from the first non-nil pointers in the struct to JSON
 func (src TimeWindowSelector) MarshalJSON() ([]byte, error) {
-	if src.TimeWindowSelectorOneOf != nil {
-		return json.Marshal(&src.TimeWindowSelectorOneOf)
+	if src.TimeWindowSelectorPageToken != nil {
+		return json.Marshal(&src.TimeWindowSelectorPageToken)
 	}
 
-	if src.TimeWindowSelectorOneOf1 != nil {
-		return json.Marshal(&src.TimeWindowSelectorOneOf1)
+	if src.TimeWindowSelectorWindow != nil {
+		return json.Marshal(&src.TimeWindowSelectorWindow)
 	}
 
 	return nil, nil // no data in oneOf schemas
@@ -96,12 +114,12 @@ func (obj *TimeWindowSelector) GetActualInstance() interface{} {
 	if obj == nil {
 		return nil
 	}
-	if obj.TimeWindowSelectorOneOf != nil {
-		return obj.TimeWindowSelectorOneOf
+	if obj.TimeWindowSelectorPageToken != nil {
+		return obj.TimeWindowSelectorPageToken
 	}
 
-	if obj.TimeWindowSelectorOneOf1 != nil {
-		return obj.TimeWindowSelectorOneOf1
+	if obj.TimeWindowSelectorWindow != nil {
+		return obj.TimeWindowSelectorWindow
 	}
 
 	// all schemas are nil

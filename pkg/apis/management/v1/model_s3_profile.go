@@ -760,7 +760,6 @@ func (o *S3Profile) UnmarshalJSON(data []byte) (err error) {
 	varS3Profile := _S3Profile{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varS3Profile)
 
 	if err != nil {

@@ -35,7 +35,7 @@ func TestPermissions_Server_GetAccess(t *testing.T) {
 		managementv1.ServerActionProvisionUsers,
 		managementv1.ServerActionReadAssignments,
 	}
-	assert.Subset(t, want, resp.AllowedActions)
+	assertAllowedActionsSubset(t, want, resp.AllowedActions, managementv1.AllowedServerActionEnumValues)
 }
 
 func TestPermissions_Server_GetAssignments(t *testing.T) {
@@ -168,7 +168,7 @@ func TestPermissions_Server_GetAccess_UserFilter(t *testing.T) {
 		managementv1.ServerActionProvisionUsers,
 		managementv1.ServerActionReadAssignments,
 	}
-	assert.Subset(t, want, resp.AllowedActions)
+	assertAllowedActionsSubset(t, want, resp.AllowedActions, managementv1.AllowedServerActionEnumValues)
 }
 
 func TestPermissions_Server_GetAccess_RoleFilter(t *testing.T) {
@@ -207,5 +207,5 @@ func TestPermissions_Server_GetAccess_RoleFilter(t *testing.T) {
 		managementv1.ServerActionProvisionUsers,
 		managementv1.ServerActionReadAssignments,
 	}
-	assert.Subset(t, want, resp.AllowedActions)
+	assertAllowedActionsSubset(t, want, resp.AllowedActions, managementv1.AllowedServerActionEnumValues)
 }

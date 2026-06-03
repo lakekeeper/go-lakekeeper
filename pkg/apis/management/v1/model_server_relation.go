@@ -44,7 +44,8 @@ func (v *ServerRelation) UnmarshalJSON(src []byte) error {
 		}
 	}
 
-	return fmt.Errorf("%+v is not a valid ServerRelation", value)
+	*v = enumTypeValue
+	return nil
 }
 
 // NewServerRelationFromValue returns a pointer to a valid ServerRelation

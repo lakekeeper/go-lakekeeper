@@ -127,7 +127,6 @@ func (o *GetNamespaceAuthPropertiesResponse) UnmarshalJSON(data []byte) (err err
 	varGetNamespaceAuthPropertiesResponse := _GetNamespaceAuthPropertiesResponse{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varGetNamespaceAuthPropertiesResponse)
 
 	if err != nil {

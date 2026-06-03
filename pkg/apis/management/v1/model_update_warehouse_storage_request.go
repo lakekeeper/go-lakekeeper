@@ -148,7 +148,6 @@ func (o *UpdateWarehouseStorageRequest) UnmarshalJSON(data []byte) (err error) {
 	varUpdateWarehouseStorageRequest := _UpdateWarehouseStorageRequest{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varUpdateWarehouseStorageRequest)
 
 	if err != nil {

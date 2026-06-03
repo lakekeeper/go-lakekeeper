@@ -99,7 +99,6 @@ func (o *QueueConfigResponse) UnmarshalJSON(data []byte) (err error) {
 	varQueueConfigResponse := _QueueConfigResponse{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varQueueConfigResponse)
 
 	if err != nil {

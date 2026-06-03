@@ -100,7 +100,6 @@ func (o *SearchTabularRequest) UnmarshalJSON(data []byte) (err error) {
 	varSearchTabularRequest := _SearchTabularRequest{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varSearchTabularRequest)
 
 	if err != nil {

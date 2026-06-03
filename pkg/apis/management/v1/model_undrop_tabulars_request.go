@@ -100,7 +100,6 @@ func (o *UndropTabularsRequest) UnmarshalJSON(data []byte) (err error) {
 	varUndropTabularsRequest := _UndropTabularsRequest{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varUndropTabularsRequest)
 
 	if err != nil {

@@ -219,7 +219,6 @@ func (o *StorageCredentialAccessKey) UnmarshalJSON(data []byte) (err error) {
 	varStorageCredentialAccessKey := _StorageCredentialAccessKey{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varStorageCredentialAccessKey)
 
 	if err != nil {

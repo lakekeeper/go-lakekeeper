@@ -48,7 +48,8 @@ func (v *OpenFGARoleAction) UnmarshalJSON(src []byte) error {
 		}
 	}
 
-	return fmt.Errorf("%+v is not a valid OpenFGARoleAction", value)
+	*v = enumTypeValue
+	return nil
 }
 
 // NewOpenFGARoleActionFromValue returns a pointer to a valid OpenFGARoleAction

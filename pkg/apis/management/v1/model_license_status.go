@@ -352,7 +352,6 @@ func (o *LicenseStatus) UnmarshalJSON(data []byte) (err error) {
 	varLicenseStatus := _LicenseStatus{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varLicenseStatus)
 
 	if err != nil {

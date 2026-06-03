@@ -99,7 +99,6 @@ func (o *GetLakekeeperTableActionsResponse) UnmarshalJSON(data []byte) (err erro
 	varGetLakekeeperTableActionsResponse := _GetLakekeeperTableActionsResponse{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varGetLakekeeperTableActionsResponse)
 
 	if err != nil {

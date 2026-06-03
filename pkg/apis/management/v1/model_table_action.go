@@ -72,7 +72,8 @@ func (v *TableAction) UnmarshalJSON(src []byte) error {
 		}
 	}
 
-	return fmt.Errorf("%+v is not a valid TableAction", value)
+	*v = enumTypeValue
+	return nil
 }
 
 // NewTableActionFromValue returns a pointer to a valid TableAction

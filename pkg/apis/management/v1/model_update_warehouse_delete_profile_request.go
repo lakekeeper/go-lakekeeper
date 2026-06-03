@@ -99,7 +99,6 @@ func (o *UpdateWarehouseDeleteProfileRequest) UnmarshalJSON(data []byte) (err er
 	varUpdateWarehouseDeleteProfileRequest := _UpdateWarehouseDeleteProfileRequest{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varUpdateWarehouseDeleteProfileRequest)
 
 	if err != nil {

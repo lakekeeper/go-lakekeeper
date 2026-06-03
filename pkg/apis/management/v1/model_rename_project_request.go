@@ -100,7 +100,6 @@ func (o *RenameProjectRequest) UnmarshalJSON(data []byte) (err error) {
 	varRenameProjectRequest := _RenameProjectRequest{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varRenameProjectRequest)
 
 	if err != nil {

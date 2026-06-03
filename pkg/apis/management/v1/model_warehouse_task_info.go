@@ -566,7 +566,6 @@ func (o *WarehouseTaskInfo) UnmarshalJSON(data []byte) (err error) {
 	varWarehouseTaskInfo := _WarehouseTaskInfo{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varWarehouseTaskInfo)
 
 	if err != nil {

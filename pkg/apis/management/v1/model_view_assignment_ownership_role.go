@@ -128,7 +128,6 @@ func (o *ViewAssignmentOwnershipRole) UnmarshalJSON(data []byte) (err error) {
 	varViewAssignmentOwnershipRole := _ViewAssignmentOwnershipRole{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varViewAssignmentOwnershipRole)
 
 	if err != nil {

@@ -44,7 +44,8 @@ func (v *S3Flavor) UnmarshalJSON(src []byte) error {
 		}
 	}
 
-	return fmt.Errorf("%+v is not a valid S3Flavor", value)
+	*v = enumTypeValue
+	return nil
 }
 
 // NewS3FlavorFromValue returns a pointer to a valid S3Flavor

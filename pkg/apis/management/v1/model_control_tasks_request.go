@@ -129,7 +129,6 @@ func (o *ControlTasksRequest) UnmarshalJSON(data []byte) (err error) {
 	varControlTasksRequest := _ControlTasksRequest{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varControlTasksRequest)
 
 	if err != nil {

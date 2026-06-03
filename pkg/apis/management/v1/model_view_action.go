@@ -70,7 +70,8 @@ func (v *ViewAction) UnmarshalJSON(src []byte) error {
 		}
 	}
 
-	return fmt.Errorf("%+v is not a valid ViewAction", value)
+	*v = enumTypeValue
+	return nil
 }
 
 // NewViewActionFromValue returns a pointer to a valid ViewAction

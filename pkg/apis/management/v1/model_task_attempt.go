@@ -365,7 +365,6 @@ func (o *TaskAttempt) UnmarshalJSON(data []byte) (err error) {
 	varTaskAttempt := _TaskAttempt{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varTaskAttempt)
 
 	if err != nil {

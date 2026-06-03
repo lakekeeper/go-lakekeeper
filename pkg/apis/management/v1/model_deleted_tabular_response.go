@@ -304,7 +304,6 @@ func (o *DeletedTabularResponse) UnmarshalJSON(data []byte) (err error) {
 	varDeletedTabularResponse := _DeletedTabularResponse{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varDeletedTabularResponse)
 
 	if err != nil {

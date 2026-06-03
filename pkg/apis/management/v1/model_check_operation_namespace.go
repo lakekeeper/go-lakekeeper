@@ -99,7 +99,6 @@ func (o *CheckOperationNamespace) UnmarshalJSON(data []byte) (err error) {
 	varCheckOperationNamespace := _CheckOperationNamespace{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varCheckOperationNamespace)
 
 	if err != nil {

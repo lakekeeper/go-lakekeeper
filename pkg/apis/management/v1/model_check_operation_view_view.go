@@ -212,7 +212,6 @@ func (o *CheckOperationViewView) UnmarshalJSON(data []byte) (err error) {
 	varCheckOperationViewView := _CheckOperationViewView{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varCheckOperationViewView)
 
 	if err != nil {

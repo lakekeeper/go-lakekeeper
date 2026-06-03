@@ -54,7 +54,8 @@ func (v *RoleAction) UnmarshalJSON(src []byte) error {
 		}
 	}
 
-	return fmt.Errorf("%+v is not a valid RoleAction", value)
+	*v = enumTypeValue
+	return nil
 }
 
 // NewRoleActionFromValue returns a pointer to a valid RoleAction

@@ -127,7 +127,6 @@ func (o *CatalogActionCheckOperationWarehouseWarehouse) UnmarshalJSON(data []byt
 	varCatalogActionCheckOperationWarehouseWarehouse := _CatalogActionCheckOperationWarehouseWarehouse{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varCatalogActionCheckOperationWarehouseWarehouse)
 
 	if err != nil {

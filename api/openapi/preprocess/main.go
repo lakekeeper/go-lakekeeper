@@ -17,9 +17,15 @@
 //  1. For every `oneOf` member shaped as `allOf([{$ref: X}, extras])` where
 //     `X` is itself a `oneOf`, replaces that single member with the
 //     cartesian product of `X`'s inner members combined with `extras`.
-//  2. For every modified `oneOf`, extracts each (now anonymous) member into
-//     a new named schema and replaces the inline definition with a `$ref`.
-//     Names are synthesized as `<ParentName><PascalCase(discriminator-value)>`.
+//  2. For every `oneOf`, extracts each (now anonymous) member into a new named
+//     schema and replaces the inline definition with a `$ref`. Names are
+//     synthesized as `<ParentName><PascalCase(discriminator-value)>`. This runs
+//     for flat unions too — members shaped `allOf([{$ref|inline}, {prop: enum}])`
+//     with no nested oneOf (e.g. StorageProfile, TabularDeleteProfile) — not just
+//     the expanded ones; anything that can't be cleanly discriminated rolls back
+//     unchanged. Unions used as a building block (referenced as `allOf[0].$ref`
+//     inside another union's members, e.g. S3Credential within StorageCredential)
+//     are left for their parent's cartesian expansion, not discriminated here.
 //  3. Adds a `discriminator` block where a single property has unique enum
 //     values across all members. Combined with `useOneOfDiscriminatorLookup`,
 //     this lets the generator emit unambiguous unmarshal logic — important
@@ -113,6 +119,14 @@ func run(inPath, outPath string) error {
 	// table of (schema, field) pairs.
 	loosenRequired(schemas)
 
+	// Building-block unions are oneOf schemas referenced as the leading
+	// `allOf[0].$ref` of another union's member (e.g. S3Credential inside
+	// StorageCredential). expandOneOf consumes them by cartesian-expanding the
+	// parent, so they must NOT be discriminated independently — doing so rewrites
+	// their members to $refs before the parent expands them, breaking the parent.
+	// They are computed once up front and skipped in the flat-union branch below.
+	buildingBlocks := collectExpansionRefs(schemas)
+
 	// For each named schema with a oneOf, attempt the full transformation
 	// (expand → extract → discriminate). If discrimination fails (e.g. no
 	// single property has unique enum values across all expanded members),
@@ -131,7 +145,15 @@ func run(inPath, outPath string) error {
 		original := append([]*yaml.Node(nil), oneOf.Content...)
 		schemasSnapshot := append([]*yaml.Node(nil), schemas.Content...)
 
-		if !expandOneOf(schema, schemas) {
+		// expandOneOf rewrites members that nest a oneOf into the cartesian
+		// product and returns true; for flat unions whose members are
+		// `allOf([{$ref|inline}, {prop: single-enum}])` it is a no-op and returns
+		// false. We discriminate flat unions too (e.g. StorageProfile,
+		// TabularDeleteProfile) — but only when they are NOT building blocks, so
+		// the parent-expansion path above is left intact. The rollback covers any
+		// schema that can't be cleanly discriminated.
+		expanded := expandOneOf(schema, schemas)
+		if !expanded && buildingBlocks[name] {
 			continue
 		}
 		if err := extractAndDiscriminate(name, schema, schemas); err != nil {
@@ -237,6 +259,42 @@ func loosenRequired(schemas *yaml.Node) {
 		}
 		req.Content = kept
 	}
+}
+
+// collectExpansionRefs returns the set of schema names that expandOneOf would
+// consume: any schema X that is referenced as the leading `allOf[0].$ref` of a
+// oneOf member somewhere and that itself has a `oneOf`. These are building
+// blocks (e.g. S3Credential, AzCredential) cartesian-expanded into their parent
+// (StorageCredential); discriminating them independently would rewrite their
+// members to $refs before the parent expands them, breaking the parent.
+func collectExpansionRefs(schemas *yaml.Node) map[string]bool {
+	refs := make(map[string]bool)
+	for _, name := range schemaNames(schemas) {
+		schema := lookupSchema(schemas, name)
+		oneOf := lookup(schema, "oneOf")
+		if oneOf == nil || oneOf.Kind != yaml.SequenceNode {
+			continue
+		}
+		for _, member := range oneOf.Content {
+			allOf := lookup(member, "allOf")
+			if allOf == nil || allOf.Kind != yaml.SequenceNode || len(allOf.Content) == 0 {
+				continue
+			}
+			refNode := lookup(allOf.Content[0], "$ref")
+			if refNode == nil {
+				continue
+			}
+			refName, ok := refNameFromPointer(refNode.Value)
+			if !ok {
+				continue
+			}
+			target := lookupSchema(schemas, refName)
+			if target != nil && lookup(target, "oneOf") != nil {
+				refs[refName] = true
+			}
+		}
+	}
+	return refs
 }
 
 // expandOneOf rewrites `schema.oneOf` members that are

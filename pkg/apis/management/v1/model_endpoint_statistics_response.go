@@ -188,7 +188,6 @@ func (o *EndpointStatisticsResponse) UnmarshalJSON(data []byte) (err error) {
 	varEndpointStatisticsResponse := _EndpointStatisticsResponse{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varEndpointStatisticsResponse)
 
 	if err != nil {

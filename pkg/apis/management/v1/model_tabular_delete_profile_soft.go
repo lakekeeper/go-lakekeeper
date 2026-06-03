@@ -127,7 +127,6 @@ func (o *TabularDeleteProfileSoft) UnmarshalJSON(data []byte) (err error) {
 	varTabularDeleteProfileSoft := _TabularDeleteProfileSoft{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varTabularDeleteProfileSoft)
 
 	if err != nil {

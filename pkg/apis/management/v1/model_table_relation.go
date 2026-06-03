@@ -52,7 +52,8 @@ func (v *TableRelation) UnmarshalJSON(src []byte) error {
 		}
 	}
 
-	return fmt.Errorf("%+v is not a valid TableRelation", value)
+	*v = enumTypeValue
+	return nil
 }
 
 // NewTableRelationFromValue returns a pointer to a valid TableRelation

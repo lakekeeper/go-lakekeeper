@@ -99,7 +99,6 @@ func (o *GetOpenFGAServerActionsResponse) UnmarshalJSON(data []byte) (err error)
 	varGetOpenFGAServerActionsResponse := _GetOpenFGAServerActionsResponse{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varGetOpenFGAServerActionsResponse)
 
 	if err != nil {

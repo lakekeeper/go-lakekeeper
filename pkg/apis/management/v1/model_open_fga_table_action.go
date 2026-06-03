@@ -54,7 +54,8 @@ func (v *OpenFGATableAction) UnmarshalJSON(src []byte) error {
 		}
 	}
 
-	return fmt.Errorf("%+v is not a valid OpenFGATableAction", value)
+	*v = enumTypeValue
+	return nil
 }
 
 // NewOpenFGATableActionFromValue returns a pointer to a valid OpenFGATableAction

@@ -155,7 +155,6 @@ func (o *StorageCredentialSharedAccessKey) UnmarshalJSON(data []byte) (err error
 	varStorageCredentialSharedAccessKey := _StorageCredentialSharedAccessKey{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varStorageCredentialSharedAccessKey)
 
 	if err != nil {

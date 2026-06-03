@@ -188,7 +188,6 @@ func (o *WarehouseStatistics) UnmarshalJSON(data []byte) (err error) {
 	varWarehouseStatistics := _WarehouseStatistics{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varWarehouseStatistics)
 
 	if err != nil {

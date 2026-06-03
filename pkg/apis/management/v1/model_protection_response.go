@@ -138,7 +138,6 @@ func (o *ProtectionResponse) UnmarshalJSON(data []byte) (err error) {
 	varProtectionResponse := _ProtectionResponse{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varProtectionResponse)
 
 	if err != nil {

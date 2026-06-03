@@ -48,7 +48,8 @@ func (v *UserLastUpdatedWith) UnmarshalJSON(src []byte) error {
 		}
 	}
 
-	return fmt.Errorf("%+v is not a valid UserLastUpdatedWith", value)
+	*v = enumTypeValue
+	return nil
 }
 
 // NewUserLastUpdatedWithFromValue returns a pointer to a valid UserLastUpdatedWith

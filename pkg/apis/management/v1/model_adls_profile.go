@@ -399,7 +399,6 @@ func (o *AdlsProfile) UnmarshalJSON(data []byte) (err error) {
 	varAdlsProfile := _AdlsProfile{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varAdlsProfile)
 
 	if err != nil {

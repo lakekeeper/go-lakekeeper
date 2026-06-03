@@ -136,7 +136,6 @@ func (o *SetTabularExpirationQueueConfig) UnmarshalJSON(data []byte) (err error)
 	varSetTabularExpirationQueueConfig := _SetTabularExpirationQueueConfig{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varSetTabularExpirationQueueConfig)
 
 	if err != nil {

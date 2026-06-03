@@ -51,7 +51,7 @@ func TestPermissions_Project_GetAccess(t *testing.T) {
 		managementv1.ProjectActionGrantDataAdmin,
 		managementv1.ProjectActionGetEndpointStatistics,
 	}
-	assert.Subset(t, want, resp.AllowedActions)
+	assertAllowedActionsSubset(t, want, resp.AllowedActions, managementv1.AllowedProjectActionEnumValues)
 }
 
 func TestPermissions_Project_GetAssignments(t *testing.T) {

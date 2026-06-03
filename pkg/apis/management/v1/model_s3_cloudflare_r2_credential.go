@@ -187,7 +187,6 @@ func (o *S3CloudflareR2Credential) UnmarshalJSON(data []byte) (err error) {
 	varS3CloudflareR2Credential := _S3CloudflareR2Credential{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varS3CloudflareR2Credential)
 
 	if err != nil {

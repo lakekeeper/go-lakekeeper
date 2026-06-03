@@ -127,7 +127,6 @@ func (o *NamespaceIdentOrUuidOneOf) UnmarshalJSON(data []byte) (err error) {
 	varNamespaceIdentOrUuidOneOf := _NamespaceIdentOrUuidOneOf{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varNamespaceIdentOrUuidOneOf)
 
 	if err != nil {

@@ -166,7 +166,6 @@ func (o *ConsoleInfo) UnmarshalJSON(data []byte) (err error) {
 	varConsoleInfo := _ConsoleInfo{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varConsoleInfo)
 
 	if err != nil {

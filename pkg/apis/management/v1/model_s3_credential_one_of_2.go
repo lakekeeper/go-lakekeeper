@@ -215,7 +215,6 @@ func (o *S3CredentialOneOf2) UnmarshalJSON(data []byte) (err error) {
 	varS3CredentialOneOf2 := _S3CredentialOneOf2{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varS3CredentialOneOf2)
 
 	if err != nil {

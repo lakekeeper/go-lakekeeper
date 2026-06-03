@@ -128,7 +128,6 @@ func (o *NamespaceAssignmentSelectRole) UnmarshalJSON(data []byte) (err error) {
 	varNamespaceAssignmentSelectRole := _NamespaceAssignmentSelectRole{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varNamespaceAssignmentSelectRole)
 
 	if err != nil {

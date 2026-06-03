@@ -17,101 +17,129 @@ import (
 
 // StorageCredentialType - The type of storage credential configured for a warehouse, without secret values.  This is returned in API responses so clients know which credential type was selected (e.g. to restore radio button state in the UI).
 type StorageCredentialType struct {
-	StorageCredentialTypeOneOf  *StorageCredentialTypeOneOf
-	StorageCredentialTypeOneOf1 *StorageCredentialTypeOneOf1
-	StorageCredentialTypeOneOf2 *StorageCredentialTypeOneOf2
+	StorageCredentialTypeAz  *StorageCredentialTypeAz
+	StorageCredentialTypeGcs *StorageCredentialTypeGcs
+	StorageCredentialTypeS3  *StorageCredentialTypeS3
 }
 
-// StorageCredentialTypeOneOfAsStorageCredentialType is a convenience function that returns StorageCredentialTypeOneOf wrapped in StorageCredentialType
-func StorageCredentialTypeOneOfAsStorageCredentialType(v *StorageCredentialTypeOneOf) StorageCredentialType {
+// StorageCredentialTypeAzAsStorageCredentialType is a convenience function that returns StorageCredentialTypeAz wrapped in StorageCredentialType
+func StorageCredentialTypeAzAsStorageCredentialType(v *StorageCredentialTypeAz) StorageCredentialType {
 	return StorageCredentialType{
-		StorageCredentialTypeOneOf: v,
+		StorageCredentialTypeAz: v,
 	}
 }
 
-// StorageCredentialTypeOneOf1AsStorageCredentialType is a convenience function that returns StorageCredentialTypeOneOf1 wrapped in StorageCredentialType
-func StorageCredentialTypeOneOf1AsStorageCredentialType(v *StorageCredentialTypeOneOf1) StorageCredentialType {
+// StorageCredentialTypeGcsAsStorageCredentialType is a convenience function that returns StorageCredentialTypeGcs wrapped in StorageCredentialType
+func StorageCredentialTypeGcsAsStorageCredentialType(v *StorageCredentialTypeGcs) StorageCredentialType {
 	return StorageCredentialType{
-		StorageCredentialTypeOneOf1: v,
+		StorageCredentialTypeGcs: v,
 	}
 }
 
-// StorageCredentialTypeOneOf2AsStorageCredentialType is a convenience function that returns StorageCredentialTypeOneOf2 wrapped in StorageCredentialType
-func StorageCredentialTypeOneOf2AsStorageCredentialType(v *StorageCredentialTypeOneOf2) StorageCredentialType {
+// StorageCredentialTypeS3AsStorageCredentialType is a convenience function that returns StorageCredentialTypeS3 wrapped in StorageCredentialType
+func StorageCredentialTypeS3AsStorageCredentialType(v *StorageCredentialTypeS3) StorageCredentialType {
 	return StorageCredentialType{
-		StorageCredentialTypeOneOf2: v,
+		StorageCredentialTypeS3: v,
 	}
 }
 
 // Unmarshal JSON data into one of the pointers in the struct
 func (dst *StorageCredentialType) UnmarshalJSON(data []byte) error {
 	var err error
-	match := 0
-	// try to unmarshal data into StorageCredentialTypeOneOf
-	err = json.Unmarshal(data, &dst.StorageCredentialTypeOneOf)
-	if err == nil {
-		jsonStorageCredentialTypeOneOf, _ := json.Marshal(dst.StorageCredentialTypeOneOf)
-		if string(jsonStorageCredentialTypeOneOf) == "{}" { // empty struct
-			dst.StorageCredentialTypeOneOf = nil
+	// use discriminator value to speed up the lookup
+	var jsonDict map[string]interface{}
+	err = newStrictDecoder(data).Decode(&jsonDict)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal JSON into map for the discriminator lookup")
+	}
+
+	// check if the discriminator value is 'az'
+	if jsonDict["type"] == "az" {
+		// try to unmarshal JSON data into StorageCredentialTypeAz
+		err = json.Unmarshal(data, &dst.StorageCredentialTypeAz)
+		if err == nil {
+			return nil // data stored in dst.StorageCredentialTypeAz, return on the first match
 		} else {
-			match++
+			dst.StorageCredentialTypeAz = nil
+			return fmt.Errorf("failed to unmarshal StorageCredentialType as StorageCredentialTypeAz: %s", err.Error())
 		}
-	} else {
-		dst.StorageCredentialTypeOneOf = nil
 	}
 
-	// try to unmarshal data into StorageCredentialTypeOneOf1
-	err = json.Unmarshal(data, &dst.StorageCredentialTypeOneOf1)
-	if err == nil {
-		jsonStorageCredentialTypeOneOf1, _ := json.Marshal(dst.StorageCredentialTypeOneOf1)
-		if string(jsonStorageCredentialTypeOneOf1) == "{}" { // empty struct
-			dst.StorageCredentialTypeOneOf1 = nil
+	// check if the discriminator value is 'gcs'
+	if jsonDict["type"] == "gcs" {
+		// try to unmarshal JSON data into StorageCredentialTypeGcs
+		err = json.Unmarshal(data, &dst.StorageCredentialTypeGcs)
+		if err == nil {
+			return nil // data stored in dst.StorageCredentialTypeGcs, return on the first match
 		} else {
-			match++
+			dst.StorageCredentialTypeGcs = nil
+			return fmt.Errorf("failed to unmarshal StorageCredentialType as StorageCredentialTypeGcs: %s", err.Error())
 		}
-	} else {
-		dst.StorageCredentialTypeOneOf1 = nil
 	}
 
-	// try to unmarshal data into StorageCredentialTypeOneOf2
-	err = json.Unmarshal(data, &dst.StorageCredentialTypeOneOf2)
-	if err == nil {
-		jsonStorageCredentialTypeOneOf2, _ := json.Marshal(dst.StorageCredentialTypeOneOf2)
-		if string(jsonStorageCredentialTypeOneOf2) == "{}" { // empty struct
-			dst.StorageCredentialTypeOneOf2 = nil
+	// check if the discriminator value is 's3'
+	if jsonDict["type"] == "s3" {
+		// try to unmarshal JSON data into StorageCredentialTypeS3
+		err = json.Unmarshal(data, &dst.StorageCredentialTypeS3)
+		if err == nil {
+			return nil // data stored in dst.StorageCredentialTypeS3, return on the first match
 		} else {
-			match++
+			dst.StorageCredentialTypeS3 = nil
+			return fmt.Errorf("failed to unmarshal StorageCredentialType as StorageCredentialTypeS3: %s", err.Error())
 		}
-	} else {
-		dst.StorageCredentialTypeOneOf2 = nil
 	}
 
-	if match > 1 { // more than 1 match
-		// reset to nil
-		dst.StorageCredentialTypeOneOf = nil
-		dst.StorageCredentialTypeOneOf1 = nil
-		dst.StorageCredentialTypeOneOf2 = nil
-
-		return fmt.Errorf("data matches more than one schema in oneOf(StorageCredentialType)")
-	} else if match == 1 {
-		return nil // exactly one match
-	} else { // no match
-		return fmt.Errorf("data failed to match schemas in oneOf(StorageCredentialType)")
+	// check if the discriminator value is 'StorageCredentialTypeAz'
+	if jsonDict["type"] == "StorageCredentialTypeAz" {
+		// try to unmarshal JSON data into StorageCredentialTypeAz
+		err = json.Unmarshal(data, &dst.StorageCredentialTypeAz)
+		if err == nil {
+			return nil // data stored in dst.StorageCredentialTypeAz, return on the first match
+		} else {
+			dst.StorageCredentialTypeAz = nil
+			return fmt.Errorf("failed to unmarshal StorageCredentialType as StorageCredentialTypeAz: %s", err.Error())
+		}
 	}
+
+	// check if the discriminator value is 'StorageCredentialTypeGcs'
+	if jsonDict["type"] == "StorageCredentialTypeGcs" {
+		// try to unmarshal JSON data into StorageCredentialTypeGcs
+		err = json.Unmarshal(data, &dst.StorageCredentialTypeGcs)
+		if err == nil {
+			return nil // data stored in dst.StorageCredentialTypeGcs, return on the first match
+		} else {
+			dst.StorageCredentialTypeGcs = nil
+			return fmt.Errorf("failed to unmarshal StorageCredentialType as StorageCredentialTypeGcs: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'StorageCredentialTypeS3'
+	if jsonDict["type"] == "StorageCredentialTypeS3" {
+		// try to unmarshal JSON data into StorageCredentialTypeS3
+		err = json.Unmarshal(data, &dst.StorageCredentialTypeS3)
+		if err == nil {
+			return nil // data stored in dst.StorageCredentialTypeS3, return on the first match
+		} else {
+			dst.StorageCredentialTypeS3 = nil
+			return fmt.Errorf("failed to unmarshal StorageCredentialType as StorageCredentialTypeS3: %s", err.Error())
+		}
+	}
+
+	return nil
 }
 
 // Marshal data from the first non-nil pointers in the struct to JSON
 func (src StorageCredentialType) MarshalJSON() ([]byte, error) {
-	if src.StorageCredentialTypeOneOf != nil {
-		return json.Marshal(&src.StorageCredentialTypeOneOf)
+	if src.StorageCredentialTypeAz != nil {
+		return json.Marshal(&src.StorageCredentialTypeAz)
 	}
 
-	if src.StorageCredentialTypeOneOf1 != nil {
-		return json.Marshal(&src.StorageCredentialTypeOneOf1)
+	if src.StorageCredentialTypeGcs != nil {
+		return json.Marshal(&src.StorageCredentialTypeGcs)
 	}
 
-	if src.StorageCredentialTypeOneOf2 != nil {
-		return json.Marshal(&src.StorageCredentialTypeOneOf2)
+	if src.StorageCredentialTypeS3 != nil {
+		return json.Marshal(&src.StorageCredentialTypeS3)
 	}
 
 	return nil, nil // no data in oneOf schemas
@@ -122,16 +150,16 @@ func (obj *StorageCredentialType) GetActualInstance() interface{} {
 	if obj == nil {
 		return nil
 	}
-	if obj.StorageCredentialTypeOneOf != nil {
-		return obj.StorageCredentialTypeOneOf
+	if obj.StorageCredentialTypeAz != nil {
+		return obj.StorageCredentialTypeAz
 	}
 
-	if obj.StorageCredentialTypeOneOf1 != nil {
-		return obj.StorageCredentialTypeOneOf1
+	if obj.StorageCredentialTypeGcs != nil {
+		return obj.StorageCredentialTypeGcs
 	}
 
-	if obj.StorageCredentialTypeOneOf2 != nil {
-		return obj.StorageCredentialTypeOneOf2
+	if obj.StorageCredentialTypeS3 != nil {
+		return obj.StorageCredentialTypeS3
 	}
 
 	// all schemas are nil

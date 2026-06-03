@@ -17,75 +17,93 @@ import (
 
 // TabularIdentUuid - struct for TabularIdentUuid
 type TabularIdentUuid struct {
-	TabularIdentUuidOneOf  *TabularIdentUuidOneOf
-	TabularIdentUuidOneOf1 *TabularIdentUuidOneOf1
+	TabularIdentUuidTable *TabularIdentUuidTable
+	TabularIdentUuidView  *TabularIdentUuidView
 }
 
-// TabularIdentUuidOneOfAsTabularIdentUuid is a convenience function that returns TabularIdentUuidOneOf wrapped in TabularIdentUuid
-func TabularIdentUuidOneOfAsTabularIdentUuid(v *TabularIdentUuidOneOf) TabularIdentUuid {
+// TabularIdentUuidTableAsTabularIdentUuid is a convenience function that returns TabularIdentUuidTable wrapped in TabularIdentUuid
+func TabularIdentUuidTableAsTabularIdentUuid(v *TabularIdentUuidTable) TabularIdentUuid {
 	return TabularIdentUuid{
-		TabularIdentUuidOneOf: v,
+		TabularIdentUuidTable: v,
 	}
 }
 
-// TabularIdentUuidOneOf1AsTabularIdentUuid is a convenience function that returns TabularIdentUuidOneOf1 wrapped in TabularIdentUuid
-func TabularIdentUuidOneOf1AsTabularIdentUuid(v *TabularIdentUuidOneOf1) TabularIdentUuid {
+// TabularIdentUuidViewAsTabularIdentUuid is a convenience function that returns TabularIdentUuidView wrapped in TabularIdentUuid
+func TabularIdentUuidViewAsTabularIdentUuid(v *TabularIdentUuidView) TabularIdentUuid {
 	return TabularIdentUuid{
-		TabularIdentUuidOneOf1: v,
+		TabularIdentUuidView: v,
 	}
 }
 
 // Unmarshal JSON data into one of the pointers in the struct
 func (dst *TabularIdentUuid) UnmarshalJSON(data []byte) error {
 	var err error
-	match := 0
-	// try to unmarshal data into TabularIdentUuidOneOf
-	err = json.Unmarshal(data, &dst.TabularIdentUuidOneOf)
-	if err == nil {
-		jsonTabularIdentUuidOneOf, _ := json.Marshal(dst.TabularIdentUuidOneOf)
-		if string(jsonTabularIdentUuidOneOf) == "{}" { // empty struct
-			dst.TabularIdentUuidOneOf = nil
+	// use discriminator value to speed up the lookup
+	var jsonDict map[string]interface{}
+	err = newStrictDecoder(data).Decode(&jsonDict)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal JSON into map for the discriminator lookup")
+	}
+
+	// check if the discriminator value is 'table'
+	if jsonDict["type"] == "table" {
+		// try to unmarshal JSON data into TabularIdentUuidTable
+		err = json.Unmarshal(data, &dst.TabularIdentUuidTable)
+		if err == nil {
+			return nil // data stored in dst.TabularIdentUuidTable, return on the first match
 		} else {
-			match++
+			dst.TabularIdentUuidTable = nil
+			return fmt.Errorf("failed to unmarshal TabularIdentUuid as TabularIdentUuidTable: %s", err.Error())
 		}
-	} else {
-		dst.TabularIdentUuidOneOf = nil
 	}
 
-	// try to unmarshal data into TabularIdentUuidOneOf1
-	err = json.Unmarshal(data, &dst.TabularIdentUuidOneOf1)
-	if err == nil {
-		jsonTabularIdentUuidOneOf1, _ := json.Marshal(dst.TabularIdentUuidOneOf1)
-		if string(jsonTabularIdentUuidOneOf1) == "{}" { // empty struct
-			dst.TabularIdentUuidOneOf1 = nil
+	// check if the discriminator value is 'view'
+	if jsonDict["type"] == "view" {
+		// try to unmarshal JSON data into TabularIdentUuidView
+		err = json.Unmarshal(data, &dst.TabularIdentUuidView)
+		if err == nil {
+			return nil // data stored in dst.TabularIdentUuidView, return on the first match
 		} else {
-			match++
+			dst.TabularIdentUuidView = nil
+			return fmt.Errorf("failed to unmarshal TabularIdentUuid as TabularIdentUuidView: %s", err.Error())
 		}
-	} else {
-		dst.TabularIdentUuidOneOf1 = nil
 	}
 
-	if match > 1 { // more than 1 match
-		// reset to nil
-		dst.TabularIdentUuidOneOf = nil
-		dst.TabularIdentUuidOneOf1 = nil
-
-		return fmt.Errorf("data matches more than one schema in oneOf(TabularIdentUuid)")
-	} else if match == 1 {
-		return nil // exactly one match
-	} else { // no match
-		return fmt.Errorf("data failed to match schemas in oneOf(TabularIdentUuid)")
+	// check if the discriminator value is 'TabularIdentUuidTable'
+	if jsonDict["type"] == "TabularIdentUuidTable" {
+		// try to unmarshal JSON data into TabularIdentUuidTable
+		err = json.Unmarshal(data, &dst.TabularIdentUuidTable)
+		if err == nil {
+			return nil // data stored in dst.TabularIdentUuidTable, return on the first match
+		} else {
+			dst.TabularIdentUuidTable = nil
+			return fmt.Errorf("failed to unmarshal TabularIdentUuid as TabularIdentUuidTable: %s", err.Error())
+		}
 	}
+
+	// check if the discriminator value is 'TabularIdentUuidView'
+	if jsonDict["type"] == "TabularIdentUuidView" {
+		// try to unmarshal JSON data into TabularIdentUuidView
+		err = json.Unmarshal(data, &dst.TabularIdentUuidView)
+		if err == nil {
+			return nil // data stored in dst.TabularIdentUuidView, return on the first match
+		} else {
+			dst.TabularIdentUuidView = nil
+			return fmt.Errorf("failed to unmarshal TabularIdentUuid as TabularIdentUuidView: %s", err.Error())
+		}
+	}
+
+	return nil
 }
 
 // Marshal data from the first non-nil pointers in the struct to JSON
 func (src TabularIdentUuid) MarshalJSON() ([]byte, error) {
-	if src.TabularIdentUuidOneOf != nil {
-		return json.Marshal(&src.TabularIdentUuidOneOf)
+	if src.TabularIdentUuidTable != nil {
+		return json.Marshal(&src.TabularIdentUuidTable)
 	}
 
-	if src.TabularIdentUuidOneOf1 != nil {
-		return json.Marshal(&src.TabularIdentUuidOneOf1)
+	if src.TabularIdentUuidView != nil {
+		return json.Marshal(&src.TabularIdentUuidView)
 	}
 
 	return nil, nil // no data in oneOf schemas
@@ -96,12 +114,12 @@ func (obj *TabularIdentUuid) GetActualInstance() interface{} {
 	if obj == nil {
 		return nil
 	}
-	if obj.TabularIdentUuidOneOf != nil {
-		return obj.TabularIdentUuidOneOf
+	if obj.TabularIdentUuidTable != nil {
+		return obj.TabularIdentUuidTable
 	}
 
-	if obj.TabularIdentUuidOneOf1 != nil {
-		return obj.TabularIdentUuidOneOf1
+	if obj.TabularIdentUuidView != nil {
+		return obj.TabularIdentUuidView
 	}
 
 	// all schemas are nil

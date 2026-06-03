@@ -127,7 +127,6 @@ func (o *StorageCredentialGcpSystemIdentity) UnmarshalJSON(data []byte) (err err
 	varStorageCredentialGcpSystemIdentity := _StorageCredentialGcpSystemIdentity{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varStorageCredentialGcpSystemIdentity)
 
 	if err != nil {

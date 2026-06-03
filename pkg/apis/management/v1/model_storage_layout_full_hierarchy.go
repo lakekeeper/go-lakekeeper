@@ -129,7 +129,6 @@ func (o *StorageLayoutFullHierarchy) UnmarshalJSON(data []byte) (err error) {
 	varStorageLayoutFullHierarchy := _StorageLayoutFullHierarchy{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varStorageLayoutFullHierarchy)
 
 	if err != nil {

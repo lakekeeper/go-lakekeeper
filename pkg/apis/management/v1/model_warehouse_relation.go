@@ -54,7 +54,8 @@ func (v *WarehouseRelation) UnmarshalJSON(src []byte) error {
 		}
 	}
 
-	return fmt.Errorf("%+v is not a valid WarehouseRelation", value)
+	*v = enumTypeValue
+	return nil
 }
 
 // NewWarehouseRelationFromValue returns a pointer to a valid WarehouseRelation

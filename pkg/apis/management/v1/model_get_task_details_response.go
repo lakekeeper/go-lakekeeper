@@ -650,7 +650,6 @@ func (o *GetTaskDetailsResponse) UnmarshalJSON(data []byte) (err error) {
 	varGetTaskDetailsResponse := _GetTaskDetailsResponse{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varGetTaskDetailsResponse)
 
 	if err != nil {

@@ -127,7 +127,6 @@ func (o *GcsCredentialServiceAccountKey) UnmarshalJSON(data []byte) (err error) 
 	varGcsCredentialServiceAccountKey := _GcsCredentialServiceAccountKey{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varGcsCredentialServiceAccountKey)
 
 	if err != nil {

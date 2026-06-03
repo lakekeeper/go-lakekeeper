@@ -248,7 +248,6 @@ func (o *CreateRoleRequest) UnmarshalJSON(data []byte) (err error) {
 	varCreateRoleRequest := _CreateRoleRequest{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varCreateRoleRequest)
 
 	if err != nil {

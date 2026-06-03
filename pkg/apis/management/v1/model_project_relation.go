@@ -56,7 +56,8 @@ func (v *ProjectRelation) UnmarshalJSON(src []byte) error {
 		}
 	}
 
-	return fmt.Errorf("%+v is not a valid ProjectRelation", value)
+	*v = enumTypeValue
+	return nil
 }
 
 // NewProjectRelationFromValue returns a pointer to a valid ProjectRelation

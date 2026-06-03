@@ -46,7 +46,8 @@ func (v *S3UrlStyleDetectionMode) UnmarshalJSON(src []byte) error {
 		}
 	}
 
-	return fmt.Errorf("%+v is not a valid S3UrlStyleDetectionMode", value)
+	*v = enumTypeValue
+	return nil
 }
 
 // NewS3UrlStyleDetectionModeFromValue returns a pointer to a valid S3UrlStyleDetectionMode

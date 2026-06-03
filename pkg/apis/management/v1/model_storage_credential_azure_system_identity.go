@@ -127,7 +127,6 @@ func (o *StorageCredentialAzureSystemIdentity) UnmarshalJSON(data []byte) (err e
 	varStorageCredentialAzureSystemIdentity := _StorageCredentialAzureSystemIdentity{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varStorageCredentialAzureSystemIdentity)
 
 	if err != nil {

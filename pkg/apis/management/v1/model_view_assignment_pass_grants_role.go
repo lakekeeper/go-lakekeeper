@@ -128,7 +128,6 @@ func (o *ViewAssignmentPassGrantsRole) UnmarshalJSON(data []byte) (err error) {
 	varViewAssignmentPassGrantsRole := _ViewAssignmentPassGrantsRole{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varViewAssignmentPassGrantsRole)
 
 	if err != nil {

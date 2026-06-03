@@ -137,7 +137,6 @@ func (o *CatalogActionsBatchCheckRequest) UnmarshalJSON(data []byte) (err error)
 	varCatalogActionsBatchCheckRequest := _CatalogActionsBatchCheckRequest{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varCatalogActionsBatchCheckRequest)
 
 	if err != nil {

@@ -44,7 +44,8 @@ func (v *WarehouseStatus) UnmarshalJSON(src []byte) error {
 		}
 	}
 
-	return fmt.Errorf("%+v is not a valid WarehouseStatus", value)
+	*v = enumTypeValue
+	return nil
 }
 
 // NewWarehouseStatusFromValue returns a pointer to a valid WarehouseStatus

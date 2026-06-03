@@ -128,7 +128,6 @@ func (o *TableAssignmentOwnershipUser) UnmarshalJSON(data []byte) (err error) {
 	varTableAssignmentOwnershipUser := _TableAssignmentOwnershipUser{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	err = decoder.Decode(&varTableAssignmentOwnershipUser)
 
 	if err != nil {

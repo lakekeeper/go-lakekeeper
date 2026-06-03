@@ -52,7 +52,8 @@ func (v *TaskStatus) UnmarshalJSON(src []byte) error {
 		}
 	}
 
-	return fmt.Errorf("%+v is not a valid TaskStatus", value)
+	*v = enumTypeValue
+	return nil
 }
 
 // NewTaskStatusFromValue returns a pointer to a valid TaskStatus

@@ -17,101 +17,129 @@ import (
 
 // WarehouseFilter - struct for WarehouseFilter
 type WarehouseFilter struct {
-	WarehouseFilterOneOf  *WarehouseFilterOneOf
-	WarehouseFilterOneOf1 *WarehouseFilterOneOf1
-	WarehouseFilterOneOf2 *WarehouseFilterOneOf2
+	WarehouseFilterAll         *WarehouseFilterAll
+	WarehouseFilterUnmapped    *WarehouseFilterUnmapped
+	WarehouseFilterWarehouseId *WarehouseFilterWarehouseId
 }
 
-// WarehouseFilterOneOfAsWarehouseFilter is a convenience function that returns WarehouseFilterOneOf wrapped in WarehouseFilter
-func WarehouseFilterOneOfAsWarehouseFilter(v *WarehouseFilterOneOf) WarehouseFilter {
+// WarehouseFilterAllAsWarehouseFilter is a convenience function that returns WarehouseFilterAll wrapped in WarehouseFilter
+func WarehouseFilterAllAsWarehouseFilter(v *WarehouseFilterAll) WarehouseFilter {
 	return WarehouseFilter{
-		WarehouseFilterOneOf: v,
+		WarehouseFilterAll: v,
 	}
 }
 
-// WarehouseFilterOneOf1AsWarehouseFilter is a convenience function that returns WarehouseFilterOneOf1 wrapped in WarehouseFilter
-func WarehouseFilterOneOf1AsWarehouseFilter(v *WarehouseFilterOneOf1) WarehouseFilter {
+// WarehouseFilterUnmappedAsWarehouseFilter is a convenience function that returns WarehouseFilterUnmapped wrapped in WarehouseFilter
+func WarehouseFilterUnmappedAsWarehouseFilter(v *WarehouseFilterUnmapped) WarehouseFilter {
 	return WarehouseFilter{
-		WarehouseFilterOneOf1: v,
+		WarehouseFilterUnmapped: v,
 	}
 }
 
-// WarehouseFilterOneOf2AsWarehouseFilter is a convenience function that returns WarehouseFilterOneOf2 wrapped in WarehouseFilter
-func WarehouseFilterOneOf2AsWarehouseFilter(v *WarehouseFilterOneOf2) WarehouseFilter {
+// WarehouseFilterWarehouseIdAsWarehouseFilter is a convenience function that returns WarehouseFilterWarehouseId wrapped in WarehouseFilter
+func WarehouseFilterWarehouseIdAsWarehouseFilter(v *WarehouseFilterWarehouseId) WarehouseFilter {
 	return WarehouseFilter{
-		WarehouseFilterOneOf2: v,
+		WarehouseFilterWarehouseId: v,
 	}
 }
 
 // Unmarshal JSON data into one of the pointers in the struct
 func (dst *WarehouseFilter) UnmarshalJSON(data []byte) error {
 	var err error
-	match := 0
-	// try to unmarshal data into WarehouseFilterOneOf
-	err = json.Unmarshal(data, &dst.WarehouseFilterOneOf)
-	if err == nil {
-		jsonWarehouseFilterOneOf, _ := json.Marshal(dst.WarehouseFilterOneOf)
-		if string(jsonWarehouseFilterOneOf) == "{}" { // empty struct
-			dst.WarehouseFilterOneOf = nil
+	// use discriminator value to speed up the lookup
+	var jsonDict map[string]interface{}
+	err = newStrictDecoder(data).Decode(&jsonDict)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal JSON into map for the discriminator lookup")
+	}
+
+	// check if the discriminator value is 'all'
+	if jsonDict["type"] == "all" {
+		// try to unmarshal JSON data into WarehouseFilterAll
+		err = json.Unmarshal(data, &dst.WarehouseFilterAll)
+		if err == nil {
+			return nil // data stored in dst.WarehouseFilterAll, return on the first match
 		} else {
-			match++
+			dst.WarehouseFilterAll = nil
+			return fmt.Errorf("failed to unmarshal WarehouseFilter as WarehouseFilterAll: %s", err.Error())
 		}
-	} else {
-		dst.WarehouseFilterOneOf = nil
 	}
 
-	// try to unmarshal data into WarehouseFilterOneOf1
-	err = json.Unmarshal(data, &dst.WarehouseFilterOneOf1)
-	if err == nil {
-		jsonWarehouseFilterOneOf1, _ := json.Marshal(dst.WarehouseFilterOneOf1)
-		if string(jsonWarehouseFilterOneOf1) == "{}" { // empty struct
-			dst.WarehouseFilterOneOf1 = nil
+	// check if the discriminator value is 'unmapped'
+	if jsonDict["type"] == "unmapped" {
+		// try to unmarshal JSON data into WarehouseFilterUnmapped
+		err = json.Unmarshal(data, &dst.WarehouseFilterUnmapped)
+		if err == nil {
+			return nil // data stored in dst.WarehouseFilterUnmapped, return on the first match
 		} else {
-			match++
+			dst.WarehouseFilterUnmapped = nil
+			return fmt.Errorf("failed to unmarshal WarehouseFilter as WarehouseFilterUnmapped: %s", err.Error())
 		}
-	} else {
-		dst.WarehouseFilterOneOf1 = nil
 	}
 
-	// try to unmarshal data into WarehouseFilterOneOf2
-	err = json.Unmarshal(data, &dst.WarehouseFilterOneOf2)
-	if err == nil {
-		jsonWarehouseFilterOneOf2, _ := json.Marshal(dst.WarehouseFilterOneOf2)
-		if string(jsonWarehouseFilterOneOf2) == "{}" { // empty struct
-			dst.WarehouseFilterOneOf2 = nil
+	// check if the discriminator value is 'warehouse-id'
+	if jsonDict["type"] == "warehouse-id" {
+		// try to unmarshal JSON data into WarehouseFilterWarehouseId
+		err = json.Unmarshal(data, &dst.WarehouseFilterWarehouseId)
+		if err == nil {
+			return nil // data stored in dst.WarehouseFilterWarehouseId, return on the first match
 		} else {
-			match++
+			dst.WarehouseFilterWarehouseId = nil
+			return fmt.Errorf("failed to unmarshal WarehouseFilter as WarehouseFilterWarehouseId: %s", err.Error())
 		}
-	} else {
-		dst.WarehouseFilterOneOf2 = nil
 	}
 
-	if match > 1 { // more than 1 match
-		// reset to nil
-		dst.WarehouseFilterOneOf = nil
-		dst.WarehouseFilterOneOf1 = nil
-		dst.WarehouseFilterOneOf2 = nil
-
-		return fmt.Errorf("data matches more than one schema in oneOf(WarehouseFilter)")
-	} else if match == 1 {
-		return nil // exactly one match
-	} else { // no match
-		return fmt.Errorf("data failed to match schemas in oneOf(WarehouseFilter)")
+	// check if the discriminator value is 'WarehouseFilterAll'
+	if jsonDict["type"] == "WarehouseFilterAll" {
+		// try to unmarshal JSON data into WarehouseFilterAll
+		err = json.Unmarshal(data, &dst.WarehouseFilterAll)
+		if err == nil {
+			return nil // data stored in dst.WarehouseFilterAll, return on the first match
+		} else {
+			dst.WarehouseFilterAll = nil
+			return fmt.Errorf("failed to unmarshal WarehouseFilter as WarehouseFilterAll: %s", err.Error())
+		}
 	}
+
+	// check if the discriminator value is 'WarehouseFilterUnmapped'
+	if jsonDict["type"] == "WarehouseFilterUnmapped" {
+		// try to unmarshal JSON data into WarehouseFilterUnmapped
+		err = json.Unmarshal(data, &dst.WarehouseFilterUnmapped)
+		if err == nil {
+			return nil // data stored in dst.WarehouseFilterUnmapped, return on the first match
+		} else {
+			dst.WarehouseFilterUnmapped = nil
+			return fmt.Errorf("failed to unmarshal WarehouseFilter as WarehouseFilterUnmapped: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'WarehouseFilterWarehouseId'
+	if jsonDict["type"] == "WarehouseFilterWarehouseId" {
+		// try to unmarshal JSON data into WarehouseFilterWarehouseId
+		err = json.Unmarshal(data, &dst.WarehouseFilterWarehouseId)
+		if err == nil {
+			return nil // data stored in dst.WarehouseFilterWarehouseId, return on the first match
+		} else {
+			dst.WarehouseFilterWarehouseId = nil
+			return fmt.Errorf("failed to unmarshal WarehouseFilter as WarehouseFilterWarehouseId: %s", err.Error())
+		}
+	}
+
+	return nil
 }
 
 // Marshal data from the first non-nil pointers in the struct to JSON
 func (src WarehouseFilter) MarshalJSON() ([]byte, error) {
-	if src.WarehouseFilterOneOf != nil {
-		return json.Marshal(&src.WarehouseFilterOneOf)
+	if src.WarehouseFilterAll != nil {
+		return json.Marshal(&src.WarehouseFilterAll)
 	}
 
-	if src.WarehouseFilterOneOf1 != nil {
-		return json.Marshal(&src.WarehouseFilterOneOf1)
+	if src.WarehouseFilterUnmapped != nil {
+		return json.Marshal(&src.WarehouseFilterUnmapped)
 	}
 
-	if src.WarehouseFilterOneOf2 != nil {
-		return json.Marshal(&src.WarehouseFilterOneOf2)
+	if src.WarehouseFilterWarehouseId != nil {
+		return json.Marshal(&src.WarehouseFilterWarehouseId)
 	}
 
 	return nil, nil // no data in oneOf schemas
@@ -122,16 +150,16 @@ func (obj *WarehouseFilter) GetActualInstance() interface{} {
 	if obj == nil {
 		return nil
 	}
-	if obj.WarehouseFilterOneOf != nil {
-		return obj.WarehouseFilterOneOf
+	if obj.WarehouseFilterAll != nil {
+		return obj.WarehouseFilterAll
 	}
 
-	if obj.WarehouseFilterOneOf1 != nil {
-		return obj.WarehouseFilterOneOf1
+	if obj.WarehouseFilterUnmapped != nil {
+		return obj.WarehouseFilterUnmapped
 	}
 
-	if obj.WarehouseFilterOneOf2 != nil {
-		return obj.WarehouseFilterOneOf2
+	if obj.WarehouseFilterWarehouseId != nil {
+		return obj.WarehouseFilterWarehouseId
 	}
 
 	// all schemas are nil
