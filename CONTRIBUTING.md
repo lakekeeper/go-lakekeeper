@@ -59,7 +59,7 @@ Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md) to help create 
 
 - Use `gofmt`, `golangci-lint`, and `go vet` before submitting.
 - Keep your changes focused: small, atomic PRs are easier to review.
-- Use clear and descriptive commit messages.
+- Use [Conventional Commits](https://www.conventionalcommits.org) for commit messages and PR titles, with one of the types `feat`, `fix`, `docs`, or `chore` (e.g. `fix: handle empty role list`). release-please derives versions and the changelog from them, and CI rejects PR titles that don't match.
 - Follow the [Effective Go](https://golang.org/doc/effective_go.html) guidelines.
 
 ## Regenerating the API client
