@@ -217,7 +217,7 @@ func MustCreateWarehouse(t *testing.T, c *client.Client, projectID string) (stri
 //   - KNOWN actions must satisfy known ⊆ want. A newly *supported* action (one
 //     in our enum but missing from `want`) FAILS — surfaced as news that should
 //     be reviewed and reflected in `want`. This tripwire is meaningful on the
-//     pinned/floor Lakekeeper (test.yml v0.12.0), where every action is known.
+//     pinned/floor Lakekeeper (ci.yml v0.12.0), where every action is known.
 //   - UNKNOWN actions (a server newer than our spec, e.g. latest-main's
 //     `set_format_version_policy`) are LOGGED, not failed. We can't add them to
 //     `want` without the enum constant, which only ships with a release; failing
