@@ -3,7 +3,8 @@
   "extends": [
     "config:recommended",
     ":automergeMinor",
-    ":automergePatch"
+    ":automergePatch",
+    "helpers:pinGitHubActionDigests"
   ],
   "packageRules": [
     {
@@ -12,6 +13,34 @@
       "automerge": false,
       "separateMajorMinor": true,
       "separateMinorPatch": false
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "groupName": "github-actions",
+      "schedule": ["* 0-5 * * 1"]
+    },
+    {
+      "matchDepNames": ["kubernetes-sigs/kind", "kindest/node"],
+      "groupName": "kind"
+    },
+    {
+      "matchDepNames": ["lakekeeper", "openapitools/openapi-generator-cli"],
+      "automerge": false
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Versions annotated with a `# renovate:` comment on the line above",
+      "managerFilePatterns": [
+        "/^\\.github/workflows/[^/]+\\.ya?ml$/",
+        "/^Makefile$/",
+        "/^e2e/kind/run\\.sh$/",
+        "/^e2e/kind/cluster\\.yaml$/"
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: registryUrl=(?<registryUrl>\\S+))?\\s*\\n[^\\n]*?(?<currentValue>v?\\d+\\.\\d+\\.\\d+)"
+      ]
     }
   ]
 }

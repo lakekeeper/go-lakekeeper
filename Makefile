@@ -61,7 +61,7 @@ GO_TAGS=$(TAGS)
 
 GO_COMMON_FLAGS = $(GO_BUILDFLAGS) -tags '$(GO_TAGS)' -ldflags '$(GO_LDFLAGS)'
 
-GO_PACKAGES := ./pkg/...
+GO_PACKAGES := ./...
 
 BIN_DIR := $(SELF_DIR)/bin
 DIST_DIR := $(SELF_DIR)/dist
@@ -70,6 +70,7 @@ CONTAINER_ENGINE ?= $(shell command -v docker >/dev/null 2>&1 && echo docker || 
 CONTAINER_COMPOSE_ENGINE ?= $(shell $(CONTAINER_ENGINE) compose version >/dev/null 2>&1 && echo '$(CONTAINER_ENGINE) compose' || echo '$(CONTAINER_ENGINE)-compose')
 DOCKER ?= $(CONTAINER_ENGINE)
 
+# renovate: datasource=docker depName=openapitools/openapi-generator-cli
 OPENAPI_GENERATOR_VERSION ?= v7.10.0
 OPENAPI_GENERATOR_IMAGE   ?= openapitools/openapi-generator-cli:$(OPENAPI_GENERATOR_VERSION)
 OPENAPI_DIR               := $(SELF_DIR)/api/openapi
@@ -125,10 +126,12 @@ test-e2e-kind: ## Runs lkctl E2E tests against a kind cluster (real projected SA
 .PHONY: test-e2e
 test-e2e: test-e2e-compose test-e2e-kind ## Runs every E2E backend sequentially.
 
-GORELEASER := $(BIN_DIR)/goreleaser
+# renovate: datasource=github-releases depName=goreleaser/goreleaser
+GORELEASER_VERSION := v2.19.0
+GORELEASER := $(BIN_DIR)/goreleaser-$(GORELEASER_VERSION)/goreleaser
 $(GORELEASER): | $(BIN_DIR)
-	@echo === installing goreleaser
-	@GOBIN=$(BIN_DIR) $(GO) install github.com/goreleaser/goreleaser/v2@latest
+	@echo === installing goreleaser $(GORELEASER_VERSION)
+	@GOBIN=$(dir $(GORELEASER)) $(GO) install github.com/goreleaser/goreleaser/v2@$(GORELEASER_VERSION)
 
 .PHONY: snapshot
 snapshot: $(GORELEASER)

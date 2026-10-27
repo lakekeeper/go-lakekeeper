@@ -4,6 +4,10 @@ FROM golang:1.26-alpine AS builder
 
 ARG TARGETOS
 ARG TARGETARCH
+ARG VERSION=latest-main
+ARG GIT_COMMIT=""
+ARG GIT_TREE_STATE=""
+ARG BUILD_DATE=""
 
 ENV CGO_ENABLED=0 \
     GOOS=$TARGETOS \
@@ -20,7 +24,12 @@ COPY . .
 # print platform for debug
 RUN echo "Building for $GOOS/$GOARCH"
 
-RUN go build -o lkctl ./cmd
+RUN go build \
+    -ldflags "-X github.com/lakekeeper/go-lakekeeper/pkg/version.version=${VERSION} \
+              -X github.com/lakekeeper/go-lakekeeper/pkg/version.gitCommit=${GIT_COMMIT} \
+              -X github.com/lakekeeper/go-lakekeeper/pkg/version.gitTreeState=${GIT_TREE_STATE} \
+              -X github.com/lakekeeper/go-lakekeeper/pkg/version.buildDate=${BUILD_DATE}" \
+    -o lkctl ./cmd
 
 FROM docker.io/debian:trixie-slim
 

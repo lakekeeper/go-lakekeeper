@@ -35,6 +35,7 @@ CLUSTER_NAME="${LKCTL_E2E_CLUSTER:-lkctl-e2e}"
 NAMESPACE="${LKCTL_E2E_NAMESPACE:-default}"
 POD="${LKCTL_E2E_POD:-lkctl-runner}"
 LKCTL_IMAGE="${LKCTL_E2E_IMAGE:-localhost/lkctl-e2e:dev}"
+# renovate: datasource=helm depName=lakekeeper registryUrl=https://lakekeeper.github.io/lakekeeper-charts/
 LAKEKEEPER_CHART_VERSION="${LAKEKEEPER_CHART_VERSION:-0.10.1}"
 
 TMP_TAR=""
