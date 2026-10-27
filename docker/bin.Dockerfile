@@ -1,6 +1,6 @@
 
 
-FROM bitnami/minideb:bookworm
+FROM docker.io/debian:trixie-slim
 
 ARG TARGETPLATFORM
 ARG TARGETOS

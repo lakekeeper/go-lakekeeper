@@ -29,7 +29,7 @@ Read the matching doc before changing its area:
 Every workflow has a `make` target; use it rather than the raw tool, because the targets provision `.env`, the compose stack, and `CONTAINER_ENGINE` (some hosts run podman only).
 
 - `make build` — builds `dist/lkctl`; runs `mod`, `fmt`, `vet`, `test` first, so it rewrites files.
-- `make test` — unit tests for `./pkg/...` only, with coverage.
+- `make test` — unit tests for `./...` with coverage; integration/e2e tests are excluded by their build tags.
 - `make validate` — `vet` + `lint`. `make fmt` applies golangci-lint fixes (gofumpt, goimports). golangci-lint runs via `go run`; nothing to install.
 - `make test-integration` — starts Lakekeeper + Keycloak + MinIO + OpenFGA via compose and runs the `integration`-tagged tests.
 - `make test-e2e-compose` — runs the `e2e_cli` suite against the host-built `lkctl` on the compose stack. Run it before calling any `e2e/` change done.

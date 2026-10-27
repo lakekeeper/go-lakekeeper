@@ -34,7 +34,7 @@ jobs:
           configuration_path: ".github/pr-title-checker-config.json"
           pass_on_octokit_error: false
 
-      - uses: marocchino/sticky-pull-request-comment@v3
+      - uses: marocchino/sticky-pull-request-comment@5770ad5eb8f42dd2c4f34da00c94c5381e49af88 # v3.0.5
         if: ${{ steps.check.outputs.success == 'false'}}
         with:
           header: 'pr-title-checker'
@@ -55,6 +55,6 @@ jobs:
         name: Fail on invalid title
         run: exit 1
     
-      - uses: actions/labeler@v6
+      - uses: actions/labeler@b8dd2d9be0f68b860e7dae5dae7d772984eacd6d # v6.2.0
         with:
          sync-labels: 'true'

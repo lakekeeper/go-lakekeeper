@@ -2,7 +2,7 @@
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/lakekeeper/go-lakekeeper)](https://goreportcard.com/report/github.com/lakekeeper/go-lakekeeper)
 [![GoDoc](https://godoc.org/github.com/lakekeeper/go-lakekeeper?status.svg)](https://godoc.org/github.com/lakekeeper/go-lakekeeper)
-[![test](https://github.com/lakekeeper/go-lakekeeper/actions/workflows/test.yml/badge.svg)](https://github.com/lakekeeper/go-lakekeeper/actions/workflows/test.yml)
+[![ci](https://github.com/lakekeeper/go-lakekeeper/actions/workflows/ci.yml/badge.svg)](https://github.com/lakekeeper/go-lakekeeper/actions/workflows/ci.yml)
 [![nightly](https://github.com/lakekeeper/go-lakekeeper/actions/workflows/nightly.yml/badge.svg)](https://github.com/lakekeeper/go-lakekeeper/actions/workflows/nightly.yml)
 
 Go SDK and `lkctl` CLI for the [Lakekeeper](https://docs.lakekeeper.io)
@@ -46,7 +46,7 @@ with an older Lakekeeper than the row below is unsupported.
 <!-- END compatibility-matrix -->
 
 The minimum version is the lowest entry in the `lakekeeper_version` matrix
-of [`.github/workflows/test.yml`](.github/workflows/test.yml).
+of [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
 
 ## Quick start — CLI
 
