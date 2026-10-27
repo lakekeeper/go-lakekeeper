@@ -29,7 +29,7 @@ Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md) to help create 
 ## Getting Started
 
 1. Fork the repository and clone it locally.
-2. Install [Go 1.25+](https://golang.org/dl/).
+2. Install [Go 1.26+](https://golang.org/dl/).
 3. Run `go mod tidy` to install dependencies.
 4. Run `make build` or use your preferred method to build the CLI/client.
 
