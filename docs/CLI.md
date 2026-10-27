@@ -17,14 +17,14 @@ To build from source:
 
 ```sh
 make build          # produces dist/lkctl
-# make build runs: mod → fmt → vet → test → go build
+# make build runs: vet → test → go build
 ```
 
 Other useful make targets:
 
 | Target | Description |
 |---|---|
-| `make build` | Lint, test, then build `dist/lkctl` |
+| `make build` | Vet, test, then build `dist/lkctl` |
 | `make validate` | `go vet` + `golangci-lint` (no build) |
 | `make test` | Unit tests under `./pkg/…` with coverage |
 | `make test-integration` | Spin up Lakekeeper + Keycloak + MinIO + OpenFGA via docker-compose and run integration tests |

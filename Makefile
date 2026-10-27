@@ -17,46 +17,22 @@ BUILDFLAGS ?=
 LDFLAGS ?=
 TAGS ?=
 
-# Set GOBIN
-ifeq (,$(shell go env GOBIN))
-GOBIN=$(shell go env GOPATH)/bin
-else
-GOBIN=$(shell go env GOBIN)
-endif
-
-# the root go project
-GO_PROJECT=github.com/lakekeeper/go-lakekeeper
-
 # CGO_ENABLED value
 CGO_ENABLED_VALUE=0
-
-COMMIT_SHA := $(shell git rev-parse HEAD)
-DATE := $(shell git log -1 --format=%cI)
 
 ifeq ($(origin VERSION), undefined)
 VERSION := $(shell git describe --dirty --always --tags | sed 's/-/./2' | sed 's/-/./2' )
 endif
 export VERSION
 
-GOHOSTOS=linux
-GOHOSTARCH := $(shell go env GOHOSTARCH)
-HOST_PLATFORM := $(GOHOSTOS)_$(GOHOSTARCH)
-
-# REAL_HOST_PLATFORM is used to determine the correct url to download the various binary tools from and it does not use
-# HOST_PLATFORM which is used to build the program.
-REAL_HOST_PLATFORM=$(shell go env GOHOSTOS)_$(GOHOSTARCH)
-
 GO := go
-GOHOST := GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) $(GO)
-GO_VERSION := $(shell $(GO) version | sed -ne 's/[^0-9]*\(\([0-9]\.\)\{0,4\}[0-9][^.]\).*/\1/p')
-GO_FULL_VERSION := $(shell $(GO) version)
 
 BUILD_DATE := $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 GIT_FULL_COMMIT := $(shell git rev-parse HEAD)
 GIT_TREE_STATE := $(shell if [ -z "`git status --porcelain`" ]; then echo "clean" ; else echo "dirty"; fi)
 
 GO_BUILDFLAGS=$(BUILDFLAGS)
-GO_LDFLAGS=-X github.com/lakekeeper/go-lakekeeper/pkg/version.buildDate=$(NOW) -X github.com/lakekeeper/go-lakekeeper/pkg/version.gitCommit=$(FULL_COMMIT) -X github.com/lakekeeper/go-lakekeeper/pkg/version.gitTreeState=$(GIT_TREE_STATE) $(LDFLAGS)
+GO_LDFLAGS=-X github.com/lakekeeper/go-lakekeeper/pkg/version.version=$(VERSION:v%=%) -X github.com/lakekeeper/go-lakekeeper/pkg/version.buildDate=$(BUILD_DATE) -X github.com/lakekeeper/go-lakekeeper/pkg/version.gitCommit=$(GIT_FULL_COMMIT) -X github.com/lakekeeper/go-lakekeeper/pkg/version.gitTreeState=$(GIT_TREE_STATE) $(LDFLAGS)
 GO_TAGS=$(TAGS)
 
 GO_COMMON_FLAGS = $(GO_BUILDFLAGS) -tags '$(GO_TAGS)' -ldflags '$(GO_LDFLAGS)'
@@ -68,7 +44,6 @@ DIST_DIR := $(SELF_DIR)/dist
 
 CONTAINER_ENGINE ?= $(shell command -v docker >/dev/null 2>&1 && echo docker || (command -v podman >/dev/null 2>&1 && echo podman || echo docker))
 CONTAINER_COMPOSE_ENGINE ?= $(shell $(CONTAINER_ENGINE) compose version >/dev/null 2>&1 && echo '$(CONTAINER_ENGINE) compose' || echo '$(CONTAINER_ENGINE)-compose')
-DOCKER ?= $(CONTAINER_ENGINE)
 
 # renovate: datasource=docker depName=openapitools/openapi-generator-cli
 OPENAPI_GENERATOR_VERSION ?= v7.10.0
@@ -82,21 +57,13 @@ $(BIN_DIR):
 	@echo === creating $(BIN_DIR)
 	@mkdir -p $(BIN_DIR)
 
-YQ_VERSION := v4.45.1
-YQ := $(BIN_DIR)/yq-$(YQ_VERSION)
-$(YQ): | $(BIN_DIR)
-	@echo === installing yq $(YQ_VERSION) $(REAL_HOST_PLATFORM)
-	@curl -s -JL https://github.com/mikefarah/yq/releases/download/$(YQ_VERSION)/yq_$(REAL_HOST_PLATFORM) -o $(YQ)
-	@chmod +x $(YQ)
-	@echo Installed yq version $(YQ_VERSION) in $(YQ)
-
 .PHONY: build
 build: build.common
 	@echo === go build dist/lkctl
 	@CGO_ENABLED=$(CGO_ENABLED_VALUE) $(GO) build -a $(GO_COMMON_FLAGS) -o $(DIST_DIR)/lkctl ./cmd
 
 .PHONY: build.common
-build.common: $(YQ) mod fmt vet test
+build.common: vet test
 
 .PHONY: mod
 mod: 
@@ -195,6 +162,7 @@ generate: ## Regenerate Go bindings from OpenAPI specs.
 .PHONY: clean
 clean:
 	@rm -fr $(BIN_DIR)
+	@rm -fr $(DIST_DIR)
 	@rm -fr coverage.txt
 	@rm -fr $(ENV_FILE)
 	@$(CONTAINER_COMPOSE_ENGINE) down --volumes

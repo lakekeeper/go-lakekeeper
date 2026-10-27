@@ -79,12 +79,20 @@ make generate
 Run all tests before opening a PR:
 
 ```sh
+# go vet + golangci-lint
+make validate
+
 # Unit tests
 make test
 
 # Integration tests
 make test-integration
+
+# lkctl end-to-end tests against the compose stack
+make test-e2e-compose
 ```
+
+`make test-e2e-kind` runs the `lkctl` end-to-end tests against a kind cluster; it needs `kind`, `kubectl` and `helm` installed.
 
 If adding a feature or fixing a bug, include relevant unit and/or integration tests.
 
