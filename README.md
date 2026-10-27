@@ -1,7 +1,7 @@
 # Lakekeeper Go Client
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/lakekeeper/go-lakekeeper)](https://goreportcard.com/report/github.com/lakekeeper/go-lakekeeper)
-[![GoDoc](https://godoc.org/github.com/lakekeeper/go-lakekeeper?status.svg)](https://godoc.org/github.com/lakekeeper/go-lakekeeper)
+[![Go Reference](https://pkg.go.dev/badge/github.com/lakekeeper/go-lakekeeper.svg)](https://pkg.go.dev/github.com/lakekeeper/go-lakekeeper)
 [![ci](https://github.com/lakekeeper/go-lakekeeper/actions/workflows/ci.yml/badge.svg)](https://github.com/lakekeeper/go-lakekeeper/actions/workflows/ci.yml)
 [![nightly](https://github.com/lakekeeper/go-lakekeeper/actions/workflows/nightly.yml/badge.svg)](https://github.com/lakekeeper/go-lakekeeper/actions/workflows/nightly.yml)
 

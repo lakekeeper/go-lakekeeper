@@ -16,7 +16,7 @@ Go client library plus `lkctl` CLI for the Lakekeeper Iceberg catalog.
 - `examples/` — runnable docker-compose stack for SDK users (separate from `e2e/compose/`)
 - `tests/` — fixtures for the compose stack (Keycloak realm); not Go test code
 
-Read the matching doc before changing its area:
+Before changing an area, read its doc:
 
 - `docs/ARCHITECTURE.md` — request lifecycle, bootstrap, project scoping
 - `docs/PACKAGES.md` — per-package contracts and dependency graph
@@ -28,7 +28,7 @@ Read the matching doc before changing its area:
 
 Every workflow has a `make` target; use it rather than the raw tool, because the targets provision `.env`, the compose stack, and `CONTAINER_ENGINE` (some hosts run podman only).
 
-- `make build` — builds `dist/lkctl`; runs `mod`, `fmt`, `vet`, `test` first, so it rewrites files.
+- `make build` — builds `dist/lkctl`; runs `vet` and `test` first. It does not rewrite files; run `make mod` / `make fmt` explicitly.
 - `make test` — unit tests for `./...` with coverage; integration/e2e tests are excluded by their build tags.
 - `make validate` — `vet` + `lint`. `make fmt` applies golangci-lint fixes (gofumpt, goimports). golangci-lint runs via `go run`; nothing to install.
 - `make test-integration` — starts Lakekeeper + Keycloak + MinIO + OpenFGA via compose and runs the `integration`-tagged tests.
