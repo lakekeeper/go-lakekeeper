@@ -14,8 +14,9 @@ concurrency:
 permissions:
   contents: read
 
-# Nightly runs against the newest golangci-lint, kind, and helm to catch
-# breakage before Renovate proposes the bump; PR CI uses pinned versions.
+# Nightly runs against the newest golangci-lint, kind, helm, and Lakekeeper
+# chart to catch breakage before Renovate proposes the bump; PR CI uses
+# pinned versions.
 jobs:
   lint:
     runs-on: ubuntu-24.04
@@ -60,7 +61,7 @@ jobs:
         with:
           version: latest
 
-      - run: GOPATH=$(go env GOPATH) make test-e2e-kind
+      - run: GOPATH=$(go env GOPATH) LAKEKEEPER_CHART_VERSION=latest make test-e2e-kind
         timeout-minutes: 20
 
   # Schedule-failure emails only reach whoever last edited the cron, so

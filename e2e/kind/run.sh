@@ -37,6 +37,9 @@ POD="${LKCTL_E2E_POD:-lkctl-runner}"
 LKCTL_IMAGE="${LKCTL_E2E_IMAGE:-localhost/lkctl-e2e:dev}"
 # renovate: datasource=helm depName=lakekeeper registryUrl=https://lakekeeper.github.io/lakekeeper-charts/
 LAKEKEEPER_CHART_VERSION="${LAKEKEEPER_CHART_VERSION:-0.10.1}"
+# `latest` omits --version so helm installs the newest chart (used by nightly).
+CHART_VERSION_ARGS=(--version "$LAKEKEEPER_CHART_VERSION")
+[ "$LAKEKEEPER_CHART_VERSION" = "latest" ] && CHART_VERSION_ARGS=()
 
 TMP_TAR=""
 teardown() {
@@ -83,7 +86,7 @@ kind load image-archive "$TMP_TAR" --name "$CLUSTER_NAME"
 # validate projected SA tokens against the in-cluster OIDC endpoint.
 helm upgrade --install lakekeeper lakekeeper \
     --repo https://lakekeeper.github.io/lakekeeper-charts/ \
-    --version "$LAKEKEEPER_CHART_VERSION" \
+    ${CHART_VERSION_ARGS[@]+"${CHART_VERSION_ARGS[@]}"} \
     --namespace "$NAMESPACE" \
     --create-namespace \
     -f "$REPO_ROOT/e2e/kind/values.yaml" \
@@ -112,5 +115,5 @@ export LAKEKEEPER_BASE_URL="http://lakekeeper.${NAMESPACE}.svc.cluster.local:818
 
 # Explicit allow-list — TestWhoamiOAuth2 / TestWhoamiAccessToken are
 # compose-only (no Keycloak in this harness) and must not match by prefix.
-go test -v -tags e2e_cli ./e2e/cli/... \
+go test -count=1 -v -tags e2e_cli ./e2e/cli/... \
     -run 'TestWhoamiK8sServiceAccount|TestServerInfo|TestServerBootstrapRejectsRebootstrap|TestBadCredentialsExitNonZero'
