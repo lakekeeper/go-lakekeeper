@@ -29,7 +29,7 @@ Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md) to help create 
 ## Getting Started
 
 1. Fork the repository and clone it locally.
-2. Install [Go 1.24+](https://golang.org/dl/).
+2. Install [Go 1.26+](https://golang.org/dl/).
 3. Run `go mod tidy` to install dependencies.
 4. Run `make build` or use your preferred method to build the CLI/client.
 
@@ -48,7 +48,7 @@ Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md) to help create 
 
 ### Submitting Changes
 
-- Fork the repo and create a new branch: `git checkout -b feature/my-feature`
+- Fork the repo and create a new branch: `git checkout -b feat/my-feature`
 - Make your changes
 - Format your code: `make fmt`
 - Run tests: `make test`
@@ -59,7 +59,7 @@ Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md) to help create 
 
 - Use `gofmt`, `golangci-lint`, and `go vet` before submitting.
 - Keep your changes focused: small, atomic PRs are easier to review.
-- Use clear and descriptive commit messages.
+- Use [Conventional Commits](https://www.conventionalcommits.org) for commit messages and PR titles, with one of the types `feat`, `fix`, `docs`, or `chore` (e.g. `fix: handle empty role list`). release-please derives versions and the changelog from them, and CI rejects PR titles that don't match.
 - Follow the [Effective Go](https://golang.org/doc/effective_go.html) guidelines.
 
 ## Regenerating the API client

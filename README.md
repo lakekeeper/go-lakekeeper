@@ -80,7 +80,7 @@ See [docs/CLI.md](docs/CLI.md) for the full command reference.
 go get github.com/lakekeeper/go-lakekeeper
 ```
 
-Requires Go 1.24+.
+Requires Go 1.26+.
 
 ```go
 package main
