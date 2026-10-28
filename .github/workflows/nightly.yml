@@ -50,10 +50,18 @@ jobs:
       - run: GOPATH=$(go env GOPATH) LAKEKEEPER_VERSION=latest-main make test-e2e-compose
         timeout-minutes: 15
 
+      # kind-action interpolates `version` into the release download URL and
+      # has no notion of `latest`, so resolve the tag first.
+      - name: resolve latest kind version
+        id: kind-version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: echo "version=$(gh release view --repo kubernetes-sigs/kind --json tagName --jq .tagName)" >> "$GITHUB_OUTPUT"
+
       - name: setup kind
         uses: helm/kind-action@1544676c07bb3570fcb70166beaa07c4528fd4aa # v1.15.1
         with:
-          version: latest
+          version: ${{ steps.kind-version.outputs.version }}
           install_only: true
 
       - name: setup helm
