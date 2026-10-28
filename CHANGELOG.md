@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.1.1](https://github.com/lakekeeper/go-lakekeeper/compare/v0.1.0...v0.1.1) (2026-10-28)
+
+
+### Bug Fixes
+
+* decode oneOf unions by discriminator and tolerate unknown response fields and enum values ([#16](https://github.com/lakekeeper/go-lakekeeper/issues/16)) ([f8aca55](https://github.com/lakekeeper/go-lakekeeper/commit/f8aca55e113652b702e8e1574629c81d933c52db))
+* resolve latest kind version before kind-action in nightly ([#24](https://github.com/lakekeeper/go-lakekeeper/issues/24)) ([a0b6102](https://github.com/lakekeeper/go-lakekeeper/commit/a0b6102aef12a4bf04fcd50ffb1355c686f43d98))
+
+
+### Miscellaneous Chores
+
+* add shared .claude/settings.json with deny rules ([#22](https://github.com/lakekeeper/go-lakekeeper/issues/22)) ([c0fca4c](https://github.com/lakekeeper/go-lakekeeper/commit/c0fca4c66164f838ebf8c07e2abd8efabd2c722d))
+* harden CI checks, pin tool versions, gate latest-main image ([#20](https://github.com/lakekeeper/go-lakekeeper/issues/20)) ([98b99dc](https://github.com/lakekeeper/go-lakekeeper/commit/98b99dc919579c5b76a432b97f2cc085612314ec))
+* move agent guidance into AGENTS.md and refresh contributor docs ([#19](https://github.com/lakekeeper/go-lakekeeper/issues/19)) ([66fd402](https://github.com/lakekeeper/go-lakekeeper/commit/66fd4024b3efad38576378d91e9c9686295b3c67))
+* remove dead config, fix Makefile, align docs ([#21](https://github.com/lakekeeper/go-lakekeeper/issues/21)) ([35eb070](https://github.com/lakekeeper/go-lakekeeper/commit/35eb070bfeb8eca859391917dc62f167b6c32b12))
+
 ## [0.1.0](https://github.com/lakekeeper/go-lakekeeper/compare/v0.0.23...v0.1.0) (2026-05-12)
 
 
