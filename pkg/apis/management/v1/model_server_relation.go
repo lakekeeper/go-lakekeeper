@@ -20,8 +20,8 @@ type ServerRelation string
 
 // List of ServerRelation
 const (
-	ServerRelationAdmin    ServerRelation = "admin"
-	ServerRelationOperator ServerRelation = "operator"
+	SERVERRELATION_ADMIN    ServerRelation = "admin"
+	SERVERRELATION_OPERATOR ServerRelation = "operator"
 )
 
 // All allowed values of ServerRelation enum

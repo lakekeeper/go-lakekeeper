@@ -54,6 +54,8 @@ type StorageProfileS3 struct {
 	StsEndpoint *string `json:"sts-endpoint,omitempty"`
 	// Optional role ARN to assume for sts vended-credentials. If not provided, `assume_role_arn` is used. Either `assume_role_arn` or `sts_role_arn` must be provided if `sts_enabled` is true.
 	StsRoleArn *string `json:"sts-role-arn,omitempty"`
+	// Add `\"Principal\": \"*\"` to every statement of the STS session policy. Some S3-compatible STS implementations, such as Yandex Object Storage, reject session policies without a principal, while AWS and MinIO reject policies that have one. Defaults to false.
+	StsSessionPolicyPrincipal *bool `json:"sts-session-policy-principal,omitempty"`
 	// Optional session tags for STS assume role operations.
 	StsSessionTags map[string]string `json:"sts-session-tags,omitempty"`
 	// The validity of the sts tokens in seconds. Default is 3600
@@ -604,6 +606,38 @@ func (o *StorageProfileS3) SetStsRoleArn(v string) {
 	o.StsRoleArn = &v
 }
 
+// GetStsSessionPolicyPrincipal returns the StsSessionPolicyPrincipal field value if set, zero value otherwise.
+func (o *StorageProfileS3) GetStsSessionPolicyPrincipal() bool {
+	if o == nil || IsNil(o.StsSessionPolicyPrincipal) {
+		var ret bool
+		return ret
+	}
+	return *o.StsSessionPolicyPrincipal
+}
+
+// GetStsSessionPolicyPrincipalOk returns a tuple with the StsSessionPolicyPrincipal field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *StorageProfileS3) GetStsSessionPolicyPrincipalOk() (*bool, bool) {
+	if o == nil || IsNil(o.StsSessionPolicyPrincipal) {
+		return nil, false
+	}
+	return o.StsSessionPolicyPrincipal, true
+}
+
+// HasStsSessionPolicyPrincipal returns a boolean if a field has been set.
+func (o *StorageProfileS3) HasStsSessionPolicyPrincipal() bool {
+	if o != nil && !IsNil(o.StsSessionPolicyPrincipal) {
+		return true
+	}
+
+	return false
+}
+
+// SetStsSessionPolicyPrincipal gets a reference to the given bool and assigns it to the StsSessionPolicyPrincipal field.
+func (o *StorageProfileS3) SetStsSessionPolicyPrincipal(v bool) {
+	o.StsSessionPolicyPrincipal = &v
+}
+
 // GetStsSessionTags returns the StsSessionTags field value if set, zero value otherwise.
 func (o *StorageProfileS3) GetStsSessionTags() map[string]string {
 	if o == nil || IsNil(o.StsSessionTags) {
@@ -738,6 +772,9 @@ func (o StorageProfileS3) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.StsRoleArn) {
 		toSerialize["sts-role-arn"] = o.StsRoleArn
+	}
+	if !IsNil(o.StsSessionPolicyPrincipal) {
+		toSerialize["sts-session-policy-principal"] = o.StsSessionPolicyPrincipal
 	}
 	if !IsNil(o.StsSessionTags) {
 		toSerialize["sts-session-tags"] = o.StsSessionTags

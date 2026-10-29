@@ -17,27 +17,39 @@ import (
 
 // LakekeeperWarehouseAction - struct for LakekeeperWarehouseAction
 type LakekeeperWarehouseAction struct {
-	LakekeeperWarehouseActionActivate                *LakekeeperWarehouseActionActivate
-	LakekeeperWarehouseActionControlAllTasks         *LakekeeperWarehouseActionControlAllTasks
-	LakekeeperWarehouseActionCreateNamespace         *LakekeeperWarehouseActionCreateNamespace
-	LakekeeperWarehouseActionDeactivate              *LakekeeperWarehouseActionDeactivate
-	LakekeeperWarehouseActionDelete                  *LakekeeperWarehouseActionDelete
-	LakekeeperWarehouseActionGetAllTasks             *LakekeeperWarehouseActionGetAllTasks
-	LakekeeperWarehouseActionGetConfig               *LakekeeperWarehouseActionGetConfig
-	LakekeeperWarehouseActionGetEndpointStatistics   *LakekeeperWarehouseActionGetEndpointStatistics
-	LakekeeperWarehouseActionGetMetadata             *LakekeeperWarehouseActionGetMetadata
-	LakekeeperWarehouseActionGetTaskQueueConfig      *LakekeeperWarehouseActionGetTaskQueueConfig
-	LakekeeperWarehouseActionIncludeInList           *LakekeeperWarehouseActionIncludeInList
-	LakekeeperWarehouseActionListDeletedTabulars     *LakekeeperWarehouseActionListDeletedTabulars
-	LakekeeperWarehouseActionListEverything          *LakekeeperWarehouseActionListEverything
-	LakekeeperWarehouseActionListNamespaces          *LakekeeperWarehouseActionListNamespaces
-	LakekeeperWarehouseActionModifySoftDeletion      *LakekeeperWarehouseActionModifySoftDeletion
-	LakekeeperWarehouseActionModifyTaskQueueConfig   *LakekeeperWarehouseActionModifyTaskQueueConfig
-	LakekeeperWarehouseActionRename                  *LakekeeperWarehouseActionRename
-	LakekeeperWarehouseActionSetProtection           *LakekeeperWarehouseActionSetProtection
-	LakekeeperWarehouseActionUpdateStorage           *LakekeeperWarehouseActionUpdateStorage
-	LakekeeperWarehouseActionUpdateStorageCredential *LakekeeperWarehouseActionUpdateStorageCredential
-	LakekeeperWarehouseActionUse                     *LakekeeperWarehouseActionUse
+	LakekeeperWarehouseActionAcceptMovedNamespace   *LakekeeperWarehouseActionAcceptMovedNamespace
+	LakekeeperWarehouseActionActivate               *LakekeeperWarehouseActionActivate
+	LakekeeperWarehouseActionControlAllTasks        *LakekeeperWarehouseActionControlAllTasks
+	LakekeeperWarehouseActionCreateNamespace        *LakekeeperWarehouseActionCreateNamespace
+	LakekeeperWarehouseActionDeactivate             *LakekeeperWarehouseActionDeactivate
+	LakekeeperWarehouseActionDelete                 *LakekeeperWarehouseActionDelete
+	LakekeeperWarehouseActionGetAllTasks            *LakekeeperWarehouseActionGetAllTasks
+	LakekeeperWarehouseActionGetConfig              *LakekeeperWarehouseActionGetConfig
+	LakekeeperWarehouseActionGetEndpointStatistics  *LakekeeperWarehouseActionGetEndpointStatistics
+	LakekeeperWarehouseActionGetMetadata            *LakekeeperWarehouseActionGetMetadata
+	LakekeeperWarehouseActionGetTaskQueueConfig     *LakekeeperWarehouseActionGetTaskQueueConfig
+	LakekeeperWarehouseActionIncludeInList          *LakekeeperWarehouseActionIncludeInList
+	LakekeeperWarehouseActionListDeletedTabulars    *LakekeeperWarehouseActionListDeletedTabulars
+	LakekeeperWarehouseActionListEverything         *LakekeeperWarehouseActionListEverything
+	LakekeeperWarehouseActionListNamespaces         *LakekeeperWarehouseActionListNamespaces
+	LakekeeperWarehouseActionManageTags             *LakekeeperWarehouseActionManageTags
+	LakekeeperWarehouseActionModifySoftDeletion     *LakekeeperWarehouseActionModifySoftDeletion
+	LakekeeperWarehouseActionModifyTaskQueueConfig  *LakekeeperWarehouseActionModifyTaskQueueConfig
+	LakekeeperWarehouseActionReadGrants             *LakekeeperWarehouseActionReadGrants
+	LakekeeperWarehouseActionReadSubtreeGrants      *LakekeeperWarehouseActionReadSubtreeGrants
+	LakekeeperWarehouseActionRename                 *LakekeeperWarehouseActionRename
+	LakekeeperWarehouseActionRevokeSubtreeGrants    *LakekeeperWarehouseActionRevokeSubtreeGrants
+	LakekeeperWarehouseActionSetFormatVersionPolicy *LakekeeperWarehouseActionSetFormatVersionPolicy
+	LakekeeperWarehouseActionSetProtection          *LakekeeperWarehouseActionSetProtection
+	LakekeeperWarehouseActionUpdateStorage          *LakekeeperWarehouseActionUpdateStorage
+	LakekeeperWarehouseActionUse                    *LakekeeperWarehouseActionUse
+}
+
+// LakekeeperWarehouseActionAcceptMovedNamespaceAsLakekeeperWarehouseAction is a convenience function that returns LakekeeperWarehouseActionAcceptMovedNamespace wrapped in LakekeeperWarehouseAction
+func LakekeeperWarehouseActionAcceptMovedNamespaceAsLakekeeperWarehouseAction(v *LakekeeperWarehouseActionAcceptMovedNamespace) LakekeeperWarehouseAction {
+	return LakekeeperWarehouseAction{
+		LakekeeperWarehouseActionAcceptMovedNamespace: v,
+	}
 }
 
 // LakekeeperWarehouseActionActivateAsLakekeeperWarehouseAction is a convenience function that returns LakekeeperWarehouseActionActivate wrapped in LakekeeperWarehouseAction
@@ -138,6 +150,13 @@ func LakekeeperWarehouseActionListNamespacesAsLakekeeperWarehouseAction(v *Lakek
 	}
 }
 
+// LakekeeperWarehouseActionManageTagsAsLakekeeperWarehouseAction is a convenience function that returns LakekeeperWarehouseActionManageTags wrapped in LakekeeperWarehouseAction
+func LakekeeperWarehouseActionManageTagsAsLakekeeperWarehouseAction(v *LakekeeperWarehouseActionManageTags) LakekeeperWarehouseAction {
+	return LakekeeperWarehouseAction{
+		LakekeeperWarehouseActionManageTags: v,
+	}
+}
+
 // LakekeeperWarehouseActionModifySoftDeletionAsLakekeeperWarehouseAction is a convenience function that returns LakekeeperWarehouseActionModifySoftDeletion wrapped in LakekeeperWarehouseAction
 func LakekeeperWarehouseActionModifySoftDeletionAsLakekeeperWarehouseAction(v *LakekeeperWarehouseActionModifySoftDeletion) LakekeeperWarehouseAction {
 	return LakekeeperWarehouseAction{
@@ -152,10 +171,38 @@ func LakekeeperWarehouseActionModifyTaskQueueConfigAsLakekeeperWarehouseAction(v
 	}
 }
 
+// LakekeeperWarehouseActionReadGrantsAsLakekeeperWarehouseAction is a convenience function that returns LakekeeperWarehouseActionReadGrants wrapped in LakekeeperWarehouseAction
+func LakekeeperWarehouseActionReadGrantsAsLakekeeperWarehouseAction(v *LakekeeperWarehouseActionReadGrants) LakekeeperWarehouseAction {
+	return LakekeeperWarehouseAction{
+		LakekeeperWarehouseActionReadGrants: v,
+	}
+}
+
+// LakekeeperWarehouseActionReadSubtreeGrantsAsLakekeeperWarehouseAction is a convenience function that returns LakekeeperWarehouseActionReadSubtreeGrants wrapped in LakekeeperWarehouseAction
+func LakekeeperWarehouseActionReadSubtreeGrantsAsLakekeeperWarehouseAction(v *LakekeeperWarehouseActionReadSubtreeGrants) LakekeeperWarehouseAction {
+	return LakekeeperWarehouseAction{
+		LakekeeperWarehouseActionReadSubtreeGrants: v,
+	}
+}
+
 // LakekeeperWarehouseActionRenameAsLakekeeperWarehouseAction is a convenience function that returns LakekeeperWarehouseActionRename wrapped in LakekeeperWarehouseAction
 func LakekeeperWarehouseActionRenameAsLakekeeperWarehouseAction(v *LakekeeperWarehouseActionRename) LakekeeperWarehouseAction {
 	return LakekeeperWarehouseAction{
 		LakekeeperWarehouseActionRename: v,
+	}
+}
+
+// LakekeeperWarehouseActionRevokeSubtreeGrantsAsLakekeeperWarehouseAction is a convenience function that returns LakekeeperWarehouseActionRevokeSubtreeGrants wrapped in LakekeeperWarehouseAction
+func LakekeeperWarehouseActionRevokeSubtreeGrantsAsLakekeeperWarehouseAction(v *LakekeeperWarehouseActionRevokeSubtreeGrants) LakekeeperWarehouseAction {
+	return LakekeeperWarehouseAction{
+		LakekeeperWarehouseActionRevokeSubtreeGrants: v,
+	}
+}
+
+// LakekeeperWarehouseActionSetFormatVersionPolicyAsLakekeeperWarehouseAction is a convenience function that returns LakekeeperWarehouseActionSetFormatVersionPolicy wrapped in LakekeeperWarehouseAction
+func LakekeeperWarehouseActionSetFormatVersionPolicyAsLakekeeperWarehouseAction(v *LakekeeperWarehouseActionSetFormatVersionPolicy) LakekeeperWarehouseAction {
+	return LakekeeperWarehouseAction{
+		LakekeeperWarehouseActionSetFormatVersionPolicy: v,
 	}
 }
 
@@ -170,13 +217,6 @@ func LakekeeperWarehouseActionSetProtectionAsLakekeeperWarehouseAction(v *Lakeke
 func LakekeeperWarehouseActionUpdateStorageAsLakekeeperWarehouseAction(v *LakekeeperWarehouseActionUpdateStorage) LakekeeperWarehouseAction {
 	return LakekeeperWarehouseAction{
 		LakekeeperWarehouseActionUpdateStorage: v,
-	}
-}
-
-// LakekeeperWarehouseActionUpdateStorageCredentialAsLakekeeperWarehouseAction is a convenience function that returns LakekeeperWarehouseActionUpdateStorageCredential wrapped in LakekeeperWarehouseAction
-func LakekeeperWarehouseActionUpdateStorageCredentialAsLakekeeperWarehouseAction(v *LakekeeperWarehouseActionUpdateStorageCredential) LakekeeperWarehouseAction {
-	return LakekeeperWarehouseAction{
-		LakekeeperWarehouseActionUpdateStorageCredential: v,
 	}
 }
 
@@ -195,6 +235,18 @@ func (dst *LakekeeperWarehouseAction) UnmarshalJSON(data []byte) error {
 	err = newStrictDecoder(data).Decode(&jsonDict)
 	if err != nil {
 		return fmt.Errorf("failed to unmarshal JSON into map for the discriminator lookup")
+	}
+
+	// check if the discriminator value is 'accept_moved_namespace'
+	if jsonDict["action"] == "accept_moved_namespace" {
+		// try to unmarshal JSON data into LakekeeperWarehouseActionAcceptMovedNamespace
+		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionAcceptMovedNamespace)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperWarehouseActionAcceptMovedNamespace, return on the first match
+		} else {
+			dst.LakekeeperWarehouseActionAcceptMovedNamespace = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionAcceptMovedNamespace: %s", err.Error())
+		}
 	}
 
 	// check if the discriminator value is 'activate'
@@ -365,6 +417,18 @@ func (dst *LakekeeperWarehouseAction) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	// check if the discriminator value is 'manage_tags'
+	if jsonDict["action"] == "manage_tags" {
+		// try to unmarshal JSON data into LakekeeperWarehouseActionManageTags
+		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionManageTags)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperWarehouseActionManageTags, return on the first match
+		} else {
+			dst.LakekeeperWarehouseActionManageTags = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionManageTags: %s", err.Error())
+		}
+	}
+
 	// check if the discriminator value is 'modify_soft_deletion'
 	if jsonDict["action"] == "modify_soft_deletion" {
 		// try to unmarshal JSON data into LakekeeperWarehouseActionModifySoftDeletion
@@ -389,6 +453,30 @@ func (dst *LakekeeperWarehouseAction) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	// check if the discriminator value is 'read_grants'
+	if jsonDict["action"] == "read_grants" {
+		// try to unmarshal JSON data into LakekeeperWarehouseActionReadGrants
+		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionReadGrants)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperWarehouseActionReadGrants, return on the first match
+		} else {
+			dst.LakekeeperWarehouseActionReadGrants = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionReadGrants: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'read_subtree_grants'
+	if jsonDict["action"] == "read_subtree_grants" {
+		// try to unmarshal JSON data into LakekeeperWarehouseActionReadSubtreeGrants
+		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionReadSubtreeGrants)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperWarehouseActionReadSubtreeGrants, return on the first match
+		} else {
+			dst.LakekeeperWarehouseActionReadSubtreeGrants = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionReadSubtreeGrants: %s", err.Error())
+		}
+	}
+
 	// check if the discriminator value is 'rename'
 	if jsonDict["action"] == "rename" {
 		// try to unmarshal JSON data into LakekeeperWarehouseActionRename
@@ -398,6 +486,30 @@ func (dst *LakekeeperWarehouseAction) UnmarshalJSON(data []byte) error {
 		} else {
 			dst.LakekeeperWarehouseActionRename = nil
 			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionRename: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'revoke_subtree_grants'
+	if jsonDict["action"] == "revoke_subtree_grants" {
+		// try to unmarshal JSON data into LakekeeperWarehouseActionRevokeSubtreeGrants
+		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionRevokeSubtreeGrants)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperWarehouseActionRevokeSubtreeGrants, return on the first match
+		} else {
+			dst.LakekeeperWarehouseActionRevokeSubtreeGrants = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionRevokeSubtreeGrants: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'set_format_version_policy'
+	if jsonDict["action"] == "set_format_version_policy" {
+		// try to unmarshal JSON data into LakekeeperWarehouseActionSetFormatVersionPolicy
+		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionSetFormatVersionPolicy)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperWarehouseActionSetFormatVersionPolicy, return on the first match
+		} else {
+			dst.LakekeeperWarehouseActionSetFormatVersionPolicy = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionSetFormatVersionPolicy: %s", err.Error())
 		}
 	}
 
@@ -425,18 +537,6 @@ func (dst *LakekeeperWarehouseAction) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	// check if the discriminator value is 'update_storage_credential'
-	if jsonDict["action"] == "update_storage_credential" {
-		// try to unmarshal JSON data into LakekeeperWarehouseActionUpdateStorageCredential
-		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionUpdateStorageCredential)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperWarehouseActionUpdateStorageCredential, return on the first match
-		} else {
-			dst.LakekeeperWarehouseActionUpdateStorageCredential = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionUpdateStorageCredential: %s", err.Error())
-		}
-	}
-
 	// check if the discriminator value is 'use'
 	if jsonDict["action"] == "use" {
 		// try to unmarshal JSON data into LakekeeperWarehouseActionUse
@@ -446,6 +546,18 @@ func (dst *LakekeeperWarehouseAction) UnmarshalJSON(data []byte) error {
 		} else {
 			dst.LakekeeperWarehouseActionUse = nil
 			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionUse: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'LakekeeperWarehouseActionAcceptMovedNamespace'
+	if jsonDict["action"] == "LakekeeperWarehouseActionAcceptMovedNamespace" {
+		// try to unmarshal JSON data into LakekeeperWarehouseActionAcceptMovedNamespace
+		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionAcceptMovedNamespace)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperWarehouseActionAcceptMovedNamespace, return on the first match
+		} else {
+			dst.LakekeeperWarehouseActionAcceptMovedNamespace = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionAcceptMovedNamespace: %s", err.Error())
 		}
 	}
 
@@ -617,6 +729,18 @@ func (dst *LakekeeperWarehouseAction) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	// check if the discriminator value is 'LakekeeperWarehouseActionManageTags'
+	if jsonDict["action"] == "LakekeeperWarehouseActionManageTags" {
+		// try to unmarshal JSON data into LakekeeperWarehouseActionManageTags
+		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionManageTags)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperWarehouseActionManageTags, return on the first match
+		} else {
+			dst.LakekeeperWarehouseActionManageTags = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionManageTags: %s", err.Error())
+		}
+	}
+
 	// check if the discriminator value is 'LakekeeperWarehouseActionModifySoftDeletion'
 	if jsonDict["action"] == "LakekeeperWarehouseActionModifySoftDeletion" {
 		// try to unmarshal JSON data into LakekeeperWarehouseActionModifySoftDeletion
@@ -641,6 +765,30 @@ func (dst *LakekeeperWarehouseAction) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	// check if the discriminator value is 'LakekeeperWarehouseActionReadGrants'
+	if jsonDict["action"] == "LakekeeperWarehouseActionReadGrants" {
+		// try to unmarshal JSON data into LakekeeperWarehouseActionReadGrants
+		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionReadGrants)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperWarehouseActionReadGrants, return on the first match
+		} else {
+			dst.LakekeeperWarehouseActionReadGrants = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionReadGrants: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'LakekeeperWarehouseActionReadSubtreeGrants'
+	if jsonDict["action"] == "LakekeeperWarehouseActionReadSubtreeGrants" {
+		// try to unmarshal JSON data into LakekeeperWarehouseActionReadSubtreeGrants
+		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionReadSubtreeGrants)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperWarehouseActionReadSubtreeGrants, return on the first match
+		} else {
+			dst.LakekeeperWarehouseActionReadSubtreeGrants = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionReadSubtreeGrants: %s", err.Error())
+		}
+	}
+
 	// check if the discriminator value is 'LakekeeperWarehouseActionRename'
 	if jsonDict["action"] == "LakekeeperWarehouseActionRename" {
 		// try to unmarshal JSON data into LakekeeperWarehouseActionRename
@@ -650,6 +798,30 @@ func (dst *LakekeeperWarehouseAction) UnmarshalJSON(data []byte) error {
 		} else {
 			dst.LakekeeperWarehouseActionRename = nil
 			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionRename: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'LakekeeperWarehouseActionRevokeSubtreeGrants'
+	if jsonDict["action"] == "LakekeeperWarehouseActionRevokeSubtreeGrants" {
+		// try to unmarshal JSON data into LakekeeperWarehouseActionRevokeSubtreeGrants
+		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionRevokeSubtreeGrants)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperWarehouseActionRevokeSubtreeGrants, return on the first match
+		} else {
+			dst.LakekeeperWarehouseActionRevokeSubtreeGrants = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionRevokeSubtreeGrants: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'LakekeeperWarehouseActionSetFormatVersionPolicy'
+	if jsonDict["action"] == "LakekeeperWarehouseActionSetFormatVersionPolicy" {
+		// try to unmarshal JSON data into LakekeeperWarehouseActionSetFormatVersionPolicy
+		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionSetFormatVersionPolicy)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperWarehouseActionSetFormatVersionPolicy, return on the first match
+		} else {
+			dst.LakekeeperWarehouseActionSetFormatVersionPolicy = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionSetFormatVersionPolicy: %s", err.Error())
 		}
 	}
 
@@ -677,18 +849,6 @@ func (dst *LakekeeperWarehouseAction) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	// check if the discriminator value is 'LakekeeperWarehouseActionUpdateStorageCredential'
-	if jsonDict["action"] == "LakekeeperWarehouseActionUpdateStorageCredential" {
-		// try to unmarshal JSON data into LakekeeperWarehouseActionUpdateStorageCredential
-		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionUpdateStorageCredential)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperWarehouseActionUpdateStorageCredential, return on the first match
-		} else {
-			dst.LakekeeperWarehouseActionUpdateStorageCredential = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionUpdateStorageCredential: %s", err.Error())
-		}
-	}
-
 	// check if the discriminator value is 'LakekeeperWarehouseActionUse'
 	if jsonDict["action"] == "LakekeeperWarehouseActionUse" {
 		// try to unmarshal JSON data into LakekeeperWarehouseActionUse
@@ -706,6 +866,10 @@ func (dst *LakekeeperWarehouseAction) UnmarshalJSON(data []byte) error {
 
 // Marshal data from the first non-nil pointers in the struct to JSON
 func (src LakekeeperWarehouseAction) MarshalJSON() ([]byte, error) {
+	if src.LakekeeperWarehouseActionAcceptMovedNamespace != nil {
+		return json.Marshal(&src.LakekeeperWarehouseActionAcceptMovedNamespace)
+	}
+
 	if src.LakekeeperWarehouseActionActivate != nil {
 		return json.Marshal(&src.LakekeeperWarehouseActionActivate)
 	}
@@ -762,6 +926,10 @@ func (src LakekeeperWarehouseAction) MarshalJSON() ([]byte, error) {
 		return json.Marshal(&src.LakekeeperWarehouseActionListNamespaces)
 	}
 
+	if src.LakekeeperWarehouseActionManageTags != nil {
+		return json.Marshal(&src.LakekeeperWarehouseActionManageTags)
+	}
+
 	if src.LakekeeperWarehouseActionModifySoftDeletion != nil {
 		return json.Marshal(&src.LakekeeperWarehouseActionModifySoftDeletion)
 	}
@@ -770,8 +938,24 @@ func (src LakekeeperWarehouseAction) MarshalJSON() ([]byte, error) {
 		return json.Marshal(&src.LakekeeperWarehouseActionModifyTaskQueueConfig)
 	}
 
+	if src.LakekeeperWarehouseActionReadGrants != nil {
+		return json.Marshal(&src.LakekeeperWarehouseActionReadGrants)
+	}
+
+	if src.LakekeeperWarehouseActionReadSubtreeGrants != nil {
+		return json.Marshal(&src.LakekeeperWarehouseActionReadSubtreeGrants)
+	}
+
 	if src.LakekeeperWarehouseActionRename != nil {
 		return json.Marshal(&src.LakekeeperWarehouseActionRename)
+	}
+
+	if src.LakekeeperWarehouseActionRevokeSubtreeGrants != nil {
+		return json.Marshal(&src.LakekeeperWarehouseActionRevokeSubtreeGrants)
+	}
+
+	if src.LakekeeperWarehouseActionSetFormatVersionPolicy != nil {
+		return json.Marshal(&src.LakekeeperWarehouseActionSetFormatVersionPolicy)
 	}
 
 	if src.LakekeeperWarehouseActionSetProtection != nil {
@@ -780,10 +964,6 @@ func (src LakekeeperWarehouseAction) MarshalJSON() ([]byte, error) {
 
 	if src.LakekeeperWarehouseActionUpdateStorage != nil {
 		return json.Marshal(&src.LakekeeperWarehouseActionUpdateStorage)
-	}
-
-	if src.LakekeeperWarehouseActionUpdateStorageCredential != nil {
-		return json.Marshal(&src.LakekeeperWarehouseActionUpdateStorageCredential)
 	}
 
 	if src.LakekeeperWarehouseActionUse != nil {
@@ -798,6 +978,10 @@ func (obj *LakekeeperWarehouseAction) GetActualInstance() interface{} {
 	if obj == nil {
 		return nil
 	}
+	if obj.LakekeeperWarehouseActionAcceptMovedNamespace != nil {
+		return obj.LakekeeperWarehouseActionAcceptMovedNamespace
+	}
+
 	if obj.LakekeeperWarehouseActionActivate != nil {
 		return obj.LakekeeperWarehouseActionActivate
 	}
@@ -854,6 +1038,10 @@ func (obj *LakekeeperWarehouseAction) GetActualInstance() interface{} {
 		return obj.LakekeeperWarehouseActionListNamespaces
 	}
 
+	if obj.LakekeeperWarehouseActionManageTags != nil {
+		return obj.LakekeeperWarehouseActionManageTags
+	}
+
 	if obj.LakekeeperWarehouseActionModifySoftDeletion != nil {
 		return obj.LakekeeperWarehouseActionModifySoftDeletion
 	}
@@ -862,8 +1050,24 @@ func (obj *LakekeeperWarehouseAction) GetActualInstance() interface{} {
 		return obj.LakekeeperWarehouseActionModifyTaskQueueConfig
 	}
 
+	if obj.LakekeeperWarehouseActionReadGrants != nil {
+		return obj.LakekeeperWarehouseActionReadGrants
+	}
+
+	if obj.LakekeeperWarehouseActionReadSubtreeGrants != nil {
+		return obj.LakekeeperWarehouseActionReadSubtreeGrants
+	}
+
 	if obj.LakekeeperWarehouseActionRename != nil {
 		return obj.LakekeeperWarehouseActionRename
+	}
+
+	if obj.LakekeeperWarehouseActionRevokeSubtreeGrants != nil {
+		return obj.LakekeeperWarehouseActionRevokeSubtreeGrants
+	}
+
+	if obj.LakekeeperWarehouseActionSetFormatVersionPolicy != nil {
+		return obj.LakekeeperWarehouseActionSetFormatVersionPolicy
 	}
 
 	if obj.LakekeeperWarehouseActionSetProtection != nil {
@@ -872,10 +1076,6 @@ func (obj *LakekeeperWarehouseAction) GetActualInstance() interface{} {
 
 	if obj.LakekeeperWarehouseActionUpdateStorage != nil {
 		return obj.LakekeeperWarehouseActionUpdateStorage
-	}
-
-	if obj.LakekeeperWarehouseActionUpdateStorageCredential != nil {
-		return obj.LakekeeperWarehouseActionUpdateStorageCredential
 	}
 
 	if obj.LakekeeperWarehouseActionUse != nil {

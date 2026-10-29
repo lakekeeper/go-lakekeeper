@@ -22,7 +22,7 @@ var _ MappedNullable = &ConsoleInfo{}
 // ConsoleInfo Information about the UI (console) shipped with this binary.
 type ConsoleInfo struct {
 	// Git commit SHA of the console source, if known.
-	CommitSha *string `json:"commit-sha,omitempty"`
+	CommitSha NullableString `json:"commit-sha,omitempty"`
 	// Edition / crate name of the bundled console. e.g. `lakekeeper-console` for the OSS console or `lakekeeper-console-plus` for the enterprise console.
 	Edition string `json:"edition"`
 	// SemVer of the console crate.
@@ -50,36 +50,47 @@ func NewConsoleInfoWithDefaults() *ConsoleInfo {
 	return &this
 }
 
-// GetCommitSha returns the CommitSha field value if set, zero value otherwise.
+// GetCommitSha returns the CommitSha field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *ConsoleInfo) GetCommitSha() string {
-	if o == nil || IsNil(o.CommitSha) {
+	if o == nil || IsNil(o.CommitSha.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.CommitSha
+	return *o.CommitSha.Get()
 }
 
 // GetCommitShaOk returns a tuple with the CommitSha field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *ConsoleInfo) GetCommitShaOk() (*string, bool) {
-	if o == nil || IsNil(o.CommitSha) {
+	if o == nil {
 		return nil, false
 	}
-	return o.CommitSha, true
+	return o.CommitSha.Get(), o.CommitSha.IsSet()
 }
 
 // HasCommitSha returns a boolean if a field has been set.
 func (o *ConsoleInfo) HasCommitSha() bool {
-	if o != nil && !IsNil(o.CommitSha) {
+	if o != nil && o.CommitSha.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetCommitSha gets a reference to the given string and assigns it to the CommitSha field.
+// SetCommitSha gets a reference to the given NullableString and assigns it to the CommitSha field.
 func (o *ConsoleInfo) SetCommitSha(v string) {
-	o.CommitSha = &v
+	o.CommitSha.Set(&v)
+}
+
+// SetCommitShaNil sets the value for CommitSha to be an explicit nil
+func (o *ConsoleInfo) SetCommitShaNil() {
+	o.CommitSha.Set(nil)
+}
+
+// UnsetCommitSha ensures that no value is present for CommitSha, not even an explicit nil
+func (o *ConsoleInfo) UnsetCommitSha() {
+	o.CommitSha.Unset()
 }
 
 // GetEdition returns the Edition field value
@@ -132,8 +143,8 @@ func (o *ConsoleInfo) SetVersion(v string) {
 
 func (o ConsoleInfo) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.CommitSha) {
-		toSerialize["commit-sha"] = o.CommitSha
+	if o.CommitSha.IsSet() {
+		toSerialize["commit-sha"] = o.CommitSha.Get()
 	}
 	toSerialize["edition"] = o.Edition
 	toSerialize["version"] = o.Version

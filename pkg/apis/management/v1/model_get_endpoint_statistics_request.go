@@ -92,9 +92,9 @@ func (o *GetEndpointStatisticsRequest) UnsetRangeSpecifier() {
 	o.RangeSpecifier.Unset()
 }
 
-// GetStatusCodes returns the StatusCodes field value if set, zero value otherwise.
+// GetStatusCodes returns the StatusCodes field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *GetEndpointStatisticsRequest) GetStatusCodes() []int32 {
-	if o == nil || IsNil(o.StatusCodes) {
+	if o == nil {
 		var ret []int32
 		return ret
 	}
@@ -103,6 +103,7 @@ func (o *GetEndpointStatisticsRequest) GetStatusCodes() []int32 {
 
 // GetStatusCodesOk returns a tuple with the StatusCodes field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *GetEndpointStatisticsRequest) GetStatusCodesOk() ([]int32, bool) {
 	if o == nil || IsNil(o.StatusCodes) {
 		return nil, false
@@ -153,7 +154,7 @@ func (o GetEndpointStatisticsRequest) ToMap() (map[string]interface{}, error) {
 	if o.RangeSpecifier.IsSet() {
 		toSerialize["range-specifier"] = o.RangeSpecifier.Get()
 	}
-	if !IsNil(o.StatusCodes) {
+	if o.StatusCodes != nil {
 		toSerialize["status-codes"] = o.StatusCodes
 	}
 	toSerialize["warehouse"] = o.Warehouse

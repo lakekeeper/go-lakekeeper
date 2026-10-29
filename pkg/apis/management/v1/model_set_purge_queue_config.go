@@ -21,7 +21,7 @@ var _ MappedNullable = &SetPurgeQueueConfig{}
 
 // SetPurgeQueueConfig struct for SetPurgeQueueConfig
 type SetPurgeQueueConfig struct {
-	MaxSecondsSinceLastHeartbeat *int64                 `json:"max-seconds-since-last-heartbeat,omitempty"`
+	MaxSecondsSinceLastHeartbeat NullableInt64          `json:"max-seconds-since-last-heartbeat,omitempty"`
 	QueueConfig                  map[string]interface{} `json:"queue-config"`
 }
 
@@ -45,36 +45,47 @@ func NewSetPurgeQueueConfigWithDefaults() *SetPurgeQueueConfig {
 	return &this
 }
 
-// GetMaxSecondsSinceLastHeartbeat returns the MaxSecondsSinceLastHeartbeat field value if set, zero value otherwise.
+// GetMaxSecondsSinceLastHeartbeat returns the MaxSecondsSinceLastHeartbeat field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *SetPurgeQueueConfig) GetMaxSecondsSinceLastHeartbeat() int64 {
-	if o == nil || IsNil(o.MaxSecondsSinceLastHeartbeat) {
+	if o == nil || IsNil(o.MaxSecondsSinceLastHeartbeat.Get()) {
 		var ret int64
 		return ret
 	}
-	return *o.MaxSecondsSinceLastHeartbeat
+	return *o.MaxSecondsSinceLastHeartbeat.Get()
 }
 
 // GetMaxSecondsSinceLastHeartbeatOk returns a tuple with the MaxSecondsSinceLastHeartbeat field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *SetPurgeQueueConfig) GetMaxSecondsSinceLastHeartbeatOk() (*int64, bool) {
-	if o == nil || IsNil(o.MaxSecondsSinceLastHeartbeat) {
+	if o == nil {
 		return nil, false
 	}
-	return o.MaxSecondsSinceLastHeartbeat, true
+	return o.MaxSecondsSinceLastHeartbeat.Get(), o.MaxSecondsSinceLastHeartbeat.IsSet()
 }
 
 // HasMaxSecondsSinceLastHeartbeat returns a boolean if a field has been set.
 func (o *SetPurgeQueueConfig) HasMaxSecondsSinceLastHeartbeat() bool {
-	if o != nil && !IsNil(o.MaxSecondsSinceLastHeartbeat) {
+	if o != nil && o.MaxSecondsSinceLastHeartbeat.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetMaxSecondsSinceLastHeartbeat gets a reference to the given int64 and assigns it to the MaxSecondsSinceLastHeartbeat field.
+// SetMaxSecondsSinceLastHeartbeat gets a reference to the given NullableInt64 and assigns it to the MaxSecondsSinceLastHeartbeat field.
 func (o *SetPurgeQueueConfig) SetMaxSecondsSinceLastHeartbeat(v int64) {
-	o.MaxSecondsSinceLastHeartbeat = &v
+	o.MaxSecondsSinceLastHeartbeat.Set(&v)
+}
+
+// SetMaxSecondsSinceLastHeartbeatNil sets the value for MaxSecondsSinceLastHeartbeat to be an explicit nil
+func (o *SetPurgeQueueConfig) SetMaxSecondsSinceLastHeartbeatNil() {
+	o.MaxSecondsSinceLastHeartbeat.Set(nil)
+}
+
+// UnsetMaxSecondsSinceLastHeartbeat ensures that no value is present for MaxSecondsSinceLastHeartbeat, not even an explicit nil
+func (o *SetPurgeQueueConfig) UnsetMaxSecondsSinceLastHeartbeat() {
+	o.MaxSecondsSinceLastHeartbeat.Unset()
 }
 
 // GetQueueConfig returns the QueueConfig field value
@@ -103,8 +114,8 @@ func (o *SetPurgeQueueConfig) SetQueueConfig(v map[string]interface{}) {
 
 func (o SetPurgeQueueConfig) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.MaxSecondsSinceLastHeartbeat) {
-		toSerialize["max-seconds-since-last-heartbeat"] = o.MaxSecondsSinceLastHeartbeat
+	if o.MaxSecondsSinceLastHeartbeat.IsSet() {
+		toSerialize["max-seconds-since-last-heartbeat"] = o.MaxSecondsSinceLastHeartbeat.Get()
 	}
 	toSerialize["queue-config"] = o.QueueConfig
 	return toSerialize, nil

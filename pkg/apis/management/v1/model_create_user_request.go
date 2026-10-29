@@ -20,11 +20,11 @@ var _ MappedNullable = &CreateUserRequest{}
 // CreateUserRequest struct for CreateUserRequest
 type CreateUserRequest struct {
 	// Email of the user. If id is not specified, the email is extracted from the provided token.
-	Email *string `json:"email,omitempty"`
+	Email NullableString `json:"email,omitempty"`
 	// Subject id of the user - allows user provisioning. The id must be identical to the subject in JWT tokens, prefixed with `<idp-identifier>~`. For example: `oidc~1234567890` for OIDC users or `kubernetes~1234567890` for Kubernetes users. To create users in self-service manner, do not set the id. The id is then extracted from the passed JWT token.
-	Id *string `json:"id,omitempty"`
+	Id NullableString `json:"id,omitempty"`
 	// Name of the user. If id is not specified, the name is extracted from the provided token.
-	Name *string `json:"name,omitempty"`
+	Name NullableString `json:"name,omitempty"`
 	// Update the user if it already exists Default: false
 	UpdateIfExists *bool `json:"update-if-exists,omitempty"`
 	// Type of the user. Useful to override wrongly classified users
@@ -48,100 +48,133 @@ func NewCreateUserRequestWithDefaults() *CreateUserRequest {
 	return &this
 }
 
-// GetEmail returns the Email field value if set, zero value otherwise.
+// GetEmail returns the Email field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *CreateUserRequest) GetEmail() string {
-	if o == nil || IsNil(o.Email) {
+	if o == nil || IsNil(o.Email.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.Email
+	return *o.Email.Get()
 }
 
 // GetEmailOk returns a tuple with the Email field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *CreateUserRequest) GetEmailOk() (*string, bool) {
-	if o == nil || IsNil(o.Email) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Email, true
+	return o.Email.Get(), o.Email.IsSet()
 }
 
 // HasEmail returns a boolean if a field has been set.
 func (o *CreateUserRequest) HasEmail() bool {
-	if o != nil && !IsNil(o.Email) {
+	if o != nil && o.Email.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetEmail gets a reference to the given string and assigns it to the Email field.
+// SetEmail gets a reference to the given NullableString and assigns it to the Email field.
 func (o *CreateUserRequest) SetEmail(v string) {
-	o.Email = &v
+	o.Email.Set(&v)
 }
 
-// GetId returns the Id field value if set, zero value otherwise.
+// SetEmailNil sets the value for Email to be an explicit nil
+func (o *CreateUserRequest) SetEmailNil() {
+	o.Email.Set(nil)
+}
+
+// UnsetEmail ensures that no value is present for Email, not even an explicit nil
+func (o *CreateUserRequest) UnsetEmail() {
+	o.Email.Unset()
+}
+
+// GetId returns the Id field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *CreateUserRequest) GetId() string {
-	if o == nil || IsNil(o.Id) {
+	if o == nil || IsNil(o.Id.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.Id
+	return *o.Id.Get()
 }
 
 // GetIdOk returns a tuple with the Id field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *CreateUserRequest) GetIdOk() (*string, bool) {
-	if o == nil || IsNil(o.Id) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Id, true
+	return o.Id.Get(), o.Id.IsSet()
 }
 
 // HasId returns a boolean if a field has been set.
 func (o *CreateUserRequest) HasId() bool {
-	if o != nil && !IsNil(o.Id) {
+	if o != nil && o.Id.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetId gets a reference to the given string and assigns it to the Id field.
+// SetId gets a reference to the given NullableString and assigns it to the Id field.
 func (o *CreateUserRequest) SetId(v string) {
-	o.Id = &v
+	o.Id.Set(&v)
 }
 
-// GetName returns the Name field value if set, zero value otherwise.
+// SetIdNil sets the value for Id to be an explicit nil
+func (o *CreateUserRequest) SetIdNil() {
+	o.Id.Set(nil)
+}
+
+// UnsetId ensures that no value is present for Id, not even an explicit nil
+func (o *CreateUserRequest) UnsetId() {
+	o.Id.Unset()
+}
+
+// GetName returns the Name field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *CreateUserRequest) GetName() string {
-	if o == nil || IsNil(o.Name) {
+	if o == nil || IsNil(o.Name.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.Name
+	return *o.Name.Get()
 }
 
 // GetNameOk returns a tuple with the Name field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *CreateUserRequest) GetNameOk() (*string, bool) {
-	if o == nil || IsNil(o.Name) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Name, true
+	return o.Name.Get(), o.Name.IsSet()
 }
 
 // HasName returns a boolean if a field has been set.
 func (o *CreateUserRequest) HasName() bool {
-	if o != nil && !IsNil(o.Name) {
+	if o != nil && o.Name.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetName gets a reference to the given string and assigns it to the Name field.
+// SetName gets a reference to the given NullableString and assigns it to the Name field.
 func (o *CreateUserRequest) SetName(v string) {
-	o.Name = &v
+	o.Name.Set(&v)
+}
+
+// SetNameNil sets the value for Name to be an explicit nil
+func (o *CreateUserRequest) SetNameNil() {
+	o.Name.Set(nil)
+}
+
+// UnsetName ensures that no value is present for Name, not even an explicit nil
+func (o *CreateUserRequest) UnsetName() {
+	o.Name.Unset()
 }
 
 // GetUpdateIfExists returns the UpdateIfExists field value if set, zero value otherwise.
@@ -221,14 +254,14 @@ func (o *CreateUserRequest) UnsetUserType() {
 
 func (o CreateUserRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.Email) {
-		toSerialize["email"] = o.Email
+	if o.Email.IsSet() {
+		toSerialize["email"] = o.Email.Get()
 	}
-	if !IsNil(o.Id) {
-		toSerialize["id"] = o.Id
+	if o.Id.IsSet() {
+		toSerialize["id"] = o.Id.Get()
 	}
-	if !IsNil(o.Name) {
-		toSerialize["name"] = o.Name
+	if o.Name.IsSet() {
+		toSerialize["name"] = o.Name.Get()
 	}
 	if !IsNil(o.UpdateIfExists) {
 		toSerialize["update-if-exists"] = o.UpdateIfExists

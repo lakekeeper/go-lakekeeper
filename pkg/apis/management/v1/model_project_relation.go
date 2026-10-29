@@ -20,14 +20,15 @@ type ProjectRelation string
 
 // List of ProjectRelation
 const (
-	ProjectRelationProjectAdmin  ProjectRelation = "project_admin"
-	ProjectRelationSecurityAdmin ProjectRelation = "security_admin"
-	ProjectRelationDataAdmin     ProjectRelation = "data_admin"
-	ProjectRelationRoleCreator   ProjectRelation = "role_creator"
-	ProjectRelationDescribe      ProjectRelation = "describe"
-	ProjectRelationSelect        ProjectRelation = "select"
-	ProjectRelationCreate        ProjectRelation = "create"
-	ProjectRelationModify        ProjectRelation = "modify"
+	PROJECTRELATION_PROJECT_ADMIN  ProjectRelation = "project_admin"
+	PROJECTRELATION_SECURITY_ADMIN ProjectRelation = "security_admin"
+	PROJECTRELATION_DATA_ADMIN     ProjectRelation = "data_admin"
+	PROJECTRELATION_ROLE_CREATOR   ProjectRelation = "role_creator"
+	PROJECTRELATION_TAG_CREATOR    ProjectRelation = "tag_creator"
+	PROJECTRELATION_DESCRIBE       ProjectRelation = "describe"
+	PROJECTRELATION_SELECT         ProjectRelation = "select"
+	PROJECTRELATION_CREATE         ProjectRelation = "create"
+	PROJECTRELATION_MODIFY         ProjectRelation = "modify"
 )
 
 // All allowed values of ProjectRelation enum
@@ -36,6 +37,7 @@ var AllowedProjectRelationEnumValues = []ProjectRelation{
 	"security_admin",
 	"data_admin",
 	"role_creator",
+	"tag_creator",
 	"describe",
 	"select",
 	"create",

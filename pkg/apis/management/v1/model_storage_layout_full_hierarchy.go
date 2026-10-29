@@ -19,12 +19,13 @@ import (
 // checks if the StorageLayoutFullHierarchy type satisfies the MappedNullable interface at compile time
 var _ MappedNullable = &StorageLayoutFullHierarchy{}
 
-// StorageLayoutFullHierarchy One directory per namespace level, one per tabular.  For a tabular `my_tabular` (uuid `…003`) in `grandparent_ns` / `parent_ns` the path is: `<base>/<grandparent-segment>/<parent-segment>/<tabular-segment>`.
+// StorageLayoutFullHierarchy struct for StorageLayoutFullHierarchy
 type StorageLayoutFullHierarchy struct {
 	// Template string for namespace path segments. Placeholders {uuid} and {name} (with curly braces) will be replaced with the actual namespace UUID and name respectively. The {name} value is percent-encoded (URL percent-encoding) so spaces and special characters are escaped (e.g. \"my name\" becomes \"my%20name\"). The {uuid} value is inserted as-is without encoding. Example: \"{name}-{uuid}\" for a namespace named \"my ns\" renders to \"my%20ns-550e8400-e29b-41d4-a716-446655440001\".
 	Namespace string `json:"namespace"`
 	// Template string for tabular names. Placeholders {uuid} and {name} (with curly braces) will be replaced with the actual tabular UUID and name respectively. The {name} value is percent-encoded (URL percent-encoding) so spaces and special characters are escaped (e.g. \"my tabular\" becomes \"my%20tabular\"). The {uuid} value is inserted as-is without encoding. Example: \"{name}-{uuid}\" for a tabular named \"my tabular\" renders to \"my%20tabular-550e8400-e29b-41d4-a716-446655440002\".
 	Tabular string `json:"tabular"`
+	Type    string `json:"type"`
 }
 
 type _StorageLayoutFullHierarchy StorageLayoutFullHierarchy
@@ -33,10 +34,11 @@ type _StorageLayoutFullHierarchy StorageLayoutFullHierarchy
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewStorageLayoutFullHierarchy(namespace string, tabular string) *StorageLayoutFullHierarchy {
+func NewStorageLayoutFullHierarchy(namespace string, tabular string, type_ string) *StorageLayoutFullHierarchy {
 	this := StorageLayoutFullHierarchy{}
 	this.Namespace = namespace
 	this.Tabular = tabular
+	this.Type = type_
 	return &this
 }
 
@@ -96,10 +98,35 @@ func (o *StorageLayoutFullHierarchy) SetTabular(v string) {
 	o.Tabular = v
 }
 
+// GetType returns the Type field value
+func (o *StorageLayoutFullHierarchy) GetType() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.Type
+}
+
+// GetTypeOk returns a tuple with the Type field value
+// and a boolean to check if the value has been set.
+func (o *StorageLayoutFullHierarchy) GetTypeOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Type, true
+}
+
+// SetType sets field value
+func (o *StorageLayoutFullHierarchy) SetType(v string) {
+	o.Type = v
+}
+
 func (o StorageLayoutFullHierarchy) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["namespace"] = o.Namespace
 	toSerialize["tabular"] = o.Tabular
+	toSerialize["type"] = o.Type
 	return toSerialize, nil
 }
 
@@ -110,6 +137,7 @@ func (o *StorageLayoutFullHierarchy) UnmarshalJSON(data []byte) (err error) {
 	requiredProperties := []string{
 		"namespace",
 		"tabular",
+		"type",
 	}
 
 	allProperties := make(map[string]interface{})

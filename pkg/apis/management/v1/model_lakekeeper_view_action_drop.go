@@ -22,6 +22,10 @@ var _ MappedNullable = &LakekeeperViewActionDrop{}
 // LakekeeperViewActionDrop struct for LakekeeperViewActionDrop
 type LakekeeperViewActionDrop struct {
 	Action string `json:"action"`
+	// Whether the warehouse-configured soft-deletion is bypassed: the view is hard-deleted at once, not kept for the configured grace period. Extra destructive — irreversible right away.
+	Force *bool `json:"force,omitempty"`
+	// Whether the underlying metadata files are physically purged from storage.
+	Purge *bool `json:"purge,omitempty"`
 }
 
 type _LakekeeperViewActionDrop LakekeeperViewActionDrop
@@ -68,9 +72,79 @@ func (o *LakekeeperViewActionDrop) SetAction(v string) {
 	o.Action = v
 }
 
+// GetForce returns the Force field value if set, zero value otherwise.
+func (o *LakekeeperViewActionDrop) GetForce() bool {
+	if o == nil || IsNil(o.Force) {
+		var ret bool
+		return ret
+	}
+	return *o.Force
+}
+
+// GetForceOk returns a tuple with the Force field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *LakekeeperViewActionDrop) GetForceOk() (*bool, bool) {
+	if o == nil || IsNil(o.Force) {
+		return nil, false
+	}
+	return o.Force, true
+}
+
+// HasForce returns a boolean if a field has been set.
+func (o *LakekeeperViewActionDrop) HasForce() bool {
+	if o != nil && !IsNil(o.Force) {
+		return true
+	}
+
+	return false
+}
+
+// SetForce gets a reference to the given bool and assigns it to the Force field.
+func (o *LakekeeperViewActionDrop) SetForce(v bool) {
+	o.Force = &v
+}
+
+// GetPurge returns the Purge field value if set, zero value otherwise.
+func (o *LakekeeperViewActionDrop) GetPurge() bool {
+	if o == nil || IsNil(o.Purge) {
+		var ret bool
+		return ret
+	}
+	return *o.Purge
+}
+
+// GetPurgeOk returns a tuple with the Purge field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *LakekeeperViewActionDrop) GetPurgeOk() (*bool, bool) {
+	if o == nil || IsNil(o.Purge) {
+		return nil, false
+	}
+	return o.Purge, true
+}
+
+// HasPurge returns a boolean if a field has been set.
+func (o *LakekeeperViewActionDrop) HasPurge() bool {
+	if o != nil && !IsNil(o.Purge) {
+		return true
+	}
+
+	return false
+}
+
+// SetPurge gets a reference to the given bool and assigns it to the Purge field.
+func (o *LakekeeperViewActionDrop) SetPurge(v bool) {
+	o.Purge = &v
+}
+
 func (o LakekeeperViewActionDrop) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["action"] = o.Action
+	if !IsNil(o.Force) {
+		toSerialize["force"] = o.Force
+	}
+	if !IsNil(o.Purge) {
+		toSerialize["purge"] = o.Purge
+	}
 	return toSerialize, nil
 }
 

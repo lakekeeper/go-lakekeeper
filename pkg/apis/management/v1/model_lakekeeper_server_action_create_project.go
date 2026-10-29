@@ -23,9 +23,9 @@ var _ MappedNullable = &LakekeeperServerActionCreateProject{}
 type LakekeeperServerActionCreateProject struct {
 	Action string `json:"action"`
 	// Name of the project to create.
-	Name *string `json:"name,omitempty"`
+	Name NullableString `json:"name,omitempty"`
 	// Project ID, if externally provided.
-	ProjectId *string `json:"project_id,omitempty"`
+	ProjectId NullableString `json:"project_id,omitempty"`
 }
 
 type _LakekeeperServerActionCreateProject LakekeeperServerActionCreateProject
@@ -72,78 +72,100 @@ func (o *LakekeeperServerActionCreateProject) SetAction(v string) {
 	o.Action = v
 }
 
-// GetName returns the Name field value if set, zero value otherwise.
+// GetName returns the Name field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *LakekeeperServerActionCreateProject) GetName() string {
-	if o == nil || IsNil(o.Name) {
+	if o == nil || IsNil(o.Name.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.Name
+	return *o.Name.Get()
 }
 
 // GetNameOk returns a tuple with the Name field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *LakekeeperServerActionCreateProject) GetNameOk() (*string, bool) {
-	if o == nil || IsNil(o.Name) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Name, true
+	return o.Name.Get(), o.Name.IsSet()
 }
 
 // HasName returns a boolean if a field has been set.
 func (o *LakekeeperServerActionCreateProject) HasName() bool {
-	if o != nil && !IsNil(o.Name) {
+	if o != nil && o.Name.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetName gets a reference to the given string and assigns it to the Name field.
+// SetName gets a reference to the given NullableString and assigns it to the Name field.
 func (o *LakekeeperServerActionCreateProject) SetName(v string) {
-	o.Name = &v
+	o.Name.Set(&v)
 }
 
-// GetProjectId returns the ProjectId field value if set, zero value otherwise.
+// SetNameNil sets the value for Name to be an explicit nil
+func (o *LakekeeperServerActionCreateProject) SetNameNil() {
+	o.Name.Set(nil)
+}
+
+// UnsetName ensures that no value is present for Name, not even an explicit nil
+func (o *LakekeeperServerActionCreateProject) UnsetName() {
+	o.Name.Unset()
+}
+
+// GetProjectId returns the ProjectId field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *LakekeeperServerActionCreateProject) GetProjectId() string {
-	if o == nil || IsNil(o.ProjectId) {
+	if o == nil || IsNil(o.ProjectId.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.ProjectId
+	return *o.ProjectId.Get()
 }
 
 // GetProjectIdOk returns a tuple with the ProjectId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *LakekeeperServerActionCreateProject) GetProjectIdOk() (*string, bool) {
-	if o == nil || IsNil(o.ProjectId) {
+	if o == nil {
 		return nil, false
 	}
-	return o.ProjectId, true
+	return o.ProjectId.Get(), o.ProjectId.IsSet()
 }
 
 // HasProjectId returns a boolean if a field has been set.
 func (o *LakekeeperServerActionCreateProject) HasProjectId() bool {
-	if o != nil && !IsNil(o.ProjectId) {
+	if o != nil && o.ProjectId.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetProjectId gets a reference to the given string and assigns it to the ProjectId field.
+// SetProjectId gets a reference to the given NullableString and assigns it to the ProjectId field.
 func (o *LakekeeperServerActionCreateProject) SetProjectId(v string) {
-	o.ProjectId = &v
+	o.ProjectId.Set(&v)
+}
+
+// SetProjectIdNil sets the value for ProjectId to be an explicit nil
+func (o *LakekeeperServerActionCreateProject) SetProjectIdNil() {
+	o.ProjectId.Set(nil)
+}
+
+// UnsetProjectId ensures that no value is present for ProjectId, not even an explicit nil
+func (o *LakekeeperServerActionCreateProject) UnsetProjectId() {
+	o.ProjectId.Unset()
 }
 
 func (o LakekeeperServerActionCreateProject) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["action"] = o.Action
-	if !IsNil(o.Name) {
-		toSerialize["name"] = o.Name
+	if o.Name.IsSet() {
+		toSerialize["name"] = o.Name.Get()
 	}
-	if !IsNil(o.ProjectId) {
-		toSerialize["project_id"] = o.ProjectId
+	if o.ProjectId.IsSet() {
+		toSerialize["project_id"] = o.ProjectId.Get()
 	}
 	return toSerialize, nil
 }

@@ -22,6 +22,12 @@ var _ MappedNullable = &LakekeeperNamespaceActionDelete{}
 // LakekeeperNamespaceActionDelete struct for LakekeeperNamespaceActionDelete
 type LakekeeperNamespaceActionDelete struct {
 	Action string `json:"action"`
+	// Whether the warehouse-configured soft-deletion is bypassed: contained tabulars are hard-deleted at once, not kept for the configured grace period.
+	Force *bool `json:"force,omitempty"`
+	// Whether the underlying data/metadata files are physically purged.
+	Purge *bool `json:"purge,omitempty"`
+	// Whether the drop recurses into child namespaces, tables and views, deleting the entire subtree rooted at this namespace.
+	Recursive *bool `json:"recursive,omitempty"`
 }
 
 type _LakekeeperNamespaceActionDelete LakekeeperNamespaceActionDelete
@@ -68,9 +74,114 @@ func (o *LakekeeperNamespaceActionDelete) SetAction(v string) {
 	o.Action = v
 }
 
+// GetForce returns the Force field value if set, zero value otherwise.
+func (o *LakekeeperNamespaceActionDelete) GetForce() bool {
+	if o == nil || IsNil(o.Force) {
+		var ret bool
+		return ret
+	}
+	return *o.Force
+}
+
+// GetForceOk returns a tuple with the Force field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *LakekeeperNamespaceActionDelete) GetForceOk() (*bool, bool) {
+	if o == nil || IsNil(o.Force) {
+		return nil, false
+	}
+	return o.Force, true
+}
+
+// HasForce returns a boolean if a field has been set.
+func (o *LakekeeperNamespaceActionDelete) HasForce() bool {
+	if o != nil && !IsNil(o.Force) {
+		return true
+	}
+
+	return false
+}
+
+// SetForce gets a reference to the given bool and assigns it to the Force field.
+func (o *LakekeeperNamespaceActionDelete) SetForce(v bool) {
+	o.Force = &v
+}
+
+// GetPurge returns the Purge field value if set, zero value otherwise.
+func (o *LakekeeperNamespaceActionDelete) GetPurge() bool {
+	if o == nil || IsNil(o.Purge) {
+		var ret bool
+		return ret
+	}
+	return *o.Purge
+}
+
+// GetPurgeOk returns a tuple with the Purge field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *LakekeeperNamespaceActionDelete) GetPurgeOk() (*bool, bool) {
+	if o == nil || IsNil(o.Purge) {
+		return nil, false
+	}
+	return o.Purge, true
+}
+
+// HasPurge returns a boolean if a field has been set.
+func (o *LakekeeperNamespaceActionDelete) HasPurge() bool {
+	if o != nil && !IsNil(o.Purge) {
+		return true
+	}
+
+	return false
+}
+
+// SetPurge gets a reference to the given bool and assigns it to the Purge field.
+func (o *LakekeeperNamespaceActionDelete) SetPurge(v bool) {
+	o.Purge = &v
+}
+
+// GetRecursive returns the Recursive field value if set, zero value otherwise.
+func (o *LakekeeperNamespaceActionDelete) GetRecursive() bool {
+	if o == nil || IsNil(o.Recursive) {
+		var ret bool
+		return ret
+	}
+	return *o.Recursive
+}
+
+// GetRecursiveOk returns a tuple with the Recursive field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *LakekeeperNamespaceActionDelete) GetRecursiveOk() (*bool, bool) {
+	if o == nil || IsNil(o.Recursive) {
+		return nil, false
+	}
+	return o.Recursive, true
+}
+
+// HasRecursive returns a boolean if a field has been set.
+func (o *LakekeeperNamespaceActionDelete) HasRecursive() bool {
+	if o != nil && !IsNil(o.Recursive) {
+		return true
+	}
+
+	return false
+}
+
+// SetRecursive gets a reference to the given bool and assigns it to the Recursive field.
+func (o *LakekeeperNamespaceActionDelete) SetRecursive(v bool) {
+	o.Recursive = &v
+}
+
 func (o LakekeeperNamespaceActionDelete) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["action"] = o.Action
+	if !IsNil(o.Force) {
+		toSerialize["force"] = o.Force
+	}
+	if !IsNil(o.Purge) {
+		toSerialize["purge"] = o.Purge
+	}
+	if !IsNil(o.Recursive) {
+		toSerialize["recursive"] = o.Recursive
+	}
 	return toSerialize, nil
 }
 

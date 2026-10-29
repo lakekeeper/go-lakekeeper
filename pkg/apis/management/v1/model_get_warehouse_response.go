@@ -22,11 +22,17 @@ var _ MappedNullable = &GetWarehouseResponse{}
 
 // GetWarehouseResponse struct for GetWarehouseResponse
 type GetWarehouseResponse struct {
+	// Iceberg table format versions that may be created in, or upgraded to, within this warehouse.
+	AllowedFormatVersions []int32 `json:"allowed-format-versions"`
+	// Default Iceberg table format version applied when a create-table request does not specify one. When absent, resolves to v2 if allowed, otherwise the highest allowed version.
+	DefaultFormatVersion NullableInt32 `json:"default-format-version,omitempty"`
 	// Delete profile used for the warehouse.
 	DeleteProfile TabularDeleteProfile `json:"delete-profile"`
 	// ID of the warehouse.
 	// Deprecated
 	Id string `json:"id"`
+	// Which control plane, if any, exclusively manages this warehouse's spec. When not `self-managed`, spec mutations are restricted to that control plane.
+	ManagedBy *ManagedBy `json:"managed-by,omitempty"`
 	// Name of the warehouse.
 	Name string `json:"name"`
 	// Project ID in which the warehouse was created.
@@ -40,7 +46,7 @@ type GetWarehouseResponse struct {
 	// Storage profile used for the warehouse.
 	StorageProfile StorageProfile `json:"storage-profile"`
 	// Last updated timestamp.
-	UpdatedAt *time.Time `json:"updated-at,omitempty"`
+	UpdatedAt NullableTime `json:"updated-at,omitempty"`
 	// ID of the warehouse.
 	WarehouseId string `json:"warehouse-id"`
 }
@@ -51,8 +57,9 @@ type _GetWarehouseResponse GetWarehouseResponse
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewGetWarehouseResponse(deleteProfile TabularDeleteProfile, id string, name string, projectId string, protected bool, status WarehouseStatus, storageProfile StorageProfile, warehouseId string) *GetWarehouseResponse {
+func NewGetWarehouseResponse(allowedFormatVersions []int32, deleteProfile TabularDeleteProfile, id string, name string, projectId string, protected bool, status WarehouseStatus, storageProfile StorageProfile, warehouseId string) *GetWarehouseResponse {
 	this := GetWarehouseResponse{}
+	this.AllowedFormatVersions = allowedFormatVersions
 	this.DeleteProfile = deleteProfile
 	this.Id = id
 	this.Name = name
@@ -70,6 +77,73 @@ func NewGetWarehouseResponse(deleteProfile TabularDeleteProfile, id string, name
 func NewGetWarehouseResponseWithDefaults() *GetWarehouseResponse {
 	this := GetWarehouseResponse{}
 	return &this
+}
+
+// GetAllowedFormatVersions returns the AllowedFormatVersions field value
+func (o *GetWarehouseResponse) GetAllowedFormatVersions() []int32 {
+	if o == nil {
+		var ret []int32
+		return ret
+	}
+
+	return o.AllowedFormatVersions
+}
+
+// GetAllowedFormatVersionsOk returns a tuple with the AllowedFormatVersions field value
+// and a boolean to check if the value has been set.
+func (o *GetWarehouseResponse) GetAllowedFormatVersionsOk() ([]int32, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return o.AllowedFormatVersions, true
+}
+
+// SetAllowedFormatVersions sets field value
+func (o *GetWarehouseResponse) SetAllowedFormatVersions(v []int32) {
+	o.AllowedFormatVersions = v
+}
+
+// GetDefaultFormatVersion returns the DefaultFormatVersion field value if set, zero value otherwise (both if not set or set to explicit null).
+func (o *GetWarehouseResponse) GetDefaultFormatVersion() int32 {
+	if o == nil || IsNil(o.DefaultFormatVersion.Get()) {
+		var ret int32
+		return ret
+	}
+	return *o.DefaultFormatVersion.Get()
+}
+
+// GetDefaultFormatVersionOk returns a tuple with the DefaultFormatVersion field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *GetWarehouseResponse) GetDefaultFormatVersionOk() (*int32, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return o.DefaultFormatVersion.Get(), o.DefaultFormatVersion.IsSet()
+}
+
+// HasDefaultFormatVersion returns a boolean if a field has been set.
+func (o *GetWarehouseResponse) HasDefaultFormatVersion() bool {
+	if o != nil && o.DefaultFormatVersion.IsSet() {
+		return true
+	}
+
+	return false
+}
+
+// SetDefaultFormatVersion gets a reference to the given NullableInt32 and assigns it to the DefaultFormatVersion field.
+func (o *GetWarehouseResponse) SetDefaultFormatVersion(v int32) {
+	o.DefaultFormatVersion.Set(&v)
+}
+
+// SetDefaultFormatVersionNil sets the value for DefaultFormatVersion to be an explicit nil
+func (o *GetWarehouseResponse) SetDefaultFormatVersionNil() {
+	o.DefaultFormatVersion.Set(nil)
+}
+
+// UnsetDefaultFormatVersion ensures that no value is present for DefaultFormatVersion, not even an explicit nil
+func (o *GetWarehouseResponse) UnsetDefaultFormatVersion() {
+	o.DefaultFormatVersion.Unset()
 }
 
 // GetDeleteProfile returns the DeleteProfile field value
@@ -121,6 +195,38 @@ func (o *GetWarehouseResponse) GetIdOk() (*string, bool) {
 // Deprecated
 func (o *GetWarehouseResponse) SetId(v string) {
 	o.Id = v
+}
+
+// GetManagedBy returns the ManagedBy field value if set, zero value otherwise.
+func (o *GetWarehouseResponse) GetManagedBy() ManagedBy {
+	if o == nil || IsNil(o.ManagedBy) {
+		var ret ManagedBy
+		return ret
+	}
+	return *o.ManagedBy
+}
+
+// GetManagedByOk returns a tuple with the ManagedBy field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *GetWarehouseResponse) GetManagedByOk() (*ManagedBy, bool) {
+	if o == nil || IsNil(o.ManagedBy) {
+		return nil, false
+	}
+	return o.ManagedBy, true
+}
+
+// HasManagedBy returns a boolean if a field has been set.
+func (o *GetWarehouseResponse) HasManagedBy() bool {
+	if o != nil && !IsNil(o.ManagedBy) {
+		return true
+	}
+
+	return false
+}
+
+// SetManagedBy gets a reference to the given ManagedBy and assigns it to the ManagedBy field.
+func (o *GetWarehouseResponse) SetManagedBy(v ManagedBy) {
+	o.ManagedBy = &v
 }
 
 // GetName returns the Name field value
@@ -286,36 +392,47 @@ func (o *GetWarehouseResponse) SetStorageProfile(v StorageProfile) {
 	o.StorageProfile = v
 }
 
-// GetUpdatedAt returns the UpdatedAt field value if set, zero value otherwise.
+// GetUpdatedAt returns the UpdatedAt field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *GetWarehouseResponse) GetUpdatedAt() time.Time {
-	if o == nil || IsNil(o.UpdatedAt) {
+	if o == nil || IsNil(o.UpdatedAt.Get()) {
 		var ret time.Time
 		return ret
 	}
-	return *o.UpdatedAt
+	return *o.UpdatedAt.Get()
 }
 
 // GetUpdatedAtOk returns a tuple with the UpdatedAt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *GetWarehouseResponse) GetUpdatedAtOk() (*time.Time, bool) {
-	if o == nil || IsNil(o.UpdatedAt) {
+	if o == nil {
 		return nil, false
 	}
-	return o.UpdatedAt, true
+	return o.UpdatedAt.Get(), o.UpdatedAt.IsSet()
 }
 
 // HasUpdatedAt returns a boolean if a field has been set.
 func (o *GetWarehouseResponse) HasUpdatedAt() bool {
-	if o != nil && !IsNil(o.UpdatedAt) {
+	if o != nil && o.UpdatedAt.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetUpdatedAt gets a reference to the given time.Time and assigns it to the UpdatedAt field.
+// SetUpdatedAt gets a reference to the given NullableTime and assigns it to the UpdatedAt field.
 func (o *GetWarehouseResponse) SetUpdatedAt(v time.Time) {
-	o.UpdatedAt = &v
+	o.UpdatedAt.Set(&v)
+}
+
+// SetUpdatedAtNil sets the value for UpdatedAt to be an explicit nil
+func (o *GetWarehouseResponse) SetUpdatedAtNil() {
+	o.UpdatedAt.Set(nil)
+}
+
+// UnsetUpdatedAt ensures that no value is present for UpdatedAt, not even an explicit nil
+func (o *GetWarehouseResponse) UnsetUpdatedAt() {
+	o.UpdatedAt.Unset()
 }
 
 // GetWarehouseId returns the WarehouseId field value
@@ -344,8 +461,15 @@ func (o *GetWarehouseResponse) SetWarehouseId(v string) {
 
 func (o GetWarehouseResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
+	toSerialize["allowed-format-versions"] = o.AllowedFormatVersions
+	if o.DefaultFormatVersion.IsSet() {
+		toSerialize["default-format-version"] = o.DefaultFormatVersion.Get()
+	}
 	toSerialize["delete-profile"] = o.DeleteProfile
 	toSerialize["id"] = o.Id
+	if !IsNil(o.ManagedBy) {
+		toSerialize["managed-by"] = o.ManagedBy
+	}
 	toSerialize["name"] = o.Name
 	toSerialize["project-id"] = o.ProjectId
 	toSerialize["protected"] = o.Protected
@@ -354,8 +478,8 @@ func (o GetWarehouseResponse) ToMap() (map[string]interface{}, error) {
 		toSerialize["storage-credential-type"] = o.StorageCredentialType.Get()
 	}
 	toSerialize["storage-profile"] = o.StorageProfile
-	if !IsNil(o.UpdatedAt) {
-		toSerialize["updated-at"] = o.UpdatedAt
+	if o.UpdatedAt.IsSet() {
+		toSerialize["updated-at"] = o.UpdatedAt.Get()
 	}
 	toSerialize["warehouse-id"] = o.WarehouseId
 	return toSerialize, nil
@@ -366,6 +490,7 @@ func (o *GetWarehouseResponse) UnmarshalJSON(data []byte) (err error) {
 	// by unmarshalling the object into a generic map with string keys and checking
 	// that every required field exists as a key in the generic map.
 	requiredProperties := []string{
+		"allowed-format-versions",
 		"delete-profile",
 		"id",
 		"name",

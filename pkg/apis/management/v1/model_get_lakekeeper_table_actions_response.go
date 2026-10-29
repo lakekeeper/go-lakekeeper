@@ -21,7 +21,7 @@ var _ MappedNullable = &GetLakekeeperTableActionsResponse{}
 
 // GetLakekeeperTableActionsResponse struct for GetLakekeeperTableActionsResponse
 type GetLakekeeperTableActionsResponse struct {
-	AllowedActions []LakekeeperTableAction `json:"allowed-actions"`
+	AllowedActions []LakekeeperTableActionKind `json:"allowed-actions"`
 }
 
 type _GetLakekeeperTableActionsResponse GetLakekeeperTableActionsResponse
@@ -30,7 +30,7 @@ type _GetLakekeeperTableActionsResponse GetLakekeeperTableActionsResponse
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewGetLakekeeperTableActionsResponse(allowedActions []LakekeeperTableAction) *GetLakekeeperTableActionsResponse {
+func NewGetLakekeeperTableActionsResponse(allowedActions []LakekeeperTableActionKind) *GetLakekeeperTableActionsResponse {
 	this := GetLakekeeperTableActionsResponse{}
 	this.AllowedActions = allowedActions
 	return &this
@@ -45,9 +45,9 @@ func NewGetLakekeeperTableActionsResponseWithDefaults() *GetLakekeeperTableActio
 }
 
 // GetAllowedActions returns the AllowedActions field value
-func (o *GetLakekeeperTableActionsResponse) GetAllowedActions() []LakekeeperTableAction {
+func (o *GetLakekeeperTableActionsResponse) GetAllowedActions() []LakekeeperTableActionKind {
 	if o == nil {
-		var ret []LakekeeperTableAction
+		var ret []LakekeeperTableActionKind
 		return ret
 	}
 
@@ -56,7 +56,7 @@ func (o *GetLakekeeperTableActionsResponse) GetAllowedActions() []LakekeeperTabl
 
 // GetAllowedActionsOk returns a tuple with the AllowedActions field value
 // and a boolean to check if the value has been set.
-func (o *GetLakekeeperTableActionsResponse) GetAllowedActionsOk() ([]LakekeeperTableAction, bool) {
+func (o *GetLakekeeperTableActionsResponse) GetAllowedActionsOk() ([]LakekeeperTableActionKind, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -64,7 +64,7 @@ func (o *GetLakekeeperTableActionsResponse) GetAllowedActionsOk() ([]LakekeeperT
 }
 
 // SetAllowedActions sets field value
-func (o *GetLakekeeperTableActionsResponse) SetAllowedActions(v []LakekeeperTableAction) {
+func (o *GetLakekeeperTableActionsResponse) SetAllowedActions(v []LakekeeperTableActionKind) {
 	o.AllowedActions = v
 }
 

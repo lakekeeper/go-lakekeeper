@@ -26,9 +26,9 @@ type BootstrapRequest struct {
 	// If set to true, the calling user is treated as an operator and obtain a corresponding role. If not specified, the user is treated as a human.
 	IsOperator *bool `json:"is-operator,omitempty"`
 	// Email of the user performing bootstrap. Optional. If not provided the server will try to parse the email from the provided token.
-	UserEmail *string `json:"user-email,omitempty"`
+	UserEmail NullableString `json:"user-email,omitempty"`
 	// Name of the user performing bootstrap. Optional. If not provided the server will try to parse the name from the provided token. The initial user will become the global admin.
-	UserName *string `json:"user-name,omitempty"`
+	UserName NullableString `json:"user-name,omitempty"`
 	// Type of the user performing bootstrap. Optional. If not provided the server will try to parse the type from the provided token.
 	UserType NullableUserType `json:"user-type,omitempty"`
 }
@@ -109,68 +109,90 @@ func (o *BootstrapRequest) SetIsOperator(v bool) {
 	o.IsOperator = &v
 }
 
-// GetUserEmail returns the UserEmail field value if set, zero value otherwise.
+// GetUserEmail returns the UserEmail field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *BootstrapRequest) GetUserEmail() string {
-	if o == nil || IsNil(o.UserEmail) {
+	if o == nil || IsNil(o.UserEmail.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.UserEmail
+	return *o.UserEmail.Get()
 }
 
 // GetUserEmailOk returns a tuple with the UserEmail field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *BootstrapRequest) GetUserEmailOk() (*string, bool) {
-	if o == nil || IsNil(o.UserEmail) {
+	if o == nil {
 		return nil, false
 	}
-	return o.UserEmail, true
+	return o.UserEmail.Get(), o.UserEmail.IsSet()
 }
 
 // HasUserEmail returns a boolean if a field has been set.
 func (o *BootstrapRequest) HasUserEmail() bool {
-	if o != nil && !IsNil(o.UserEmail) {
+	if o != nil && o.UserEmail.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetUserEmail gets a reference to the given string and assigns it to the UserEmail field.
+// SetUserEmail gets a reference to the given NullableString and assigns it to the UserEmail field.
 func (o *BootstrapRequest) SetUserEmail(v string) {
-	o.UserEmail = &v
+	o.UserEmail.Set(&v)
 }
 
-// GetUserName returns the UserName field value if set, zero value otherwise.
+// SetUserEmailNil sets the value for UserEmail to be an explicit nil
+func (o *BootstrapRequest) SetUserEmailNil() {
+	o.UserEmail.Set(nil)
+}
+
+// UnsetUserEmail ensures that no value is present for UserEmail, not even an explicit nil
+func (o *BootstrapRequest) UnsetUserEmail() {
+	o.UserEmail.Unset()
+}
+
+// GetUserName returns the UserName field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *BootstrapRequest) GetUserName() string {
-	if o == nil || IsNil(o.UserName) {
+	if o == nil || IsNil(o.UserName.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.UserName
+	return *o.UserName.Get()
 }
 
 // GetUserNameOk returns a tuple with the UserName field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *BootstrapRequest) GetUserNameOk() (*string, bool) {
-	if o == nil || IsNil(o.UserName) {
+	if o == nil {
 		return nil, false
 	}
-	return o.UserName, true
+	return o.UserName.Get(), o.UserName.IsSet()
 }
 
 // HasUserName returns a boolean if a field has been set.
 func (o *BootstrapRequest) HasUserName() bool {
-	if o != nil && !IsNil(o.UserName) {
+	if o != nil && o.UserName.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetUserName gets a reference to the given string and assigns it to the UserName field.
+// SetUserName gets a reference to the given NullableString and assigns it to the UserName field.
 func (o *BootstrapRequest) SetUserName(v string) {
-	o.UserName = &v
+	o.UserName.Set(&v)
+}
+
+// SetUserNameNil sets the value for UserName to be an explicit nil
+func (o *BootstrapRequest) SetUserNameNil() {
+	o.UserName.Set(nil)
+}
+
+// UnsetUserName ensures that no value is present for UserName, not even an explicit nil
+func (o *BootstrapRequest) UnsetUserName() {
+	o.UserName.Unset()
 }
 
 // GetUserType returns the UserType field value if set, zero value otherwise (both if not set or set to explicit null).
@@ -222,11 +244,11 @@ func (o BootstrapRequest) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.IsOperator) {
 		toSerialize["is-operator"] = o.IsOperator
 	}
-	if !IsNil(o.UserEmail) {
-		toSerialize["user-email"] = o.UserEmail
+	if o.UserEmail.IsSet() {
+		toSerialize["user-email"] = o.UserEmail.Get()
 	}
-	if !IsNil(o.UserName) {
-		toSerialize["user-name"] = o.UserName
+	if o.UserName.IsSet() {
+		toSerialize["user-name"] = o.UserName.Get()
 	}
 	if o.UserType.IsSet() {
 		toSerialize["user-type"] = o.UserType.Get()

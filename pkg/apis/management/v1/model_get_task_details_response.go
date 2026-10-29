@@ -42,6 +42,8 @@ type GetTaskDetailsResponse struct {
 	ProjectId string `json:"project-id"`
 	// Name of the queue processing this task
 	QueueName string `json:"queue-name"`
+	// How much worker capacity the task needs, in a unit its queue chooses; unset if the task has none.
+	ResourceDemand *int64 `json:"resource-demand,omitempty"`
 	// When the latest attempt of the task is scheduled for
 	ScheduledFor time.Time `json:"scheduled-for"`
 	// Current status of the task
@@ -56,6 +58,8 @@ type GetTaskDetailsResponse struct {
 	Attempts []TaskAttempt `json:"attempts"`
 	// Execution details for the current attempt
 	ExecutionDetails map[string]interface{} `json:"execution-details,omitempty"`
+	// Message for the current attempt: success result details if it succeeded, or the failure reason if it failed. `null` while the attempt is still running or scheduled.
+	Message NullableString `json:"message,omitempty"`
 	// Task-specific data
 	TaskData map[string]interface{} `json:"task-data"`
 }
@@ -370,6 +374,38 @@ func (o *GetTaskDetailsResponse) SetQueueName(v string) {
 	o.QueueName = v
 }
 
+// GetResourceDemand returns the ResourceDemand field value if set, zero value otherwise.
+func (o *GetTaskDetailsResponse) GetResourceDemand() int64 {
+	if o == nil || IsNil(o.ResourceDemand) {
+		var ret int64
+		return ret
+	}
+	return *o.ResourceDemand
+}
+
+// GetResourceDemandOk returns a tuple with the ResourceDemand field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *GetTaskDetailsResponse) GetResourceDemandOk() (*int64, bool) {
+	if o == nil || IsNil(o.ResourceDemand) {
+		return nil, false
+	}
+	return o.ResourceDemand, true
+}
+
+// HasResourceDemand returns a boolean if a field has been set.
+func (o *GetTaskDetailsResponse) HasResourceDemand() bool {
+	if o != nil && !IsNil(o.ResourceDemand) {
+		return true
+	}
+
+	return false
+}
+
+// SetResourceDemand gets a reference to the given int64 and assigns it to the ResourceDemand field.
+func (o *GetTaskDetailsResponse) SetResourceDemand(v int64) {
+	o.ResourceDemand = &v
+}
+
 // GetScheduledFor returns the ScheduledFor field value
 func (o *GetTaskDetailsResponse) GetScheduledFor() time.Time {
 	if o == nil {
@@ -522,9 +558,9 @@ func (o *GetTaskDetailsResponse) SetAttempts(v []TaskAttempt) {
 	o.Attempts = v
 }
 
-// GetExecutionDetails returns the ExecutionDetails field value if set, zero value otherwise.
+// GetExecutionDetails returns the ExecutionDetails field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *GetTaskDetailsResponse) GetExecutionDetails() map[string]interface{} {
-	if o == nil || IsNil(o.ExecutionDetails) {
+	if o == nil {
 		var ret map[string]interface{}
 		return ret
 	}
@@ -533,6 +569,7 @@ func (o *GetTaskDetailsResponse) GetExecutionDetails() map[string]interface{} {
 
 // GetExecutionDetailsOk returns a tuple with the ExecutionDetails field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *GetTaskDetailsResponse) GetExecutionDetailsOk() (map[string]interface{}, bool) {
 	if o == nil || IsNil(o.ExecutionDetails) {
 		return map[string]interface{}{}, false
@@ -552,6 +589,49 @@ func (o *GetTaskDetailsResponse) HasExecutionDetails() bool {
 // SetExecutionDetails gets a reference to the given map[string]interface{} and assigns it to the ExecutionDetails field.
 func (o *GetTaskDetailsResponse) SetExecutionDetails(v map[string]interface{}) {
 	o.ExecutionDetails = v
+}
+
+// GetMessage returns the Message field value if set, zero value otherwise (both if not set or set to explicit null).
+func (o *GetTaskDetailsResponse) GetMessage() string {
+	if o == nil || IsNil(o.Message.Get()) {
+		var ret string
+		return ret
+	}
+	return *o.Message.Get()
+}
+
+// GetMessageOk returns a tuple with the Message field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *GetTaskDetailsResponse) GetMessageOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return o.Message.Get(), o.Message.IsSet()
+}
+
+// HasMessage returns a boolean if a field has been set.
+func (o *GetTaskDetailsResponse) HasMessage() bool {
+	if o != nil && o.Message.IsSet() {
+		return true
+	}
+
+	return false
+}
+
+// SetMessage gets a reference to the given NullableString and assigns it to the Message field.
+func (o *GetTaskDetailsResponse) SetMessage(v string) {
+	o.Message.Set(&v)
+}
+
+// SetMessageNil sets the value for Message to be an explicit nil
+func (o *GetTaskDetailsResponse) SetMessageNil() {
+	o.Message.Set(nil)
+}
+
+// UnsetMessage ensures that no value is present for Message, not even an explicit nil
+func (o *GetTaskDetailsResponse) UnsetMessage() {
+	o.Message.Unset()
 }
 
 // GetTaskData returns the TaskData field value
@@ -600,6 +680,9 @@ func (o GetTaskDetailsResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize["progress"] = o.Progress
 	toSerialize["project-id"] = o.ProjectId
 	toSerialize["queue-name"] = o.QueueName
+	if !IsNil(o.ResourceDemand) {
+		toSerialize["resource-demand"] = o.ResourceDemand
+	}
 	toSerialize["scheduled-for"] = o.ScheduledFor
 	toSerialize["status"] = o.Status
 	toSerialize["task-id"] = o.TaskId
@@ -608,8 +691,11 @@ func (o GetTaskDetailsResponse) ToMap() (map[string]interface{}, error) {
 	}
 	toSerialize["warehouse-id"] = o.WarehouseId
 	toSerialize["attempts"] = o.Attempts
-	if !IsNil(o.ExecutionDetails) {
+	if o.ExecutionDetails != nil {
 		toSerialize["execution-details"] = o.ExecutionDetails
+	}
+	if o.Message.IsSet() {
+		toSerialize["message"] = o.Message.Get()
 	}
 	toSerialize["task-data"] = o.TaskData
 	return toSerialize, nil

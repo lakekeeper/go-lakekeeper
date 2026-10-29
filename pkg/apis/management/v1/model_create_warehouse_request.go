@@ -21,14 +21,22 @@ var _ MappedNullable = &CreateWarehouseRequest{}
 
 // CreateWarehouseRequest struct for CreateWarehouseRequest
 type CreateWarehouseRequest struct {
+	// Iceberg table format versions that may be created in, or upgraded to, within this warehouse. Must be a non-empty subset of `[1, 2, 3]`. Defaults to all supported versions when omitted.
+	AllowedFormatVersions []int32 `json:"allowed-format-versions,omitempty"`
+	// Default Iceberg table format version applied when a create-table request does not specify one. Must be a member of `allowed-format-versions`. When omitted, resolves to v2 if allowed, otherwise the highest allowed version.
+	DefaultFormatVersion NullableInt32 `json:"default-format-version,omitempty"`
 	// Profile to determine behavior upon dropping of tabulars. Default: hard deletion.
 	DeleteProfile *TabularDeleteProfile `json:"delete-profile,omitempty"`
+	// Which control plane, if any, exclusively manages this warehouse's spec. Defaults to `self-managed`. Creating a managed warehouse (e.g. `instance-admin`) requires instance-admin privilege.
+	ManagedBy *ManagedBy `json:"managed-by,omitempty"`
 	// Project ID in which to create the warehouse. Deprecated: Please use the `x-project-id` header instead.
-	ProjectId *string `json:"project-id,omitempty"`
+	ProjectId NullableString `json:"project-id,omitempty"`
 	// Optional storage credential to use for the warehouse.
 	StorageCredential NullableStorageCredential `json:"storage-credential,omitempty"`
 	// Storage profile to use for the warehouse.
 	StorageProfile StorageProfile `json:"storage-profile"`
+	// Request a specific warehouse ID - optional. If not provided, a new warehouse ID will be generated (recommended). Warehouse IDs are unique across the whole Lakekeeper instance, not just within a project. If you do provide one, prefer a UUIDv7, so that IDs sort by creation time.
+	WarehouseId NullableString `json:"warehouse-id,omitempty"`
 	// Name of the warehouse to create. Must be unique within a project and may not contain \"/\"
 	WarehouseName string `json:"warehouse-name"`
 }
@@ -52,6 +60,82 @@ func NewCreateWarehouseRequest(storageProfile StorageProfile, warehouseName stri
 func NewCreateWarehouseRequestWithDefaults() *CreateWarehouseRequest {
 	this := CreateWarehouseRequest{}
 	return &this
+}
+
+// GetAllowedFormatVersions returns the AllowedFormatVersions field value if set, zero value otherwise (both if not set or set to explicit null).
+func (o *CreateWarehouseRequest) GetAllowedFormatVersions() []int32 {
+	if o == nil {
+		var ret []int32
+		return ret
+	}
+	return o.AllowedFormatVersions
+}
+
+// GetAllowedFormatVersionsOk returns a tuple with the AllowedFormatVersions field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *CreateWarehouseRequest) GetAllowedFormatVersionsOk() ([]int32, bool) {
+	if o == nil || IsNil(o.AllowedFormatVersions) {
+		return nil, false
+	}
+	return o.AllowedFormatVersions, true
+}
+
+// HasAllowedFormatVersions returns a boolean if a field has been set.
+func (o *CreateWarehouseRequest) HasAllowedFormatVersions() bool {
+	if o != nil && !IsNil(o.AllowedFormatVersions) {
+		return true
+	}
+
+	return false
+}
+
+// SetAllowedFormatVersions gets a reference to the given []int32 and assigns it to the AllowedFormatVersions field.
+func (o *CreateWarehouseRequest) SetAllowedFormatVersions(v []int32) {
+	o.AllowedFormatVersions = v
+}
+
+// GetDefaultFormatVersion returns the DefaultFormatVersion field value if set, zero value otherwise (both if not set or set to explicit null).
+func (o *CreateWarehouseRequest) GetDefaultFormatVersion() int32 {
+	if o == nil || IsNil(o.DefaultFormatVersion.Get()) {
+		var ret int32
+		return ret
+	}
+	return *o.DefaultFormatVersion.Get()
+}
+
+// GetDefaultFormatVersionOk returns a tuple with the DefaultFormatVersion field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *CreateWarehouseRequest) GetDefaultFormatVersionOk() (*int32, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return o.DefaultFormatVersion.Get(), o.DefaultFormatVersion.IsSet()
+}
+
+// HasDefaultFormatVersion returns a boolean if a field has been set.
+func (o *CreateWarehouseRequest) HasDefaultFormatVersion() bool {
+	if o != nil && o.DefaultFormatVersion.IsSet() {
+		return true
+	}
+
+	return false
+}
+
+// SetDefaultFormatVersion gets a reference to the given NullableInt32 and assigns it to the DefaultFormatVersion field.
+func (o *CreateWarehouseRequest) SetDefaultFormatVersion(v int32) {
+	o.DefaultFormatVersion.Set(&v)
+}
+
+// SetDefaultFormatVersionNil sets the value for DefaultFormatVersion to be an explicit nil
+func (o *CreateWarehouseRequest) SetDefaultFormatVersionNil() {
+	o.DefaultFormatVersion.Set(nil)
+}
+
+// UnsetDefaultFormatVersion ensures that no value is present for DefaultFormatVersion, not even an explicit nil
+func (o *CreateWarehouseRequest) UnsetDefaultFormatVersion() {
+	o.DefaultFormatVersion.Unset()
 }
 
 // GetDeleteProfile returns the DeleteProfile field value if set, zero value otherwise.
@@ -86,36 +170,79 @@ func (o *CreateWarehouseRequest) SetDeleteProfile(v TabularDeleteProfile) {
 	o.DeleteProfile = &v
 }
 
-// GetProjectId returns the ProjectId field value if set, zero value otherwise.
-func (o *CreateWarehouseRequest) GetProjectId() string {
-	if o == nil || IsNil(o.ProjectId) {
-		var ret string
+// GetManagedBy returns the ManagedBy field value if set, zero value otherwise.
+func (o *CreateWarehouseRequest) GetManagedBy() ManagedBy {
+	if o == nil || IsNil(o.ManagedBy) {
+		var ret ManagedBy
 		return ret
 	}
-	return *o.ProjectId
+	return *o.ManagedBy
 }
 
-// GetProjectIdOk returns a tuple with the ProjectId field value if set, nil otherwise
+// GetManagedByOk returns a tuple with the ManagedBy field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *CreateWarehouseRequest) GetProjectIdOk() (*string, bool) {
-	if o == nil || IsNil(o.ProjectId) {
+func (o *CreateWarehouseRequest) GetManagedByOk() (*ManagedBy, bool) {
+	if o == nil || IsNil(o.ManagedBy) {
 		return nil, false
 	}
-	return o.ProjectId, true
+	return o.ManagedBy, true
 }
 
-// HasProjectId returns a boolean if a field has been set.
-func (o *CreateWarehouseRequest) HasProjectId() bool {
-	if o != nil && !IsNil(o.ProjectId) {
+// HasManagedBy returns a boolean if a field has been set.
+func (o *CreateWarehouseRequest) HasManagedBy() bool {
+	if o != nil && !IsNil(o.ManagedBy) {
 		return true
 	}
 
 	return false
 }
 
-// SetProjectId gets a reference to the given string and assigns it to the ProjectId field.
+// SetManagedBy gets a reference to the given ManagedBy and assigns it to the ManagedBy field.
+func (o *CreateWarehouseRequest) SetManagedBy(v ManagedBy) {
+	o.ManagedBy = &v
+}
+
+// GetProjectId returns the ProjectId field value if set, zero value otherwise (both if not set or set to explicit null).
+func (o *CreateWarehouseRequest) GetProjectId() string {
+	if o == nil || IsNil(o.ProjectId.Get()) {
+		var ret string
+		return ret
+	}
+	return *o.ProjectId.Get()
+}
+
+// GetProjectIdOk returns a tuple with the ProjectId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *CreateWarehouseRequest) GetProjectIdOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return o.ProjectId.Get(), o.ProjectId.IsSet()
+}
+
+// HasProjectId returns a boolean if a field has been set.
+func (o *CreateWarehouseRequest) HasProjectId() bool {
+	if o != nil && o.ProjectId.IsSet() {
+		return true
+	}
+
+	return false
+}
+
+// SetProjectId gets a reference to the given NullableString and assigns it to the ProjectId field.
 func (o *CreateWarehouseRequest) SetProjectId(v string) {
-	o.ProjectId = &v
+	o.ProjectId.Set(&v)
+}
+
+// SetProjectIdNil sets the value for ProjectId to be an explicit nil
+func (o *CreateWarehouseRequest) SetProjectIdNil() {
+	o.ProjectId.Set(nil)
+}
+
+// UnsetProjectId ensures that no value is present for ProjectId, not even an explicit nil
+func (o *CreateWarehouseRequest) UnsetProjectId() {
+	o.ProjectId.Unset()
 }
 
 // GetStorageCredential returns the StorageCredential field value if set, zero value otherwise (both if not set or set to explicit null).
@@ -185,6 +312,49 @@ func (o *CreateWarehouseRequest) SetStorageProfile(v StorageProfile) {
 	o.StorageProfile = v
 }
 
+// GetWarehouseId returns the WarehouseId field value if set, zero value otherwise (both if not set or set to explicit null).
+func (o *CreateWarehouseRequest) GetWarehouseId() string {
+	if o == nil || IsNil(o.WarehouseId.Get()) {
+		var ret string
+		return ret
+	}
+	return *o.WarehouseId.Get()
+}
+
+// GetWarehouseIdOk returns a tuple with the WarehouseId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *CreateWarehouseRequest) GetWarehouseIdOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return o.WarehouseId.Get(), o.WarehouseId.IsSet()
+}
+
+// HasWarehouseId returns a boolean if a field has been set.
+func (o *CreateWarehouseRequest) HasWarehouseId() bool {
+	if o != nil && o.WarehouseId.IsSet() {
+		return true
+	}
+
+	return false
+}
+
+// SetWarehouseId gets a reference to the given NullableString and assigns it to the WarehouseId field.
+func (o *CreateWarehouseRequest) SetWarehouseId(v string) {
+	o.WarehouseId.Set(&v)
+}
+
+// SetWarehouseIdNil sets the value for WarehouseId to be an explicit nil
+func (o *CreateWarehouseRequest) SetWarehouseIdNil() {
+	o.WarehouseId.Set(nil)
+}
+
+// UnsetWarehouseId ensures that no value is present for WarehouseId, not even an explicit nil
+func (o *CreateWarehouseRequest) UnsetWarehouseId() {
+	o.WarehouseId.Unset()
+}
+
 // GetWarehouseName returns the WarehouseName field value
 func (o *CreateWarehouseRequest) GetWarehouseName() string {
 	if o == nil {
@@ -211,16 +381,28 @@ func (o *CreateWarehouseRequest) SetWarehouseName(v string) {
 
 func (o CreateWarehouseRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
+	if o.AllowedFormatVersions != nil {
+		toSerialize["allowed-format-versions"] = o.AllowedFormatVersions
+	}
+	if o.DefaultFormatVersion.IsSet() {
+		toSerialize["default-format-version"] = o.DefaultFormatVersion.Get()
+	}
 	if !IsNil(o.DeleteProfile) {
 		toSerialize["delete-profile"] = o.DeleteProfile
 	}
-	if !IsNil(o.ProjectId) {
-		toSerialize["project-id"] = o.ProjectId
+	if !IsNil(o.ManagedBy) {
+		toSerialize["managed-by"] = o.ManagedBy
+	}
+	if o.ProjectId.IsSet() {
+		toSerialize["project-id"] = o.ProjectId.Get()
 	}
 	if o.StorageCredential.IsSet() {
 		toSerialize["storage-credential"] = o.StorageCredential.Get()
 	}
 	toSerialize["storage-profile"] = o.StorageProfile
+	if o.WarehouseId.IsSet() {
+		toSerialize["warehouse-id"] = o.WarehouseId.Get()
+	}
 	toSerialize["warehouse-name"] = o.WarehouseName
 	return toSerialize, nil
 }

@@ -20,9 +20,10 @@ type S3CredentialType string
 
 // List of S3CredentialType
 const (
-	S3CredentialTypeAccessKey         S3CredentialType = "access-key"
-	S3CredentialTypeAwsSystemIdentity S3CredentialType = "aws-system-identity"
-	S3CredentialTypeCloudflareR2      S3CredentialType = "cloudflare-r2"
+	S3CREDENTIALTYPE_ACCESS_KEY          S3CredentialType = "access-key"
+	S3CREDENTIALTYPE_AWS_SYSTEM_IDENTITY S3CredentialType = "aws-system-identity"
+	S3CREDENTIALTYPE_CLOUDFLARE_R2       S3CredentialType = "cloudflare-r2"
+	S3CREDENTIALTYPE_ALIYUN_OSS          S3CredentialType = "aliyun-oss"
 )
 
 // All allowed values of S3CredentialType enum
@@ -30,6 +31,7 @@ var AllowedS3CredentialTypeEnumValues = []S3CredentialType{
 	"access-key",
 	"aws-system-identity",
 	"cloudflare-r2",
+	"aliyun-oss",
 }
 
 func (v *S3CredentialType) UnmarshalJSON(src []byte) error {

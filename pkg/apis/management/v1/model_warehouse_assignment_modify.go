@@ -11,101 +11,177 @@ API version: 0.0.0
 package managementv1
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 )
 
-// WarehouseAssignmentModify - struct for WarehouseAssignmentModify
+// checks if the WarehouseAssignmentModify type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &WarehouseAssignmentModify{}
+
+// WarehouseAssignmentModify struct for WarehouseAssignmentModify
 type WarehouseAssignmentModify struct {
-	WarehouseAssignmentModifyRole *WarehouseAssignmentModifyRole
-	WarehouseAssignmentModifyUser *WarehouseAssignmentModifyUser
+	// Id of the role
+	Role *string `json:"role,omitempty"`
+	// Id of the user
+	User *string `json:"user,omitempty"`
+	Type string  `json:"type"`
 }
 
-// WarehouseAssignmentModifyRoleAsWarehouseAssignmentModify is a convenience function that returns WarehouseAssignmentModifyRole wrapped in WarehouseAssignmentModify
-func WarehouseAssignmentModifyRoleAsWarehouseAssignmentModify(v *WarehouseAssignmentModifyRole) WarehouseAssignmentModify {
-	return WarehouseAssignmentModify{
-		WarehouseAssignmentModifyRole: v,
+type _WarehouseAssignmentModify WarehouseAssignmentModify
+
+// NewWarehouseAssignmentModify instantiates a new WarehouseAssignmentModify object
+// This constructor will assign default values to properties that have it defined,
+// and makes sure properties required by API are set, but the set of arguments
+// will change when the set of required properties is changed
+func NewWarehouseAssignmentModify(type_ string) *WarehouseAssignmentModify {
+	this := WarehouseAssignmentModify{}
+	this.Type = type_
+	return &this
+}
+
+// NewWarehouseAssignmentModifyWithDefaults instantiates a new WarehouseAssignmentModify object
+// This constructor will only assign default values to properties that have it defined,
+// but it doesn't guarantee that properties required by API are set
+func NewWarehouseAssignmentModifyWithDefaults() *WarehouseAssignmentModify {
+	this := WarehouseAssignmentModify{}
+	return &this
+}
+
+// GetRole returns the Role field value if set, zero value otherwise.
+func (o *WarehouseAssignmentModify) GetRole() string {
+	if o == nil || IsNil(o.Role) {
+		var ret string
+		return ret
 	}
+	return *o.Role
 }
 
-// WarehouseAssignmentModifyUserAsWarehouseAssignmentModify is a convenience function that returns WarehouseAssignmentModifyUser wrapped in WarehouseAssignmentModify
-func WarehouseAssignmentModifyUserAsWarehouseAssignmentModify(v *WarehouseAssignmentModifyUser) WarehouseAssignmentModify {
-	return WarehouseAssignmentModify{
-		WarehouseAssignmentModifyUser: v,
+// GetRoleOk returns a tuple with the Role field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WarehouseAssignmentModify) GetRoleOk() (*string, bool) {
+	if o == nil || IsNil(o.Role) {
+		return nil, false
 	}
+	return o.Role, true
 }
 
-// Unmarshal JSON data into one of the pointers in the struct
-func (dst *WarehouseAssignmentModify) UnmarshalJSON(data []byte) error {
-	var err error
-	match := 0
-	// try to unmarshal data into WarehouseAssignmentModifyRole
-	err = json.Unmarshal(data, &dst.WarehouseAssignmentModifyRole)
-	if err == nil {
-		jsonWarehouseAssignmentModifyRole, _ := json.Marshal(dst.WarehouseAssignmentModifyRole)
-		if string(jsonWarehouseAssignmentModifyRole) == "{}" { // empty struct
-			dst.WarehouseAssignmentModifyRole = nil
-		} else {
-			match++
+// HasRole returns a boolean if a field has been set.
+func (o *WarehouseAssignmentModify) HasRole() bool {
+	if o != nil && !IsNil(o.Role) {
+		return true
+	}
+
+	return false
+}
+
+// SetRole gets a reference to the given string and assigns it to the Role field.
+func (o *WarehouseAssignmentModify) SetRole(v string) {
+	o.Role = &v
+}
+
+// GetUser returns the User field value if set, zero value otherwise.
+func (o *WarehouseAssignmentModify) GetUser() string {
+	if o == nil || IsNil(o.User) {
+		var ret string
+		return ret
+	}
+	return *o.User
+}
+
+// GetUserOk returns a tuple with the User field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WarehouseAssignmentModify) GetUserOk() (*string, bool) {
+	if o == nil || IsNil(o.User) {
+		return nil, false
+	}
+	return o.User, true
+}
+
+// HasUser returns a boolean if a field has been set.
+func (o *WarehouseAssignmentModify) HasUser() bool {
+	if o != nil && !IsNil(o.User) {
+		return true
+	}
+
+	return false
+}
+
+// SetUser gets a reference to the given string and assigns it to the User field.
+func (o *WarehouseAssignmentModify) SetUser(v string) {
+	o.User = &v
+}
+
+// GetType returns the Type field value
+func (o *WarehouseAssignmentModify) GetType() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.Type
+}
+
+// GetTypeOk returns a tuple with the Type field value
+// and a boolean to check if the value has been set.
+func (o *WarehouseAssignmentModify) GetTypeOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Type, true
+}
+
+// SetType sets field value
+func (o *WarehouseAssignmentModify) SetType(v string) {
+	o.Type = v
+}
+
+func (o WarehouseAssignmentModify) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.Role) {
+		toSerialize["role"] = o.Role
+	}
+	if !IsNil(o.User) {
+		toSerialize["user"] = o.User
+	}
+	toSerialize["type"] = o.Type
+	return toSerialize, nil
+}
+
+func (o *WarehouseAssignmentModify) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"type",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err
+	}
+
+	for _, requiredProperty := range requiredProperties {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
-	} else {
-		dst.WarehouseAssignmentModifyRole = nil
 	}
 
-	// try to unmarshal data into WarehouseAssignmentModifyUser
-	err = json.Unmarshal(data, &dst.WarehouseAssignmentModifyUser)
-	if err == nil {
-		jsonWarehouseAssignmentModifyUser, _ := json.Marshal(dst.WarehouseAssignmentModifyUser)
-		if string(jsonWarehouseAssignmentModifyUser) == "{}" { // empty struct
-			dst.WarehouseAssignmentModifyUser = nil
-		} else {
-			match++
-		}
-	} else {
-		dst.WarehouseAssignmentModifyUser = nil
+	varWarehouseAssignmentModify := _WarehouseAssignmentModify{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	err = decoder.Decode(&varWarehouseAssignmentModify)
+
+	if err != nil {
+		return err
 	}
 
-	if match > 1 { // more than 1 match
-		// reset to nil
-		dst.WarehouseAssignmentModifyRole = nil
-		dst.WarehouseAssignmentModifyUser = nil
+	*o = WarehouseAssignmentModify(varWarehouseAssignmentModify)
 
-		return fmt.Errorf("data matches more than one schema in oneOf(WarehouseAssignmentModify)")
-	} else if match == 1 {
-		return nil // exactly one match
-	} else { // no match
-		return fmt.Errorf("data failed to match schemas in oneOf(WarehouseAssignmentModify)")
-	}
-}
-
-// Marshal data from the first non-nil pointers in the struct to JSON
-func (src WarehouseAssignmentModify) MarshalJSON() ([]byte, error) {
-	if src.WarehouseAssignmentModifyRole != nil {
-		return json.Marshal(&src.WarehouseAssignmentModifyRole)
-	}
-
-	if src.WarehouseAssignmentModifyUser != nil {
-		return json.Marshal(&src.WarehouseAssignmentModifyUser)
-	}
-
-	return nil, nil // no data in oneOf schemas
-}
-
-// Get the actual instance
-func (obj *WarehouseAssignmentModify) GetActualInstance() interface{} {
-	if obj == nil {
-		return nil
-	}
-	if obj.WarehouseAssignmentModifyRole != nil {
-		return obj.WarehouseAssignmentModifyRole
-	}
-
-	if obj.WarehouseAssignmentModifyUser != nil {
-		return obj.WarehouseAssignmentModifyUser
-	}
-
-	// all schemas are nil
-	return nil
+	return err
 }
 
 type NullableWarehouseAssignmentModify struct {

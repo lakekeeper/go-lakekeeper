@@ -11,101 +11,177 @@ API version: 0.0.0
 package managementv1
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 )
 
-// ViewAssignmentSelect - struct for ViewAssignmentSelect
+// checks if the ViewAssignmentSelect type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &ViewAssignmentSelect{}
+
+// ViewAssignmentSelect struct for ViewAssignmentSelect
 type ViewAssignmentSelect struct {
-	ViewAssignmentSelectRole *ViewAssignmentSelectRole
-	ViewAssignmentSelectUser *ViewAssignmentSelectUser
+	// Id of the role
+	Role *string `json:"role,omitempty"`
+	// Id of the user
+	User *string `json:"user,omitempty"`
+	Type string  `json:"type"`
 }
 
-// ViewAssignmentSelectRoleAsViewAssignmentSelect is a convenience function that returns ViewAssignmentSelectRole wrapped in ViewAssignmentSelect
-func ViewAssignmentSelectRoleAsViewAssignmentSelect(v *ViewAssignmentSelectRole) ViewAssignmentSelect {
-	return ViewAssignmentSelect{
-		ViewAssignmentSelectRole: v,
+type _ViewAssignmentSelect ViewAssignmentSelect
+
+// NewViewAssignmentSelect instantiates a new ViewAssignmentSelect object
+// This constructor will assign default values to properties that have it defined,
+// and makes sure properties required by API are set, but the set of arguments
+// will change when the set of required properties is changed
+func NewViewAssignmentSelect(type_ string) *ViewAssignmentSelect {
+	this := ViewAssignmentSelect{}
+	this.Type = type_
+	return &this
+}
+
+// NewViewAssignmentSelectWithDefaults instantiates a new ViewAssignmentSelect object
+// This constructor will only assign default values to properties that have it defined,
+// but it doesn't guarantee that properties required by API are set
+func NewViewAssignmentSelectWithDefaults() *ViewAssignmentSelect {
+	this := ViewAssignmentSelect{}
+	return &this
+}
+
+// GetRole returns the Role field value if set, zero value otherwise.
+func (o *ViewAssignmentSelect) GetRole() string {
+	if o == nil || IsNil(o.Role) {
+		var ret string
+		return ret
 	}
+	return *o.Role
 }
 
-// ViewAssignmentSelectUserAsViewAssignmentSelect is a convenience function that returns ViewAssignmentSelectUser wrapped in ViewAssignmentSelect
-func ViewAssignmentSelectUserAsViewAssignmentSelect(v *ViewAssignmentSelectUser) ViewAssignmentSelect {
-	return ViewAssignmentSelect{
-		ViewAssignmentSelectUser: v,
+// GetRoleOk returns a tuple with the Role field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *ViewAssignmentSelect) GetRoleOk() (*string, bool) {
+	if o == nil || IsNil(o.Role) {
+		return nil, false
 	}
+	return o.Role, true
 }
 
-// Unmarshal JSON data into one of the pointers in the struct
-func (dst *ViewAssignmentSelect) UnmarshalJSON(data []byte) error {
-	var err error
-	match := 0
-	// try to unmarshal data into ViewAssignmentSelectRole
-	err = json.Unmarshal(data, &dst.ViewAssignmentSelectRole)
-	if err == nil {
-		jsonViewAssignmentSelectRole, _ := json.Marshal(dst.ViewAssignmentSelectRole)
-		if string(jsonViewAssignmentSelectRole) == "{}" { // empty struct
-			dst.ViewAssignmentSelectRole = nil
-		} else {
-			match++
+// HasRole returns a boolean if a field has been set.
+func (o *ViewAssignmentSelect) HasRole() bool {
+	if o != nil && !IsNil(o.Role) {
+		return true
+	}
+
+	return false
+}
+
+// SetRole gets a reference to the given string and assigns it to the Role field.
+func (o *ViewAssignmentSelect) SetRole(v string) {
+	o.Role = &v
+}
+
+// GetUser returns the User field value if set, zero value otherwise.
+func (o *ViewAssignmentSelect) GetUser() string {
+	if o == nil || IsNil(o.User) {
+		var ret string
+		return ret
+	}
+	return *o.User
+}
+
+// GetUserOk returns a tuple with the User field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *ViewAssignmentSelect) GetUserOk() (*string, bool) {
+	if o == nil || IsNil(o.User) {
+		return nil, false
+	}
+	return o.User, true
+}
+
+// HasUser returns a boolean if a field has been set.
+func (o *ViewAssignmentSelect) HasUser() bool {
+	if o != nil && !IsNil(o.User) {
+		return true
+	}
+
+	return false
+}
+
+// SetUser gets a reference to the given string and assigns it to the User field.
+func (o *ViewAssignmentSelect) SetUser(v string) {
+	o.User = &v
+}
+
+// GetType returns the Type field value
+func (o *ViewAssignmentSelect) GetType() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.Type
+}
+
+// GetTypeOk returns a tuple with the Type field value
+// and a boolean to check if the value has been set.
+func (o *ViewAssignmentSelect) GetTypeOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Type, true
+}
+
+// SetType sets field value
+func (o *ViewAssignmentSelect) SetType(v string) {
+	o.Type = v
+}
+
+func (o ViewAssignmentSelect) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.Role) {
+		toSerialize["role"] = o.Role
+	}
+	if !IsNil(o.User) {
+		toSerialize["user"] = o.User
+	}
+	toSerialize["type"] = o.Type
+	return toSerialize, nil
+}
+
+func (o *ViewAssignmentSelect) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"type",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err
+	}
+
+	for _, requiredProperty := range requiredProperties {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
-	} else {
-		dst.ViewAssignmentSelectRole = nil
 	}
 
-	// try to unmarshal data into ViewAssignmentSelectUser
-	err = json.Unmarshal(data, &dst.ViewAssignmentSelectUser)
-	if err == nil {
-		jsonViewAssignmentSelectUser, _ := json.Marshal(dst.ViewAssignmentSelectUser)
-		if string(jsonViewAssignmentSelectUser) == "{}" { // empty struct
-			dst.ViewAssignmentSelectUser = nil
-		} else {
-			match++
-		}
-	} else {
-		dst.ViewAssignmentSelectUser = nil
+	varViewAssignmentSelect := _ViewAssignmentSelect{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	err = decoder.Decode(&varViewAssignmentSelect)
+
+	if err != nil {
+		return err
 	}
 
-	if match > 1 { // more than 1 match
-		// reset to nil
-		dst.ViewAssignmentSelectRole = nil
-		dst.ViewAssignmentSelectUser = nil
+	*o = ViewAssignmentSelect(varViewAssignmentSelect)
 
-		return fmt.Errorf("data matches more than one schema in oneOf(ViewAssignmentSelect)")
-	} else if match == 1 {
-		return nil // exactly one match
-	} else { // no match
-		return fmt.Errorf("data failed to match schemas in oneOf(ViewAssignmentSelect)")
-	}
-}
-
-// Marshal data from the first non-nil pointers in the struct to JSON
-func (src ViewAssignmentSelect) MarshalJSON() ([]byte, error) {
-	if src.ViewAssignmentSelectRole != nil {
-		return json.Marshal(&src.ViewAssignmentSelectRole)
-	}
-
-	if src.ViewAssignmentSelectUser != nil {
-		return json.Marshal(&src.ViewAssignmentSelectUser)
-	}
-
-	return nil, nil // no data in oneOf schemas
-}
-
-// Get the actual instance
-func (obj *ViewAssignmentSelect) GetActualInstance() interface{} {
-	if obj == nil {
-		return nil
-	}
-	if obj.ViewAssignmentSelectRole != nil {
-		return obj.ViewAssignmentSelectRole
-	}
-
-	if obj.ViewAssignmentSelectUser != nil {
-		return obj.ViewAssignmentSelectUser
-	}
-
-	// all schemas are nil
-	return nil
+	return err
 }
 
 type NullableViewAssignmentSelect struct {

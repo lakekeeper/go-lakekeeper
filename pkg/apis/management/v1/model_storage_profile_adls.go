@@ -19,7 +19,7 @@ import (
 // checks if the StorageProfileAdls type satisfies the MappedNullable interface at compile time
 var _ MappedNullable = &StorageProfileAdls{}
 
-// StorageProfileAdls Azure storage profile
+// StorageProfileAdls Generic Azure Data Lake Storage Gen2 profile. Speaks ADLS Gen2 against any storage account.
 type StorageProfileAdls struct {
 	// Name of the azure storage account.
 	AccountName string `json:"account-name"`
@@ -35,7 +35,7 @@ type StorageProfileAdls struct {
 	KeyPrefix *string `json:"key-prefix,omitempty"`
 	// Enable SAS (Shared Access Signature) token generation for Azure Data Lake Storage. When disabled, clients cannot use vended credentials for this storage profile. Defaults to true.
 	SasEnabled *bool `json:"sas-enabled,omitempty"`
-	// The validity of the sas token in seconds. Default: 3600.
+	// The validity of the sas token in seconds. Default: 3600. Max: 7 days.
 	SasTokenValiditySeconds *int64 `json:"sas-token-validity-seconds,omitempty"`
 	// Storage layout for namespace and tabular paths.
 	StorageLayout *StorageLayout `json:"storage-layout,omitempty"`

@@ -21,8 +21,12 @@ var _ MappedNullable = &LakekeeperTableActionCommit{}
 
 // LakekeeperTableActionCommit struct for LakekeeperTableActionCommit
 type LakekeeperTableActionCommit struct {
-	Action            string            `json:"action"`
-	RemovedProperties []string          `json:"removed_properties,omitempty"`
+	Action            string   `json:"action"`
+	RemovedProperties []string `json:"removed_properties,omitempty"`
+	// The branch and tag names this commit creates, moves, or removes. Empty when the commit targets no ref by name.
+	TargetRefs []string `json:"target_refs,omitempty"`
+	// The kinds of metadata updates this commit contains.
+	UpdateKinds       []TableUpdateKind `json:"update_kinds,omitempty"`
 	UpdatedProperties map[string]string `json:"updated_properties,omitempty"`
 }
 
@@ -102,6 +106,70 @@ func (o *LakekeeperTableActionCommit) SetRemovedProperties(v []string) {
 	o.RemovedProperties = v
 }
 
+// GetTargetRefs returns the TargetRefs field value if set, zero value otherwise.
+func (o *LakekeeperTableActionCommit) GetTargetRefs() []string {
+	if o == nil || IsNil(o.TargetRefs) {
+		var ret []string
+		return ret
+	}
+	return o.TargetRefs
+}
+
+// GetTargetRefsOk returns a tuple with the TargetRefs field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *LakekeeperTableActionCommit) GetTargetRefsOk() ([]string, bool) {
+	if o == nil || IsNil(o.TargetRefs) {
+		return nil, false
+	}
+	return o.TargetRefs, true
+}
+
+// HasTargetRefs returns a boolean if a field has been set.
+func (o *LakekeeperTableActionCommit) HasTargetRefs() bool {
+	if o != nil && !IsNil(o.TargetRefs) {
+		return true
+	}
+
+	return false
+}
+
+// SetTargetRefs gets a reference to the given []string and assigns it to the TargetRefs field.
+func (o *LakekeeperTableActionCommit) SetTargetRefs(v []string) {
+	o.TargetRefs = v
+}
+
+// GetUpdateKinds returns the UpdateKinds field value if set, zero value otherwise.
+func (o *LakekeeperTableActionCommit) GetUpdateKinds() []TableUpdateKind {
+	if o == nil || IsNil(o.UpdateKinds) {
+		var ret []TableUpdateKind
+		return ret
+	}
+	return o.UpdateKinds
+}
+
+// GetUpdateKindsOk returns a tuple with the UpdateKinds field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *LakekeeperTableActionCommit) GetUpdateKindsOk() ([]TableUpdateKind, bool) {
+	if o == nil || IsNil(o.UpdateKinds) {
+		return nil, false
+	}
+	return o.UpdateKinds, true
+}
+
+// HasUpdateKinds returns a boolean if a field has been set.
+func (o *LakekeeperTableActionCommit) HasUpdateKinds() bool {
+	if o != nil && !IsNil(o.UpdateKinds) {
+		return true
+	}
+
+	return false
+}
+
+// SetUpdateKinds gets a reference to the given []TableUpdateKind and assigns it to the UpdateKinds field.
+func (o *LakekeeperTableActionCommit) SetUpdateKinds(v []TableUpdateKind) {
+	o.UpdateKinds = v
+}
+
 // GetUpdatedProperties returns the UpdatedProperties field value if set, zero value otherwise.
 func (o *LakekeeperTableActionCommit) GetUpdatedProperties() map[string]string {
 	if o == nil || IsNil(o.UpdatedProperties) {
@@ -139,6 +207,12 @@ func (o LakekeeperTableActionCommit) ToMap() (map[string]interface{}, error) {
 	toSerialize["action"] = o.Action
 	if !IsNil(o.RemovedProperties) {
 		toSerialize["removed_properties"] = o.RemovedProperties
+	}
+	if !IsNil(o.TargetRefs) {
+		toSerialize["target_refs"] = o.TargetRefs
+	}
+	if !IsNil(o.UpdateKinds) {
+		toSerialize["update_kinds"] = o.UpdateKinds
 	}
 	if !IsNil(o.UpdatedProperties) {
 		toSerialize["updated_properties"] = o.UpdatedProperties

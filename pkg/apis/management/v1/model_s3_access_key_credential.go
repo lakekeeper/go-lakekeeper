@@ -21,9 +21,9 @@ var _ MappedNullable = &S3AccessKeyCredential{}
 
 // S3AccessKeyCredential struct for S3AccessKeyCredential
 type S3AccessKeyCredential struct {
-	AccessKeyId     string  `json:"access-key-id"`
-	ExternalId      *string `json:"external-id,omitempty"`
-	SecretAccessKey string  `json:"secret-access-key"`
+	AccessKeyId     string         `json:"access-key-id"`
+	ExternalId      NullableString `json:"external-id,omitempty"`
+	SecretAccessKey string         `json:"secret-access-key"`
 }
 
 type _S3AccessKeyCredential S3AccessKeyCredential
@@ -71,36 +71,47 @@ func (o *S3AccessKeyCredential) SetAccessKeyId(v string) {
 	o.AccessKeyId = v
 }
 
-// GetExternalId returns the ExternalId field value if set, zero value otherwise.
+// GetExternalId returns the ExternalId field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *S3AccessKeyCredential) GetExternalId() string {
-	if o == nil || IsNil(o.ExternalId) {
+	if o == nil || IsNil(o.ExternalId.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.ExternalId
+	return *o.ExternalId.Get()
 }
 
 // GetExternalIdOk returns a tuple with the ExternalId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *S3AccessKeyCredential) GetExternalIdOk() (*string, bool) {
-	if o == nil || IsNil(o.ExternalId) {
+	if o == nil {
 		return nil, false
 	}
-	return o.ExternalId, true
+	return o.ExternalId.Get(), o.ExternalId.IsSet()
 }
 
 // HasExternalId returns a boolean if a field has been set.
 func (o *S3AccessKeyCredential) HasExternalId() bool {
-	if o != nil && !IsNil(o.ExternalId) {
+	if o != nil && o.ExternalId.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetExternalId gets a reference to the given string and assigns it to the ExternalId field.
+// SetExternalId gets a reference to the given NullableString and assigns it to the ExternalId field.
 func (o *S3AccessKeyCredential) SetExternalId(v string) {
-	o.ExternalId = &v
+	o.ExternalId.Set(&v)
+}
+
+// SetExternalIdNil sets the value for ExternalId to be an explicit nil
+func (o *S3AccessKeyCredential) SetExternalIdNil() {
+	o.ExternalId.Set(nil)
+}
+
+// UnsetExternalId ensures that no value is present for ExternalId, not even an explicit nil
+func (o *S3AccessKeyCredential) UnsetExternalId() {
+	o.ExternalId.Unset()
 }
 
 // GetSecretAccessKey returns the SecretAccessKey field value
@@ -130,8 +141,8 @@ func (o *S3AccessKeyCredential) SetSecretAccessKey(v string) {
 func (o S3AccessKeyCredential) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["access-key-id"] = o.AccessKeyId
-	if !IsNil(o.ExternalId) {
-		toSerialize["external-id"] = o.ExternalId
+	if o.ExternalId.IsSet() {
+		toSerialize["external-id"] = o.ExternalId.Get()
 	}
 	toSerialize["secret-access-key"] = o.SecretAccessKey
 	return toSerialize, nil

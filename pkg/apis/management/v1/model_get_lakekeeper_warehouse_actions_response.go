@@ -21,7 +21,7 @@ var _ MappedNullable = &GetLakekeeperWarehouseActionsResponse{}
 
 // GetLakekeeperWarehouseActionsResponse struct for GetLakekeeperWarehouseActionsResponse
 type GetLakekeeperWarehouseActionsResponse struct {
-	AllowedActions []LakekeeperWarehouseAction `json:"allowed-actions"`
+	AllowedActions []LakekeeperWarehouseActionKind `json:"allowed-actions"`
 }
 
 type _GetLakekeeperWarehouseActionsResponse GetLakekeeperWarehouseActionsResponse
@@ -30,7 +30,7 @@ type _GetLakekeeperWarehouseActionsResponse GetLakekeeperWarehouseActionsRespons
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewGetLakekeeperWarehouseActionsResponse(allowedActions []LakekeeperWarehouseAction) *GetLakekeeperWarehouseActionsResponse {
+func NewGetLakekeeperWarehouseActionsResponse(allowedActions []LakekeeperWarehouseActionKind) *GetLakekeeperWarehouseActionsResponse {
 	this := GetLakekeeperWarehouseActionsResponse{}
 	this.AllowedActions = allowedActions
 	return &this
@@ -45,9 +45,9 @@ func NewGetLakekeeperWarehouseActionsResponseWithDefaults() *GetLakekeeperWareho
 }
 
 // GetAllowedActions returns the AllowedActions field value
-func (o *GetLakekeeperWarehouseActionsResponse) GetAllowedActions() []LakekeeperWarehouseAction {
+func (o *GetLakekeeperWarehouseActionsResponse) GetAllowedActions() []LakekeeperWarehouseActionKind {
 	if o == nil {
-		var ret []LakekeeperWarehouseAction
+		var ret []LakekeeperWarehouseActionKind
 		return ret
 	}
 
@@ -56,7 +56,7 @@ func (o *GetLakekeeperWarehouseActionsResponse) GetAllowedActions() []Lakekeeper
 
 // GetAllowedActionsOk returns a tuple with the AllowedActions field value
 // and a boolean to check if the value has been set.
-func (o *GetLakekeeperWarehouseActionsResponse) GetAllowedActionsOk() ([]LakekeeperWarehouseAction, bool) {
+func (o *GetLakekeeperWarehouseActionsResponse) GetAllowedActionsOk() ([]LakekeeperWarehouseActionKind, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -64,7 +64,7 @@ func (o *GetLakekeeperWarehouseActionsResponse) GetAllowedActionsOk() ([]Lakekee
 }
 
 // SetAllowedActions sets field value
-func (o *GetLakekeeperWarehouseActionsResponse) SetAllowedActions(v []LakekeeperWarehouseAction) {
+func (o *GetLakekeeperWarehouseActionsResponse) SetAllowedActions(v []LakekeeperWarehouseActionKind) {
 	o.AllowedActions = v
 }
 

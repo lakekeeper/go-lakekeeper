@@ -15,23 +15,23 @@ import (
 	"fmt"
 )
 
-// TabularIdentOrUuid - Identifier for a table or view, either a UUID or its name and namespace
+// TabularIdentOrUuid - Identifier for a tabular (table, view, or generic table) — either a UUID or its name and namespace. Wire format primary names are `table-id` and `table`; `view_id` / `view` and `generic_table_id` / `generic_table` are accepted as input aliases for client ergonomics.
 type TabularIdentOrUuid struct {
-	TabularIdentOrUuidOneOf  *TabularIdentOrUuidOneOf
-	TabularIdentOrUuidOneOf1 *TabularIdentOrUuidOneOf1
+	TabularIdentOrUuidById   *TabularIdentOrUuidById
+	TabularIdentOrUuidByName *TabularIdentOrUuidByName
 }
 
-// TabularIdentOrUuidOneOfAsTabularIdentOrUuid is a convenience function that returns TabularIdentOrUuidOneOf wrapped in TabularIdentOrUuid
-func TabularIdentOrUuidOneOfAsTabularIdentOrUuid(v *TabularIdentOrUuidOneOf) TabularIdentOrUuid {
+// TabularIdentOrUuidByIdAsTabularIdentOrUuid is a convenience function that returns TabularIdentOrUuidById wrapped in TabularIdentOrUuid
+func TabularIdentOrUuidByIdAsTabularIdentOrUuid(v *TabularIdentOrUuidById) TabularIdentOrUuid {
 	return TabularIdentOrUuid{
-		TabularIdentOrUuidOneOf: v,
+		TabularIdentOrUuidById: v,
 	}
 }
 
-// TabularIdentOrUuidOneOf1AsTabularIdentOrUuid is a convenience function that returns TabularIdentOrUuidOneOf1 wrapped in TabularIdentOrUuid
-func TabularIdentOrUuidOneOf1AsTabularIdentOrUuid(v *TabularIdentOrUuidOneOf1) TabularIdentOrUuid {
+// TabularIdentOrUuidByNameAsTabularIdentOrUuid is a convenience function that returns TabularIdentOrUuidByName wrapped in TabularIdentOrUuid
+func TabularIdentOrUuidByNameAsTabularIdentOrUuid(v *TabularIdentOrUuidByName) TabularIdentOrUuid {
 	return TabularIdentOrUuid{
-		TabularIdentOrUuidOneOf1: v,
+		TabularIdentOrUuidByName: v,
 	}
 }
 
@@ -39,36 +39,36 @@ func TabularIdentOrUuidOneOf1AsTabularIdentOrUuid(v *TabularIdentOrUuidOneOf1) T
 func (dst *TabularIdentOrUuid) UnmarshalJSON(data []byte) error {
 	var err error
 	match := 0
-	// try to unmarshal data into TabularIdentOrUuidOneOf
-	err = json.Unmarshal(data, &dst.TabularIdentOrUuidOneOf)
+	// try to unmarshal data into TabularIdentOrUuidById
+	err = json.Unmarshal(data, &dst.TabularIdentOrUuidById)
 	if err == nil {
-		jsonTabularIdentOrUuidOneOf, _ := json.Marshal(dst.TabularIdentOrUuidOneOf)
-		if string(jsonTabularIdentOrUuidOneOf) == "{}" { // empty struct
-			dst.TabularIdentOrUuidOneOf = nil
+		jsonTabularIdentOrUuidById, _ := json.Marshal(dst.TabularIdentOrUuidById)
+		if string(jsonTabularIdentOrUuidById) == "{}" { // empty struct
+			dst.TabularIdentOrUuidById = nil
 		} else {
 			match++
 		}
 	} else {
-		dst.TabularIdentOrUuidOneOf = nil
+		dst.TabularIdentOrUuidById = nil
 	}
 
-	// try to unmarshal data into TabularIdentOrUuidOneOf1
-	err = json.Unmarshal(data, &dst.TabularIdentOrUuidOneOf1)
+	// try to unmarshal data into TabularIdentOrUuidByName
+	err = json.Unmarshal(data, &dst.TabularIdentOrUuidByName)
 	if err == nil {
-		jsonTabularIdentOrUuidOneOf1, _ := json.Marshal(dst.TabularIdentOrUuidOneOf1)
-		if string(jsonTabularIdentOrUuidOneOf1) == "{}" { // empty struct
-			dst.TabularIdentOrUuidOneOf1 = nil
+		jsonTabularIdentOrUuidByName, _ := json.Marshal(dst.TabularIdentOrUuidByName)
+		if string(jsonTabularIdentOrUuidByName) == "{}" { // empty struct
+			dst.TabularIdentOrUuidByName = nil
 		} else {
 			match++
 		}
 	} else {
-		dst.TabularIdentOrUuidOneOf1 = nil
+		dst.TabularIdentOrUuidByName = nil
 	}
 
 	if match > 1 { // more than 1 match
 		// reset to nil
-		dst.TabularIdentOrUuidOneOf = nil
-		dst.TabularIdentOrUuidOneOf1 = nil
+		dst.TabularIdentOrUuidById = nil
+		dst.TabularIdentOrUuidByName = nil
 
 		return fmt.Errorf("data matches more than one schema in oneOf(TabularIdentOrUuid)")
 	} else if match == 1 {
@@ -80,12 +80,12 @@ func (dst *TabularIdentOrUuid) UnmarshalJSON(data []byte) error {
 
 // Marshal data from the first non-nil pointers in the struct to JSON
 func (src TabularIdentOrUuid) MarshalJSON() ([]byte, error) {
-	if src.TabularIdentOrUuidOneOf != nil {
-		return json.Marshal(&src.TabularIdentOrUuidOneOf)
+	if src.TabularIdentOrUuidById != nil {
+		return json.Marshal(&src.TabularIdentOrUuidById)
 	}
 
-	if src.TabularIdentOrUuidOneOf1 != nil {
-		return json.Marshal(&src.TabularIdentOrUuidOneOf1)
+	if src.TabularIdentOrUuidByName != nil {
+		return json.Marshal(&src.TabularIdentOrUuidByName)
 	}
 
 	return nil, nil // no data in oneOf schemas
@@ -96,12 +96,12 @@ func (obj *TabularIdentOrUuid) GetActualInstance() interface{} {
 	if obj == nil {
 		return nil
 	}
-	if obj.TabularIdentOrUuidOneOf != nil {
-		return obj.TabularIdentOrUuidOneOf
+	if obj.TabularIdentOrUuidById != nil {
+		return obj.TabularIdentOrUuidById
 	}
 
-	if obj.TabularIdentOrUuidOneOf1 != nil {
-		return obj.TabularIdentOrUuidOneOf1
+	if obj.TabularIdentOrUuidByName != nil {
+		return obj.TabularIdentOrUuidByName
 	}
 
 	// all schemas are nil

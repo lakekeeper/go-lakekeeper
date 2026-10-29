@@ -21,7 +21,7 @@ var _ MappedNullable = &GetLakekeeperNamespaceActionsResponse{}
 
 // GetLakekeeperNamespaceActionsResponse struct for GetLakekeeperNamespaceActionsResponse
 type GetLakekeeperNamespaceActionsResponse struct {
-	AllowedActions []LakekeeperNamespaceAction `json:"allowed-actions"`
+	AllowedActions []LakekeeperNamespaceActionKind `json:"allowed-actions"`
 }
 
 type _GetLakekeeperNamespaceActionsResponse GetLakekeeperNamespaceActionsResponse
@@ -30,7 +30,7 @@ type _GetLakekeeperNamespaceActionsResponse GetLakekeeperNamespaceActionsRespons
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewGetLakekeeperNamespaceActionsResponse(allowedActions []LakekeeperNamespaceAction) *GetLakekeeperNamespaceActionsResponse {
+func NewGetLakekeeperNamespaceActionsResponse(allowedActions []LakekeeperNamespaceActionKind) *GetLakekeeperNamespaceActionsResponse {
 	this := GetLakekeeperNamespaceActionsResponse{}
 	this.AllowedActions = allowedActions
 	return &this
@@ -45,9 +45,9 @@ func NewGetLakekeeperNamespaceActionsResponseWithDefaults() *GetLakekeeperNamesp
 }
 
 // GetAllowedActions returns the AllowedActions field value
-func (o *GetLakekeeperNamespaceActionsResponse) GetAllowedActions() []LakekeeperNamespaceAction {
+func (o *GetLakekeeperNamespaceActionsResponse) GetAllowedActions() []LakekeeperNamespaceActionKind {
 	if o == nil {
-		var ret []LakekeeperNamespaceAction
+		var ret []LakekeeperNamespaceActionKind
 		return ret
 	}
 
@@ -56,7 +56,7 @@ func (o *GetLakekeeperNamespaceActionsResponse) GetAllowedActions() []Lakekeeper
 
 // GetAllowedActionsOk returns a tuple with the AllowedActions field value
 // and a boolean to check if the value has been set.
-func (o *GetLakekeeperNamespaceActionsResponse) GetAllowedActionsOk() ([]LakekeeperNamespaceAction, bool) {
+func (o *GetLakekeeperNamespaceActionsResponse) GetAllowedActionsOk() ([]LakekeeperNamespaceActionKind, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -64,7 +64,7 @@ func (o *GetLakekeeperNamespaceActionsResponse) GetAllowedActionsOk() ([]Lakekee
 }
 
 // SetAllowedActions sets field value
-func (o *GetLakekeeperNamespaceActionsResponse) SetAllowedActions(v []LakekeeperNamespaceAction) {
+func (o *GetLakekeeperNamespaceActionsResponse) SetAllowedActions(v []LakekeeperNamespaceActionKind) {
 	o.AllowedActions = v
 }
 

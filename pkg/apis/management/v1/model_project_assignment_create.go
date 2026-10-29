@@ -11,101 +11,177 @@ API version: 0.0.0
 package managementv1
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 )
 
-// ProjectAssignmentCreate - struct for ProjectAssignmentCreate
+// checks if the ProjectAssignmentCreate type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &ProjectAssignmentCreate{}
+
+// ProjectAssignmentCreate struct for ProjectAssignmentCreate
 type ProjectAssignmentCreate struct {
-	ProjectAssignmentCreateRole *ProjectAssignmentCreateRole
-	ProjectAssignmentCreateUser *ProjectAssignmentCreateUser
+	// Id of the role
+	Role *string `json:"role,omitempty"`
+	// Id of the user
+	User *string `json:"user,omitempty"`
+	Type string  `json:"type"`
 }
 
-// ProjectAssignmentCreateRoleAsProjectAssignmentCreate is a convenience function that returns ProjectAssignmentCreateRole wrapped in ProjectAssignmentCreate
-func ProjectAssignmentCreateRoleAsProjectAssignmentCreate(v *ProjectAssignmentCreateRole) ProjectAssignmentCreate {
-	return ProjectAssignmentCreate{
-		ProjectAssignmentCreateRole: v,
+type _ProjectAssignmentCreate ProjectAssignmentCreate
+
+// NewProjectAssignmentCreate instantiates a new ProjectAssignmentCreate object
+// This constructor will assign default values to properties that have it defined,
+// and makes sure properties required by API are set, but the set of arguments
+// will change when the set of required properties is changed
+func NewProjectAssignmentCreate(type_ string) *ProjectAssignmentCreate {
+	this := ProjectAssignmentCreate{}
+	this.Type = type_
+	return &this
+}
+
+// NewProjectAssignmentCreateWithDefaults instantiates a new ProjectAssignmentCreate object
+// This constructor will only assign default values to properties that have it defined,
+// but it doesn't guarantee that properties required by API are set
+func NewProjectAssignmentCreateWithDefaults() *ProjectAssignmentCreate {
+	this := ProjectAssignmentCreate{}
+	return &this
+}
+
+// GetRole returns the Role field value if set, zero value otherwise.
+func (o *ProjectAssignmentCreate) GetRole() string {
+	if o == nil || IsNil(o.Role) {
+		var ret string
+		return ret
 	}
+	return *o.Role
 }
 
-// ProjectAssignmentCreateUserAsProjectAssignmentCreate is a convenience function that returns ProjectAssignmentCreateUser wrapped in ProjectAssignmentCreate
-func ProjectAssignmentCreateUserAsProjectAssignmentCreate(v *ProjectAssignmentCreateUser) ProjectAssignmentCreate {
-	return ProjectAssignmentCreate{
-		ProjectAssignmentCreateUser: v,
+// GetRoleOk returns a tuple with the Role field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *ProjectAssignmentCreate) GetRoleOk() (*string, bool) {
+	if o == nil || IsNil(o.Role) {
+		return nil, false
 	}
+	return o.Role, true
 }
 
-// Unmarshal JSON data into one of the pointers in the struct
-func (dst *ProjectAssignmentCreate) UnmarshalJSON(data []byte) error {
-	var err error
-	match := 0
-	// try to unmarshal data into ProjectAssignmentCreateRole
-	err = json.Unmarshal(data, &dst.ProjectAssignmentCreateRole)
-	if err == nil {
-		jsonProjectAssignmentCreateRole, _ := json.Marshal(dst.ProjectAssignmentCreateRole)
-		if string(jsonProjectAssignmentCreateRole) == "{}" { // empty struct
-			dst.ProjectAssignmentCreateRole = nil
-		} else {
-			match++
+// HasRole returns a boolean if a field has been set.
+func (o *ProjectAssignmentCreate) HasRole() bool {
+	if o != nil && !IsNil(o.Role) {
+		return true
+	}
+
+	return false
+}
+
+// SetRole gets a reference to the given string and assigns it to the Role field.
+func (o *ProjectAssignmentCreate) SetRole(v string) {
+	o.Role = &v
+}
+
+// GetUser returns the User field value if set, zero value otherwise.
+func (o *ProjectAssignmentCreate) GetUser() string {
+	if o == nil || IsNil(o.User) {
+		var ret string
+		return ret
+	}
+	return *o.User
+}
+
+// GetUserOk returns a tuple with the User field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *ProjectAssignmentCreate) GetUserOk() (*string, bool) {
+	if o == nil || IsNil(o.User) {
+		return nil, false
+	}
+	return o.User, true
+}
+
+// HasUser returns a boolean if a field has been set.
+func (o *ProjectAssignmentCreate) HasUser() bool {
+	if o != nil && !IsNil(o.User) {
+		return true
+	}
+
+	return false
+}
+
+// SetUser gets a reference to the given string and assigns it to the User field.
+func (o *ProjectAssignmentCreate) SetUser(v string) {
+	o.User = &v
+}
+
+// GetType returns the Type field value
+func (o *ProjectAssignmentCreate) GetType() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.Type
+}
+
+// GetTypeOk returns a tuple with the Type field value
+// and a boolean to check if the value has been set.
+func (o *ProjectAssignmentCreate) GetTypeOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Type, true
+}
+
+// SetType sets field value
+func (o *ProjectAssignmentCreate) SetType(v string) {
+	o.Type = v
+}
+
+func (o ProjectAssignmentCreate) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.Role) {
+		toSerialize["role"] = o.Role
+	}
+	if !IsNil(o.User) {
+		toSerialize["user"] = o.User
+	}
+	toSerialize["type"] = o.Type
+	return toSerialize, nil
+}
+
+func (o *ProjectAssignmentCreate) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"type",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err
+	}
+
+	for _, requiredProperty := range requiredProperties {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
-	} else {
-		dst.ProjectAssignmentCreateRole = nil
 	}
 
-	// try to unmarshal data into ProjectAssignmentCreateUser
-	err = json.Unmarshal(data, &dst.ProjectAssignmentCreateUser)
-	if err == nil {
-		jsonProjectAssignmentCreateUser, _ := json.Marshal(dst.ProjectAssignmentCreateUser)
-		if string(jsonProjectAssignmentCreateUser) == "{}" { // empty struct
-			dst.ProjectAssignmentCreateUser = nil
-		} else {
-			match++
-		}
-	} else {
-		dst.ProjectAssignmentCreateUser = nil
+	varProjectAssignmentCreate := _ProjectAssignmentCreate{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	err = decoder.Decode(&varProjectAssignmentCreate)
+
+	if err != nil {
+		return err
 	}
 
-	if match > 1 { // more than 1 match
-		// reset to nil
-		dst.ProjectAssignmentCreateRole = nil
-		dst.ProjectAssignmentCreateUser = nil
+	*o = ProjectAssignmentCreate(varProjectAssignmentCreate)
 
-		return fmt.Errorf("data matches more than one schema in oneOf(ProjectAssignmentCreate)")
-	} else if match == 1 {
-		return nil // exactly one match
-	} else { // no match
-		return fmt.Errorf("data failed to match schemas in oneOf(ProjectAssignmentCreate)")
-	}
-}
-
-// Marshal data from the first non-nil pointers in the struct to JSON
-func (src ProjectAssignmentCreate) MarshalJSON() ([]byte, error) {
-	if src.ProjectAssignmentCreateRole != nil {
-		return json.Marshal(&src.ProjectAssignmentCreateRole)
-	}
-
-	if src.ProjectAssignmentCreateUser != nil {
-		return json.Marshal(&src.ProjectAssignmentCreateUser)
-	}
-
-	return nil, nil // no data in oneOf schemas
-}
-
-// Get the actual instance
-func (obj *ProjectAssignmentCreate) GetActualInstance() interface{} {
-	if obj == nil {
-		return nil
-	}
-	if obj.ProjectAssignmentCreateRole != nil {
-		return obj.ProjectAssignmentCreateRole
-	}
-
-	if obj.ProjectAssignmentCreateUser != nil {
-		return obj.ProjectAssignmentCreateUser
-	}
-
-	// all schemas are nil
-	return nil
+	return err
 }
 
 type NullableProjectAssignmentCreate struct {

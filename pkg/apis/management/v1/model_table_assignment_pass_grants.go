@@ -11,101 +11,177 @@ API version: 0.0.0
 package managementv1
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 )
 
-// TableAssignmentPassGrants - struct for TableAssignmentPassGrants
+// checks if the TableAssignmentPassGrants type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &TableAssignmentPassGrants{}
+
+// TableAssignmentPassGrants struct for TableAssignmentPassGrants
 type TableAssignmentPassGrants struct {
-	TableAssignmentPassGrantsRole *TableAssignmentPassGrantsRole
-	TableAssignmentPassGrantsUser *TableAssignmentPassGrantsUser
+	// Id of the role
+	Role *string `json:"role,omitempty"`
+	// Id of the user
+	User *string `json:"user,omitempty"`
+	Type string  `json:"type"`
 }
 
-// TableAssignmentPassGrantsRoleAsTableAssignmentPassGrants is a convenience function that returns TableAssignmentPassGrantsRole wrapped in TableAssignmentPassGrants
-func TableAssignmentPassGrantsRoleAsTableAssignmentPassGrants(v *TableAssignmentPassGrantsRole) TableAssignmentPassGrants {
-	return TableAssignmentPassGrants{
-		TableAssignmentPassGrantsRole: v,
+type _TableAssignmentPassGrants TableAssignmentPassGrants
+
+// NewTableAssignmentPassGrants instantiates a new TableAssignmentPassGrants object
+// This constructor will assign default values to properties that have it defined,
+// and makes sure properties required by API are set, but the set of arguments
+// will change when the set of required properties is changed
+func NewTableAssignmentPassGrants(type_ string) *TableAssignmentPassGrants {
+	this := TableAssignmentPassGrants{}
+	this.Type = type_
+	return &this
+}
+
+// NewTableAssignmentPassGrantsWithDefaults instantiates a new TableAssignmentPassGrants object
+// This constructor will only assign default values to properties that have it defined,
+// but it doesn't guarantee that properties required by API are set
+func NewTableAssignmentPassGrantsWithDefaults() *TableAssignmentPassGrants {
+	this := TableAssignmentPassGrants{}
+	return &this
+}
+
+// GetRole returns the Role field value if set, zero value otherwise.
+func (o *TableAssignmentPassGrants) GetRole() string {
+	if o == nil || IsNil(o.Role) {
+		var ret string
+		return ret
 	}
+	return *o.Role
 }
 
-// TableAssignmentPassGrantsUserAsTableAssignmentPassGrants is a convenience function that returns TableAssignmentPassGrantsUser wrapped in TableAssignmentPassGrants
-func TableAssignmentPassGrantsUserAsTableAssignmentPassGrants(v *TableAssignmentPassGrantsUser) TableAssignmentPassGrants {
-	return TableAssignmentPassGrants{
-		TableAssignmentPassGrantsUser: v,
+// GetRoleOk returns a tuple with the Role field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TableAssignmentPassGrants) GetRoleOk() (*string, bool) {
+	if o == nil || IsNil(o.Role) {
+		return nil, false
 	}
+	return o.Role, true
 }
 
-// Unmarshal JSON data into one of the pointers in the struct
-func (dst *TableAssignmentPassGrants) UnmarshalJSON(data []byte) error {
-	var err error
-	match := 0
-	// try to unmarshal data into TableAssignmentPassGrantsRole
-	err = json.Unmarshal(data, &dst.TableAssignmentPassGrantsRole)
-	if err == nil {
-		jsonTableAssignmentPassGrantsRole, _ := json.Marshal(dst.TableAssignmentPassGrantsRole)
-		if string(jsonTableAssignmentPassGrantsRole) == "{}" { // empty struct
-			dst.TableAssignmentPassGrantsRole = nil
-		} else {
-			match++
+// HasRole returns a boolean if a field has been set.
+func (o *TableAssignmentPassGrants) HasRole() bool {
+	if o != nil && !IsNil(o.Role) {
+		return true
+	}
+
+	return false
+}
+
+// SetRole gets a reference to the given string and assigns it to the Role field.
+func (o *TableAssignmentPassGrants) SetRole(v string) {
+	o.Role = &v
+}
+
+// GetUser returns the User field value if set, zero value otherwise.
+func (o *TableAssignmentPassGrants) GetUser() string {
+	if o == nil || IsNil(o.User) {
+		var ret string
+		return ret
+	}
+	return *o.User
+}
+
+// GetUserOk returns a tuple with the User field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TableAssignmentPassGrants) GetUserOk() (*string, bool) {
+	if o == nil || IsNil(o.User) {
+		return nil, false
+	}
+	return o.User, true
+}
+
+// HasUser returns a boolean if a field has been set.
+func (o *TableAssignmentPassGrants) HasUser() bool {
+	if o != nil && !IsNil(o.User) {
+		return true
+	}
+
+	return false
+}
+
+// SetUser gets a reference to the given string and assigns it to the User field.
+func (o *TableAssignmentPassGrants) SetUser(v string) {
+	o.User = &v
+}
+
+// GetType returns the Type field value
+func (o *TableAssignmentPassGrants) GetType() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.Type
+}
+
+// GetTypeOk returns a tuple with the Type field value
+// and a boolean to check if the value has been set.
+func (o *TableAssignmentPassGrants) GetTypeOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Type, true
+}
+
+// SetType sets field value
+func (o *TableAssignmentPassGrants) SetType(v string) {
+	o.Type = v
+}
+
+func (o TableAssignmentPassGrants) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.Role) {
+		toSerialize["role"] = o.Role
+	}
+	if !IsNil(o.User) {
+		toSerialize["user"] = o.User
+	}
+	toSerialize["type"] = o.Type
+	return toSerialize, nil
+}
+
+func (o *TableAssignmentPassGrants) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"type",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err
+	}
+
+	for _, requiredProperty := range requiredProperties {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
-	} else {
-		dst.TableAssignmentPassGrantsRole = nil
 	}
 
-	// try to unmarshal data into TableAssignmentPassGrantsUser
-	err = json.Unmarshal(data, &dst.TableAssignmentPassGrantsUser)
-	if err == nil {
-		jsonTableAssignmentPassGrantsUser, _ := json.Marshal(dst.TableAssignmentPassGrantsUser)
-		if string(jsonTableAssignmentPassGrantsUser) == "{}" { // empty struct
-			dst.TableAssignmentPassGrantsUser = nil
-		} else {
-			match++
-		}
-	} else {
-		dst.TableAssignmentPassGrantsUser = nil
+	varTableAssignmentPassGrants := _TableAssignmentPassGrants{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	err = decoder.Decode(&varTableAssignmentPassGrants)
+
+	if err != nil {
+		return err
 	}
 
-	if match > 1 { // more than 1 match
-		// reset to nil
-		dst.TableAssignmentPassGrantsRole = nil
-		dst.TableAssignmentPassGrantsUser = nil
+	*o = TableAssignmentPassGrants(varTableAssignmentPassGrants)
 
-		return fmt.Errorf("data matches more than one schema in oneOf(TableAssignmentPassGrants)")
-	} else if match == 1 {
-		return nil // exactly one match
-	} else { // no match
-		return fmt.Errorf("data failed to match schemas in oneOf(TableAssignmentPassGrants)")
-	}
-}
-
-// Marshal data from the first non-nil pointers in the struct to JSON
-func (src TableAssignmentPassGrants) MarshalJSON() ([]byte, error) {
-	if src.TableAssignmentPassGrantsRole != nil {
-		return json.Marshal(&src.TableAssignmentPassGrantsRole)
-	}
-
-	if src.TableAssignmentPassGrantsUser != nil {
-		return json.Marshal(&src.TableAssignmentPassGrantsUser)
-	}
-
-	return nil, nil // no data in oneOf schemas
-}
-
-// Get the actual instance
-func (obj *TableAssignmentPassGrants) GetActualInstance() interface{} {
-	if obj == nil {
-		return nil
-	}
-	if obj.TableAssignmentPassGrantsRole != nil {
-		return obj.TableAssignmentPassGrantsRole
-	}
-
-	if obj.TableAssignmentPassGrantsUser != nil {
-		return obj.TableAssignmentPassGrantsUser
-	}
-
-	// all schemas are nil
-	return nil
+	return err
 }
 
 type NullableTableAssignmentPassGrants struct {

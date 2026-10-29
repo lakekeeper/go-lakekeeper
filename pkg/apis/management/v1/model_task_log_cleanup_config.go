@@ -19,10 +19,10 @@ var _ MappedNullable = &TaskLogCleanupConfig{}
 
 // TaskLogCleanupConfig struct for TaskLogCleanupConfig
 type TaskLogCleanupConfig struct {
-	// How often to run the cleanup task in ISO8601 duration format. Defaults to once a day (P1D). If a value below 1 day is provided, it will be set to the default of 1 day.
-	CleanupPeriod *string `json:"cleanup-period,omitempty"`
+	// How often to run the cleanup task in ISO8601 duration format. Defaults to once a day (P1D). Values below 1 day are raised to 1 day; values above 100 years are lowered to 100 years.
+	CleanupPeriod NullableString `json:"cleanup-period,omitempty"`
 	// How long to retain task logs before deletion in ISO8601 duration format. Defaults to 90 days.
-	RetentionPeriod *string `json:"retention-period,omitempty"`
+	RetentionPeriod NullableString `json:"retention-period,omitempty"`
 }
 
 // NewTaskLogCleanupConfig instantiates a new TaskLogCleanupConfig object
@@ -42,77 +42,99 @@ func NewTaskLogCleanupConfigWithDefaults() *TaskLogCleanupConfig {
 	return &this
 }
 
-// GetCleanupPeriod returns the CleanupPeriod field value if set, zero value otherwise.
+// GetCleanupPeriod returns the CleanupPeriod field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *TaskLogCleanupConfig) GetCleanupPeriod() string {
-	if o == nil || IsNil(o.CleanupPeriod) {
+	if o == nil || IsNil(o.CleanupPeriod.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.CleanupPeriod
+	return *o.CleanupPeriod.Get()
 }
 
 // GetCleanupPeriodOk returns a tuple with the CleanupPeriod field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *TaskLogCleanupConfig) GetCleanupPeriodOk() (*string, bool) {
-	if o == nil || IsNil(o.CleanupPeriod) {
+	if o == nil {
 		return nil, false
 	}
-	return o.CleanupPeriod, true
+	return o.CleanupPeriod.Get(), o.CleanupPeriod.IsSet()
 }
 
 // HasCleanupPeriod returns a boolean if a field has been set.
 func (o *TaskLogCleanupConfig) HasCleanupPeriod() bool {
-	if o != nil && !IsNil(o.CleanupPeriod) {
+	if o != nil && o.CleanupPeriod.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetCleanupPeriod gets a reference to the given string and assigns it to the CleanupPeriod field.
+// SetCleanupPeriod gets a reference to the given NullableString and assigns it to the CleanupPeriod field.
 func (o *TaskLogCleanupConfig) SetCleanupPeriod(v string) {
-	o.CleanupPeriod = &v
+	o.CleanupPeriod.Set(&v)
 }
 
-// GetRetentionPeriod returns the RetentionPeriod field value if set, zero value otherwise.
+// SetCleanupPeriodNil sets the value for CleanupPeriod to be an explicit nil
+func (o *TaskLogCleanupConfig) SetCleanupPeriodNil() {
+	o.CleanupPeriod.Set(nil)
+}
+
+// UnsetCleanupPeriod ensures that no value is present for CleanupPeriod, not even an explicit nil
+func (o *TaskLogCleanupConfig) UnsetCleanupPeriod() {
+	o.CleanupPeriod.Unset()
+}
+
+// GetRetentionPeriod returns the RetentionPeriod field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *TaskLogCleanupConfig) GetRetentionPeriod() string {
-	if o == nil || IsNil(o.RetentionPeriod) {
+	if o == nil || IsNil(o.RetentionPeriod.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.RetentionPeriod
+	return *o.RetentionPeriod.Get()
 }
 
 // GetRetentionPeriodOk returns a tuple with the RetentionPeriod field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *TaskLogCleanupConfig) GetRetentionPeriodOk() (*string, bool) {
-	if o == nil || IsNil(o.RetentionPeriod) {
+	if o == nil {
 		return nil, false
 	}
-	return o.RetentionPeriod, true
+	return o.RetentionPeriod.Get(), o.RetentionPeriod.IsSet()
 }
 
 // HasRetentionPeriod returns a boolean if a field has been set.
 func (o *TaskLogCleanupConfig) HasRetentionPeriod() bool {
-	if o != nil && !IsNil(o.RetentionPeriod) {
+	if o != nil && o.RetentionPeriod.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetRetentionPeriod gets a reference to the given string and assigns it to the RetentionPeriod field.
+// SetRetentionPeriod gets a reference to the given NullableString and assigns it to the RetentionPeriod field.
 func (o *TaskLogCleanupConfig) SetRetentionPeriod(v string) {
-	o.RetentionPeriod = &v
+	o.RetentionPeriod.Set(&v)
+}
+
+// SetRetentionPeriodNil sets the value for RetentionPeriod to be an explicit nil
+func (o *TaskLogCleanupConfig) SetRetentionPeriodNil() {
+	o.RetentionPeriod.Set(nil)
+}
+
+// UnsetRetentionPeriod ensures that no value is present for RetentionPeriod, not even an explicit nil
+func (o *TaskLogCleanupConfig) UnsetRetentionPeriod() {
+	o.RetentionPeriod.Unset()
 }
 
 func (o TaskLogCleanupConfig) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.CleanupPeriod) {
-		toSerialize["cleanup-period"] = o.CleanupPeriod
+	if o.CleanupPeriod.IsSet() {
+		toSerialize["cleanup-period"] = o.CleanupPeriod.Get()
 	}
-	if !IsNil(o.RetentionPeriod) {
-		toSerialize["retention-period"] = o.RetentionPeriod
+	if o.RetentionPeriod.IsSet() {
+		toSerialize["retention-period"] = o.RetentionPeriod.Get()
 	}
 	return toSerialize, nil
 }

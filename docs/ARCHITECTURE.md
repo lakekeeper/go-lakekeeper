@@ -7,7 +7,7 @@ OpenAPI spec; everything else — the auth layer, the retry layer, the CLI,
 and the ergonomic builders for storage and permissions — is hand-written.
 
 For the generated/manual split, regeneration workflow, and the OpenAPI
-preprocessor, see [GENERATION.md](GENERATION.md). For a per-package tour
+pre- and postprocessor, see [GENERATION.md](GENERATION.md). For a per-package tour
 of types and entry points, see [PACKAGES.md](PACKAGES.md).
 
 ## Component Overview

@@ -23,7 +23,9 @@ var _ MappedNullable = &LakekeeperProjectActionCreateRole{}
 type LakekeeperProjectActionCreateRole struct {
 	Action string `json:"action"`
 	// Name of the role to create.
-	Name *string `json:"name,omitempty"`
+	Name NullableString `json:"name,omitempty"`
+	// External identity (provider + source id) the request binds the new role to. Absent when the request names none, in which case the role is created in the `lakekeeper` provider with a generated source id.
+	SourceSystem NullableRoleSourceSystem `json:"source_system,omitempty"`
 }
 
 type _LakekeeperProjectActionCreateRole LakekeeperProjectActionCreateRole
@@ -70,43 +72,100 @@ func (o *LakekeeperProjectActionCreateRole) SetAction(v string) {
 	o.Action = v
 }
 
-// GetName returns the Name field value if set, zero value otherwise.
+// GetName returns the Name field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *LakekeeperProjectActionCreateRole) GetName() string {
-	if o == nil || IsNil(o.Name) {
+	if o == nil || IsNil(o.Name.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.Name
+	return *o.Name.Get()
 }
 
 // GetNameOk returns a tuple with the Name field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *LakekeeperProjectActionCreateRole) GetNameOk() (*string, bool) {
-	if o == nil || IsNil(o.Name) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Name, true
+	return o.Name.Get(), o.Name.IsSet()
 }
 
 // HasName returns a boolean if a field has been set.
 func (o *LakekeeperProjectActionCreateRole) HasName() bool {
-	if o != nil && !IsNil(o.Name) {
+	if o != nil && o.Name.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetName gets a reference to the given string and assigns it to the Name field.
+// SetName gets a reference to the given NullableString and assigns it to the Name field.
 func (o *LakekeeperProjectActionCreateRole) SetName(v string) {
-	o.Name = &v
+	o.Name.Set(&v)
+}
+
+// SetNameNil sets the value for Name to be an explicit nil
+func (o *LakekeeperProjectActionCreateRole) SetNameNil() {
+	o.Name.Set(nil)
+}
+
+// UnsetName ensures that no value is present for Name, not even an explicit nil
+func (o *LakekeeperProjectActionCreateRole) UnsetName() {
+	o.Name.Unset()
+}
+
+// GetSourceSystem returns the SourceSystem field value if set, zero value otherwise (both if not set or set to explicit null).
+func (o *LakekeeperProjectActionCreateRole) GetSourceSystem() RoleSourceSystem {
+	if o == nil || IsNil(o.SourceSystem.Get()) {
+		var ret RoleSourceSystem
+		return ret
+	}
+	return *o.SourceSystem.Get()
+}
+
+// GetSourceSystemOk returns a tuple with the SourceSystem field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *LakekeeperProjectActionCreateRole) GetSourceSystemOk() (*RoleSourceSystem, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return o.SourceSystem.Get(), o.SourceSystem.IsSet()
+}
+
+// HasSourceSystem returns a boolean if a field has been set.
+func (o *LakekeeperProjectActionCreateRole) HasSourceSystem() bool {
+	if o != nil && o.SourceSystem.IsSet() {
+		return true
+	}
+
+	return false
+}
+
+// SetSourceSystem gets a reference to the given NullableRoleSourceSystem and assigns it to the SourceSystem field.
+func (o *LakekeeperProjectActionCreateRole) SetSourceSystem(v RoleSourceSystem) {
+	o.SourceSystem.Set(&v)
+}
+
+// SetSourceSystemNil sets the value for SourceSystem to be an explicit nil
+func (o *LakekeeperProjectActionCreateRole) SetSourceSystemNil() {
+	o.SourceSystem.Set(nil)
+}
+
+// UnsetSourceSystem ensures that no value is present for SourceSystem, not even an explicit nil
+func (o *LakekeeperProjectActionCreateRole) UnsetSourceSystem() {
+	o.SourceSystem.Unset()
 }
 
 func (o LakekeeperProjectActionCreateRole) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["action"] = o.Action
-	if !IsNil(o.Name) {
-		toSerialize["name"] = o.Name
+	if o.Name.IsSet() {
+		toSerialize["name"] = o.Name.Get()
+	}
+	if o.SourceSystem.IsSet() {
+		toSerialize["source_system"] = o.SourceSystem.Get()
 	}
 	return toSerialize, nil
 }

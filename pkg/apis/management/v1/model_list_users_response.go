@@ -21,8 +21,8 @@ var _ MappedNullable = &ListUsersResponse{}
 
 // ListUsersResponse struct for ListUsersResponse
 type ListUsersResponse struct {
-	NextPageToken *string `json:"next-page-token,omitempty"`
-	Users         []User  `json:"users"`
+	NextPageToken NullableString `json:"next-page-token,omitempty"`
+	Users         []User         `json:"users"`
 }
 
 type _ListUsersResponse ListUsersResponse
@@ -45,36 +45,47 @@ func NewListUsersResponseWithDefaults() *ListUsersResponse {
 	return &this
 }
 
-// GetNextPageToken returns the NextPageToken field value if set, zero value otherwise.
+// GetNextPageToken returns the NextPageToken field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *ListUsersResponse) GetNextPageToken() string {
-	if o == nil || IsNil(o.NextPageToken) {
+	if o == nil || IsNil(o.NextPageToken.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.NextPageToken
+	return *o.NextPageToken.Get()
 }
 
 // GetNextPageTokenOk returns a tuple with the NextPageToken field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *ListUsersResponse) GetNextPageTokenOk() (*string, bool) {
-	if o == nil || IsNil(o.NextPageToken) {
+	if o == nil {
 		return nil, false
 	}
-	return o.NextPageToken, true
+	return o.NextPageToken.Get(), o.NextPageToken.IsSet()
 }
 
 // HasNextPageToken returns a boolean if a field has been set.
 func (o *ListUsersResponse) HasNextPageToken() bool {
-	if o != nil && !IsNil(o.NextPageToken) {
+	if o != nil && o.NextPageToken.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetNextPageToken gets a reference to the given string and assigns it to the NextPageToken field.
+// SetNextPageToken gets a reference to the given NullableString and assigns it to the NextPageToken field.
 func (o *ListUsersResponse) SetNextPageToken(v string) {
-	o.NextPageToken = &v
+	o.NextPageToken.Set(&v)
+}
+
+// SetNextPageTokenNil sets the value for NextPageToken to be an explicit nil
+func (o *ListUsersResponse) SetNextPageTokenNil() {
+	o.NextPageToken.Set(nil)
+}
+
+// UnsetNextPageToken ensures that no value is present for NextPageToken, not even an explicit nil
+func (o *ListUsersResponse) UnsetNextPageToken() {
+	o.NextPageToken.Unset()
 }
 
 // GetUsers returns the Users field value
@@ -103,8 +114,8 @@ func (o *ListUsersResponse) SetUsers(v []User) {
 
 func (o ListUsersResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.NextPageToken) {
-		toSerialize["next-page-token"] = o.NextPageToken
+	if o.NextPageToken.IsSet() {
+		toSerialize["next-page-token"] = o.NextPageToken.Get()
 	}
 	toSerialize["users"] = o.Users
 	return toSerialize, nil

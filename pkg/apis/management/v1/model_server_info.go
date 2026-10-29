@@ -32,19 +32,21 @@ type ServerInfo struct {
 	// Information about the bundled console (UI), if any.
 	Console NullableConsoleInfo `json:"console,omitempty"`
 	// Default Project ID. Null if not set
-	DefaultProjectId *string `json:"default-project-id,omitempty"`
+	DefaultProjectId NullableString `json:"default-project-id,omitempty"`
 	// If using GCP system identities for GCS storage profiles are enabled.
 	GcpSystemIdentitiesEnabled bool `json:"gcp-system-identities-enabled"`
 	// Git commit SHA of the upstream `lakekeeper` crate, if the binary reported it at build time.
-	LakekeeperCommitSha *string `json:"lakekeeper-commit-sha,omitempty"`
+	LakekeeperCommitSha NullableString `json:"lakekeeper-commit-sha,omitempty"`
 	// Git commit SHA of the enterprise binary, if known.
-	LakekeeperEnterpriseCommitSha *string `json:"lakekeeper-enterprise-commit-sha,omitempty"`
+	LakekeeperEnterpriseCommitSha NullableString `json:"lakekeeper-enterprise-commit-sha,omitempty"`
 	// SemVer of the enterprise binary (e.g. `lakekeeper-plus`) when this server is an enterprise build. `None` on OSS builds.
-	LakekeeperEnterpriseVersion *string `json:"lakekeeper-enterprise-version,omitempty"`
+	LakekeeperEnterpriseVersion NullableString `json:"lakekeeper-enterprise-version,omitempty"`
 	// SemVer of the upstream `lakekeeper` crate the server was built against.
-	LakekeeperVersion *string `json:"lakekeeper-version,omitempty"`
+	LakekeeperVersion string `json:"lakekeeper-version"`
 	// License status information
 	LicenseStatus LicenseStatus `json:"license-status"`
+	// Role-provider namespaces whose roles are maintained by a configured role provider (LDAP/Entra/Okta/token), sorted. Roles whose `provider-id` appears here are the provider's to maintain: creating one, or renaming, re-describing or rebinding an existing one, is rejected with `ManagedRoleImmutable` so provider sync cannot be clobbered. Deleting one is allowed; if the provider still reports the group, it creates the role again on its next sync.  This is live server configuration, not a property of the namespace string. A provider removed from config drops out of the list, and the roles it left behind become renamable again.  Empty when no role provider is configured. Two namespaces never appear, and a client gating on this list must handle both itself: `lakekeeper`, which is always writable, and the reserved `system`: its existing roles reject the same mutations and deletion with `SystemRoleImmutable`, and naming it on create or rebind returns `RoleProviderIdReserved`. Some authorizers create and rebind roles only in `lakekeeper`; they refuse a namespace that is neither `lakekeeper`, `system` nor listed here with `RoleProviderNotApiManaged`.  **Membership is gated differently — do not derive it from this list.** Adding or removing a role's members requires the `lakekeeper` namespace (or `system`, for an instance admin); every other namespace is refused with `RoleNotManuallyAssignable` whether or not it appears here. So an orphaned role from a since-removed provider is renamable and deletable but still not assignable — gate member editing on `provider-id == \"lakekeeper\"`, not on absence from this list.
+	ManagedRoleProviders []string `json:"managed-role-providers"`
 	// List of queues that are registered for the server.
 	Queues []string `json:"queues"`
 	// ID of the server. Returns null if the catalog has not been bootstrapped.
@@ -60,14 +62,16 @@ type _ServerInfo ServerInfo
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewServerInfo(authzBackend string, awsSystemIdentitiesEnabled bool, azureSystemIdentitiesEnabled bool, bootstrapped bool, gcpSystemIdentitiesEnabled bool, licenseStatus LicenseStatus, queues []string, serverId string, version string) *ServerInfo {
+func NewServerInfo(authzBackend string, awsSystemIdentitiesEnabled bool, azureSystemIdentitiesEnabled bool, bootstrapped bool, gcpSystemIdentitiesEnabled bool, lakekeeperVersion string, licenseStatus LicenseStatus, managedRoleProviders []string, queues []string, serverId string, version string) *ServerInfo {
 	this := ServerInfo{}
 	this.AuthzBackend = authzBackend
 	this.AwsSystemIdentitiesEnabled = awsSystemIdentitiesEnabled
 	this.AzureSystemIdentitiesEnabled = azureSystemIdentitiesEnabled
 	this.Bootstrapped = bootstrapped
 	this.GcpSystemIdentitiesEnabled = gcpSystemIdentitiesEnabled
+	this.LakekeeperVersion = lakekeeperVersion
 	this.LicenseStatus = licenseStatus
+	this.ManagedRoleProviders = managedRoleProviders
 	this.Queues = queues
 	this.ServerId = serverId
 	this.Version = version
@@ -221,36 +225,47 @@ func (o *ServerInfo) UnsetConsole() {
 	o.Console.Unset()
 }
 
-// GetDefaultProjectId returns the DefaultProjectId field value if set, zero value otherwise.
+// GetDefaultProjectId returns the DefaultProjectId field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *ServerInfo) GetDefaultProjectId() string {
-	if o == nil || IsNil(o.DefaultProjectId) {
+	if o == nil || IsNil(o.DefaultProjectId.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.DefaultProjectId
+	return *o.DefaultProjectId.Get()
 }
 
 // GetDefaultProjectIdOk returns a tuple with the DefaultProjectId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *ServerInfo) GetDefaultProjectIdOk() (*string, bool) {
-	if o == nil || IsNil(o.DefaultProjectId) {
+	if o == nil {
 		return nil, false
 	}
-	return o.DefaultProjectId, true
+	return o.DefaultProjectId.Get(), o.DefaultProjectId.IsSet()
 }
 
 // HasDefaultProjectId returns a boolean if a field has been set.
 func (o *ServerInfo) HasDefaultProjectId() bool {
-	if o != nil && !IsNil(o.DefaultProjectId) {
+	if o != nil && o.DefaultProjectId.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetDefaultProjectId gets a reference to the given string and assigns it to the DefaultProjectId field.
+// SetDefaultProjectId gets a reference to the given NullableString and assigns it to the DefaultProjectId field.
 func (o *ServerInfo) SetDefaultProjectId(v string) {
-	o.DefaultProjectId = &v
+	o.DefaultProjectId.Set(&v)
+}
+
+// SetDefaultProjectIdNil sets the value for DefaultProjectId to be an explicit nil
+func (o *ServerInfo) SetDefaultProjectIdNil() {
+	o.DefaultProjectId.Set(nil)
+}
+
+// UnsetDefaultProjectId ensures that no value is present for DefaultProjectId, not even an explicit nil
+func (o *ServerInfo) UnsetDefaultProjectId() {
+	o.DefaultProjectId.Unset()
 }
 
 // GetGcpSystemIdentitiesEnabled returns the GcpSystemIdentitiesEnabled field value
@@ -277,132 +292,157 @@ func (o *ServerInfo) SetGcpSystemIdentitiesEnabled(v bool) {
 	o.GcpSystemIdentitiesEnabled = v
 }
 
-// GetLakekeeperCommitSha returns the LakekeeperCommitSha field value if set, zero value otherwise.
+// GetLakekeeperCommitSha returns the LakekeeperCommitSha field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *ServerInfo) GetLakekeeperCommitSha() string {
-	if o == nil || IsNil(o.LakekeeperCommitSha) {
+	if o == nil || IsNil(o.LakekeeperCommitSha.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.LakekeeperCommitSha
+	return *o.LakekeeperCommitSha.Get()
 }
 
 // GetLakekeeperCommitShaOk returns a tuple with the LakekeeperCommitSha field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *ServerInfo) GetLakekeeperCommitShaOk() (*string, bool) {
-	if o == nil || IsNil(o.LakekeeperCommitSha) {
+	if o == nil {
 		return nil, false
 	}
-	return o.LakekeeperCommitSha, true
+	return o.LakekeeperCommitSha.Get(), o.LakekeeperCommitSha.IsSet()
 }
 
 // HasLakekeeperCommitSha returns a boolean if a field has been set.
 func (o *ServerInfo) HasLakekeeperCommitSha() bool {
-	if o != nil && !IsNil(o.LakekeeperCommitSha) {
+	if o != nil && o.LakekeeperCommitSha.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetLakekeeperCommitSha gets a reference to the given string and assigns it to the LakekeeperCommitSha field.
+// SetLakekeeperCommitSha gets a reference to the given NullableString and assigns it to the LakekeeperCommitSha field.
 func (o *ServerInfo) SetLakekeeperCommitSha(v string) {
-	o.LakekeeperCommitSha = &v
+	o.LakekeeperCommitSha.Set(&v)
 }
 
-// GetLakekeeperEnterpriseCommitSha returns the LakekeeperEnterpriseCommitSha field value if set, zero value otherwise.
+// SetLakekeeperCommitShaNil sets the value for LakekeeperCommitSha to be an explicit nil
+func (o *ServerInfo) SetLakekeeperCommitShaNil() {
+	o.LakekeeperCommitSha.Set(nil)
+}
+
+// UnsetLakekeeperCommitSha ensures that no value is present for LakekeeperCommitSha, not even an explicit nil
+func (o *ServerInfo) UnsetLakekeeperCommitSha() {
+	o.LakekeeperCommitSha.Unset()
+}
+
+// GetLakekeeperEnterpriseCommitSha returns the LakekeeperEnterpriseCommitSha field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *ServerInfo) GetLakekeeperEnterpriseCommitSha() string {
-	if o == nil || IsNil(o.LakekeeperEnterpriseCommitSha) {
+	if o == nil || IsNil(o.LakekeeperEnterpriseCommitSha.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.LakekeeperEnterpriseCommitSha
+	return *o.LakekeeperEnterpriseCommitSha.Get()
 }
 
 // GetLakekeeperEnterpriseCommitShaOk returns a tuple with the LakekeeperEnterpriseCommitSha field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *ServerInfo) GetLakekeeperEnterpriseCommitShaOk() (*string, bool) {
-	if o == nil || IsNil(o.LakekeeperEnterpriseCommitSha) {
+	if o == nil {
 		return nil, false
 	}
-	return o.LakekeeperEnterpriseCommitSha, true
+	return o.LakekeeperEnterpriseCommitSha.Get(), o.LakekeeperEnterpriseCommitSha.IsSet()
 }
 
 // HasLakekeeperEnterpriseCommitSha returns a boolean if a field has been set.
 func (o *ServerInfo) HasLakekeeperEnterpriseCommitSha() bool {
-	if o != nil && !IsNil(o.LakekeeperEnterpriseCommitSha) {
+	if o != nil && o.LakekeeperEnterpriseCommitSha.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetLakekeeperEnterpriseCommitSha gets a reference to the given string and assigns it to the LakekeeperEnterpriseCommitSha field.
+// SetLakekeeperEnterpriseCommitSha gets a reference to the given NullableString and assigns it to the LakekeeperEnterpriseCommitSha field.
 func (o *ServerInfo) SetLakekeeperEnterpriseCommitSha(v string) {
-	o.LakekeeperEnterpriseCommitSha = &v
+	o.LakekeeperEnterpriseCommitSha.Set(&v)
 }
 
-// GetLakekeeperEnterpriseVersion returns the LakekeeperEnterpriseVersion field value if set, zero value otherwise.
+// SetLakekeeperEnterpriseCommitShaNil sets the value for LakekeeperEnterpriseCommitSha to be an explicit nil
+func (o *ServerInfo) SetLakekeeperEnterpriseCommitShaNil() {
+	o.LakekeeperEnterpriseCommitSha.Set(nil)
+}
+
+// UnsetLakekeeperEnterpriseCommitSha ensures that no value is present for LakekeeperEnterpriseCommitSha, not even an explicit nil
+func (o *ServerInfo) UnsetLakekeeperEnterpriseCommitSha() {
+	o.LakekeeperEnterpriseCommitSha.Unset()
+}
+
+// GetLakekeeperEnterpriseVersion returns the LakekeeperEnterpriseVersion field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *ServerInfo) GetLakekeeperEnterpriseVersion() string {
-	if o == nil || IsNil(o.LakekeeperEnterpriseVersion) {
+	if o == nil || IsNil(o.LakekeeperEnterpriseVersion.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.LakekeeperEnterpriseVersion
+	return *o.LakekeeperEnterpriseVersion.Get()
 }
 
 // GetLakekeeperEnterpriseVersionOk returns a tuple with the LakekeeperEnterpriseVersion field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *ServerInfo) GetLakekeeperEnterpriseVersionOk() (*string, bool) {
-	if o == nil || IsNil(o.LakekeeperEnterpriseVersion) {
+	if o == nil {
 		return nil, false
 	}
-	return o.LakekeeperEnterpriseVersion, true
+	return o.LakekeeperEnterpriseVersion.Get(), o.LakekeeperEnterpriseVersion.IsSet()
 }
 
 // HasLakekeeperEnterpriseVersion returns a boolean if a field has been set.
 func (o *ServerInfo) HasLakekeeperEnterpriseVersion() bool {
-	if o != nil && !IsNil(o.LakekeeperEnterpriseVersion) {
+	if o != nil && o.LakekeeperEnterpriseVersion.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetLakekeeperEnterpriseVersion gets a reference to the given string and assigns it to the LakekeeperEnterpriseVersion field.
+// SetLakekeeperEnterpriseVersion gets a reference to the given NullableString and assigns it to the LakekeeperEnterpriseVersion field.
 func (o *ServerInfo) SetLakekeeperEnterpriseVersion(v string) {
-	o.LakekeeperEnterpriseVersion = &v
+	o.LakekeeperEnterpriseVersion.Set(&v)
 }
 
-// GetLakekeeperVersion returns the LakekeeperVersion field value if set, zero value otherwise.
+// SetLakekeeperEnterpriseVersionNil sets the value for LakekeeperEnterpriseVersion to be an explicit nil
+func (o *ServerInfo) SetLakekeeperEnterpriseVersionNil() {
+	o.LakekeeperEnterpriseVersion.Set(nil)
+}
+
+// UnsetLakekeeperEnterpriseVersion ensures that no value is present for LakekeeperEnterpriseVersion, not even an explicit nil
+func (o *ServerInfo) UnsetLakekeeperEnterpriseVersion() {
+	o.LakekeeperEnterpriseVersion.Unset()
+}
+
+// GetLakekeeperVersion returns the LakekeeperVersion field value
 func (o *ServerInfo) GetLakekeeperVersion() string {
-	if o == nil || IsNil(o.LakekeeperVersion) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.LakekeeperVersion
+
+	return o.LakekeeperVersion
 }
 
-// GetLakekeeperVersionOk returns a tuple with the LakekeeperVersion field value if set, nil otherwise
+// GetLakekeeperVersionOk returns a tuple with the LakekeeperVersion field value
 // and a boolean to check if the value has been set.
 func (o *ServerInfo) GetLakekeeperVersionOk() (*string, bool) {
-	if o == nil || IsNil(o.LakekeeperVersion) {
+	if o == nil {
 		return nil, false
 	}
-	return o.LakekeeperVersion, true
+	return &o.LakekeeperVersion, true
 }
 
-// HasLakekeeperVersion returns a boolean if a field has been set.
-func (o *ServerInfo) HasLakekeeperVersion() bool {
-	if o != nil && !IsNil(o.LakekeeperVersion) {
-		return true
-	}
-
-	return false
-}
-
-// SetLakekeeperVersion gets a reference to the given string and assigns it to the LakekeeperVersion field.
+// SetLakekeeperVersion sets field value
 func (o *ServerInfo) SetLakekeeperVersion(v string) {
-	o.LakekeeperVersion = &v
+	o.LakekeeperVersion = v
 }
 
 // GetLicenseStatus returns the LicenseStatus field value
@@ -427,6 +467,30 @@ func (o *ServerInfo) GetLicenseStatusOk() (*LicenseStatus, bool) {
 // SetLicenseStatus sets field value
 func (o *ServerInfo) SetLicenseStatus(v LicenseStatus) {
 	o.LicenseStatus = v
+}
+
+// GetManagedRoleProviders returns the ManagedRoleProviders field value
+func (o *ServerInfo) GetManagedRoleProviders() []string {
+	if o == nil {
+		var ret []string
+		return ret
+	}
+
+	return o.ManagedRoleProviders
+}
+
+// GetManagedRoleProvidersOk returns a tuple with the ManagedRoleProviders field value
+// and a boolean to check if the value has been set.
+func (o *ServerInfo) GetManagedRoleProvidersOk() ([]string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return o.ManagedRoleProviders, true
+}
+
+// SetManagedRoleProviders sets field value
+func (o *ServerInfo) SetManagedRoleProviders(v []string) {
+	o.ManagedRoleProviders = v
 }
 
 // GetQueues returns the Queues field value
@@ -513,23 +577,22 @@ func (o ServerInfo) ToMap() (map[string]interface{}, error) {
 	if o.Console.IsSet() {
 		toSerialize["console"] = o.Console.Get()
 	}
-	if !IsNil(o.DefaultProjectId) {
-		toSerialize["default-project-id"] = o.DefaultProjectId
+	if o.DefaultProjectId.IsSet() {
+		toSerialize["default-project-id"] = o.DefaultProjectId.Get()
 	}
 	toSerialize["gcp-system-identities-enabled"] = o.GcpSystemIdentitiesEnabled
-	if !IsNil(o.LakekeeperCommitSha) {
-		toSerialize["lakekeeper-commit-sha"] = o.LakekeeperCommitSha
+	if o.LakekeeperCommitSha.IsSet() {
+		toSerialize["lakekeeper-commit-sha"] = o.LakekeeperCommitSha.Get()
 	}
-	if !IsNil(o.LakekeeperEnterpriseCommitSha) {
-		toSerialize["lakekeeper-enterprise-commit-sha"] = o.LakekeeperEnterpriseCommitSha
+	if o.LakekeeperEnterpriseCommitSha.IsSet() {
+		toSerialize["lakekeeper-enterprise-commit-sha"] = o.LakekeeperEnterpriseCommitSha.Get()
 	}
-	if !IsNil(o.LakekeeperEnterpriseVersion) {
-		toSerialize["lakekeeper-enterprise-version"] = o.LakekeeperEnterpriseVersion
+	if o.LakekeeperEnterpriseVersion.IsSet() {
+		toSerialize["lakekeeper-enterprise-version"] = o.LakekeeperEnterpriseVersion.Get()
 	}
-	if !IsNil(o.LakekeeperVersion) {
-		toSerialize["lakekeeper-version"] = o.LakekeeperVersion
-	}
+	toSerialize["lakekeeper-version"] = o.LakekeeperVersion
 	toSerialize["license-status"] = o.LicenseStatus
+	toSerialize["managed-role-providers"] = o.ManagedRoleProviders
 	toSerialize["queues"] = o.Queues
 	toSerialize["server-id"] = o.ServerId
 	toSerialize["version"] = o.Version
@@ -546,7 +609,9 @@ func (o *ServerInfo) UnmarshalJSON(data []byte) (err error) {
 		"azure-system-identities-enabled",
 		"bootstrapped",
 		"gcp-system-identities-enabled",
+		"lakekeeper-version",
 		"license-status",
+		"managed-role-providers",
 		"queues",
 		"server-id",
 		"version",

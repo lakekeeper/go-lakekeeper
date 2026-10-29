@@ -18,6 +18,7 @@ import (
 // StorageCredential - Storage secret for a warehouse.
 type StorageCredential struct {
 	StorageCredentialAccessKey           *StorageCredentialAccessKey
+	StorageCredentialAliyunOss           *StorageCredentialAliyunOss
 	StorageCredentialAwsSystemIdentity   *StorageCredentialAwsSystemIdentity
 	StorageCredentialAzureSystemIdentity *StorageCredentialAzureSystemIdentity
 	StorageCredentialClientCredentials   *StorageCredentialClientCredentials
@@ -25,12 +26,20 @@ type StorageCredential struct {
 	StorageCredentialGcpSystemIdentity   *StorageCredentialGcpSystemIdentity
 	StorageCredentialServiceAccountKey   *StorageCredentialServiceAccountKey
 	StorageCredentialSharedAccessKey     *StorageCredentialSharedAccessKey
+	StorageCredentialStackitAccessKey    *StorageCredentialStackitAccessKey
 }
 
 // StorageCredentialAccessKeyAsStorageCredential is a convenience function that returns StorageCredentialAccessKey wrapped in StorageCredential
 func StorageCredentialAccessKeyAsStorageCredential(v *StorageCredentialAccessKey) StorageCredential {
 	return StorageCredential{
 		StorageCredentialAccessKey: v,
+	}
+}
+
+// StorageCredentialAliyunOssAsStorageCredential is a convenience function that returns StorageCredentialAliyunOss wrapped in StorageCredential
+func StorageCredentialAliyunOssAsStorageCredential(v *StorageCredentialAliyunOss) StorageCredential {
+	return StorageCredential{
+		StorageCredentialAliyunOss: v,
 	}
 }
 
@@ -83,6 +92,13 @@ func StorageCredentialSharedAccessKeyAsStorageCredential(v *StorageCredentialSha
 	}
 }
 
+// StorageCredentialStackitAccessKeyAsStorageCredential is a convenience function that returns StorageCredentialStackitAccessKey wrapped in StorageCredential
+func StorageCredentialStackitAccessKeyAsStorageCredential(v *StorageCredentialStackitAccessKey) StorageCredential {
+	return StorageCredential{
+		StorageCredentialStackitAccessKey: v,
+	}
+}
+
 // Unmarshal JSON data into one of the pointers in the struct
 func (dst *StorageCredential) UnmarshalJSON(data []byte) error {
 	var err error
@@ -102,6 +118,18 @@ func (dst *StorageCredential) UnmarshalJSON(data []byte) error {
 		} else {
 			dst.StorageCredentialAccessKey = nil
 			return fmt.Errorf("failed to unmarshal StorageCredential as StorageCredentialAccessKey: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'aliyun-oss'
+	if jsonDict["credential-type"] == "aliyun-oss" {
+		// try to unmarshal JSON data into StorageCredentialAliyunOss
+		err = json.Unmarshal(data, &dst.StorageCredentialAliyunOss)
+		if err == nil {
+			return nil // data stored in dst.StorageCredentialAliyunOss, return on the first match
+		} else {
+			dst.StorageCredentialAliyunOss = nil
+			return fmt.Errorf("failed to unmarshal StorageCredential as StorageCredentialAliyunOss: %s", err.Error())
 		}
 	}
 
@@ -189,6 +217,18 @@ func (dst *StorageCredential) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	// check if the discriminator value is 'stackit-access-key'
+	if jsonDict["credential-type"] == "stackit-access-key" {
+		// try to unmarshal JSON data into StorageCredentialStackitAccessKey
+		err = json.Unmarshal(data, &dst.StorageCredentialStackitAccessKey)
+		if err == nil {
+			return nil // data stored in dst.StorageCredentialStackitAccessKey, return on the first match
+		} else {
+			dst.StorageCredentialStackitAccessKey = nil
+			return fmt.Errorf("failed to unmarshal StorageCredential as StorageCredentialStackitAccessKey: %s", err.Error())
+		}
+	}
+
 	// check if the discriminator value is 'StorageCredentialAccessKey'
 	if jsonDict["credential-type"] == "StorageCredentialAccessKey" {
 		// try to unmarshal JSON data into StorageCredentialAccessKey
@@ -198,6 +238,18 @@ func (dst *StorageCredential) UnmarshalJSON(data []byte) error {
 		} else {
 			dst.StorageCredentialAccessKey = nil
 			return fmt.Errorf("failed to unmarshal StorageCredential as StorageCredentialAccessKey: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'StorageCredentialAliyunOss'
+	if jsonDict["credential-type"] == "StorageCredentialAliyunOss" {
+		// try to unmarshal JSON data into StorageCredentialAliyunOss
+		err = json.Unmarshal(data, &dst.StorageCredentialAliyunOss)
+		if err == nil {
+			return nil // data stored in dst.StorageCredentialAliyunOss, return on the first match
+		} else {
+			dst.StorageCredentialAliyunOss = nil
+			return fmt.Errorf("failed to unmarshal StorageCredential as StorageCredentialAliyunOss: %s", err.Error())
 		}
 	}
 
@@ -285,6 +337,18 @@ func (dst *StorageCredential) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	// check if the discriminator value is 'StorageCredentialStackitAccessKey'
+	if jsonDict["credential-type"] == "StorageCredentialStackitAccessKey" {
+		// try to unmarshal JSON data into StorageCredentialStackitAccessKey
+		err = json.Unmarshal(data, &dst.StorageCredentialStackitAccessKey)
+		if err == nil {
+			return nil // data stored in dst.StorageCredentialStackitAccessKey, return on the first match
+		} else {
+			dst.StorageCredentialStackitAccessKey = nil
+			return fmt.Errorf("failed to unmarshal StorageCredential as StorageCredentialStackitAccessKey: %s", err.Error())
+		}
+	}
+
 	return nil
 }
 
@@ -292,6 +356,10 @@ func (dst *StorageCredential) UnmarshalJSON(data []byte) error {
 func (src StorageCredential) MarshalJSON() ([]byte, error) {
 	if src.StorageCredentialAccessKey != nil {
 		return json.Marshal(&src.StorageCredentialAccessKey)
+	}
+
+	if src.StorageCredentialAliyunOss != nil {
+		return json.Marshal(&src.StorageCredentialAliyunOss)
 	}
 
 	if src.StorageCredentialAwsSystemIdentity != nil {
@@ -322,6 +390,10 @@ func (src StorageCredential) MarshalJSON() ([]byte, error) {
 		return json.Marshal(&src.StorageCredentialSharedAccessKey)
 	}
 
+	if src.StorageCredentialStackitAccessKey != nil {
+		return json.Marshal(&src.StorageCredentialStackitAccessKey)
+	}
+
 	return nil, nil // no data in oneOf schemas
 }
 
@@ -332,6 +404,10 @@ func (obj *StorageCredential) GetActualInstance() interface{} {
 	}
 	if obj.StorageCredentialAccessKey != nil {
 		return obj.StorageCredentialAccessKey
+	}
+
+	if obj.StorageCredentialAliyunOss != nil {
+		return obj.StorageCredentialAliyunOss
 	}
 
 	if obj.StorageCredentialAwsSystemIdentity != nil {
@@ -360,6 +436,10 @@ func (obj *StorageCredential) GetActualInstance() interface{} {
 
 	if obj.StorageCredentialSharedAccessKey != nil {
 		return obj.StorageCredentialSharedAccessKey
+	}
+
+	if obj.StorageCredentialStackitAccessKey != nil {
+		return obj.StorageCredentialStackitAccessKey
 	}
 
 	// all schemas are nil
