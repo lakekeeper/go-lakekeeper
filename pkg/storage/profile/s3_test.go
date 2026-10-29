@@ -30,8 +30,8 @@ func TestNewS3Profile_Defaults(t *testing.T) {
 func TestNewS3Profile_AllOptionsApplied(t *testing.T) {
 	t.Parallel()
 
-	flavor := managementv1.S3FlavorS3Compat
-	style := managementv1.S3UrlStyleDetectionModePath
+	flavor := managementv1.S3FLAVOR_S3_COMPAT
+	style := managementv1.S3URLSTYLEDETECTIONMODE_PATH
 
 	tags := map[string]string{"env": "prod", "team": "data"}
 
