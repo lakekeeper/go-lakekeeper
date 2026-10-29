@@ -135,7 +135,7 @@ validate: vet lint
 generate: ## Regenerate Go bindings from OpenAPI specs.
 	@echo === regenerating management API from $(OPENAPI_DIR)/management-open-api.yaml
 	@test -f $(OPENAPI_DIR)/management-open-api.yaml || { echo "missing $(OPENAPI_DIR)/management-open-api.yaml"; exit 1; }
-	@echo === preprocessing spec to flatten allOf+oneOf compositions
+	@echo === preprocessing spec to force bracket notation on relations query params
 	@$(GO) run ./api/openapi/preprocess \
 		$(OPENAPI_DIR)/management-open-api.yaml \
 		$(OPENAPI_DIR)/management-open-api.processed.yaml

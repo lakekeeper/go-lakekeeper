@@ -17,101 +17,165 @@ import (
 
 // S3Credential - struct for S3Credential
 type S3Credential struct {
-	S3CredentialOneOf  *S3CredentialOneOf
-	S3CredentialOneOf1 *S3CredentialOneOf1
-	S3CredentialOneOf2 *S3CredentialOneOf2
+	S3CredentialAccessKey         *S3CredentialAccessKey
+	S3CredentialAliyunOss         *S3CredentialAliyunOss
+	S3CredentialAwsSystemIdentity *S3CredentialAwsSystemIdentity
+	S3CredentialCloudflareR2      *S3CredentialCloudflareR2
 }
 
-// S3CredentialOneOfAsS3Credential is a convenience function that returns S3CredentialOneOf wrapped in S3Credential
-func S3CredentialOneOfAsS3Credential(v *S3CredentialOneOf) S3Credential {
+// S3CredentialAccessKeyAsS3Credential is a convenience function that returns S3CredentialAccessKey wrapped in S3Credential
+func S3CredentialAccessKeyAsS3Credential(v *S3CredentialAccessKey) S3Credential {
 	return S3Credential{
-		S3CredentialOneOf: v,
+		S3CredentialAccessKey: v,
 	}
 }
 
-// S3CredentialOneOf1AsS3Credential is a convenience function that returns S3CredentialOneOf1 wrapped in S3Credential
-func S3CredentialOneOf1AsS3Credential(v *S3CredentialOneOf1) S3Credential {
+// S3CredentialAliyunOssAsS3Credential is a convenience function that returns S3CredentialAliyunOss wrapped in S3Credential
+func S3CredentialAliyunOssAsS3Credential(v *S3CredentialAliyunOss) S3Credential {
 	return S3Credential{
-		S3CredentialOneOf1: v,
+		S3CredentialAliyunOss: v,
 	}
 }
 
-// S3CredentialOneOf2AsS3Credential is a convenience function that returns S3CredentialOneOf2 wrapped in S3Credential
-func S3CredentialOneOf2AsS3Credential(v *S3CredentialOneOf2) S3Credential {
+// S3CredentialAwsSystemIdentityAsS3Credential is a convenience function that returns S3CredentialAwsSystemIdentity wrapped in S3Credential
+func S3CredentialAwsSystemIdentityAsS3Credential(v *S3CredentialAwsSystemIdentity) S3Credential {
 	return S3Credential{
-		S3CredentialOneOf2: v,
+		S3CredentialAwsSystemIdentity: v,
+	}
+}
+
+// S3CredentialCloudflareR2AsS3Credential is a convenience function that returns S3CredentialCloudflareR2 wrapped in S3Credential
+func S3CredentialCloudflareR2AsS3Credential(v *S3CredentialCloudflareR2) S3Credential {
+	return S3Credential{
+		S3CredentialCloudflareR2: v,
 	}
 }
 
 // Unmarshal JSON data into one of the pointers in the struct
 func (dst *S3Credential) UnmarshalJSON(data []byte) error {
 	var err error
-	match := 0
-	// try to unmarshal data into S3CredentialOneOf
-	err = json.Unmarshal(data, &dst.S3CredentialOneOf)
-	if err == nil {
-		jsonS3CredentialOneOf, _ := json.Marshal(dst.S3CredentialOneOf)
-		if string(jsonS3CredentialOneOf) == "{}" { // empty struct
-			dst.S3CredentialOneOf = nil
+	// use discriminator value to speed up the lookup
+	var jsonDict map[string]interface{}
+	err = newStrictDecoder(data).Decode(&jsonDict)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal JSON into map for the discriminator lookup")
+	}
+
+	// check if the discriminator value is 'access-key'
+	if jsonDict["credential-type"] == "access-key" {
+		// try to unmarshal JSON data into S3CredentialAccessKey
+		err = json.Unmarshal(data, &dst.S3CredentialAccessKey)
+		if err == nil {
+			return nil // data stored in dst.S3CredentialAccessKey, return on the first match
 		} else {
-			match++
+			dst.S3CredentialAccessKey = nil
+			return fmt.Errorf("failed to unmarshal S3Credential as S3CredentialAccessKey: %s", err.Error())
 		}
-	} else {
-		dst.S3CredentialOneOf = nil
 	}
 
-	// try to unmarshal data into S3CredentialOneOf1
-	err = json.Unmarshal(data, &dst.S3CredentialOneOf1)
-	if err == nil {
-		jsonS3CredentialOneOf1, _ := json.Marshal(dst.S3CredentialOneOf1)
-		if string(jsonS3CredentialOneOf1) == "{}" { // empty struct
-			dst.S3CredentialOneOf1 = nil
+	// check if the discriminator value is 'aliyun-oss'
+	if jsonDict["credential-type"] == "aliyun-oss" {
+		// try to unmarshal JSON data into S3CredentialAliyunOss
+		err = json.Unmarshal(data, &dst.S3CredentialAliyunOss)
+		if err == nil {
+			return nil // data stored in dst.S3CredentialAliyunOss, return on the first match
 		} else {
-			match++
+			dst.S3CredentialAliyunOss = nil
+			return fmt.Errorf("failed to unmarshal S3Credential as S3CredentialAliyunOss: %s", err.Error())
 		}
-	} else {
-		dst.S3CredentialOneOf1 = nil
 	}
 
-	// try to unmarshal data into S3CredentialOneOf2
-	err = json.Unmarshal(data, &dst.S3CredentialOneOf2)
-	if err == nil {
-		jsonS3CredentialOneOf2, _ := json.Marshal(dst.S3CredentialOneOf2)
-		if string(jsonS3CredentialOneOf2) == "{}" { // empty struct
-			dst.S3CredentialOneOf2 = nil
+	// check if the discriminator value is 'aws-system-identity'
+	if jsonDict["credential-type"] == "aws-system-identity" {
+		// try to unmarshal JSON data into S3CredentialAwsSystemIdentity
+		err = json.Unmarshal(data, &dst.S3CredentialAwsSystemIdentity)
+		if err == nil {
+			return nil // data stored in dst.S3CredentialAwsSystemIdentity, return on the first match
 		} else {
-			match++
+			dst.S3CredentialAwsSystemIdentity = nil
+			return fmt.Errorf("failed to unmarshal S3Credential as S3CredentialAwsSystemIdentity: %s", err.Error())
 		}
-	} else {
-		dst.S3CredentialOneOf2 = nil
 	}
 
-	if match > 1 { // more than 1 match
-		// reset to nil
-		dst.S3CredentialOneOf = nil
-		dst.S3CredentialOneOf1 = nil
-		dst.S3CredentialOneOf2 = nil
-
-		return fmt.Errorf("data matches more than one schema in oneOf(S3Credential)")
-	} else if match == 1 {
-		return nil // exactly one match
-	} else { // no match
-		return fmt.Errorf("data failed to match schemas in oneOf(S3Credential)")
+	// check if the discriminator value is 'cloudflare-r2'
+	if jsonDict["credential-type"] == "cloudflare-r2" {
+		// try to unmarshal JSON data into S3CredentialCloudflareR2
+		err = json.Unmarshal(data, &dst.S3CredentialCloudflareR2)
+		if err == nil {
+			return nil // data stored in dst.S3CredentialCloudflareR2, return on the first match
+		} else {
+			dst.S3CredentialCloudflareR2 = nil
+			return fmt.Errorf("failed to unmarshal S3Credential as S3CredentialCloudflareR2: %s", err.Error())
+		}
 	}
+
+	// check if the discriminator value is 'S3CredentialAccessKey'
+	if jsonDict["credential-type"] == "S3CredentialAccessKey" {
+		// try to unmarshal JSON data into S3CredentialAccessKey
+		err = json.Unmarshal(data, &dst.S3CredentialAccessKey)
+		if err == nil {
+			return nil // data stored in dst.S3CredentialAccessKey, return on the first match
+		} else {
+			dst.S3CredentialAccessKey = nil
+			return fmt.Errorf("failed to unmarshal S3Credential as S3CredentialAccessKey: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'S3CredentialAliyunOss'
+	if jsonDict["credential-type"] == "S3CredentialAliyunOss" {
+		// try to unmarshal JSON data into S3CredentialAliyunOss
+		err = json.Unmarshal(data, &dst.S3CredentialAliyunOss)
+		if err == nil {
+			return nil // data stored in dst.S3CredentialAliyunOss, return on the first match
+		} else {
+			dst.S3CredentialAliyunOss = nil
+			return fmt.Errorf("failed to unmarshal S3Credential as S3CredentialAliyunOss: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'S3CredentialAwsSystemIdentity'
+	if jsonDict["credential-type"] == "S3CredentialAwsSystemIdentity" {
+		// try to unmarshal JSON data into S3CredentialAwsSystemIdentity
+		err = json.Unmarshal(data, &dst.S3CredentialAwsSystemIdentity)
+		if err == nil {
+			return nil // data stored in dst.S3CredentialAwsSystemIdentity, return on the first match
+		} else {
+			dst.S3CredentialAwsSystemIdentity = nil
+			return fmt.Errorf("failed to unmarshal S3Credential as S3CredentialAwsSystemIdentity: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'S3CredentialCloudflareR2'
+	if jsonDict["credential-type"] == "S3CredentialCloudflareR2" {
+		// try to unmarshal JSON data into S3CredentialCloudflareR2
+		err = json.Unmarshal(data, &dst.S3CredentialCloudflareR2)
+		if err == nil {
+			return nil // data stored in dst.S3CredentialCloudflareR2, return on the first match
+		} else {
+			dst.S3CredentialCloudflareR2 = nil
+			return fmt.Errorf("failed to unmarshal S3Credential as S3CredentialCloudflareR2: %s", err.Error())
+		}
+	}
+
+	return nil
 }
 
 // Marshal data from the first non-nil pointers in the struct to JSON
 func (src S3Credential) MarshalJSON() ([]byte, error) {
-	if src.S3CredentialOneOf != nil {
-		return json.Marshal(&src.S3CredentialOneOf)
+	if src.S3CredentialAccessKey != nil {
+		return json.Marshal(&src.S3CredentialAccessKey)
 	}
 
-	if src.S3CredentialOneOf1 != nil {
-		return json.Marshal(&src.S3CredentialOneOf1)
+	if src.S3CredentialAliyunOss != nil {
+		return json.Marshal(&src.S3CredentialAliyunOss)
 	}
 
-	if src.S3CredentialOneOf2 != nil {
-		return json.Marshal(&src.S3CredentialOneOf2)
+	if src.S3CredentialAwsSystemIdentity != nil {
+		return json.Marshal(&src.S3CredentialAwsSystemIdentity)
+	}
+
+	if src.S3CredentialCloudflareR2 != nil {
+		return json.Marshal(&src.S3CredentialCloudflareR2)
 	}
 
 	return nil, nil // no data in oneOf schemas
@@ -122,16 +186,20 @@ func (obj *S3Credential) GetActualInstance() interface{} {
 	if obj == nil {
 		return nil
 	}
-	if obj.S3CredentialOneOf != nil {
-		return obj.S3CredentialOneOf
+	if obj.S3CredentialAccessKey != nil {
+		return obj.S3CredentialAccessKey
 	}
 
-	if obj.S3CredentialOneOf1 != nil {
-		return obj.S3CredentialOneOf1
+	if obj.S3CredentialAliyunOss != nil {
+		return obj.S3CredentialAliyunOss
 	}
 
-	if obj.S3CredentialOneOf2 != nil {
-		return obj.S3CredentialOneOf2
+	if obj.S3CredentialAwsSystemIdentity != nil {
+		return obj.S3CredentialAwsSystemIdentity
+	}
+
+	if obj.S3CredentialCloudflareR2 != nil {
+		return obj.S3CredentialCloudflareR2
 	}
 
 	// all schemas are nil

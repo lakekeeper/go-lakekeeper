@@ -12,100 +12,109 @@ package managementv1
 
 import (
 	"encoding/json"
-	"fmt"
 )
 
-// UserOrRole - Identifies a user or a role
+// checks if the UserOrRole type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &UserOrRole{}
+
+// UserOrRole Identifies a user or a role  Exactly one of `user` and `role` must be set. The server rejects a payload that names both, and one that names neither.  The schema does not express that: both properties are optional on a single object, so `{}` and `{\"user\": ..., \"role\": ...}` are schema-valid and are refused at runtime instead. Clients must enforce the choice themselves. The shape is deliberate — a `oneOf` here cannot be composed by code generators, because the `*Assignment` schemas embed this type and generators flatten the union into a struct that requires both properties.
 type UserOrRole struct {
-	UserOrRoleRole *UserOrRoleRole
-	UserOrRoleUser *UserOrRoleUser
+	// Id of the role
+	Role *string `json:"role,omitempty"`
+	// Id of the user
+	User *string `json:"user,omitempty"`
 }
 
-// UserOrRoleRoleAsUserOrRole is a convenience function that returns UserOrRoleRole wrapped in UserOrRole
-func UserOrRoleRoleAsUserOrRole(v *UserOrRoleRole) UserOrRole {
-	return UserOrRole{
-		UserOrRoleRole: v,
-	}
+// NewUserOrRole instantiates a new UserOrRole object
+// This constructor will assign default values to properties that have it defined,
+// and makes sure properties required by API are set, but the set of arguments
+// will change when the set of required properties is changed
+func NewUserOrRole() *UserOrRole {
+	this := UserOrRole{}
+	return &this
 }
 
-// UserOrRoleUserAsUserOrRole is a convenience function that returns UserOrRoleUser wrapped in UserOrRole
-func UserOrRoleUserAsUserOrRole(v *UserOrRoleUser) UserOrRole {
-	return UserOrRole{
-		UserOrRoleUser: v,
-	}
+// NewUserOrRoleWithDefaults instantiates a new UserOrRole object
+// This constructor will only assign default values to properties that have it defined,
+// but it doesn't guarantee that properties required by API are set
+func NewUserOrRoleWithDefaults() *UserOrRole {
+	this := UserOrRole{}
+	return &this
 }
 
-// Unmarshal JSON data into one of the pointers in the struct
-func (dst *UserOrRole) UnmarshalJSON(data []byte) error {
-	var err error
-	match := 0
-	// try to unmarshal data into UserOrRoleRole
-	err = json.Unmarshal(data, &dst.UserOrRoleRole)
-	if err == nil {
-		jsonUserOrRoleRole, _ := json.Marshal(dst.UserOrRoleRole)
-		if string(jsonUserOrRoleRole) == "{}" { // empty struct
-			dst.UserOrRoleRole = nil
-		} else {
-			match++
-		}
-	} else {
-		dst.UserOrRoleRole = nil
+// GetRole returns the Role field value if set, zero value otherwise.
+func (o *UserOrRole) GetRole() string {
+	if o == nil || IsNil(o.Role) {
+		var ret string
+		return ret
 	}
-
-	// try to unmarshal data into UserOrRoleUser
-	err = json.Unmarshal(data, &dst.UserOrRoleUser)
-	if err == nil {
-		jsonUserOrRoleUser, _ := json.Marshal(dst.UserOrRoleUser)
-		if string(jsonUserOrRoleUser) == "{}" { // empty struct
-			dst.UserOrRoleUser = nil
-		} else {
-			match++
-		}
-	} else {
-		dst.UserOrRoleUser = nil
-	}
-
-	if match > 1 { // more than 1 match
-		// reset to nil
-		dst.UserOrRoleRole = nil
-		dst.UserOrRoleUser = nil
-
-		return fmt.Errorf("data matches more than one schema in oneOf(UserOrRole)")
-	} else if match == 1 {
-		return nil // exactly one match
-	} else { // no match
-		return fmt.Errorf("data failed to match schemas in oneOf(UserOrRole)")
-	}
+	return *o.Role
 }
 
-// Marshal data from the first non-nil pointers in the struct to JSON
-func (src UserOrRole) MarshalJSON() ([]byte, error) {
-	if src.UserOrRoleRole != nil {
-		return json.Marshal(&src.UserOrRoleRole)
+// GetRoleOk returns a tuple with the Role field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *UserOrRole) GetRoleOk() (*string, bool) {
+	if o == nil || IsNil(o.Role) {
+		return nil, false
 	}
-
-	if src.UserOrRoleUser != nil {
-		return json.Marshal(&src.UserOrRoleUser)
-	}
-
-	return nil, nil // no data in oneOf schemas
+	return o.Role, true
 }
 
-// Get the actual instance
-func (obj *UserOrRole) GetActualInstance() interface{} {
-	if obj == nil {
-		return nil
-	}
-	if obj.UserOrRoleRole != nil {
-		return obj.UserOrRoleRole
+// HasRole returns a boolean if a field has been set.
+func (o *UserOrRole) HasRole() bool {
+	if o != nil && !IsNil(o.Role) {
+		return true
 	}
 
-	if obj.UserOrRoleUser != nil {
-		return obj.UserOrRoleUser
+	return false
+}
+
+// SetRole gets a reference to the given string and assigns it to the Role field.
+func (o *UserOrRole) SetRole(v string) {
+	o.Role = &v
+}
+
+// GetUser returns the User field value if set, zero value otherwise.
+func (o *UserOrRole) GetUser() string {
+	if o == nil || IsNil(o.User) {
+		var ret string
+		return ret
+	}
+	return *o.User
+}
+
+// GetUserOk returns a tuple with the User field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *UserOrRole) GetUserOk() (*string, bool) {
+	if o == nil || IsNil(o.User) {
+		return nil, false
+	}
+	return o.User, true
+}
+
+// HasUser returns a boolean if a field has been set.
+func (o *UserOrRole) HasUser() bool {
+	if o != nil && !IsNil(o.User) {
+		return true
 	}
 
-	// all schemas are nil
-	return nil
+	return false
+}
+
+// SetUser gets a reference to the given string and assigns it to the User field.
+func (o *UserOrRole) SetUser(v string) {
+	o.User = &v
+}
+
+func (o UserOrRole) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.Role) {
+		toSerialize["role"] = o.Role
+	}
+	if !IsNil(o.User) {
+		toSerialize["user"] = o.User
+	}
+	return toSerialize, nil
 }
 
 type NullableUserOrRole struct {

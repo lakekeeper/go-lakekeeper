@@ -21,7 +21,7 @@ var _ MappedNullable = &GetLakekeeperProjectActionsResponse{}
 
 // GetLakekeeperProjectActionsResponse struct for GetLakekeeperProjectActionsResponse
 type GetLakekeeperProjectActionsResponse struct {
-	AllowedActions []LakekeeperProjectAction `json:"allowed-actions"`
+	AllowedActions []LakekeeperProjectActionKind `json:"allowed-actions"`
 }
 
 type _GetLakekeeperProjectActionsResponse GetLakekeeperProjectActionsResponse
@@ -30,7 +30,7 @@ type _GetLakekeeperProjectActionsResponse GetLakekeeperProjectActionsResponse
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewGetLakekeeperProjectActionsResponse(allowedActions []LakekeeperProjectAction) *GetLakekeeperProjectActionsResponse {
+func NewGetLakekeeperProjectActionsResponse(allowedActions []LakekeeperProjectActionKind) *GetLakekeeperProjectActionsResponse {
 	this := GetLakekeeperProjectActionsResponse{}
 	this.AllowedActions = allowedActions
 	return &this
@@ -45,9 +45,9 @@ func NewGetLakekeeperProjectActionsResponseWithDefaults() *GetLakekeeperProjectA
 }
 
 // GetAllowedActions returns the AllowedActions field value
-func (o *GetLakekeeperProjectActionsResponse) GetAllowedActions() []LakekeeperProjectAction {
+func (o *GetLakekeeperProjectActionsResponse) GetAllowedActions() []LakekeeperProjectActionKind {
 	if o == nil {
-		var ret []LakekeeperProjectAction
+		var ret []LakekeeperProjectActionKind
 		return ret
 	}
 
@@ -56,7 +56,7 @@ func (o *GetLakekeeperProjectActionsResponse) GetAllowedActions() []LakekeeperPr
 
 // GetAllowedActionsOk returns a tuple with the AllowedActions field value
 // and a boolean to check if the value has been set.
-func (o *GetLakekeeperProjectActionsResponse) GetAllowedActionsOk() ([]LakekeeperProjectAction, bool) {
+func (o *GetLakekeeperProjectActionsResponse) GetAllowedActionsOk() ([]LakekeeperProjectActionKind, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -64,7 +64,7 @@ func (o *GetLakekeeperProjectActionsResponse) GetAllowedActionsOk() ([]Lakekeepe
 }
 
 // SetAllowedActions sets field value
-func (o *GetLakekeeperProjectActionsResponse) SetAllowedActions(v []LakekeeperProjectAction) {
+func (o *GetLakekeeperProjectActionsResponse) SetAllowedActions(v []LakekeeperProjectActionKind) {
 	o.AllowedActions = v
 }
 

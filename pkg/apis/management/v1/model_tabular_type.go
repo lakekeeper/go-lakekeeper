@@ -20,14 +20,16 @@ type TabularType string
 
 // List of TabularType
 const (
-	TabularTypeTable TabularType = "table"
-	TabularTypeView  TabularType = "view"
+	TABULARTYPE_TABLE         TabularType = "table"
+	TABULARTYPE_VIEW          TabularType = "view"
+	TABULARTYPE_GENERIC_TABLE TabularType = "generic-table"
 )
 
 // All allowed values of TabularType enum
 var AllowedTabularTypeEnumValues = []TabularType{
 	"table",
 	"view",
+	"generic-table",
 }
 
 func (v *TabularType) UnmarshalJSON(src []byte) error {

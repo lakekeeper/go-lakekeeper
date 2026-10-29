@@ -20,13 +20,14 @@ type WarehouseRelation string
 
 // List of WarehouseRelation
 const (
-	WarehouseRelationOwnership    WarehouseRelation = "ownership"
-	WarehouseRelationPassGrants   WarehouseRelation = "pass_grants"
-	WarehouseRelationManageGrants WarehouseRelation = "manage_grants"
-	WarehouseRelationDescribe     WarehouseRelation = "describe"
-	WarehouseRelationSelect       WarehouseRelation = "select"
-	WarehouseRelationCreate       WarehouseRelation = "create"
-	WarehouseRelationModify       WarehouseRelation = "modify"
+	WAREHOUSERELATION_OWNERSHIP     WarehouseRelation = "ownership"
+	WAREHOUSERELATION_PASS_GRANTS   WarehouseRelation = "pass_grants"
+	WAREHOUSERELATION_MANAGE_GRANTS WarehouseRelation = "manage_grants"
+	WAREHOUSERELATION_DESCRIBE      WarehouseRelation = "describe"
+	WAREHOUSERELATION_SELECT        WarehouseRelation = "select"
+	WAREHOUSERELATION_CREATE        WarehouseRelation = "create"
+	WAREHOUSERELATION_MODIFY        WarehouseRelation = "modify"
+	WAREHOUSERELATION_MANAGE_TAGS   WarehouseRelation = "manage_tags"
 )
 
 // All allowed values of WarehouseRelation enum
@@ -38,6 +39,7 @@ var AllowedWarehouseRelationEnumValues = []WarehouseRelation{
 	"select",
 	"create",
 	"modify",
+	"manage_tags",
 }
 
 func (v *WarehouseRelation) UnmarshalJSON(src []byte) error {

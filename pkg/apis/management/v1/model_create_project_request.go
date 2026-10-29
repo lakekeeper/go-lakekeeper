@@ -22,7 +22,7 @@ var _ MappedNullable = &CreateProjectRequest{}
 // CreateProjectRequest struct for CreateProjectRequest
 type CreateProjectRequest struct {
 	// Request a specific project ID - optional. If not provided, a new project ID will be generated (recommended).
-	ProjectId *string `json:"project-id,omitempty"`
+	ProjectId NullableString `json:"project-id,omitempty"`
 	// Name of the project to create.
 	ProjectName string `json:"project-name"`
 }
@@ -47,36 +47,47 @@ func NewCreateProjectRequestWithDefaults() *CreateProjectRequest {
 	return &this
 }
 
-// GetProjectId returns the ProjectId field value if set, zero value otherwise.
+// GetProjectId returns the ProjectId field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *CreateProjectRequest) GetProjectId() string {
-	if o == nil || IsNil(o.ProjectId) {
+	if o == nil || IsNil(o.ProjectId.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.ProjectId
+	return *o.ProjectId.Get()
 }
 
 // GetProjectIdOk returns a tuple with the ProjectId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *CreateProjectRequest) GetProjectIdOk() (*string, bool) {
-	if o == nil || IsNil(o.ProjectId) {
+	if o == nil {
 		return nil, false
 	}
-	return o.ProjectId, true
+	return o.ProjectId.Get(), o.ProjectId.IsSet()
 }
 
 // HasProjectId returns a boolean if a field has been set.
 func (o *CreateProjectRequest) HasProjectId() bool {
-	if o != nil && !IsNil(o.ProjectId) {
+	if o != nil && o.ProjectId.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetProjectId gets a reference to the given string and assigns it to the ProjectId field.
+// SetProjectId gets a reference to the given NullableString and assigns it to the ProjectId field.
 func (o *CreateProjectRequest) SetProjectId(v string) {
-	o.ProjectId = &v
+	o.ProjectId.Set(&v)
+}
+
+// SetProjectIdNil sets the value for ProjectId to be an explicit nil
+func (o *CreateProjectRequest) SetProjectIdNil() {
+	o.ProjectId.Set(nil)
+}
+
+// UnsetProjectId ensures that no value is present for ProjectId, not even an explicit nil
+func (o *CreateProjectRequest) UnsetProjectId() {
+	o.ProjectId.Unset()
 }
 
 // GetProjectName returns the ProjectName field value
@@ -105,8 +116,8 @@ func (o *CreateProjectRequest) SetProjectName(v string) {
 
 func (o CreateProjectRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.ProjectId) {
-		toSerialize["project-id"] = o.ProjectId
+	if o.ProjectId.IsSet() {
+		toSerialize["project-id"] = o.ProjectId.Get()
 	}
 	toSerialize["project-name"] = o.ProjectName
 	return toSerialize, nil

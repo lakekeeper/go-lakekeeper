@@ -19,8 +19,8 @@ func TestServer_Info(t *testing.T) {
 	require.NoError(t, err)
 	assert.True(t, info.Bootstrapped)
 	assert.NotEmpty(t, info.ServerId)
-	require.NotNil(t, info.DefaultProjectId)
-	assert.NotEmpty(t, *info.DefaultProjectId)
+	require.NotNil(t, info.DefaultProjectId.Get())
+	assert.NotEmpty(t, *info.DefaultProjectId.Get())
 	assert.Equal(t, "openfga", info.AuthzBackend)
 }
 

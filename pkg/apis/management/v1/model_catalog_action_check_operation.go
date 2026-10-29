@@ -17,12 +17,20 @@ import (
 
 // CatalogActionCheckOperation - Represents an action on an object
 type CatalogActionCheckOperation struct {
-	CatalogActionCheckOperationNamespace *CatalogActionCheckOperationNamespace
-	CatalogActionCheckOperationProject   *CatalogActionCheckOperationProject
-	CatalogActionCheckOperationServer    *CatalogActionCheckOperationServer
-	CatalogActionCheckOperationTable     *CatalogActionCheckOperationTable
-	CatalogActionCheckOperationView      *CatalogActionCheckOperationView
-	CatalogActionCheckOperationWarehouse *CatalogActionCheckOperationWarehouse
+	CatalogActionCheckOperationGenericTable *CatalogActionCheckOperationGenericTable
+	CatalogActionCheckOperationNamespace    *CatalogActionCheckOperationNamespace
+	CatalogActionCheckOperationProject      *CatalogActionCheckOperationProject
+	CatalogActionCheckOperationServer       *CatalogActionCheckOperationServer
+	CatalogActionCheckOperationTable        *CatalogActionCheckOperationTable
+	CatalogActionCheckOperationView         *CatalogActionCheckOperationView
+	CatalogActionCheckOperationWarehouse    *CatalogActionCheckOperationWarehouse
+}
+
+// CatalogActionCheckOperationGenericTableAsCatalogActionCheckOperation is a convenience function that returns CatalogActionCheckOperationGenericTable wrapped in CatalogActionCheckOperation
+func CatalogActionCheckOperationGenericTableAsCatalogActionCheckOperation(v *CatalogActionCheckOperationGenericTable) CatalogActionCheckOperation {
+	return CatalogActionCheckOperation{
+		CatalogActionCheckOperationGenericTable: v,
+	}
 }
 
 // CatalogActionCheckOperationNamespaceAsCatalogActionCheckOperation is a convenience function that returns CatalogActionCheckOperationNamespace wrapped in CatalogActionCheckOperation
@@ -71,6 +79,19 @@ func CatalogActionCheckOperationWarehouseAsCatalogActionCheckOperation(v *Catalo
 func (dst *CatalogActionCheckOperation) UnmarshalJSON(data []byte) error {
 	var err error
 	match := 0
+	// try to unmarshal data into CatalogActionCheckOperationGenericTable
+	err = json.Unmarshal(data, &dst.CatalogActionCheckOperationGenericTable)
+	if err == nil {
+		jsonCatalogActionCheckOperationGenericTable, _ := json.Marshal(dst.CatalogActionCheckOperationGenericTable)
+		if string(jsonCatalogActionCheckOperationGenericTable) == "{}" { // empty struct
+			dst.CatalogActionCheckOperationGenericTable = nil
+		} else {
+			match++
+		}
+	} else {
+		dst.CatalogActionCheckOperationGenericTable = nil
+	}
+
 	// try to unmarshal data into CatalogActionCheckOperationNamespace
 	err = json.Unmarshal(data, &dst.CatalogActionCheckOperationNamespace)
 	if err == nil {
@@ -151,6 +172,7 @@ func (dst *CatalogActionCheckOperation) UnmarshalJSON(data []byte) error {
 
 	if match > 1 { // more than 1 match
 		// reset to nil
+		dst.CatalogActionCheckOperationGenericTable = nil
 		dst.CatalogActionCheckOperationNamespace = nil
 		dst.CatalogActionCheckOperationProject = nil
 		dst.CatalogActionCheckOperationServer = nil
@@ -168,6 +190,10 @@ func (dst *CatalogActionCheckOperation) UnmarshalJSON(data []byte) error {
 
 // Marshal data from the first non-nil pointers in the struct to JSON
 func (src CatalogActionCheckOperation) MarshalJSON() ([]byte, error) {
+	if src.CatalogActionCheckOperationGenericTable != nil {
+		return json.Marshal(&src.CatalogActionCheckOperationGenericTable)
+	}
+
 	if src.CatalogActionCheckOperationNamespace != nil {
 		return json.Marshal(&src.CatalogActionCheckOperationNamespace)
 	}
@@ -200,6 +226,10 @@ func (obj *CatalogActionCheckOperation) GetActualInstance() interface{} {
 	if obj == nil {
 		return nil
 	}
+	if obj.CatalogActionCheckOperationGenericTable != nil {
+		return obj.CatalogActionCheckOperationGenericTable
+	}
+
 	if obj.CatalogActionCheckOperationNamespace != nil {
 		return obj.CatalogActionCheckOperationNamespace
 	}

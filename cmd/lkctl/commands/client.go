@@ -109,7 +109,7 @@ func newClient(ctx context.Context, opts *clientOptions) (*client.Client, error)
 
 	var clientOpts []client.Option
 	if opts.bootstrap {
-		clientOpts = append(clientOpts, client.WithInitialBootstrap(true, true, core.Ptr(managementv1.UserTypeApplication)))
+		clientOpts = append(clientOpts, client.WithInitialBootstrap(true, true, core.Ptr(managementv1.USERTYPE_APPLICATION)))
 	}
 
 	return client.NewWithAuthSource(ctx, opts.baseURL, authSource, clientOpts...)

@@ -38,44 +38,62 @@ func GcsCredentialSystemIdentityAsGcsCredential(v *GcsCredentialSystemIdentity) 
 // Unmarshal JSON data into one of the pointers in the struct
 func (dst *GcsCredential) UnmarshalJSON(data []byte) error {
 	var err error
-	match := 0
-	// try to unmarshal data into GcsCredentialServiceAccountKey
-	err = json.Unmarshal(data, &dst.GcsCredentialServiceAccountKey)
-	if err == nil {
-		jsonGcsCredentialServiceAccountKey, _ := json.Marshal(dst.GcsCredentialServiceAccountKey)
-		if string(jsonGcsCredentialServiceAccountKey) == "{}" { // empty struct
-			dst.GcsCredentialServiceAccountKey = nil
-		} else {
-			match++
-		}
-	} else {
-		dst.GcsCredentialServiceAccountKey = nil
+	// use discriminator value to speed up the lookup
+	var jsonDict map[string]interface{}
+	err = newStrictDecoder(data).Decode(&jsonDict)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal JSON into map for the discriminator lookup")
 	}
 
-	// try to unmarshal data into GcsCredentialSystemIdentity
-	err = json.Unmarshal(data, &dst.GcsCredentialSystemIdentity)
-	if err == nil {
-		jsonGcsCredentialSystemIdentity, _ := json.Marshal(dst.GcsCredentialSystemIdentity)
-		if string(jsonGcsCredentialSystemIdentity) == "{}" { // empty struct
+	// check if the discriminator value is 'gcp-system-identity'
+	if jsonDict["credential-type"] == "gcp-system-identity" {
+		// try to unmarshal JSON data into GcsCredentialSystemIdentity
+		err = json.Unmarshal(data, &dst.GcsCredentialSystemIdentity)
+		if err == nil {
+			return nil // data stored in dst.GcsCredentialSystemIdentity, return on the first match
+		} else {
 			dst.GcsCredentialSystemIdentity = nil
-		} else {
-			match++
+			return fmt.Errorf("failed to unmarshal GcsCredential as GcsCredentialSystemIdentity: %s", err.Error())
 		}
-	} else {
-		dst.GcsCredentialSystemIdentity = nil
 	}
 
-	if match > 1 { // more than 1 match
-		// reset to nil
-		dst.GcsCredentialServiceAccountKey = nil
-		dst.GcsCredentialSystemIdentity = nil
-
-		return fmt.Errorf("data matches more than one schema in oneOf(GcsCredential)")
-	} else if match == 1 {
-		return nil // exactly one match
-	} else { // no match
-		return fmt.Errorf("data failed to match schemas in oneOf(GcsCredential)")
+	// check if the discriminator value is 'service-account-key'
+	if jsonDict["credential-type"] == "service-account-key" {
+		// try to unmarshal JSON data into GcsCredentialServiceAccountKey
+		err = json.Unmarshal(data, &dst.GcsCredentialServiceAccountKey)
+		if err == nil {
+			return nil // data stored in dst.GcsCredentialServiceAccountKey, return on the first match
+		} else {
+			dst.GcsCredentialServiceAccountKey = nil
+			return fmt.Errorf("failed to unmarshal GcsCredential as GcsCredentialServiceAccountKey: %s", err.Error())
+		}
 	}
+
+	// check if the discriminator value is 'GcsCredentialServiceAccountKey'
+	if jsonDict["credential-type"] == "GcsCredentialServiceAccountKey" {
+		// try to unmarshal JSON data into GcsCredentialServiceAccountKey
+		err = json.Unmarshal(data, &dst.GcsCredentialServiceAccountKey)
+		if err == nil {
+			return nil // data stored in dst.GcsCredentialServiceAccountKey, return on the first match
+		} else {
+			dst.GcsCredentialServiceAccountKey = nil
+			return fmt.Errorf("failed to unmarshal GcsCredential as GcsCredentialServiceAccountKey: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'GcsCredentialSystemIdentity'
+	if jsonDict["credential-type"] == "GcsCredentialSystemIdentity" {
+		// try to unmarshal JSON data into GcsCredentialSystemIdentity
+		err = json.Unmarshal(data, &dst.GcsCredentialSystemIdentity)
+		if err == nil {
+			return nil // data stored in dst.GcsCredentialSystemIdentity, return on the first match
+		} else {
+			dst.GcsCredentialSystemIdentity = nil
+			return fmt.Errorf("failed to unmarshal GcsCredential as GcsCredentialSystemIdentity: %s", err.Error())
+		}
+	}
+
+	return nil
 }
 
 // Marshal data from the first non-nil pointers in the struct to JSON

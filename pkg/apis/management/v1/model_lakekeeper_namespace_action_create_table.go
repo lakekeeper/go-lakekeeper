@@ -23,10 +23,10 @@ var _ MappedNullable = &LakekeeperNamespaceActionCreateTable{}
 type LakekeeperNamespaceActionCreateTable struct {
 	Action string `json:"action"`
 	// Name of the table to create.
-	Name       *string           `json:"name,omitempty"`
+	Name       NullableString    `json:"name,omitempty"`
 	Properties map[string]string `json:"properties,omitempty"`
 	// Table ID, if externally provided (e.g. via register).
-	TableId *string `json:"table_id,omitempty"`
+	TableId NullableString `json:"table_id,omitempty"`
 }
 
 type _LakekeeperNamespaceActionCreateTable LakekeeperNamespaceActionCreateTable
@@ -73,36 +73,47 @@ func (o *LakekeeperNamespaceActionCreateTable) SetAction(v string) {
 	o.Action = v
 }
 
-// GetName returns the Name field value if set, zero value otherwise.
+// GetName returns the Name field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *LakekeeperNamespaceActionCreateTable) GetName() string {
-	if o == nil || IsNil(o.Name) {
+	if o == nil || IsNil(o.Name.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.Name
+	return *o.Name.Get()
 }
 
 // GetNameOk returns a tuple with the Name field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *LakekeeperNamespaceActionCreateTable) GetNameOk() (*string, bool) {
-	if o == nil || IsNil(o.Name) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Name, true
+	return o.Name.Get(), o.Name.IsSet()
 }
 
 // HasName returns a boolean if a field has been set.
 func (o *LakekeeperNamespaceActionCreateTable) HasName() bool {
-	if o != nil && !IsNil(o.Name) {
+	if o != nil && o.Name.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetName gets a reference to the given string and assigns it to the Name field.
+// SetName gets a reference to the given NullableString and assigns it to the Name field.
 func (o *LakekeeperNamespaceActionCreateTable) SetName(v string) {
-	o.Name = &v
+	o.Name.Set(&v)
+}
+
+// SetNameNil sets the value for Name to be an explicit nil
+func (o *LakekeeperNamespaceActionCreateTable) SetNameNil() {
+	o.Name.Set(nil)
+}
+
+// UnsetName ensures that no value is present for Name, not even an explicit nil
+func (o *LakekeeperNamespaceActionCreateTable) UnsetName() {
+	o.Name.Unset()
 }
 
 // GetProperties returns the Properties field value if set, zero value otherwise.
@@ -137,49 +148,60 @@ func (o *LakekeeperNamespaceActionCreateTable) SetProperties(v map[string]string
 	o.Properties = v
 }
 
-// GetTableId returns the TableId field value if set, zero value otherwise.
+// GetTableId returns the TableId field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *LakekeeperNamespaceActionCreateTable) GetTableId() string {
-	if o == nil || IsNil(o.TableId) {
+	if o == nil || IsNil(o.TableId.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.TableId
+	return *o.TableId.Get()
 }
 
 // GetTableIdOk returns a tuple with the TableId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *LakekeeperNamespaceActionCreateTable) GetTableIdOk() (*string, bool) {
-	if o == nil || IsNil(o.TableId) {
+	if o == nil {
 		return nil, false
 	}
-	return o.TableId, true
+	return o.TableId.Get(), o.TableId.IsSet()
 }
 
 // HasTableId returns a boolean if a field has been set.
 func (o *LakekeeperNamespaceActionCreateTable) HasTableId() bool {
-	if o != nil && !IsNil(o.TableId) {
+	if o != nil && o.TableId.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetTableId gets a reference to the given string and assigns it to the TableId field.
+// SetTableId gets a reference to the given NullableString and assigns it to the TableId field.
 func (o *LakekeeperNamespaceActionCreateTable) SetTableId(v string) {
-	o.TableId = &v
+	o.TableId.Set(&v)
+}
+
+// SetTableIdNil sets the value for TableId to be an explicit nil
+func (o *LakekeeperNamespaceActionCreateTable) SetTableIdNil() {
+	o.TableId.Set(nil)
+}
+
+// UnsetTableId ensures that no value is present for TableId, not even an explicit nil
+func (o *LakekeeperNamespaceActionCreateTable) UnsetTableId() {
+	o.TableId.Unset()
 }
 
 func (o LakekeeperNamespaceActionCreateTable) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["action"] = o.Action
-	if !IsNil(o.Name) {
-		toSerialize["name"] = o.Name
+	if o.Name.IsSet() {
+		toSerialize["name"] = o.Name.Get()
 	}
 	if !IsNil(o.Properties) {
 		toSerialize["properties"] = o.Properties
 	}
-	if !IsNil(o.TableId) {
-		toSerialize["table_id"] = o.TableId
+	if o.TableId.IsSet() {
+		toSerialize["table_id"] = o.TableId.Get()
 	}
 	return toSerialize, nil
 }

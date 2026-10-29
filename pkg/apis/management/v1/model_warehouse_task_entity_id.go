@@ -17,8 +17,16 @@ import (
 
 // WarehouseTaskEntityId - struct for WarehouseTaskEntityId
 type WarehouseTaskEntityId struct {
-	WarehouseTaskEntityIdTable *WarehouseTaskEntityIdTable
-	WarehouseTaskEntityIdView  *WarehouseTaskEntityIdView
+	WarehouseTaskEntityIdGenericTable *WarehouseTaskEntityIdGenericTable
+	WarehouseTaskEntityIdTable        *WarehouseTaskEntityIdTable
+	WarehouseTaskEntityIdView         *WarehouseTaskEntityIdView
+}
+
+// WarehouseTaskEntityIdGenericTableAsWarehouseTaskEntityId is a convenience function that returns WarehouseTaskEntityIdGenericTable wrapped in WarehouseTaskEntityId
+func WarehouseTaskEntityIdGenericTableAsWarehouseTaskEntityId(v *WarehouseTaskEntityIdGenericTable) WarehouseTaskEntityId {
+	return WarehouseTaskEntityId{
+		WarehouseTaskEntityIdGenericTable: v,
+	}
 }
 
 // WarehouseTaskEntityIdTableAsWarehouseTaskEntityId is a convenience function that returns WarehouseTaskEntityIdTable wrapped in WarehouseTaskEntityId
@@ -45,6 +53,18 @@ func (dst *WarehouseTaskEntityId) UnmarshalJSON(data []byte) error {
 		return fmt.Errorf("failed to unmarshal JSON into map for the discriminator lookup")
 	}
 
+	// check if the discriminator value is 'generic-table'
+	if jsonDict["type"] == "generic-table" {
+		// try to unmarshal JSON data into WarehouseTaskEntityIdGenericTable
+		err = json.Unmarshal(data, &dst.WarehouseTaskEntityIdGenericTable)
+		if err == nil {
+			return nil // data stored in dst.WarehouseTaskEntityIdGenericTable, return on the first match
+		} else {
+			dst.WarehouseTaskEntityIdGenericTable = nil
+			return fmt.Errorf("failed to unmarshal WarehouseTaskEntityId as WarehouseTaskEntityIdGenericTable: %s", err.Error())
+		}
+	}
+
 	// check if the discriminator value is 'table'
 	if jsonDict["type"] == "table" {
 		// try to unmarshal JSON data into WarehouseTaskEntityIdTable
@@ -66,6 +86,18 @@ func (dst *WarehouseTaskEntityId) UnmarshalJSON(data []byte) error {
 		} else {
 			dst.WarehouseTaskEntityIdView = nil
 			return fmt.Errorf("failed to unmarshal WarehouseTaskEntityId as WarehouseTaskEntityIdView: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'WarehouseTaskEntityIdGenericTable'
+	if jsonDict["type"] == "WarehouseTaskEntityIdGenericTable" {
+		// try to unmarshal JSON data into WarehouseTaskEntityIdGenericTable
+		err = json.Unmarshal(data, &dst.WarehouseTaskEntityIdGenericTable)
+		if err == nil {
+			return nil // data stored in dst.WarehouseTaskEntityIdGenericTable, return on the first match
+		} else {
+			dst.WarehouseTaskEntityIdGenericTable = nil
+			return fmt.Errorf("failed to unmarshal WarehouseTaskEntityId as WarehouseTaskEntityIdGenericTable: %s", err.Error())
 		}
 	}
 
@@ -98,6 +130,10 @@ func (dst *WarehouseTaskEntityId) UnmarshalJSON(data []byte) error {
 
 // Marshal data from the first non-nil pointers in the struct to JSON
 func (src WarehouseTaskEntityId) MarshalJSON() ([]byte, error) {
+	if src.WarehouseTaskEntityIdGenericTable != nil {
+		return json.Marshal(&src.WarehouseTaskEntityIdGenericTable)
+	}
+
 	if src.WarehouseTaskEntityIdTable != nil {
 		return json.Marshal(&src.WarehouseTaskEntityIdTable)
 	}
@@ -114,6 +150,10 @@ func (obj *WarehouseTaskEntityId) GetActualInstance() interface{} {
 	if obj == nil {
 		return nil
 	}
+	if obj.WarehouseTaskEntityIdGenericTable != nil {
+		return obj.WarehouseTaskEntityIdGenericTable
+	}
+
 	if obj.WarehouseTaskEntityIdTable != nil {
 		return obj.WarehouseTaskEntityIdTable
 	}

@@ -21,6 +21,7 @@ type LakekeeperServerAction struct {
 	LakekeeperServerActionDeleteUsers    *LakekeeperServerActionDeleteUsers
 	LakekeeperServerActionListUsers      *LakekeeperServerActionListUsers
 	LakekeeperServerActionProvisionUsers *LakekeeperServerActionProvisionUsers
+	LakekeeperServerActionReadGrants     *LakekeeperServerActionReadGrants
 	LakekeeperServerActionUpdateUsers    *LakekeeperServerActionUpdateUsers
 }
 
@@ -49,6 +50,13 @@ func LakekeeperServerActionListUsersAsLakekeeperServerAction(v *LakekeeperServer
 func LakekeeperServerActionProvisionUsersAsLakekeeperServerAction(v *LakekeeperServerActionProvisionUsers) LakekeeperServerAction {
 	return LakekeeperServerAction{
 		LakekeeperServerActionProvisionUsers: v,
+	}
+}
+
+// LakekeeperServerActionReadGrantsAsLakekeeperServerAction is a convenience function that returns LakekeeperServerActionReadGrants wrapped in LakekeeperServerAction
+func LakekeeperServerActionReadGrantsAsLakekeeperServerAction(v *LakekeeperServerActionReadGrants) LakekeeperServerAction {
+	return LakekeeperServerAction{
+		LakekeeperServerActionReadGrants: v,
 	}
 }
 
@@ -117,6 +125,18 @@ func (dst *LakekeeperServerAction) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	// check if the discriminator value is 'read_grants'
+	if jsonDict["action"] == "read_grants" {
+		// try to unmarshal JSON data into LakekeeperServerActionReadGrants
+		err = json.Unmarshal(data, &dst.LakekeeperServerActionReadGrants)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperServerActionReadGrants, return on the first match
+		} else {
+			dst.LakekeeperServerActionReadGrants = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperServerAction as LakekeeperServerActionReadGrants: %s", err.Error())
+		}
+	}
+
 	// check if the discriminator value is 'update_users'
 	if jsonDict["action"] == "update_users" {
 		// try to unmarshal JSON data into LakekeeperServerActionUpdateUsers
@@ -177,6 +197,18 @@ func (dst *LakekeeperServerAction) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	// check if the discriminator value is 'LakekeeperServerActionReadGrants'
+	if jsonDict["action"] == "LakekeeperServerActionReadGrants" {
+		// try to unmarshal JSON data into LakekeeperServerActionReadGrants
+		err = json.Unmarshal(data, &dst.LakekeeperServerActionReadGrants)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperServerActionReadGrants, return on the first match
+		} else {
+			dst.LakekeeperServerActionReadGrants = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperServerAction as LakekeeperServerActionReadGrants: %s", err.Error())
+		}
+	}
+
 	// check if the discriminator value is 'LakekeeperServerActionUpdateUsers'
 	if jsonDict["action"] == "LakekeeperServerActionUpdateUsers" {
 		// try to unmarshal JSON data into LakekeeperServerActionUpdateUsers
@@ -210,6 +242,10 @@ func (src LakekeeperServerAction) MarshalJSON() ([]byte, error) {
 		return json.Marshal(&src.LakekeeperServerActionProvisionUsers)
 	}
 
+	if src.LakekeeperServerActionReadGrants != nil {
+		return json.Marshal(&src.LakekeeperServerActionReadGrants)
+	}
+
 	if src.LakekeeperServerActionUpdateUsers != nil {
 		return json.Marshal(&src.LakekeeperServerActionUpdateUsers)
 	}
@@ -236,6 +272,10 @@ func (obj *LakekeeperServerAction) GetActualInstance() interface{} {
 
 	if obj.LakekeeperServerActionProvisionUsers != nil {
 		return obj.LakekeeperServerActionProvisionUsers
+	}
+
+	if obj.LakekeeperServerActionReadGrants != nil {
+		return obj.LakekeeperServerActionReadGrants
 	}
 
 	if obj.LakekeeperServerActionUpdateUsers != nil {

@@ -131,6 +131,135 @@ func (a *PermissionsOpenfgaAPIService) CheckExecute(r ApiCheckRequest) (*CheckRe
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+type ApiGetAuthorizerGenericTableActionsRequest struct {
+	ctx            context.Context
+	ApiService     *PermissionsOpenfgaAPIService
+	warehouseId    string
+	genericTableId string
+	principalUser  *string
+	principalRole  *string
+}
+
+// The user to show actions for. If neither user nor role is specified, shows actions for the current user.
+func (r ApiGetAuthorizerGenericTableActionsRequest) PrincipalUser(principalUser string) ApiGetAuthorizerGenericTableActionsRequest {
+	r.principalUser = &principalUser
+	return r
+}
+
+// The role to show actions for. If neither user nor role is specified, shows actions for the current user.
+func (r ApiGetAuthorizerGenericTableActionsRequest) PrincipalRole(principalRole string) ApiGetAuthorizerGenericTableActionsRequest {
+	r.principalRole = &principalRole
+	return r
+}
+
+func (r ApiGetAuthorizerGenericTableActionsRequest) Execute() (*GetOpenFGAGenericTableActionsResponse, *http.Response, error) {
+	return r.ApiService.GetAuthorizerGenericTableActionsExecute(r)
+}
+
+/*
+GetAuthorizerGenericTableActions Get allowed Authorizer actions on a generic table
+
+Returns Authorizer permissions (OpenFGA relations) for the specified generic table.
+For Catalog permissions, use `/management/v1/warehouse/{warehouse_id}/generic-table/{generic_table_id}/actions` instead.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param warehouseId Warehouse ID
+	@param genericTableId Generic Table ID
+	@return ApiGetAuthorizerGenericTableActionsRequest
+*/
+func (a *PermissionsOpenfgaAPIService) GetAuthorizerGenericTableActions(ctx context.Context, warehouseId string, genericTableId string) ApiGetAuthorizerGenericTableActionsRequest {
+	return ApiGetAuthorizerGenericTableActionsRequest{
+		ApiService:     a,
+		ctx:            ctx,
+		warehouseId:    warehouseId,
+		genericTableId: genericTableId,
+	}
+}
+
+// Execute executes the request
+//
+//	@return GetOpenFGAGenericTableActionsResponse
+func (a *PermissionsOpenfgaAPIService) GetAuthorizerGenericTableActionsExecute(r ApiGetAuthorizerGenericTableActionsRequest) (*GetOpenFGAGenericTableActionsResponse, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *GetOpenFGAGenericTableActionsResponse
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "PermissionsOpenfgaAPIService.GetAuthorizerGenericTableActions")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/management/v1/permissions/warehouse/{warehouse_id}/generic-table/{generic_table_id}/authorizer-actions"
+	localVarPath = strings.Replace(localVarPath, "{"+"warehouse_id"+"}", url.PathEscape(parameterValueToString(r.warehouseId, "warehouseId")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"generic_table_id"+"}", url.PathEscape(parameterValueToString(r.genericTableId, "genericTableId")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if r.principalUser != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "principalUser", r.principalUser, "form", "")
+	}
+	if r.principalRole != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "principalRole", r.principalRole, "form", "")
+	}
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 type ApiGetAuthorizerNamespaceActionsRequest struct {
 	ctx           context.Context
 	ApiService    *PermissionsOpenfgaAPIService
@@ -961,6 +1090,122 @@ func (a *PermissionsOpenfgaAPIService) GetAuthorizerWarehouseActionsExecute(r Ap
 	}
 	if r.principalRole != nil {
 		parameterAddToHeaderOrQuery(localVarQueryParams, "principalRole", r.principalRole, "form", "")
+	}
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiGetGenericTableAssignmentsByIdRequest struct {
+	ctx            context.Context
+	ApiService     *PermissionsOpenfgaAPIService
+	warehouseId    string
+	genericTableId string
+	relations      *[]GenericTableRelation
+}
+
+// Relations to be loaded. If not specified, all relations are returned.
+func (r ApiGetGenericTableAssignmentsByIdRequest) Relations(relations []GenericTableRelation) ApiGetGenericTableAssignmentsByIdRequest {
+	r.relations = &relations
+	return r
+}
+
+func (r ApiGetGenericTableAssignmentsByIdRequest) Execute() (*GetGenericTableAssignmentsResponse, *http.Response, error) {
+	return r.ApiService.GetGenericTableAssignmentsByIdExecute(r)
+}
+
+/*
+GetGenericTableAssignmentsById Get user and role assignments for a generic table
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param warehouseId Warehouse ID
+	@param genericTableId Generic Table ID
+	@return ApiGetGenericTableAssignmentsByIdRequest
+*/
+func (a *PermissionsOpenfgaAPIService) GetGenericTableAssignmentsById(ctx context.Context, warehouseId string, genericTableId string) ApiGetGenericTableAssignmentsByIdRequest {
+	return ApiGetGenericTableAssignmentsByIdRequest{
+		ApiService:     a,
+		ctx:            ctx,
+		warehouseId:    warehouseId,
+		genericTableId: genericTableId,
+	}
+}
+
+// Execute executes the request
+//
+//	@return GetGenericTableAssignmentsResponse
+func (a *PermissionsOpenfgaAPIService) GetGenericTableAssignmentsByIdExecute(r ApiGetGenericTableAssignmentsByIdRequest) (*GetGenericTableAssignmentsResponse, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *GetGenericTableAssignmentsResponse
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "PermissionsOpenfgaAPIService.GetGenericTableAssignmentsById")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/management/v1/permissions/warehouse/{warehouse_id}/generic-table/{generic_table_id}/assignments"
+	localVarPath = strings.Replace(localVarPath, "{"+"warehouse_id"+"}", url.PathEscape(parameterValueToString(r.warehouseId, "warehouseId")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"generic_table_id"+"}", url.PathEscape(parameterValueToString(r.genericTableId, "genericTableId")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if r.relations != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "relations", r.relations, "deepObject", "csv")
 	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
@@ -2542,6 +2787,118 @@ func (a *PermissionsOpenfgaAPIService) GetTableAssignmentsByIdExecute(r ApiGetTa
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+type ApiGetTagAssignmentsByIdRequest struct {
+	ctx             context.Context
+	ApiService      *PermissionsOpenfgaAPIService
+	tagDefinitionId string
+	relations       *[]TagRelation
+}
+
+// Relations to be loaded. If not specified, all relations are returned.
+func (r ApiGetTagAssignmentsByIdRequest) Relations(relations []TagRelation) ApiGetTagAssignmentsByIdRequest {
+	r.relations = &relations
+	return r
+}
+
+func (r ApiGetTagAssignmentsByIdRequest) Execute() (*GetTagAssignmentsResponse, *http.Response, error) {
+	return r.ApiService.GetTagAssignmentsByIdExecute(r)
+}
+
+/*
+GetTagAssignmentsById Get user and role assignments of a tag definition (who may apply it / owns it)
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param tagDefinitionId Tag Definition ID
+	@return ApiGetTagAssignmentsByIdRequest
+*/
+func (a *PermissionsOpenfgaAPIService) GetTagAssignmentsById(ctx context.Context, tagDefinitionId string) ApiGetTagAssignmentsByIdRequest {
+	return ApiGetTagAssignmentsByIdRequest{
+		ApiService:      a,
+		ctx:             ctx,
+		tagDefinitionId: tagDefinitionId,
+	}
+}
+
+// Execute executes the request
+//
+//	@return GetTagAssignmentsResponse
+func (a *PermissionsOpenfgaAPIService) GetTagAssignmentsByIdExecute(r ApiGetTagAssignmentsByIdRequest) (*GetTagAssignmentsResponse, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *GetTagAssignmentsResponse
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "PermissionsOpenfgaAPIService.GetTagAssignmentsById")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/management/v1/permissions/tag/{tag_definition_id}/assignments"
+	localVarPath = strings.Replace(localVarPath, "{"+"tag_definition_id"+"}", url.PathEscape(parameterValueToString(r.tagDefinitionId, "tagDefinitionId")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if r.relations != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "relations", r.relations, "deepObject", "csv")
+	}
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 type ApiGetViewAccessByIdRequest struct {
 	ctx           context.Context
 	ApiService    *PermissionsOpenfgaAPIService
@@ -3336,6 +3693,111 @@ func (a *PermissionsOpenfgaAPIService) SetWarehouseManagedAccessExecute(r ApiSet
 	return localVarHTTPResponse, nil
 }
 
+type ApiUpdateGenericTableAssignmentsByIdRequest struct {
+	ctx                                  context.Context
+	ApiService                           *PermissionsOpenfgaAPIService
+	warehouseId                          string
+	genericTableId                       string
+	updateGenericTableAssignmentsRequest *UpdateGenericTableAssignmentsRequest
+}
+
+func (r ApiUpdateGenericTableAssignmentsByIdRequest) UpdateGenericTableAssignmentsRequest(updateGenericTableAssignmentsRequest UpdateGenericTableAssignmentsRequest) ApiUpdateGenericTableAssignmentsByIdRequest {
+	r.updateGenericTableAssignmentsRequest = &updateGenericTableAssignmentsRequest
+	return r
+}
+
+func (r ApiUpdateGenericTableAssignmentsByIdRequest) Execute() (*http.Response, error) {
+	return r.ApiService.UpdateGenericTableAssignmentsByIdExecute(r)
+}
+
+/*
+UpdateGenericTableAssignmentsById Update permissions for a generic table
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param warehouseId Warehouse ID
+	@param genericTableId Generic Table ID
+	@return ApiUpdateGenericTableAssignmentsByIdRequest
+*/
+func (a *PermissionsOpenfgaAPIService) UpdateGenericTableAssignmentsById(ctx context.Context, warehouseId string, genericTableId string) ApiUpdateGenericTableAssignmentsByIdRequest {
+	return ApiUpdateGenericTableAssignmentsByIdRequest{
+		ApiService:     a,
+		ctx:            ctx,
+		warehouseId:    warehouseId,
+		genericTableId: genericTableId,
+	}
+}
+
+// Execute executes the request
+func (a *PermissionsOpenfgaAPIService) UpdateGenericTableAssignmentsByIdExecute(r ApiUpdateGenericTableAssignmentsByIdRequest) (*http.Response, error) {
+	var (
+		localVarHTTPMethod = http.MethodPost
+		localVarPostBody   interface{}
+		formFiles          []formFile
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "PermissionsOpenfgaAPIService.UpdateGenericTableAssignmentsById")
+	if err != nil {
+		return nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/management/v1/permissions/warehouse/{warehouse_id}/generic-table/{generic_table_id}/assignments"
+	localVarPath = strings.Replace(localVarPath, "{"+"warehouse_id"+"}", url.PathEscape(parameterValueToString(r.warehouseId, "warehouseId")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"generic_table_id"+"}", url.PathEscape(parameterValueToString(r.genericTableId, "genericTableId")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.updateGenericTableAssignmentsRequest == nil {
+		return nil, reportError("updateGenericTableAssignmentsRequest is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.updateGenericTableAssignmentsRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
+}
+
 type ApiUpdateNamespaceAssignmentsByIdRequest struct {
 	ctx                               context.Context
 	ApiService                        *PermissionsOpenfgaAPIService
@@ -3910,6 +4372,107 @@ func (a *PermissionsOpenfgaAPIService) UpdateTableAssignmentsByIdExecute(r ApiUp
 	}
 	// body params
 	localVarPostBody = r.updateTableAssignmentsRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
+}
+
+type ApiUpdateTagAssignmentsByIdRequest struct {
+	ctx                         context.Context
+	ApiService                  *PermissionsOpenfgaAPIService
+	tagDefinitionId             string
+	updateTagAssignmentsRequest *UpdateTagAssignmentsRequest
+}
+
+func (r ApiUpdateTagAssignmentsByIdRequest) UpdateTagAssignmentsRequest(updateTagAssignmentsRequest UpdateTagAssignmentsRequest) ApiUpdateTagAssignmentsByIdRequest {
+	r.updateTagAssignmentsRequest = &updateTagAssignmentsRequest
+	return r
+}
+
+func (r ApiUpdateTagAssignmentsByIdRequest) Execute() (*http.Response, error) {
+	return r.ApiService.UpdateTagAssignmentsByIdExecute(r)
+}
+
+/*
+UpdateTagAssignmentsById Update user and role assignments of a tag definition (grant/revoke apply, transfer ownership)
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param tagDefinitionId Tag Definition ID
+	@return ApiUpdateTagAssignmentsByIdRequest
+*/
+func (a *PermissionsOpenfgaAPIService) UpdateTagAssignmentsById(ctx context.Context, tagDefinitionId string) ApiUpdateTagAssignmentsByIdRequest {
+	return ApiUpdateTagAssignmentsByIdRequest{
+		ApiService:      a,
+		ctx:             ctx,
+		tagDefinitionId: tagDefinitionId,
+	}
+}
+
+// Execute executes the request
+func (a *PermissionsOpenfgaAPIService) UpdateTagAssignmentsByIdExecute(r ApiUpdateTagAssignmentsByIdRequest) (*http.Response, error) {
+	var (
+		localVarHTTPMethod = http.MethodPost
+		localVarPostBody   interface{}
+		formFiles          []formFile
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "PermissionsOpenfgaAPIService.UpdateTagAssignmentsById")
+	if err != nil {
+		return nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/management/v1/permissions/tag/{tag_definition_id}/assignments"
+	localVarPath = strings.Replace(localVarPath, "{"+"tag_definition_id"+"}", url.PathEscape(parameterValueToString(r.tagDefinitionId, "tagDefinitionId")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.updateTagAssignmentsRequest == nil {
+		return nil, reportError("updateTagAssignmentsRequest is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.updateTagAssignmentsRequest
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return nil, err

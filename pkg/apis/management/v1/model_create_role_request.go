@@ -22,15 +22,15 @@ var _ MappedNullable = &CreateRoleRequest{}
 // CreateRoleRequest struct for CreateRoleRequest
 type CreateRoleRequest struct {
 	// Description of the role
-	Description *string `json:"description,omitempty"`
+	Description NullableString `json:"description,omitempty"`
 	// Name of the role to create
 	Name string `json:"name"`
 	// Project ID in which the role is created. Deprecated: Please use the `x-project-id` header instead.
-	ProjectId *string `json:"project-id,omitempty"`
-	// Provider that owns this role (e.g. `\"lakekeeper\"`, `\"oidc\"`). Must be provided together with `source-id`. Omit both to let the server assign `provider-id = \"lakekeeper\"` and a fresh UUIDv7 `source-id`.
-	ProviderId *string `json:"provider-id,omitempty"`
+	ProjectId NullableString `json:"project-id,omitempty"`
+	// Provider that owns this role (e.g. `\"lakekeeper\"`, `\"oidc\"`). Must be provided together with `source-id`. Omit both to let the server assign `provider-id = \"lakekeeper\"` and use the role's `id` as `source-id`.
+	ProviderId NullableString `json:"provider-id,omitempty"`
 	// Identifier of the role in the provider. Must be provided together with `provider-id`.
-	SourceId *string `json:"source-id,omitempty"`
+	SourceId NullableString `json:"source-id,omitempty"`
 }
 
 type _CreateRoleRequest CreateRoleRequest
@@ -53,36 +53,47 @@ func NewCreateRoleRequestWithDefaults() *CreateRoleRequest {
 	return &this
 }
 
-// GetDescription returns the Description field value if set, zero value otherwise.
+// GetDescription returns the Description field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *CreateRoleRequest) GetDescription() string {
-	if o == nil || IsNil(o.Description) {
+	if o == nil || IsNil(o.Description.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.Description
+	return *o.Description.Get()
 }
 
 // GetDescriptionOk returns a tuple with the Description field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *CreateRoleRequest) GetDescriptionOk() (*string, bool) {
-	if o == nil || IsNil(o.Description) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Description, true
+	return o.Description.Get(), o.Description.IsSet()
 }
 
 // HasDescription returns a boolean if a field has been set.
 func (o *CreateRoleRequest) HasDescription() bool {
-	if o != nil && !IsNil(o.Description) {
+	if o != nil && o.Description.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetDescription gets a reference to the given string and assigns it to the Description field.
+// SetDescription gets a reference to the given NullableString and assigns it to the Description field.
 func (o *CreateRoleRequest) SetDescription(v string) {
-	o.Description = &v
+	o.Description.Set(&v)
+}
+
+// SetDescriptionNil sets the value for Description to be an explicit nil
+func (o *CreateRoleRequest) SetDescriptionNil() {
+	o.Description.Set(nil)
+}
+
+// UnsetDescription ensures that no value is present for Description, not even an explicit nil
+func (o *CreateRoleRequest) UnsetDescription() {
+	o.Description.Unset()
 }
 
 // GetName returns the Name field value
@@ -109,116 +120,149 @@ func (o *CreateRoleRequest) SetName(v string) {
 	o.Name = v
 }
 
-// GetProjectId returns the ProjectId field value if set, zero value otherwise.
+// GetProjectId returns the ProjectId field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *CreateRoleRequest) GetProjectId() string {
-	if o == nil || IsNil(o.ProjectId) {
+	if o == nil || IsNil(o.ProjectId.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.ProjectId
+	return *o.ProjectId.Get()
 }
 
 // GetProjectIdOk returns a tuple with the ProjectId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *CreateRoleRequest) GetProjectIdOk() (*string, bool) {
-	if o == nil || IsNil(o.ProjectId) {
+	if o == nil {
 		return nil, false
 	}
-	return o.ProjectId, true
+	return o.ProjectId.Get(), o.ProjectId.IsSet()
 }
 
 // HasProjectId returns a boolean if a field has been set.
 func (o *CreateRoleRequest) HasProjectId() bool {
-	if o != nil && !IsNil(o.ProjectId) {
+	if o != nil && o.ProjectId.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetProjectId gets a reference to the given string and assigns it to the ProjectId field.
+// SetProjectId gets a reference to the given NullableString and assigns it to the ProjectId field.
 func (o *CreateRoleRequest) SetProjectId(v string) {
-	o.ProjectId = &v
+	o.ProjectId.Set(&v)
 }
 
-// GetProviderId returns the ProviderId field value if set, zero value otherwise.
+// SetProjectIdNil sets the value for ProjectId to be an explicit nil
+func (o *CreateRoleRequest) SetProjectIdNil() {
+	o.ProjectId.Set(nil)
+}
+
+// UnsetProjectId ensures that no value is present for ProjectId, not even an explicit nil
+func (o *CreateRoleRequest) UnsetProjectId() {
+	o.ProjectId.Unset()
+}
+
+// GetProviderId returns the ProviderId field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *CreateRoleRequest) GetProviderId() string {
-	if o == nil || IsNil(o.ProviderId) {
+	if o == nil || IsNil(o.ProviderId.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.ProviderId
+	return *o.ProviderId.Get()
 }
 
 // GetProviderIdOk returns a tuple with the ProviderId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *CreateRoleRequest) GetProviderIdOk() (*string, bool) {
-	if o == nil || IsNil(o.ProviderId) {
+	if o == nil {
 		return nil, false
 	}
-	return o.ProviderId, true
+	return o.ProviderId.Get(), o.ProviderId.IsSet()
 }
 
 // HasProviderId returns a boolean if a field has been set.
 func (o *CreateRoleRequest) HasProviderId() bool {
-	if o != nil && !IsNil(o.ProviderId) {
+	if o != nil && o.ProviderId.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetProviderId gets a reference to the given string and assigns it to the ProviderId field.
+// SetProviderId gets a reference to the given NullableString and assigns it to the ProviderId field.
 func (o *CreateRoleRequest) SetProviderId(v string) {
-	o.ProviderId = &v
+	o.ProviderId.Set(&v)
 }
 
-// GetSourceId returns the SourceId field value if set, zero value otherwise.
+// SetProviderIdNil sets the value for ProviderId to be an explicit nil
+func (o *CreateRoleRequest) SetProviderIdNil() {
+	o.ProviderId.Set(nil)
+}
+
+// UnsetProviderId ensures that no value is present for ProviderId, not even an explicit nil
+func (o *CreateRoleRequest) UnsetProviderId() {
+	o.ProviderId.Unset()
+}
+
+// GetSourceId returns the SourceId field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *CreateRoleRequest) GetSourceId() string {
-	if o == nil || IsNil(o.SourceId) {
+	if o == nil || IsNil(o.SourceId.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.SourceId
+	return *o.SourceId.Get()
 }
 
 // GetSourceIdOk returns a tuple with the SourceId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *CreateRoleRequest) GetSourceIdOk() (*string, bool) {
-	if o == nil || IsNil(o.SourceId) {
+	if o == nil {
 		return nil, false
 	}
-	return o.SourceId, true
+	return o.SourceId.Get(), o.SourceId.IsSet()
 }
 
 // HasSourceId returns a boolean if a field has been set.
 func (o *CreateRoleRequest) HasSourceId() bool {
-	if o != nil && !IsNil(o.SourceId) {
+	if o != nil && o.SourceId.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetSourceId gets a reference to the given string and assigns it to the SourceId field.
+// SetSourceId gets a reference to the given NullableString and assigns it to the SourceId field.
 func (o *CreateRoleRequest) SetSourceId(v string) {
-	o.SourceId = &v
+	o.SourceId.Set(&v)
+}
+
+// SetSourceIdNil sets the value for SourceId to be an explicit nil
+func (o *CreateRoleRequest) SetSourceIdNil() {
+	o.SourceId.Set(nil)
+}
+
+// UnsetSourceId ensures that no value is present for SourceId, not even an explicit nil
+func (o *CreateRoleRequest) UnsetSourceId() {
+	o.SourceId.Unset()
 }
 
 func (o CreateRoleRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.Description) {
-		toSerialize["description"] = o.Description
+	if o.Description.IsSet() {
+		toSerialize["description"] = o.Description.Get()
 	}
 	toSerialize["name"] = o.Name
-	if !IsNil(o.ProjectId) {
-		toSerialize["project-id"] = o.ProjectId
+	if o.ProjectId.IsSet() {
+		toSerialize["project-id"] = o.ProjectId.Get()
 	}
-	if !IsNil(o.ProviderId) {
-		toSerialize["provider-id"] = o.ProviderId
+	if o.ProviderId.IsSet() {
+		toSerialize["provider-id"] = o.ProviderId.Get()
 	}
-	if !IsNil(o.SourceId) {
-		toSerialize["source-id"] = o.SourceId
+	if o.SourceId.IsSet() {
+		toSerialize["source-id"] = o.SourceId.Get()
 	}
 	return toSerialize, nil
 }

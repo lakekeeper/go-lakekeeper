@@ -453,6 +453,260 @@ func (a *WarehouseAPIService) DeleteWarehouseExecute(r ApiDeleteWarehouseRequest
 	return localVarHTTPResponse, nil
 }
 
+type ApiGetGenericTableActionsRequest struct {
+	ctx            context.Context
+	ApiService     *WarehouseAPIService
+	warehouseId    string
+	genericTableId string
+	principalUser  *string
+	principalRole  *string
+}
+
+// The user to show actions for. If neither user nor role is specified, shows actions for the current user.
+func (r ApiGetGenericTableActionsRequest) PrincipalUser(principalUser string) ApiGetGenericTableActionsRequest {
+	r.principalUser = &principalUser
+	return r
+}
+
+// The role to show actions for. If neither user nor role is specified, shows actions for the current user.
+func (r ApiGetGenericTableActionsRequest) PrincipalRole(principalRole string) ApiGetGenericTableActionsRequest {
+	r.principalRole = &principalRole
+	return r
+}
+
+func (r ApiGetGenericTableActionsRequest) Execute() (*GetLakekeeperGenericTableActionsResponse, *http.Response, error) {
+	return r.ApiService.GetGenericTableActionsExecute(r)
+}
+
+/*
+GetGenericTableActions Get allowed actions for a generic table
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param warehouseId
+	@param genericTableId
+	@return ApiGetGenericTableActionsRequest
+*/
+func (a *WarehouseAPIService) GetGenericTableActions(ctx context.Context, warehouseId string, genericTableId string) ApiGetGenericTableActionsRequest {
+	return ApiGetGenericTableActionsRequest{
+		ApiService:     a,
+		ctx:            ctx,
+		warehouseId:    warehouseId,
+		genericTableId: genericTableId,
+	}
+}
+
+// Execute executes the request
+//
+//	@return GetLakekeeperGenericTableActionsResponse
+func (a *WarehouseAPIService) GetGenericTableActionsExecute(r ApiGetGenericTableActionsRequest) (*GetLakekeeperGenericTableActionsResponse, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *GetLakekeeperGenericTableActionsResponse
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "WarehouseAPIService.GetGenericTableActions")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/management/v1/warehouse/{warehouse_id}/generic-table/{generic_table_id}/actions"
+	localVarPath = strings.Replace(localVarPath, "{"+"warehouse_id"+"}", url.PathEscape(parameterValueToString(r.warehouseId, "warehouseId")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"generic_table_id"+"}", url.PathEscape(parameterValueToString(r.genericTableId, "genericTableId")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if r.principalUser != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "principalUser", r.principalUser, "form", "")
+	}
+	if r.principalRole != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "principalRole", r.principalRole, "form", "")
+	}
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode >= 400 && localVarHTTPResponse.StatusCode < 500 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiGetGenericTableProtectionRequest struct {
+	ctx            context.Context
+	ApiService     *WarehouseAPIService
+	warehouseId    string
+	genericTableId string
+}
+
+func (r ApiGetGenericTableProtectionRequest) Execute() (*ProtectionResponse, *http.Response, error) {
+	return r.ApiService.GetGenericTableProtectionExecute(r)
+}
+
+/*
+GetGenericTableProtection Get Generic Table Protection
+
+Retrieves whether a generic table is protected from deletion.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param warehouseId
+	@param genericTableId
+	@return ApiGetGenericTableProtectionRequest
+*/
+func (a *WarehouseAPIService) GetGenericTableProtection(ctx context.Context, warehouseId string, genericTableId string) ApiGetGenericTableProtectionRequest {
+	return ApiGetGenericTableProtectionRequest{
+		ApiService:     a,
+		ctx:            ctx,
+		warehouseId:    warehouseId,
+		genericTableId: genericTableId,
+	}
+}
+
+// Execute executes the request
+//
+//	@return ProtectionResponse
+func (a *WarehouseAPIService) GetGenericTableProtectionExecute(r ApiGetGenericTableProtectionRequest) (*ProtectionResponse, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *ProtectionResponse
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "WarehouseAPIService.GetGenericTableProtection")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/management/v1/warehouse/{warehouse_id}/generic-table/{generic_table_id}/protection"
+	localVarPath = strings.Replace(localVarPath, "{"+"warehouse_id"+"}", url.PathEscape(parameterValueToString(r.warehouseId, "warehouseId")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"generic_table_id"+"}", url.PathEscape(parameterValueToString(r.genericTableId, "genericTableId")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode >= 400 && localVarHTTPResponse.StatusCode < 500 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 type ApiGetNamespaceActionsRequest struct {
 	ctx           context.Context
 	ApiService    *WarehouseAPIService
@@ -1900,6 +2154,161 @@ func (a *WarehouseAPIService) ListWarehousesExecute(r ApiListWarehousesRequest) 
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+type ApiMoveNamespaceRequest struct {
+	ctx                  context.Context
+	ApiService           *WarehouseAPIService
+	warehouseId          string
+	namespaceId          string
+	moveNamespaceRequest *MoveNamespaceRequest
+}
+
+func (r ApiMoveNamespaceRequest) MoveNamespaceRequest(moveNamespaceRequest MoveNamespaceRequest) ApiMoveNamespaceRequest {
+	r.moveNamespaceRequest = &moveNamespaceRequest
+	return r
+}
+
+func (r ApiMoveNamespaceRequest) Execute() (*MoveNamespaceResponse, *http.Response, error) {
+	return r.ApiService.MoveNamespaceExecute(r)
+}
+
+/*
+MoveNamespace Move a Namespace
+
+Moves a namespace to a new location in the warehouse's namespace hierarchy,
+re-parenting it and/or renaming it. The request body carries the full destination path:
+its last element is the new name, the preceding elements identify the new parent, so a
+single-element path moves the namespace to the warehouse root. The path must not be
+empty.
+
+Requires:
+
+  - `move` on the namespace being moved,
+  - `create_namespace` **and** `accept_moved_namespace` on the destination parent (or on
+    the warehouse, when moving to the root).
+
+Re-parenting makes the namespace's contents inherit the destination subtree's
+permissions without any assignment being recorded, and the namespace arrives carrying
+its contents and their grants. With OpenFGA, `move` requires `manage_grants` and
+`modify`; `accept_moved_namespace` requires `create`, plus `manage_grants` when the
+destination is under managed access.
+
+Constraints:
+  - Namespaces that contain child namespaces cannot be moved.
+  - Moves stay within one warehouse.
+  - Protected namespaces require `force`.
+  - Rejected for warehouses whose storage layout derives physical locations from
+    namespace names or from the namespace hierarchy.
+
+A destination equal to the namespace's current path is a no-op and returns 200, so a
+retried request cannot fail with a spurious conflict.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param warehouseId
+	@param namespaceId
+	@return ApiMoveNamespaceRequest
+*/
+func (a *WarehouseAPIService) MoveNamespace(ctx context.Context, warehouseId string, namespaceId string) ApiMoveNamespaceRequest {
+	return ApiMoveNamespaceRequest{
+		ApiService:  a,
+		ctx:         ctx,
+		warehouseId: warehouseId,
+		namespaceId: namespaceId,
+	}
+}
+
+// Execute executes the request
+//
+//	@return MoveNamespaceResponse
+func (a *WarehouseAPIService) MoveNamespaceExecute(r ApiMoveNamespaceRequest) (*MoveNamespaceResponse, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodPost
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *MoveNamespaceResponse
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "WarehouseAPIService.MoveNamespace")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/management/v1/warehouse/{warehouse_id}/namespace/{namespace_id}/move"
+	localVarPath = strings.Replace(localVarPath, "{"+"warehouse_id"+"}", url.PathEscape(parameterValueToString(r.warehouseId, "warehouseId")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"namespace_id"+"}", url.PathEscape(parameterValueToString(r.namespaceId, "namespaceId")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.moveNamespaceRequest == nil {
+		return localVarReturnValue, nil, reportError("moveNamespaceRequest is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.moveNamespaceRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode >= 400 && localVarHTTPResponse.StatusCode < 500 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 type ApiRenameWarehouseRequest struct {
 	ctx                    context.Context
 	ApiService             *WarehouseAPIService
@@ -2106,6 +2515,135 @@ func (a *WarehouseAPIService) SearchTabularExecute(r ApiSearchTabularRequest) (*
 	}
 	// body params
 	localVarPostBody = r.searchTabularRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode >= 400 && localVarHTTPResponse.StatusCode < 500 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiSetGenericTableProtectionRequest struct {
+	ctx                  context.Context
+	ApiService           *WarehouseAPIService
+	warehouseId          string
+	genericTableId       string
+	setProtectionRequest *SetProtectionRequest
+}
+
+func (r ApiSetGenericTableProtectionRequest) SetProtectionRequest(setProtectionRequest SetProtectionRequest) ApiSetGenericTableProtectionRequest {
+	r.setProtectionRequest = &setProtectionRequest
+	return r
+}
+
+func (r ApiSetGenericTableProtectionRequest) Execute() (*ProtectionResponse, *http.Response, error) {
+	return r.ApiService.SetGenericTableProtectionExecute(r)
+}
+
+/*
+SetGenericTableProtection Set Generic Table Protection
+
+Configures whether a generic table should be protected from deletion.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param warehouseId
+	@param genericTableId
+	@return ApiSetGenericTableProtectionRequest
+*/
+func (a *WarehouseAPIService) SetGenericTableProtection(ctx context.Context, warehouseId string, genericTableId string) ApiSetGenericTableProtectionRequest {
+	return ApiSetGenericTableProtectionRequest{
+		ApiService:     a,
+		ctx:            ctx,
+		warehouseId:    warehouseId,
+		genericTableId: genericTableId,
+	}
+}
+
+// Execute executes the request
+//
+//	@return ProtectionResponse
+func (a *WarehouseAPIService) SetGenericTableProtectionExecute(r ApiSetGenericTableProtectionRequest) (*ProtectionResponse, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodPost
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *ProtectionResponse
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "WarehouseAPIService.SetGenericTableProtection")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/management/v1/warehouse/{warehouse_id}/generic-table/{generic_table_id}/protection"
+	localVarPath = strings.Replace(localVarPath, "{"+"warehouse_id"+"}", url.PathEscape(parameterValueToString(r.warehouseId, "warehouseId")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"generic_table_id"+"}", url.PathEscape(parameterValueToString(r.genericTableId, "genericTableId")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.setProtectionRequest == nil {
+		return localVarReturnValue, nil, reportError("setProtectionRequest is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.setProtectionRequest
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -2493,6 +3031,133 @@ func (a *WarehouseAPIService) SetViewProtectionExecute(r ApiSetViewProtectionReq
 	}
 	// body params
 	localVarPostBody = r.setProtectionRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode >= 400 && localVarHTTPResponse.StatusCode < 500 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiSetWarehouseManagedByRequest struct {
+	ctx                          context.Context
+	ApiService                   *WarehouseAPIService
+	warehouseId                  string
+	setWarehouseManagedByRequest *SetWarehouseManagedByRequest
+}
+
+func (r ApiSetWarehouseManagedByRequest) SetWarehouseManagedByRequest(setWarehouseManagedByRequest SetWarehouseManagedByRequest) ApiSetWarehouseManagedByRequest {
+	r.setWarehouseManagedByRequest = &setWarehouseManagedByRequest
+	return r
+}
+
+func (r ApiSetWarehouseManagedByRequest) Execute() (*GetWarehouseResponse, *http.Response, error) {
+	return r.ApiService.SetWarehouseManagedByExecute(r)
+}
+
+/*
+SetWarehouseManagedBy Set Warehouse Managed-By
+
+Sets (or clears) the managed-by marker on a warehouse. When set, the
+warehouse spec becomes mutable only by the managing control plane
+(instance admins). Requires instance-admin privilege.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param warehouseId
+	@return ApiSetWarehouseManagedByRequest
+*/
+func (a *WarehouseAPIService) SetWarehouseManagedBy(ctx context.Context, warehouseId string) ApiSetWarehouseManagedByRequest {
+	return ApiSetWarehouseManagedByRequest{
+		ApiService:  a,
+		ctx:         ctx,
+		warehouseId: warehouseId,
+	}
+}
+
+// Execute executes the request
+//
+//	@return GetWarehouseResponse
+func (a *WarehouseAPIService) SetWarehouseManagedByExecute(r ApiSetWarehouseManagedByRequest) (*GetWarehouseResponse, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodPost
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *GetWarehouseResponse
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "WarehouseAPIService.SetWarehouseManagedBy")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/management/v1/warehouse/{warehouse_id}/managed-by"
+	localVarPath = strings.Replace(localVarPath, "{"+"warehouse_id"+"}", url.PathEscape(parameterValueToString(r.warehouseId, "warehouseId")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.setWarehouseManagedByRequest == nil {
+		return localVarReturnValue, nil, reportError("setWarehouseManagedByRequest is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.setWarehouseManagedByRequest
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -3107,6 +3772,650 @@ func (a *WarehouseAPIService) UpdateWarehouseDeleteProfileExecute(r ApiUpdateWar
 	}
 	// body params
 	localVarPostBody = r.updateWarehouseDeleteProfileRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode >= 400 && localVarHTTPResponse.StatusCode < 500 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiUpdateWarehouseFormatVersionPolicyRequest struct {
+	ctx                                       context.Context
+	ApiService                                *WarehouseAPIService
+	warehouseId                               string
+	updateWarehouseFormatVersionPolicyRequest *UpdateWarehouseFormatVersionPolicyRequest
+}
+
+func (r ApiUpdateWarehouseFormatVersionPolicyRequest) UpdateWarehouseFormatVersionPolicyRequest(updateWarehouseFormatVersionPolicyRequest UpdateWarehouseFormatVersionPolicyRequest) ApiUpdateWarehouseFormatVersionPolicyRequest {
+	r.updateWarehouseFormatVersionPolicyRequest = &updateWarehouseFormatVersionPolicyRequest
+	return r
+}
+
+func (r ApiUpdateWarehouseFormatVersionPolicyRequest) Execute() (*GetWarehouseResponse, *http.Response, error) {
+	return r.ApiService.UpdateWarehouseFormatVersionPolicyExecute(r)
+}
+
+/*
+UpdateWarehouseFormatVersionPolicy Update Format Version Policy
+
+Configures which Iceberg table format versions may be created in, or
+upgraded to, within a warehouse, and the default version applied when a
+create-table request does not specify one.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param warehouseId
+	@return ApiUpdateWarehouseFormatVersionPolicyRequest
+*/
+func (a *WarehouseAPIService) UpdateWarehouseFormatVersionPolicy(ctx context.Context, warehouseId string) ApiUpdateWarehouseFormatVersionPolicyRequest {
+	return ApiUpdateWarehouseFormatVersionPolicyRequest{
+		ApiService:  a,
+		ctx:         ctx,
+		warehouseId: warehouseId,
+	}
+}
+
+// Execute executes the request
+//
+//	@return GetWarehouseResponse
+func (a *WarehouseAPIService) UpdateWarehouseFormatVersionPolicyExecute(r ApiUpdateWarehouseFormatVersionPolicyRequest) (*GetWarehouseResponse, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodPost
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *GetWarehouseResponse
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "WarehouseAPIService.UpdateWarehouseFormatVersionPolicy")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/management/v1/warehouse/{warehouse_id}/format-version-policy"
+	localVarPath = strings.Replace(localVarPath, "{"+"warehouse_id"+"}", url.PathEscape(parameterValueToString(r.warehouseId, "warehouseId")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.updateWarehouseFormatVersionPolicyRequest == nil {
+		return localVarReturnValue, nil, reportError("updateWarehouseFormatVersionPolicyRequest is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.updateWarehouseFormatVersionPolicyRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode >= 400 && localVarHTTPResponse.StatusCode < 500 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiValidateStorageAccessRequest struct {
+	ctx         context.Context
+	ApiService  *WarehouseAPIService
+	warehouseId string
+}
+
+func (r ApiValidateStorageAccessRequest) Execute() (*ValidateWarehouseResponse, *http.Response, error) {
+	return r.ApiService.ValidateStorageAccessExecute(r)
+}
+
+/*
+ValidateStorageAccess Validate Stored Warehouse Configuration
+
+Re-runs the storage checks against the configuration the warehouse is
+currently running with, using its stored profile and stored credential.
+Use this to find out whether a warehouse's storage access still works —
+for example after a credential has expired or a bucket policy changed.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param warehouseId
+	@return ApiValidateStorageAccessRequest
+*/
+func (a *WarehouseAPIService) ValidateStorageAccess(ctx context.Context, warehouseId string) ApiValidateStorageAccessRequest {
+	return ApiValidateStorageAccessRequest{
+		ApiService:  a,
+		ctx:         ctx,
+		warehouseId: warehouseId,
+	}
+}
+
+// Execute executes the request
+//
+//	@return ValidateWarehouseResponse
+func (a *WarehouseAPIService) ValidateStorageAccessExecute(r ApiValidateStorageAccessRequest) (*ValidateWarehouseResponse, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodPost
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *ValidateWarehouseResponse
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "WarehouseAPIService.ValidateStorageAccess")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/management/v1/warehouse/{warehouse_id}/storage/validate-access"
+	localVarPath = strings.Replace(localVarPath, "{"+"warehouse_id"+"}", url.PathEscape(parameterValueToString(r.warehouseId, "warehouseId")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode >= 400 && localVarHTTPResponse.StatusCode < 500 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiValidateStorageCredentialRequest struct {
+	ctx                              context.Context
+	ApiService                       *WarehouseAPIService
+	warehouseId                      string
+	updateWarehouseCredentialRequest *UpdateWarehouseCredentialRequest
+}
+
+func (r ApiValidateStorageCredentialRequest) UpdateWarehouseCredentialRequest(updateWarehouseCredentialRequest UpdateWarehouseCredentialRequest) ApiValidateStorageCredentialRequest {
+	r.updateWarehouseCredentialRequest = &updateWarehouseCredentialRequest
+	return r
+}
+
+func (r ApiValidateStorageCredentialRequest) Execute() (*ValidateWarehouseResponse, *http.Response, error) {
+	return r.ApiService.ValidateStorageCredentialExecute(r)
+}
+
+/*
+ValidateStorageCredential Validate Storage Credential
+
+Dry-run of `Update Storage Credential`: probes the warehouse's stored
+storage profile with the supplied replacement credential. The stored
+credential is left untouched.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param warehouseId
+	@return ApiValidateStorageCredentialRequest
+*/
+func (a *WarehouseAPIService) ValidateStorageCredential(ctx context.Context, warehouseId string) ApiValidateStorageCredentialRequest {
+	return ApiValidateStorageCredentialRequest{
+		ApiService:  a,
+		ctx:         ctx,
+		warehouseId: warehouseId,
+	}
+}
+
+// Execute executes the request
+//
+//	@return ValidateWarehouseResponse
+func (a *WarehouseAPIService) ValidateStorageCredentialExecute(r ApiValidateStorageCredentialRequest) (*ValidateWarehouseResponse, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodPost
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *ValidateWarehouseResponse
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "WarehouseAPIService.ValidateStorageCredential")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/management/v1/warehouse/{warehouse_id}/storage/validate-credential"
+	localVarPath = strings.Replace(localVarPath, "{"+"warehouse_id"+"}", url.PathEscape(parameterValueToString(r.warehouseId, "warehouseId")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.updateWarehouseCredentialRequest == nil {
+		return localVarReturnValue, nil, reportError("updateWarehouseCredentialRequest is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.updateWarehouseCredentialRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode >= 400 && localVarHTTPResponse.StatusCode < 500 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiValidateStorageProfileRequest struct {
+	ctx                           context.Context
+	ApiService                    *WarehouseAPIService
+	warehouseId                   string
+	updateWarehouseStorageRequest *UpdateWarehouseStorageRequest
+}
+
+func (r ApiValidateStorageProfileRequest) UpdateWarehouseStorageRequest(updateWarehouseStorageRequest UpdateWarehouseStorageRequest) ApiValidateStorageProfileRequest {
+	r.updateWarehouseStorageRequest = &updateWarehouseStorageRequest
+	return r
+}
+
+func (r ApiValidateStorageProfileRequest) Execute() (*ValidateWarehouseResponse, *http.Response, error) {
+	return r.ApiService.ValidateStorageProfileExecute(r)
+}
+
+/*
+ValidateStorageProfile Validate Storage Profile Update
+
+Dry-run of `Update Storage Profile`: checks that the warehouse's spec may
+be changed, that the new profile is a permitted evolution of the current
+one, and that the storage is reachable — without changing the warehouse.
+
+Probes the incoming profile as supplied, before it would be merged into
+the stored one, matching what the real update validates.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param warehouseId
+	@return ApiValidateStorageProfileRequest
+*/
+func (a *WarehouseAPIService) ValidateStorageProfile(ctx context.Context, warehouseId string) ApiValidateStorageProfileRequest {
+	return ApiValidateStorageProfileRequest{
+		ApiService:  a,
+		ctx:         ctx,
+		warehouseId: warehouseId,
+	}
+}
+
+// Execute executes the request
+//
+//	@return ValidateWarehouseResponse
+func (a *WarehouseAPIService) ValidateStorageProfileExecute(r ApiValidateStorageProfileRequest) (*ValidateWarehouseResponse, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodPost
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *ValidateWarehouseResponse
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "WarehouseAPIService.ValidateStorageProfile")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/management/v1/warehouse/{warehouse_id}/storage/validate-profile"
+	localVarPath = strings.Replace(localVarPath, "{"+"warehouse_id"+"}", url.PathEscape(parameterValueToString(r.warehouseId, "warehouseId")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.updateWarehouseStorageRequest == nil {
+		return localVarReturnValue, nil, reportError("updateWarehouseStorageRequest is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.updateWarehouseStorageRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode >= 400 && localVarHTTPResponse.StatusCode < 500 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiValidateWarehouseRequest struct {
+	ctx                    context.Context
+	ApiService             *WarehouseAPIService
+	createWarehouseRequest *CreateWarehouseRequest
+	xProjectId             *string
+}
+
+func (r ApiValidateWarehouseRequest) CreateWarehouseRequest(createWarehouseRequest CreateWarehouseRequest) ApiValidateWarehouseRequest {
+	r.createWarehouseRequest = &createWarehouseRequest
+	return r
+}
+
+// Project ID (optional; falls back to the default project if not provided)
+func (r ApiValidateWarehouseRequest) XProjectId(xProjectId string) ApiValidateWarehouseRequest {
+	r.xProjectId = &xProjectId
+	return r
+}
+
+func (r ApiValidateWarehouseRequest) Execute() (*ValidateWarehouseResponse, *http.Response, error) {
+	return r.ApiService.ValidateWarehouseExecute(r)
+}
+
+/*
+ValidateWarehouse Validate Warehouse Configuration
+
+Runs the checks `Create Warehouse` runs — profile syntax, name and ID
+availability, location overlap, format-version policy, `managed-by`, and
+physical storage access including credential vending — without creating
+anything. No warehouse is persisted and no credential is stored.
+
+Returns 200 whether or not the configuration is usable; inspect `valid` and
+the per-check results. Requires the same permission as creating a warehouse.
+
+Results are advisory and reserve nothing: a concurrent request can take a
+name or ID between this call and the create. `warehouse-id-available` in
+particular examines only the caller's own project, while warehouse IDs are
+unique across the whole instance — so an ID it reports as available can
+still be refused with `409 WarehouseIdAlreadyExists` on create.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiValidateWarehouseRequest
+*/
+func (a *WarehouseAPIService) ValidateWarehouse(ctx context.Context) ApiValidateWarehouseRequest {
+	return ApiValidateWarehouseRequest{
+		ApiService: a,
+		ctx:        ctx,
+	}
+}
+
+// Execute executes the request
+//
+//	@return ValidateWarehouseResponse
+func (a *WarehouseAPIService) ValidateWarehouseExecute(r ApiValidateWarehouseRequest) (*ValidateWarehouseResponse, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodPost
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *ValidateWarehouseResponse
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "WarehouseAPIService.ValidateWarehouse")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/management/v1/warehouse-creation-validation"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.createWarehouseRequest == nil {
+		return localVarReturnValue, nil, reportError("createWarehouseRequest is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	if r.xProjectId != nil {
+		parameterAddToHeaderOrQuery(localVarHeaderParams, "x-project-id", r.xProjectId, "simple", "")
+	}
+	// body params
+	localVarPostBody = r.createWarehouseRequest
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err

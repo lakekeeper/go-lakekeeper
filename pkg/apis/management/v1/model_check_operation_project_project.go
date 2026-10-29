@@ -21,8 +21,8 @@ var _ MappedNullable = &CheckOperationProjectProject{}
 
 // CheckOperationProjectProject struct for CheckOperationProjectProject
 type CheckOperationProjectProject struct {
-	Action    ProjectAction `json:"action"`
-	ProjectId *string       `json:"project-id,omitempty"`
+	Action    ProjectAction  `json:"action"`
+	ProjectId NullableString `json:"project-id,omitempty"`
 }
 
 type _CheckOperationProjectProject CheckOperationProjectProject
@@ -69,43 +69,54 @@ func (o *CheckOperationProjectProject) SetAction(v ProjectAction) {
 	o.Action = v
 }
 
-// GetProjectId returns the ProjectId field value if set, zero value otherwise.
+// GetProjectId returns the ProjectId field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *CheckOperationProjectProject) GetProjectId() string {
-	if o == nil || IsNil(o.ProjectId) {
+	if o == nil || IsNil(o.ProjectId.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.ProjectId
+	return *o.ProjectId.Get()
 }
 
 // GetProjectIdOk returns a tuple with the ProjectId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *CheckOperationProjectProject) GetProjectIdOk() (*string, bool) {
-	if o == nil || IsNil(o.ProjectId) {
+	if o == nil {
 		return nil, false
 	}
-	return o.ProjectId, true
+	return o.ProjectId.Get(), o.ProjectId.IsSet()
 }
 
 // HasProjectId returns a boolean if a field has been set.
 func (o *CheckOperationProjectProject) HasProjectId() bool {
-	if o != nil && !IsNil(o.ProjectId) {
+	if o != nil && o.ProjectId.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetProjectId gets a reference to the given string and assigns it to the ProjectId field.
+// SetProjectId gets a reference to the given NullableString and assigns it to the ProjectId field.
 func (o *CheckOperationProjectProject) SetProjectId(v string) {
-	o.ProjectId = &v
+	o.ProjectId.Set(&v)
+}
+
+// SetProjectIdNil sets the value for ProjectId to be an explicit nil
+func (o *CheckOperationProjectProject) SetProjectIdNil() {
+	o.ProjectId.Set(nil)
+}
+
+// UnsetProjectId ensures that no value is present for ProjectId, not even an explicit nil
+func (o *CheckOperationProjectProject) UnsetProjectId() {
+	o.ProjectId.Unset()
 }
 
 func (o CheckOperationProjectProject) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["action"] = o.Action
-	if !IsNil(o.ProjectId) {
-		toSerialize["project-id"] = o.ProjectId
+	if o.ProjectId.IsSet() {
+		toSerialize["project-id"] = o.ProjectId.Get()
 	}
 	return toSerialize, nil
 }

@@ -89,8 +89,8 @@ func newRoleListCmd(opts *clientOptions, project *string) *cobra.Command {
 				if err := printRoles(cmd.OutOrStdout(), output, roles...); err != nil {
 					return err
 				}
-				if resp.NextPageToken != nil {
-					fmt.Fprintf(cmd.OutOrStdout(), "\nNext page token: %s\n", *resp.NextPageToken)
+				if resp.NextPageToken.Get() != nil {
+					fmt.Fprintf(cmd.OutOrStdout(), "\nNext page token: %s\n", *resp.NextPageToken.Get())
 				}
 				return nil
 			default:
@@ -446,8 +446,8 @@ func printRoles(w io.Writer, output string, roles ...managementv1.Role) error {
 			fmt.Fprintf(tw, "%s\t%s\t%s\t%s\t%s\t%s\n",
 				r.Id, r.Name, r.ProjectId,
 				r.CreatedAt.Format(time.RFC3339),
-				formatTimePtr(r.UpdatedAt),
-				formatStringPtr(r.Description))
+				formatTimePtr(r.UpdatedAt.Get()),
+				formatStringPtr(r.Description.Get()))
 		}
 	} else {
 		fmt.Fprintln(tw, "ID\tNAME\tPROJECT ID\tCREATED AT\tUPDATED AT")
@@ -456,7 +456,7 @@ func printRoles(w io.Writer, output string, roles ...managementv1.Role) error {
 			fmt.Fprintf(tw, "%s\t%s\t%s\t%s\t%s\n",
 				r.Id, r.Name, r.ProjectId,
 				r.CreatedAt.Format(time.RFC3339),
-				formatTimePtr(r.UpdatedAt))
+				formatTimePtr(r.UpdatedAt.Get()))
 		}
 	}
 	return tw.Flush()

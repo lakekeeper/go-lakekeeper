@@ -20,35 +20,39 @@ type WarehouseAction string
 
 // List of WarehouseAction
 const (
-	WarehouseActionCreateNamespace         WarehouseAction = "create_namespace"
-	WarehouseActionDelete                  WarehouseAction = "delete"
-	WarehouseActionModifyStorage           WarehouseAction = "modify_storage"
-	WarehouseActionModifyStorageCredential WarehouseAction = "modify_storage_credential"
-	WarehouseActionGetConfig               WarehouseAction = "get_config"
-	WarehouseActionGetMetadata             WarehouseAction = "get_metadata"
-	WarehouseActionListNamespaces          WarehouseAction = "list_namespaces"
-	WarehouseActionIncludeInList           WarehouseAction = "include_in_list"
-	WarehouseActionDeactivate              WarehouseAction = "deactivate"
-	WarehouseActionActivate                WarehouseAction = "activate"
-	WarehouseActionRename                  WarehouseAction = "rename"
-	WarehouseActionListDeletedTabulars     WarehouseAction = "list_deleted_tabulars"
-	WarehouseActionReadAssignments         WarehouseAction = "read_assignments"
-	WarehouseActionGrantCreate             WarehouseAction = "grant_create"
-	WarehouseActionGrantDescribe           WarehouseAction = "grant_describe"
-	WarehouseActionGrantModify             WarehouseAction = "grant_modify"
-	WarehouseActionGrantSelect             WarehouseAction = "grant_select"
-	WarehouseActionGrantPassGrants         WarehouseAction = "grant_pass_grants"
-	WarehouseActionGrantManageGrants       WarehouseAction = "grant_manage_grants"
-	WarehouseActionChangeOwnership         WarehouseAction = "change_ownership"
-	WarehouseActionGetAllTasks             WarehouseAction = "get_all_tasks"
-	WarehouseActionControlAllTasks         WarehouseAction = "control_all_tasks"
-	WarehouseActionSetProtection           WarehouseAction = "set_protection"
-	WarehouseActionGetEndpointStatistics   WarehouseAction = "get_endpoint_statistics"
+	WAREHOUSEACTION_CREATE_NAMESPACE          WarehouseAction = "create_namespace"
+	WAREHOUSEACTION_ACCEPT_MOVED_NAMESPACE    WarehouseAction = "accept_moved_namespace"
+	WAREHOUSEACTION_DELETE                    WarehouseAction = "delete"
+	WAREHOUSEACTION_MODIFY_STORAGE            WarehouseAction = "modify_storage"
+	WAREHOUSEACTION_MODIFY_STORAGE_CREDENTIAL WarehouseAction = "modify_storage_credential"
+	WAREHOUSEACTION_GET_CONFIG                WarehouseAction = "get_config"
+	WAREHOUSEACTION_GET_METADATA              WarehouseAction = "get_metadata"
+	WAREHOUSEACTION_LIST_NAMESPACES           WarehouseAction = "list_namespaces"
+	WAREHOUSEACTION_INCLUDE_IN_LIST           WarehouseAction = "include_in_list"
+	WAREHOUSEACTION_DEACTIVATE                WarehouseAction = "deactivate"
+	WAREHOUSEACTION_ACTIVATE                  WarehouseAction = "activate"
+	WAREHOUSEACTION_RENAME                    WarehouseAction = "rename"
+	WAREHOUSEACTION_LIST_DELETED_TABULARS     WarehouseAction = "list_deleted_tabulars"
+	WAREHOUSEACTION_READ_ASSIGNMENTS          WarehouseAction = "read_assignments"
+	WAREHOUSEACTION_GRANT_CREATE              WarehouseAction = "grant_create"
+	WAREHOUSEACTION_GRANT_DESCRIBE            WarehouseAction = "grant_describe"
+	WAREHOUSEACTION_GRANT_MODIFY              WarehouseAction = "grant_modify"
+	WAREHOUSEACTION_GRANT_SELECT              WarehouseAction = "grant_select"
+	WAREHOUSEACTION_GRANT_PASS_GRANTS         WarehouseAction = "grant_pass_grants"
+	WAREHOUSEACTION_GRANT_MANAGE_GRANTS       WarehouseAction = "grant_manage_grants"
+	WAREHOUSEACTION_GRANT_MANAGE_TAGS         WarehouseAction = "grant_manage_tags"
+	WAREHOUSEACTION_CHANGE_OWNERSHIP          WarehouseAction = "change_ownership"
+	WAREHOUSEACTION_GET_ALL_TASKS             WarehouseAction = "get_all_tasks"
+	WAREHOUSEACTION_CONTROL_ALL_TASKS         WarehouseAction = "control_all_tasks"
+	WAREHOUSEACTION_SET_PROTECTION            WarehouseAction = "set_protection"
+	WAREHOUSEACTION_SET_FORMAT_VERSION_POLICY WarehouseAction = "set_format_version_policy"
+	WAREHOUSEACTION_GET_ENDPOINT_STATISTICS   WarehouseAction = "get_endpoint_statistics"
 )
 
 // All allowed values of WarehouseAction enum
 var AllowedWarehouseActionEnumValues = []WarehouseAction{
 	"create_namespace",
+	"accept_moved_namespace",
 	"delete",
 	"modify_storage",
 	"modify_storage_credential",
@@ -67,10 +71,12 @@ var AllowedWarehouseActionEnumValues = []WarehouseAction{
 	"grant_select",
 	"grant_pass_grants",
 	"grant_manage_grants",
+	"grant_manage_tags",
 	"change_ownership",
 	"get_all_tasks",
 	"control_all_tasks",
 	"set_protection",
+	"set_format_version_policy",
 	"get_endpoint_statistics",
 }
 

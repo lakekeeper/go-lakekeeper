@@ -21,7 +21,7 @@ var _ MappedNullable = &GetLakekeeperRoleActionsResponse{}
 
 // GetLakekeeperRoleActionsResponse struct for GetLakekeeperRoleActionsResponse
 type GetLakekeeperRoleActionsResponse struct {
-	AllowedActions []LakekeeperRoleAction `json:"allowed-actions"`
+	AllowedActions []LakekeeperRoleActionKind `json:"allowed-actions"`
 }
 
 type _GetLakekeeperRoleActionsResponse GetLakekeeperRoleActionsResponse
@@ -30,7 +30,7 @@ type _GetLakekeeperRoleActionsResponse GetLakekeeperRoleActionsResponse
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewGetLakekeeperRoleActionsResponse(allowedActions []LakekeeperRoleAction) *GetLakekeeperRoleActionsResponse {
+func NewGetLakekeeperRoleActionsResponse(allowedActions []LakekeeperRoleActionKind) *GetLakekeeperRoleActionsResponse {
 	this := GetLakekeeperRoleActionsResponse{}
 	this.AllowedActions = allowedActions
 	return &this
@@ -45,9 +45,9 @@ func NewGetLakekeeperRoleActionsResponseWithDefaults() *GetLakekeeperRoleActions
 }
 
 // GetAllowedActions returns the AllowedActions field value
-func (o *GetLakekeeperRoleActionsResponse) GetAllowedActions() []LakekeeperRoleAction {
+func (o *GetLakekeeperRoleActionsResponse) GetAllowedActions() []LakekeeperRoleActionKind {
 	if o == nil {
-		var ret []LakekeeperRoleAction
+		var ret []LakekeeperRoleActionKind
 		return ret
 	}
 
@@ -56,7 +56,7 @@ func (o *GetLakekeeperRoleActionsResponse) GetAllowedActions() []LakekeeperRoleA
 
 // GetAllowedActionsOk returns a tuple with the AllowedActions field value
 // and a boolean to check if the value has been set.
-func (o *GetLakekeeperRoleActionsResponse) GetAllowedActionsOk() ([]LakekeeperRoleAction, bool) {
+func (o *GetLakekeeperRoleActionsResponse) GetAllowedActionsOk() ([]LakekeeperRoleActionKind, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -64,7 +64,7 @@ func (o *GetLakekeeperRoleActionsResponse) GetAllowedActionsOk() ([]LakekeeperRo
 }
 
 // SetAllowedActions sets field value
-func (o *GetLakekeeperRoleActionsResponse) SetAllowedActions(v []LakekeeperRoleAction) {
+func (o *GetLakekeeperRoleActionsResponse) SetAllowedActions(v []LakekeeperRoleActionKind) {
 	o.AllowedActions = v
 }
 

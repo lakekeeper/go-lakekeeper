@@ -11,101 +11,177 @@ API version: 0.0.0
 package managementv1
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 )
 
-// TableAssignmentOwnership - struct for TableAssignmentOwnership
+// checks if the TableAssignmentOwnership type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &TableAssignmentOwnership{}
+
+// TableAssignmentOwnership struct for TableAssignmentOwnership
 type TableAssignmentOwnership struct {
-	TableAssignmentOwnershipRole *TableAssignmentOwnershipRole
-	TableAssignmentOwnershipUser *TableAssignmentOwnershipUser
+	// Id of the role
+	Role *string `json:"role,omitempty"`
+	// Id of the user
+	User *string `json:"user,omitempty"`
+	Type string  `json:"type"`
 }
 
-// TableAssignmentOwnershipRoleAsTableAssignmentOwnership is a convenience function that returns TableAssignmentOwnershipRole wrapped in TableAssignmentOwnership
-func TableAssignmentOwnershipRoleAsTableAssignmentOwnership(v *TableAssignmentOwnershipRole) TableAssignmentOwnership {
-	return TableAssignmentOwnership{
-		TableAssignmentOwnershipRole: v,
+type _TableAssignmentOwnership TableAssignmentOwnership
+
+// NewTableAssignmentOwnership instantiates a new TableAssignmentOwnership object
+// This constructor will assign default values to properties that have it defined,
+// and makes sure properties required by API are set, but the set of arguments
+// will change when the set of required properties is changed
+func NewTableAssignmentOwnership(type_ string) *TableAssignmentOwnership {
+	this := TableAssignmentOwnership{}
+	this.Type = type_
+	return &this
+}
+
+// NewTableAssignmentOwnershipWithDefaults instantiates a new TableAssignmentOwnership object
+// This constructor will only assign default values to properties that have it defined,
+// but it doesn't guarantee that properties required by API are set
+func NewTableAssignmentOwnershipWithDefaults() *TableAssignmentOwnership {
+	this := TableAssignmentOwnership{}
+	return &this
+}
+
+// GetRole returns the Role field value if set, zero value otherwise.
+func (o *TableAssignmentOwnership) GetRole() string {
+	if o == nil || IsNil(o.Role) {
+		var ret string
+		return ret
 	}
+	return *o.Role
 }
 
-// TableAssignmentOwnershipUserAsTableAssignmentOwnership is a convenience function that returns TableAssignmentOwnershipUser wrapped in TableAssignmentOwnership
-func TableAssignmentOwnershipUserAsTableAssignmentOwnership(v *TableAssignmentOwnershipUser) TableAssignmentOwnership {
-	return TableAssignmentOwnership{
-		TableAssignmentOwnershipUser: v,
+// GetRoleOk returns a tuple with the Role field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TableAssignmentOwnership) GetRoleOk() (*string, bool) {
+	if o == nil || IsNil(o.Role) {
+		return nil, false
 	}
+	return o.Role, true
 }
 
-// Unmarshal JSON data into one of the pointers in the struct
-func (dst *TableAssignmentOwnership) UnmarshalJSON(data []byte) error {
-	var err error
-	match := 0
-	// try to unmarshal data into TableAssignmentOwnershipRole
-	err = json.Unmarshal(data, &dst.TableAssignmentOwnershipRole)
-	if err == nil {
-		jsonTableAssignmentOwnershipRole, _ := json.Marshal(dst.TableAssignmentOwnershipRole)
-		if string(jsonTableAssignmentOwnershipRole) == "{}" { // empty struct
-			dst.TableAssignmentOwnershipRole = nil
-		} else {
-			match++
+// HasRole returns a boolean if a field has been set.
+func (o *TableAssignmentOwnership) HasRole() bool {
+	if o != nil && !IsNil(o.Role) {
+		return true
+	}
+
+	return false
+}
+
+// SetRole gets a reference to the given string and assigns it to the Role field.
+func (o *TableAssignmentOwnership) SetRole(v string) {
+	o.Role = &v
+}
+
+// GetUser returns the User field value if set, zero value otherwise.
+func (o *TableAssignmentOwnership) GetUser() string {
+	if o == nil || IsNil(o.User) {
+		var ret string
+		return ret
+	}
+	return *o.User
+}
+
+// GetUserOk returns a tuple with the User field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TableAssignmentOwnership) GetUserOk() (*string, bool) {
+	if o == nil || IsNil(o.User) {
+		return nil, false
+	}
+	return o.User, true
+}
+
+// HasUser returns a boolean if a field has been set.
+func (o *TableAssignmentOwnership) HasUser() bool {
+	if o != nil && !IsNil(o.User) {
+		return true
+	}
+
+	return false
+}
+
+// SetUser gets a reference to the given string and assigns it to the User field.
+func (o *TableAssignmentOwnership) SetUser(v string) {
+	o.User = &v
+}
+
+// GetType returns the Type field value
+func (o *TableAssignmentOwnership) GetType() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.Type
+}
+
+// GetTypeOk returns a tuple with the Type field value
+// and a boolean to check if the value has been set.
+func (o *TableAssignmentOwnership) GetTypeOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Type, true
+}
+
+// SetType sets field value
+func (o *TableAssignmentOwnership) SetType(v string) {
+	o.Type = v
+}
+
+func (o TableAssignmentOwnership) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.Role) {
+		toSerialize["role"] = o.Role
+	}
+	if !IsNil(o.User) {
+		toSerialize["user"] = o.User
+	}
+	toSerialize["type"] = o.Type
+	return toSerialize, nil
+}
+
+func (o *TableAssignmentOwnership) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"type",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err
+	}
+
+	for _, requiredProperty := range requiredProperties {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
-	} else {
-		dst.TableAssignmentOwnershipRole = nil
 	}
 
-	// try to unmarshal data into TableAssignmentOwnershipUser
-	err = json.Unmarshal(data, &dst.TableAssignmentOwnershipUser)
-	if err == nil {
-		jsonTableAssignmentOwnershipUser, _ := json.Marshal(dst.TableAssignmentOwnershipUser)
-		if string(jsonTableAssignmentOwnershipUser) == "{}" { // empty struct
-			dst.TableAssignmentOwnershipUser = nil
-		} else {
-			match++
-		}
-	} else {
-		dst.TableAssignmentOwnershipUser = nil
+	varTableAssignmentOwnership := _TableAssignmentOwnership{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	err = decoder.Decode(&varTableAssignmentOwnership)
+
+	if err != nil {
+		return err
 	}
 
-	if match > 1 { // more than 1 match
-		// reset to nil
-		dst.TableAssignmentOwnershipRole = nil
-		dst.TableAssignmentOwnershipUser = nil
+	*o = TableAssignmentOwnership(varTableAssignmentOwnership)
 
-		return fmt.Errorf("data matches more than one schema in oneOf(TableAssignmentOwnership)")
-	} else if match == 1 {
-		return nil // exactly one match
-	} else { // no match
-		return fmt.Errorf("data failed to match schemas in oneOf(TableAssignmentOwnership)")
-	}
-}
-
-// Marshal data from the first non-nil pointers in the struct to JSON
-func (src TableAssignmentOwnership) MarshalJSON() ([]byte, error) {
-	if src.TableAssignmentOwnershipRole != nil {
-		return json.Marshal(&src.TableAssignmentOwnershipRole)
-	}
-
-	if src.TableAssignmentOwnershipUser != nil {
-		return json.Marshal(&src.TableAssignmentOwnershipUser)
-	}
-
-	return nil, nil // no data in oneOf schemas
-}
-
-// Get the actual instance
-func (obj *TableAssignmentOwnership) GetActualInstance() interface{} {
-	if obj == nil {
-		return nil
-	}
-	if obj.TableAssignmentOwnershipRole != nil {
-		return obj.TableAssignmentOwnershipRole
-	}
-
-	if obj.TableAssignmentOwnershipUser != nil {
-		return obj.TableAssignmentOwnershipUser
-	}
-
-	// all schemas are nil
-	return nil
+	return err
 }
 
 type NullableTableAssignmentOwnership struct {

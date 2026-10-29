@@ -17,21 +17,21 @@ import (
 
 // NamespaceIdentOrUuid - Identifier for a namespace, either a UUID or its name and warehouse ID
 type NamespaceIdentOrUuid struct {
-	NamespaceIdentOrUuidOneOf  *NamespaceIdentOrUuidOneOf
-	NamespaceIdentOrUuidOneOf1 *NamespaceIdentOrUuidOneOf1
+	NamespaceIdentOrUuidById   *NamespaceIdentOrUuidById
+	NamespaceIdentOrUuidByName *NamespaceIdentOrUuidByName
 }
 
-// NamespaceIdentOrUuidOneOfAsNamespaceIdentOrUuid is a convenience function that returns NamespaceIdentOrUuidOneOf wrapped in NamespaceIdentOrUuid
-func NamespaceIdentOrUuidOneOfAsNamespaceIdentOrUuid(v *NamespaceIdentOrUuidOneOf) NamespaceIdentOrUuid {
+// NamespaceIdentOrUuidByIdAsNamespaceIdentOrUuid is a convenience function that returns NamespaceIdentOrUuidById wrapped in NamespaceIdentOrUuid
+func NamespaceIdentOrUuidByIdAsNamespaceIdentOrUuid(v *NamespaceIdentOrUuidById) NamespaceIdentOrUuid {
 	return NamespaceIdentOrUuid{
-		NamespaceIdentOrUuidOneOf: v,
+		NamespaceIdentOrUuidById: v,
 	}
 }
 
-// NamespaceIdentOrUuidOneOf1AsNamespaceIdentOrUuid is a convenience function that returns NamespaceIdentOrUuidOneOf1 wrapped in NamespaceIdentOrUuid
-func NamespaceIdentOrUuidOneOf1AsNamespaceIdentOrUuid(v *NamespaceIdentOrUuidOneOf1) NamespaceIdentOrUuid {
+// NamespaceIdentOrUuidByNameAsNamespaceIdentOrUuid is a convenience function that returns NamespaceIdentOrUuidByName wrapped in NamespaceIdentOrUuid
+func NamespaceIdentOrUuidByNameAsNamespaceIdentOrUuid(v *NamespaceIdentOrUuidByName) NamespaceIdentOrUuid {
 	return NamespaceIdentOrUuid{
-		NamespaceIdentOrUuidOneOf1: v,
+		NamespaceIdentOrUuidByName: v,
 	}
 }
 
@@ -39,36 +39,36 @@ func NamespaceIdentOrUuidOneOf1AsNamespaceIdentOrUuid(v *NamespaceIdentOrUuidOne
 func (dst *NamespaceIdentOrUuid) UnmarshalJSON(data []byte) error {
 	var err error
 	match := 0
-	// try to unmarshal data into NamespaceIdentOrUuidOneOf
-	err = json.Unmarshal(data, &dst.NamespaceIdentOrUuidOneOf)
+	// try to unmarshal data into NamespaceIdentOrUuidById
+	err = json.Unmarshal(data, &dst.NamespaceIdentOrUuidById)
 	if err == nil {
-		jsonNamespaceIdentOrUuidOneOf, _ := json.Marshal(dst.NamespaceIdentOrUuidOneOf)
-		if string(jsonNamespaceIdentOrUuidOneOf) == "{}" { // empty struct
-			dst.NamespaceIdentOrUuidOneOf = nil
+		jsonNamespaceIdentOrUuidById, _ := json.Marshal(dst.NamespaceIdentOrUuidById)
+		if string(jsonNamespaceIdentOrUuidById) == "{}" { // empty struct
+			dst.NamespaceIdentOrUuidById = nil
 		} else {
 			match++
 		}
 	} else {
-		dst.NamespaceIdentOrUuidOneOf = nil
+		dst.NamespaceIdentOrUuidById = nil
 	}
 
-	// try to unmarshal data into NamespaceIdentOrUuidOneOf1
-	err = json.Unmarshal(data, &dst.NamespaceIdentOrUuidOneOf1)
+	// try to unmarshal data into NamespaceIdentOrUuidByName
+	err = json.Unmarshal(data, &dst.NamespaceIdentOrUuidByName)
 	if err == nil {
-		jsonNamespaceIdentOrUuidOneOf1, _ := json.Marshal(dst.NamespaceIdentOrUuidOneOf1)
-		if string(jsonNamespaceIdentOrUuidOneOf1) == "{}" { // empty struct
-			dst.NamespaceIdentOrUuidOneOf1 = nil
+		jsonNamespaceIdentOrUuidByName, _ := json.Marshal(dst.NamespaceIdentOrUuidByName)
+		if string(jsonNamespaceIdentOrUuidByName) == "{}" { // empty struct
+			dst.NamespaceIdentOrUuidByName = nil
 		} else {
 			match++
 		}
 	} else {
-		dst.NamespaceIdentOrUuidOneOf1 = nil
+		dst.NamespaceIdentOrUuidByName = nil
 	}
 
 	if match > 1 { // more than 1 match
 		// reset to nil
-		dst.NamespaceIdentOrUuidOneOf = nil
-		dst.NamespaceIdentOrUuidOneOf1 = nil
+		dst.NamespaceIdentOrUuidById = nil
+		dst.NamespaceIdentOrUuidByName = nil
 
 		return fmt.Errorf("data matches more than one schema in oneOf(NamespaceIdentOrUuid)")
 	} else if match == 1 {
@@ -80,12 +80,12 @@ func (dst *NamespaceIdentOrUuid) UnmarshalJSON(data []byte) error {
 
 // Marshal data from the first non-nil pointers in the struct to JSON
 func (src NamespaceIdentOrUuid) MarshalJSON() ([]byte, error) {
-	if src.NamespaceIdentOrUuidOneOf != nil {
-		return json.Marshal(&src.NamespaceIdentOrUuidOneOf)
+	if src.NamespaceIdentOrUuidById != nil {
+		return json.Marshal(&src.NamespaceIdentOrUuidById)
 	}
 
-	if src.NamespaceIdentOrUuidOneOf1 != nil {
-		return json.Marshal(&src.NamespaceIdentOrUuidOneOf1)
+	if src.NamespaceIdentOrUuidByName != nil {
+		return json.Marshal(&src.NamespaceIdentOrUuidByName)
 	}
 
 	return nil, nil // no data in oneOf schemas
@@ -96,12 +96,12 @@ func (obj *NamespaceIdentOrUuid) GetActualInstance() interface{} {
 	if obj == nil {
 		return nil
 	}
-	if obj.NamespaceIdentOrUuidOneOf != nil {
-		return obj.NamespaceIdentOrUuidOneOf
+	if obj.NamespaceIdentOrUuidById != nil {
+		return obj.NamespaceIdentOrUuidById
 	}
 
-	if obj.NamespaceIdentOrUuidOneOf1 != nil {
-		return obj.NamespaceIdentOrUuidOneOf1
+	if obj.NamespaceIdentOrUuidByName != nil {
+		return obj.NamespaceIdentOrUuidByName
 	}
 
 	// all schemas are nil

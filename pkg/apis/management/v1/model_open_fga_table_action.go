@@ -20,13 +20,14 @@ type OpenFGATableAction string
 
 // List of OpenFGATableAction
 const (
-	OpenFGATableActionReadAssignments   OpenFGATableAction = "read_assignments"
-	OpenFGATableActionGrantPassGrants   OpenFGATableAction = "grant_pass_grants"
-	OpenFGATableActionGrantManageGrants OpenFGATableAction = "grant_manage_grants"
-	OpenFGATableActionGrantDescribe     OpenFGATableAction = "grant_describe"
-	OpenFGATableActionGrantSelect       OpenFGATableAction = "grant_select"
-	OpenFGATableActionGrantModify       OpenFGATableAction = "grant_modify"
-	OpenFGATableActionChangeOwnership   OpenFGATableAction = "change_ownership"
+	OPENFGATABLEACTION_READ_ASSIGNMENTS    OpenFGATableAction = "read_assignments"
+	OPENFGATABLEACTION_GRANT_PASS_GRANTS   OpenFGATableAction = "grant_pass_grants"
+	OPENFGATABLEACTION_GRANT_MANAGE_GRANTS OpenFGATableAction = "grant_manage_grants"
+	OPENFGATABLEACTION_GRANT_MANAGE_TAGS   OpenFGATableAction = "grant_manage_tags"
+	OPENFGATABLEACTION_GRANT_DESCRIBE      OpenFGATableAction = "grant_describe"
+	OPENFGATABLEACTION_GRANT_SELECT        OpenFGATableAction = "grant_select"
+	OPENFGATABLEACTION_GRANT_MODIFY        OpenFGATableAction = "grant_modify"
+	OPENFGATABLEACTION_CHANGE_OWNERSHIP    OpenFGATableAction = "change_ownership"
 )
 
 // All allowed values of OpenFGATableAction enum
@@ -34,6 +35,7 @@ var AllowedOpenFGATableActionEnumValues = []OpenFGATableAction{
 	"read_assignments",
 	"grant_pass_grants",
 	"grant_manage_grants",
+	"grant_manage_tags",
 	"grant_describe",
 	"grant_select",
 	"grant_modify",
