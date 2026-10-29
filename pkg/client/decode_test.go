@@ -46,7 +46,7 @@ func TestGetWarehouseResponse_ToleratesUnknownField(t *testing.T) {
 
 	// The known fields still decode correctly alongside the unknown one.
 	assert.Equal(t, "test-wh", wh.Name)
-	assert.Equal(t, managementv1.WarehouseStatusActive, wh.Status)
+	assert.Equal(t, managementv1.WAREHOUSESTATUS_ACTIVE, wh.Status)
 	require.NotNil(t, wh.StorageProfile.StorageProfileS3)
 	assert.Equal(t, "testacc", wh.StorageProfile.StorageProfileS3.Bucket)
 }

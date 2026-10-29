@@ -16,9 +16,9 @@ func TestBuildAssignmentServerAdminUser(t *testing.T) {
 	require.NoError(t, err)
 
 	require.NotNil(t, got.ServerAssignmentAdmin)
-	require.NotNil(t, got.ServerAssignmentAdmin.ServerAssignmentAdminUser)
-	assert.Equal(t, "alice", got.ServerAssignmentAdmin.ServerAssignmentAdminUser.User)
-	assert.Equal(t, "admin", got.ServerAssignmentAdmin.ServerAssignmentAdminUser.Type)
+	assert.Equal(t, "alice", got.ServerAssignmentAdmin.GetUser())
+	assert.Nil(t, got.ServerAssignmentAdmin.Role)
+	assert.Equal(t, "admin", got.ServerAssignmentAdmin.Type)
 }
 
 func TestBuildAssignmentServerOperatorRole(t *testing.T) {
@@ -28,9 +28,9 @@ func TestBuildAssignmentServerOperatorRole(t *testing.T) {
 	require.NoError(t, err)
 
 	require.NotNil(t, got.ServerAssignmentOperator)
-	require.NotNil(t, got.ServerAssignmentOperator.ServerAssignmentOperatorRole)
-	assert.Equal(t, "role-id", got.ServerAssignmentOperator.ServerAssignmentOperatorRole.Role)
-	assert.Equal(t, "operator", got.ServerAssignmentOperator.ServerAssignmentOperatorRole.Type)
+	assert.Equal(t, "role-id", got.ServerAssignmentOperator.GetRole())
+	assert.Nil(t, got.ServerAssignmentOperator.User)
+	assert.Equal(t, "operator", got.ServerAssignmentOperator.Type)
 }
 
 func TestBuildAssignmentProjectSelectUser(t *testing.T) {
@@ -40,9 +40,9 @@ func TestBuildAssignmentProjectSelectUser(t *testing.T) {
 	require.NoError(t, err)
 
 	require.NotNil(t, got.ProjectAssignmentSelect)
-	require.NotNil(t, got.ProjectAssignmentSelect.ProjectAssignmentSelectUser)
-	assert.Equal(t, "alice", got.ProjectAssignmentSelect.ProjectAssignmentSelectUser.User)
-	assert.Equal(t, "select", got.ProjectAssignmentSelect.ProjectAssignmentSelectUser.Type)
+	assert.Equal(t, "alice", got.ProjectAssignmentSelect.GetUser())
+	assert.Nil(t, got.ProjectAssignmentSelect.Role)
+	assert.Equal(t, "select", got.ProjectAssignmentSelect.Type)
 }
 
 func TestBuildAssignmentMissingFields(t *testing.T) {
@@ -82,9 +82,8 @@ func TestBuildAssignmentRejectsUnknownRelation(t *testing.T) {
 func TestDescribeAssignmentUser(t *testing.T) {
 	t.Parallel()
 
-	a := managementv1.ServerAssignmentAdminAsServerAssignment(&managementv1.ServerAssignmentAdmin{
-		ServerAssignmentAdminUser: managementv1.NewServerAssignmentAdminUser("alice", "admin"),
-	})
+	a := managementv1.ServerAssignmentAdminAsServerAssignment(
+		withUser(managementv1.NewServerAssignmentAdmin("admin"), "alice"))
 
 	got, ok := DescribeAssignment(a)
 	require.True(t, ok)
@@ -96,9 +95,8 @@ func TestDescribeAssignmentUser(t *testing.T) {
 func TestDescribeAssignmentRole(t *testing.T) {
 	t.Parallel()
 
-	a := managementv1.ServerAssignmentOperatorAsServerAssignment(&managementv1.ServerAssignmentOperator{
-		ServerAssignmentOperatorRole: managementv1.NewServerAssignmentOperatorRole("role-id", "operator"),
-	})
+	a := managementv1.ServerAssignmentOperatorAsServerAssignment(
+		withRole(managementv1.NewServerAssignmentOperator("operator"), "role-id"))
 
 	got, ok := DescribeAssignment(a)
 	require.True(t, ok)

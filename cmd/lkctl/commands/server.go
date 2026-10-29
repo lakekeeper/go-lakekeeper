@@ -307,7 +307,7 @@ func printServerInfo(w io.Writer, info *managementv1.ServerInfo) error {
 	fmt.Fprintf(w, "ID: %s\n", info.ServerId)
 	fmt.Fprintf(w, "Version: %s\n", info.Version)
 	fmt.Fprintf(w, "Lakekeeper Version: %s\n", info.GetLakekeeperVersion())
-	fmt.Fprintf(w, "Default Project ID: %s\n", formatStringPtr(info.DefaultProjectId))
+	fmt.Fprintf(w, "Default Project ID: %s\n", formatStringPtr(info.DefaultProjectId.Get()))
 	fmt.Fprintf(w, "Bootstrapped: %t\n", info.Bootstrapped)
 	fmt.Fprintf(w, "Authorization Backend: %s\n", info.AuthzBackend)
 	fmt.Fprintf(w, "AWS System Identities Enabled: %t\n", info.AwsSystemIdentitiesEnabled)

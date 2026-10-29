@@ -50,7 +50,7 @@ func (u *Users) Update(ctx context.Context, userID string, req *managementv1.Upd
 }
 
 // Whoami returns the calling principal's user record.
-func (u *Users) Whoami(ctx context.Context) (*managementv1.User, error) {
+func (u *Users) Whoami(ctx context.Context) (*managementv1.WhoamiResponse, error) {
 	out, _, err := u.api.Whoami(ctx).Execute()
 	return out, wrapAPIError("whoami", err)
 }

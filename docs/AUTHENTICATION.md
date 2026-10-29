@@ -203,7 +203,7 @@ c, err := client.NewWithAuthSource(ctx, baseURL, as,
     client.WithInitialBootstrap(
         true,                                       // acceptTermsOfUse
         true,                                       // isOperator
-        core.Ptr(managementv1.UserTypeApplication), // userType (optional)
+        core.Ptr(managementv1.USERTYPE_APPLICATION), // userType (optional)
     ),
 )
 ```

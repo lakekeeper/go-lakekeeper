@@ -437,13 +437,13 @@ to keep them resource-generic, but the spec exports a typed enum per
 resource: `managementv1.WarehouseRelation`, `ProjectRelation`,
 `RoleRelation`, `ServerRelation`, `NamespaceRelation`, `TableRelation`,
 `ViewRelation`. Their constants
-(`managementv1.WarehouseRelationOwnership`,
-`managementv1.ProjectRelationDescribe`, …) are typed strings that pass
+(`managementv1.WAREHOUSERELATION_OWNERSHIP`,
+`managementv1.PROJECTRELATION_DESCRIBE`, …) are typed strings that pass
 straight in via conversion:
 
 ```go
 writes, err := permissions.BuildAssignmentSet[managementv1.WarehouseAssignment](
-    []string{string(managementv1.WarehouseRelationOwnership)},
+    []string{string(managementv1.WAREHOUSERELATION_OWNERSHIP)},
     permissions.PrincipalSet{Users: []string{userID}},
 )
 ```

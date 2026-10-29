@@ -32,9 +32,9 @@ func TestPrintAssignmentsDroppedWarning(t *testing.T) {
 func TestPrintAssignmentsTable(t *testing.T) {
 	t.Parallel()
 
-	a := managementv1.ServerAssignmentAdminAsServerAssignment(&managementv1.ServerAssignmentAdmin{
-		ServerAssignmentAdminUser: managementv1.NewServerAssignmentAdminUser("alice", "admin"),
-	})
+	admin := managementv1.NewServerAssignmentAdmin("admin")
+	admin.SetUser("alice")
+	a := managementv1.ServerAssignmentAdminAsServerAssignment(admin)
 
 	var buf bytes.Buffer
 	require.NoError(t, printAssignments(&buf, a))

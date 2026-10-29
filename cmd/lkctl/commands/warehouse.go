@@ -166,9 +166,9 @@ func newWarehouseCreateCmd(opts *clientOptions, project *string) *cobra.Command 
 			if err != nil {
 				return err
 			}
-			if req.ProjectId == nil {
+			if req.ProjectId.Get() == nil {
 				req.SetProjectId(*project)
-			} else if *req.ProjectId != *project {
+			} else if *req.ProjectId.Get() != *project {
 				return errors.New("project id in config does not match --project")
 			}
 			wh, _, err := c.WarehouseAPI.CreateWarehouse(ctx).CreateWarehouseRequest(req).Execute()
@@ -336,8 +336,8 @@ func newWarehouseStatisticsCmd(opts *clientOptions) *cobra.Command {
 				if err := printWarehouseStatistics(cmd.OutOrStdout(), resp.Stats...); err != nil {
 					return err
 				}
-				if resp.NextPageToken != nil {
-					fmt.Fprintf(cmd.OutOrStdout(), "\nNext page token: %s\n", *resp.NextPageToken)
+				if resp.NextPageToken.Get() != nil {
+					fmt.Fprintf(cmd.OutOrStdout(), "\nNext page token: %s\n", *resp.NextPageToken.Get())
 				}
 				return nil
 			default:
