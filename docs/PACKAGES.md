@@ -113,10 +113,9 @@ What it re-exports:
 What it does **not** re-export:
 - The full ~189-schema Management API surface. Reach for `managementv1`
   when you need a less-common type.
-- Generated enum constants. Use `managementv1.<EnumValue>` directly; the
-  preprocessor produces idiomatic Go names there
-  (`managementv1.WarehouseStatusActive`, `managementv1.S3FlavorAws`),
-  so an alias would only add a second name for the same value.
+- Generated enum constants. Use `managementv1.<ENUM>_<VALUE>` directly
+  (`managementv1.WAREHOUSESTATUS_ACTIVE`, `managementv1.S3FLAVOR_AWS`);
+  an alias would only add a second name for the same value.
 
 The umbrella is a thin file (~150 LoC) that runs `go vet` clean and
 provides no behaviour of its own — every symbol resolves through
@@ -533,7 +532,7 @@ Wire-format round-trip tests for the generated assignment models. Lives
 **outside** `pkg/apis/management/v1/` so test fixtures don't bleed into the
 generated package (which is rebuilt wholesale by `make generate`).
 
-When the OpenAPI preprocessor changes shape, the tests in here are the
+When the spec or the generator config changes shape, the tests in here are the
 fastest signal that something has broken.
 
 ---

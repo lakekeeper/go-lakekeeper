@@ -17,9 +17,11 @@ import (
 
 // StorageProfile - Storage profile for a warehouse.
 type StorageProfile struct {
-	StorageProfileAdls *StorageProfileAdls
-	StorageProfileGcs  *StorageProfileGcs
-	StorageProfileS3   *StorageProfileS3
+	StorageProfileAdls    *StorageProfileAdls
+	StorageProfileGcs     *StorageProfileGcs
+	StorageProfileOneLake *StorageProfileOneLake
+	StorageProfileS3      *StorageProfileS3
+	StorageProfileStackit *StorageProfileStackit
 }
 
 // StorageProfileAdlsAsStorageProfile is a convenience function that returns StorageProfileAdls wrapped in StorageProfile
@@ -36,10 +38,24 @@ func StorageProfileGcsAsStorageProfile(v *StorageProfileGcs) StorageProfile {
 	}
 }
 
+// StorageProfileOneLakeAsStorageProfile is a convenience function that returns StorageProfileOneLake wrapped in StorageProfile
+func StorageProfileOneLakeAsStorageProfile(v *StorageProfileOneLake) StorageProfile {
+	return StorageProfile{
+		StorageProfileOneLake: v,
+	}
+}
+
 // StorageProfileS3AsStorageProfile is a convenience function that returns StorageProfileS3 wrapped in StorageProfile
 func StorageProfileS3AsStorageProfile(v *StorageProfileS3) StorageProfile {
 	return StorageProfile{
 		StorageProfileS3: v,
+	}
+}
+
+// StorageProfileStackitAsStorageProfile is a convenience function that returns StorageProfileStackit wrapped in StorageProfile
+func StorageProfileStackitAsStorageProfile(v *StorageProfileStackit) StorageProfile {
+	return StorageProfile{
+		StorageProfileStackit: v,
 	}
 }
 
@@ -77,6 +93,18 @@ func (dst *StorageProfile) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	// check if the discriminator value is 'onelake'
+	if jsonDict["type"] == "onelake" {
+		// try to unmarshal JSON data into StorageProfileOneLake
+		err = json.Unmarshal(data, &dst.StorageProfileOneLake)
+		if err == nil {
+			return nil // data stored in dst.StorageProfileOneLake, return on the first match
+		} else {
+			dst.StorageProfileOneLake = nil
+			return fmt.Errorf("failed to unmarshal StorageProfile as StorageProfileOneLake: %s", err.Error())
+		}
+	}
+
 	// check if the discriminator value is 's3'
 	if jsonDict["type"] == "s3" {
 		// try to unmarshal JSON data into StorageProfileS3
@@ -86,6 +114,18 @@ func (dst *StorageProfile) UnmarshalJSON(data []byte) error {
 		} else {
 			dst.StorageProfileS3 = nil
 			return fmt.Errorf("failed to unmarshal StorageProfile as StorageProfileS3: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'stackit'
+	if jsonDict["type"] == "stackit" {
+		// try to unmarshal JSON data into StorageProfileStackit
+		err = json.Unmarshal(data, &dst.StorageProfileStackit)
+		if err == nil {
+			return nil // data stored in dst.StorageProfileStackit, return on the first match
+		} else {
+			dst.StorageProfileStackit = nil
+			return fmt.Errorf("failed to unmarshal StorageProfile as StorageProfileStackit: %s", err.Error())
 		}
 	}
 
@@ -113,6 +153,18 @@ func (dst *StorageProfile) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	// check if the discriminator value is 'StorageProfileOneLake'
+	if jsonDict["type"] == "StorageProfileOneLake" {
+		// try to unmarshal JSON data into StorageProfileOneLake
+		err = json.Unmarshal(data, &dst.StorageProfileOneLake)
+		if err == nil {
+			return nil // data stored in dst.StorageProfileOneLake, return on the first match
+		} else {
+			dst.StorageProfileOneLake = nil
+			return fmt.Errorf("failed to unmarshal StorageProfile as StorageProfileOneLake: %s", err.Error())
+		}
+	}
+
 	// check if the discriminator value is 'StorageProfileS3'
 	if jsonDict["type"] == "StorageProfileS3" {
 		// try to unmarshal JSON data into StorageProfileS3
@@ -122,6 +174,18 @@ func (dst *StorageProfile) UnmarshalJSON(data []byte) error {
 		} else {
 			dst.StorageProfileS3 = nil
 			return fmt.Errorf("failed to unmarshal StorageProfile as StorageProfileS3: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'StorageProfileStackit'
+	if jsonDict["type"] == "StorageProfileStackit" {
+		// try to unmarshal JSON data into StorageProfileStackit
+		err = json.Unmarshal(data, &dst.StorageProfileStackit)
+		if err == nil {
+			return nil // data stored in dst.StorageProfileStackit, return on the first match
+		} else {
+			dst.StorageProfileStackit = nil
+			return fmt.Errorf("failed to unmarshal StorageProfile as StorageProfileStackit: %s", err.Error())
 		}
 	}
 
@@ -138,8 +202,16 @@ func (src StorageProfile) MarshalJSON() ([]byte, error) {
 		return json.Marshal(&src.StorageProfileGcs)
 	}
 
+	if src.StorageProfileOneLake != nil {
+		return json.Marshal(&src.StorageProfileOneLake)
+	}
+
 	if src.StorageProfileS3 != nil {
 		return json.Marshal(&src.StorageProfileS3)
+	}
+
+	if src.StorageProfileStackit != nil {
+		return json.Marshal(&src.StorageProfileStackit)
 	}
 
 	return nil, nil // no data in oneOf schemas
@@ -158,8 +230,16 @@ func (obj *StorageProfile) GetActualInstance() interface{} {
 		return obj.StorageProfileGcs
 	}
 
+	if obj.StorageProfileOneLake != nil {
+		return obj.StorageProfileOneLake
+	}
+
 	if obj.StorageProfileS3 != nil {
 		return obj.StorageProfileS3
+	}
+
+	if obj.StorageProfileStackit != nil {
+		return obj.StorageProfileStackit
 	}
 
 	// all schemas are nil

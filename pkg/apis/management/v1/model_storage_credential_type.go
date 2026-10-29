@@ -17,9 +17,10 @@ import (
 
 // StorageCredentialType - The type of storage credential configured for a warehouse, without secret values.  This is returned in API responses so clients know which credential type was selected (e.g. to restore radio button state in the UI).
 type StorageCredentialType struct {
-	StorageCredentialTypeAz  *StorageCredentialTypeAz
-	StorageCredentialTypeGcs *StorageCredentialTypeGcs
-	StorageCredentialTypeS3  *StorageCredentialTypeS3
+	StorageCredentialTypeAz      *StorageCredentialTypeAz
+	StorageCredentialTypeGcs     *StorageCredentialTypeGcs
+	StorageCredentialTypeS3      *StorageCredentialTypeS3
+	StorageCredentialTypeStackit *StorageCredentialTypeStackit
 }
 
 // StorageCredentialTypeAzAsStorageCredentialType is a convenience function that returns StorageCredentialTypeAz wrapped in StorageCredentialType
@@ -40,6 +41,13 @@ func StorageCredentialTypeGcsAsStorageCredentialType(v *StorageCredentialTypeGcs
 func StorageCredentialTypeS3AsStorageCredentialType(v *StorageCredentialTypeS3) StorageCredentialType {
 	return StorageCredentialType{
 		StorageCredentialTypeS3: v,
+	}
+}
+
+// StorageCredentialTypeStackitAsStorageCredentialType is a convenience function that returns StorageCredentialTypeStackit wrapped in StorageCredentialType
+func StorageCredentialTypeStackitAsStorageCredentialType(v *StorageCredentialTypeStackit) StorageCredentialType {
+	return StorageCredentialType{
+		StorageCredentialTypeStackit: v,
 	}
 }
 
@@ -89,6 +97,18 @@ func (dst *StorageCredentialType) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	// check if the discriminator value is 'stackit'
+	if jsonDict["type"] == "stackit" {
+		// try to unmarshal JSON data into StorageCredentialTypeStackit
+		err = json.Unmarshal(data, &dst.StorageCredentialTypeStackit)
+		if err == nil {
+			return nil // data stored in dst.StorageCredentialTypeStackit, return on the first match
+		} else {
+			dst.StorageCredentialTypeStackit = nil
+			return fmt.Errorf("failed to unmarshal StorageCredentialType as StorageCredentialTypeStackit: %s", err.Error())
+		}
+	}
+
 	// check if the discriminator value is 'StorageCredentialTypeAz'
 	if jsonDict["type"] == "StorageCredentialTypeAz" {
 		// try to unmarshal JSON data into StorageCredentialTypeAz
@@ -125,6 +145,18 @@ func (dst *StorageCredentialType) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	// check if the discriminator value is 'StorageCredentialTypeStackit'
+	if jsonDict["type"] == "StorageCredentialTypeStackit" {
+		// try to unmarshal JSON data into StorageCredentialTypeStackit
+		err = json.Unmarshal(data, &dst.StorageCredentialTypeStackit)
+		if err == nil {
+			return nil // data stored in dst.StorageCredentialTypeStackit, return on the first match
+		} else {
+			dst.StorageCredentialTypeStackit = nil
+			return fmt.Errorf("failed to unmarshal StorageCredentialType as StorageCredentialTypeStackit: %s", err.Error())
+		}
+	}
+
 	return nil
 }
 
@@ -140,6 +172,10 @@ func (src StorageCredentialType) MarshalJSON() ([]byte, error) {
 
 	if src.StorageCredentialTypeS3 != nil {
 		return json.Marshal(&src.StorageCredentialTypeS3)
+	}
+
+	if src.StorageCredentialTypeStackit != nil {
+		return json.Marshal(&src.StorageCredentialTypeStackit)
 	}
 
 	return nil, nil // no data in oneOf schemas
@@ -160,6 +196,10 @@ func (obj *StorageCredentialType) GetActualInstance() interface{} {
 
 	if obj.StorageCredentialTypeS3 != nil {
 		return obj.StorageCredentialTypeS3
+	}
+
+	if obj.StorageCredentialTypeStackit != nil {
+		return obj.StorageCredentialTypeStackit
 	}
 
 	// all schemas are nil

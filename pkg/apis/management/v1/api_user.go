@@ -633,6 +633,306 @@ func (a *UserAPIService) ListUserExecute(r ApiListUserRequest) (*ListUsersRespon
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+type ApiListUserRolesRequest struct {
+	ctx        context.Context
+	ApiService *UserAPIService
+	userId     string
+	pageToken  *string
+	pageSize   *int64
+	xProjectId *string
+}
+
+func (r ApiListUserRolesRequest) PageToken(pageToken string) ApiListUserRolesRequest {
+	r.pageToken = &pageToken
+	return r
+}
+
+// Upper bound on the number of results returned. Default: 100.
+func (r ApiListUserRolesRequest) PageSize(pageSize int64) ApiListUserRolesRequest {
+	r.pageSize = &pageSize
+	return r
+}
+
+// Project ID (optional; falls back to the default project if not provided)
+func (r ApiListUserRolesRequest) XProjectId(xProjectId string) ApiListUserRolesRequest {
+	r.xProjectId = &xProjectId
+	return r
+}
+
+func (r ApiListUserRolesRequest) Execute() (*ListRoleMembershipsResponse, *http.Response, error) {
+	return r.ApiService.ListUserRolesExecute(r)
+}
+
+/*
+ListUserRoles List User Roles
+
+Lists the roles a user is directly assigned to, keyset-paginated.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param userId User ID
+	@return ApiListUserRolesRequest
+*/
+func (a *UserAPIService) ListUserRoles(ctx context.Context, userId string) ApiListUserRolesRequest {
+	return ApiListUserRolesRequest{
+		ApiService: a,
+		ctx:        ctx,
+		userId:     userId,
+	}
+}
+
+// Execute executes the request
+//
+//	@return ListRoleMembershipsResponse
+func (a *UserAPIService) ListUserRolesExecute(r ApiListUserRolesRequest) (*ListRoleMembershipsResponse, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *ListRoleMembershipsResponse
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "UserAPIService.ListUserRoles")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/management/v1/user/{user_id}/roles"
+	localVarPath = strings.Replace(localVarPath, "{"+"user_id"+"}", url.PathEscape(parameterValueToString(r.userId, "userId")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if r.pageToken != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "pageToken", r.pageToken, "form", "")
+	}
+	if r.pageSize != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "pageSize", r.pageSize, "form", "")
+	}
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	if r.xProjectId != nil {
+		parameterAddToHeaderOrQuery(localVarHeaderParams, "x-project-id", r.xProjectId, "simple", "")
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode >= 400 && localVarHTTPResponse.StatusCode < 500 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiListUserTransitiveRolesRequest struct {
+	ctx        context.Context
+	ApiService *UserAPIService
+	userId     string
+	pageToken  *string
+	pageSize   *int64
+	xProjectId *string
+}
+
+func (r ApiListUserTransitiveRolesRequest) PageToken(pageToken string) ApiListUserTransitiveRolesRequest {
+	r.pageToken = &pageToken
+	return r
+}
+
+// Upper bound on the number of results returned. Default: 100.
+func (r ApiListUserTransitiveRolesRequest) PageSize(pageSize int64) ApiListUserTransitiveRolesRequest {
+	r.pageSize = &pageSize
+	return r
+}
+
+// Project ID (optional; falls back to the default project if not provided)
+func (r ApiListUserTransitiveRolesRequest) XProjectId(xProjectId string) ApiListUserTransitiveRolesRequest {
+	r.xProjectId = &xProjectId
+	return r
+}
+
+func (r ApiListUserTransitiveRolesRequest) Execute() (*ListRoleMembershipsResponse, *http.Response, error) {
+	return r.ApiService.ListUserTransitiveRolesExecute(r)
+}
+
+/*
+ListUserTransitiveRoles List Transitive User Roles
+
+Lists the full effective (transitive) role set a user holds — direct
+assignments plus every role reachable upward through membership — keyset-
+paginated. Supported only when assignments are catalog-managed; an
+assignment-managing authorizer (e.g. OpenFGA) returns `501`.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param userId User ID
+	@return ApiListUserTransitiveRolesRequest
+*/
+func (a *UserAPIService) ListUserTransitiveRoles(ctx context.Context, userId string) ApiListUserTransitiveRolesRequest {
+	return ApiListUserTransitiveRolesRequest{
+		ApiService: a,
+		ctx:        ctx,
+		userId:     userId,
+	}
+}
+
+// Execute executes the request
+//
+//	@return ListRoleMembershipsResponse
+func (a *UserAPIService) ListUserTransitiveRolesExecute(r ApiListUserTransitiveRolesRequest) (*ListRoleMembershipsResponse, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *ListRoleMembershipsResponse
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "UserAPIService.ListUserTransitiveRoles")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/management/v1/user/{user_id}/roles/transitive"
+	localVarPath = strings.Replace(localVarPath, "{"+"user_id"+"}", url.PathEscape(parameterValueToString(r.userId, "userId")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if r.pageToken != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "pageToken", r.pageToken, "form", "")
+	}
+	if r.pageSize != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "pageSize", r.pageSize, "form", "")
+	}
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	if r.xProjectId != nil {
+		parameterAddToHeaderOrQuery(localVarHeaderParams, "x-project-id", r.xProjectId, "simple", "")
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 501 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode >= 400 && localVarHTTPResponse.StatusCode < 500 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 type ApiSearchUserRequest struct {
 	ctx               context.Context
 	ApiService        *UserAPIService
@@ -873,7 +1173,7 @@ type ApiWhoamiRequest struct {
 	ApiService *UserAPIService
 }
 
-func (r ApiWhoamiRequest) Execute() (*User, *http.Response, error) {
+func (r ApiWhoamiRequest) Execute() (*WhoamiResponse, *http.Response, error) {
 	return r.ApiService.WhoamiExecute(r)
 }
 
@@ -894,13 +1194,13 @@ func (a *UserAPIService) Whoami(ctx context.Context) ApiWhoamiRequest {
 
 // Execute executes the request
 //
-//	@return User
-func (a *UserAPIService) WhoamiExecute(r ApiWhoamiRequest) (*User, *http.Response, error) {
+//	@return WhoamiResponse
+func (a *UserAPIService) WhoamiExecute(r ApiWhoamiRequest) (*WhoamiResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
 		formFiles           []formFile
-		localVarReturnValue *User
+		localVarReturnValue *WhoamiResponse
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "UserAPIService.Whoami")

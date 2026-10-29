@@ -20,6 +20,7 @@ type WarehouseAssignment struct {
 	WarehouseAssignmentCreate       *WarehouseAssignmentCreate
 	WarehouseAssignmentDescribe     *WarehouseAssignmentDescribe
 	WarehouseAssignmentManageGrants *WarehouseAssignmentManageGrants
+	WarehouseAssignmentManageTags   *WarehouseAssignmentManageTags
 	WarehouseAssignmentModify       *WarehouseAssignmentModify
 	WarehouseAssignmentOwnership    *WarehouseAssignmentOwnership
 	WarehouseAssignmentPassGrants   *WarehouseAssignmentPassGrants
@@ -44,6 +45,13 @@ func WarehouseAssignmentDescribeAsWarehouseAssignment(v *WarehouseAssignmentDesc
 func WarehouseAssignmentManageGrantsAsWarehouseAssignment(v *WarehouseAssignmentManageGrants) WarehouseAssignment {
 	return WarehouseAssignment{
 		WarehouseAssignmentManageGrants: v,
+	}
+}
+
+// WarehouseAssignmentManageTagsAsWarehouseAssignment is a convenience function that returns WarehouseAssignmentManageTags wrapped in WarehouseAssignment
+func WarehouseAssignmentManageTagsAsWarehouseAssignment(v *WarehouseAssignmentManageTags) WarehouseAssignment {
+	return WarehouseAssignment{
+		WarehouseAssignmentManageTags: v,
 	}
 }
 
@@ -118,6 +126,18 @@ func (dst *WarehouseAssignment) UnmarshalJSON(data []byte) error {
 		} else {
 			dst.WarehouseAssignmentManageGrants = nil
 			return fmt.Errorf("failed to unmarshal WarehouseAssignment as WarehouseAssignmentManageGrants: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'manage_tags'
+	if jsonDict["type"] == "manage_tags" {
+		// try to unmarshal JSON data into WarehouseAssignmentManageTags
+		err = json.Unmarshal(data, &dst.WarehouseAssignmentManageTags)
+		if err == nil {
+			return nil // data stored in dst.WarehouseAssignmentManageTags, return on the first match
+		} else {
+			dst.WarehouseAssignmentManageTags = nil
+			return fmt.Errorf("failed to unmarshal WarehouseAssignment as WarehouseAssignmentManageTags: %s", err.Error())
 		}
 	}
 
@@ -205,6 +225,18 @@ func (dst *WarehouseAssignment) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	// check if the discriminator value is 'WarehouseAssignmentManageTags'
+	if jsonDict["type"] == "WarehouseAssignmentManageTags" {
+		// try to unmarshal JSON data into WarehouseAssignmentManageTags
+		err = json.Unmarshal(data, &dst.WarehouseAssignmentManageTags)
+		if err == nil {
+			return nil // data stored in dst.WarehouseAssignmentManageTags, return on the first match
+		} else {
+			dst.WarehouseAssignmentManageTags = nil
+			return fmt.Errorf("failed to unmarshal WarehouseAssignment as WarehouseAssignmentManageTags: %s", err.Error())
+		}
+	}
+
 	// check if the discriminator value is 'WarehouseAssignmentModify'
 	if jsonDict["type"] == "WarehouseAssignmentModify" {
 		// try to unmarshal JSON data into WarehouseAssignmentModify
@@ -270,6 +302,10 @@ func (src WarehouseAssignment) MarshalJSON() ([]byte, error) {
 		return json.Marshal(&src.WarehouseAssignmentManageGrants)
 	}
 
+	if src.WarehouseAssignmentManageTags != nil {
+		return json.Marshal(&src.WarehouseAssignmentManageTags)
+	}
+
 	if src.WarehouseAssignmentModify != nil {
 		return json.Marshal(&src.WarehouseAssignmentModify)
 	}
@@ -304,6 +340,10 @@ func (obj *WarehouseAssignment) GetActualInstance() interface{} {
 
 	if obj.WarehouseAssignmentManageGrants != nil {
 		return obj.WarehouseAssignmentManageGrants
+	}
+
+	if obj.WarehouseAssignmentManageTags != nil {
+		return obj.WarehouseAssignmentManageTags
 	}
 
 	if obj.WarehouseAssignmentModify != nil {

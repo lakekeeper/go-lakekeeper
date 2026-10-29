@@ -11,12 +11,10 @@ isGoSubmodule: true
 # types are oneOf unions; the discriminator lookup makes them ergonomic.
 useOneOfDiscriminatorLookup: true
 
-# Use the Go-idiomatic constant names supplied per-schema by the preprocessor's
-# `x-enum-varnames` pass (e.g. `S3FlavorAws` rather than the default
-# `S3FLAVOR_AWS`). The preprocessor synthesises a unique varname for every
-# value so disabling enum-class prefixing can't cause cross-enum collisions
-# on shared values like `create`, `delete`, `select`.
-enumClassPrefix: false
+# Prefix enum constants with their type name (e.g. `S3FLAVOR_AWS`). Without
+# the prefix, values shared across enums (`create`, `delete`, `select` in the
+# various `*Action` enums) collide as package-level constants.
+enumClassPrefix: true
 
 # Drop per-leaf-struct MarshalJSON. The default Go encoder on the struct's
 # json tags produces byte-identical wire format (each optional field carries
@@ -25,8 +23,10 @@ enumClassPrefix: false
 generateMarshalJSON: false
 
 # Keep per-leaf-struct UnmarshalJSON. It enforces required-property presence on
-# inbound responses (catching a server that drops a field clients depend on) and
-# supplies the oneOf discriminator dispatch. Its one undesirable side effect —
+# inbound responses (catching a server that drops a field clients depend on),
+# which is also what lets unions without a discriminator in the spec (e.g.
+# NamespaceIdentOrUuid, SubtreeGrantPrincipal) pick the one matching variant.
+# Its one undesirable side effect —
 # strict decoding via decoder.DisallowUnknownFields(), which rejects responses
 # carrying a field the SDK's spec doesn't know about — is the wrong posture for a
 # client library (Lakekeeper adds fields between releases, e.g. latest-main's

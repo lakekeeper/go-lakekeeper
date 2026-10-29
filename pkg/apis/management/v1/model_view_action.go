@@ -20,21 +20,23 @@ type ViewAction string
 
 // List of ViewAction
 const (
-	ViewActionDrop              ViewAction = "drop"
-	ViewActionCommit            ViewAction = "commit"
-	ViewActionGetMetadata       ViewAction = "get_metadata"
-	ViewActionSelect            ViewAction = "select"
-	ViewActionRename            ViewAction = "rename"
-	ViewActionReadAssignments   ViewAction = "read_assignments"
-	ViewActionGrantPassGrants   ViewAction = "grant_pass_grants"
-	ViewActionGrantManageGrants ViewAction = "grant_manage_grants"
-	ViewActionGrantDescribe     ViewAction = "grant_describe"
-	ViewActionGrantSelect       ViewAction = "grant_select"
-	ViewActionGrantModify       ViewAction = "grant_modify"
-	ViewActionChangeOwnership   ViewAction = "change_ownership"
-	ViewActionGetTasks          ViewAction = "get_tasks"
-	ViewActionControlTasks      ViewAction = "control_tasks"
-	ViewActionSetProtection     ViewAction = "set_protection"
+	VIEWACTION_DROP                ViewAction = "drop"
+	VIEWACTION_COMMIT              ViewAction = "commit"
+	VIEWACTION_GET_METADATA        ViewAction = "get_metadata"
+	VIEWACTION_SELECT              ViewAction = "select"
+	VIEWACTION_RENAME              ViewAction = "rename"
+	VIEWACTION_MOVE                ViewAction = "move"
+	VIEWACTION_READ_ASSIGNMENTS    ViewAction = "read_assignments"
+	VIEWACTION_GRANT_PASS_GRANTS   ViewAction = "grant_pass_grants"
+	VIEWACTION_GRANT_MANAGE_GRANTS ViewAction = "grant_manage_grants"
+	VIEWACTION_GRANT_MANAGE_TAGS   ViewAction = "grant_manage_tags"
+	VIEWACTION_GRANT_DESCRIBE      ViewAction = "grant_describe"
+	VIEWACTION_GRANT_SELECT        ViewAction = "grant_select"
+	VIEWACTION_GRANT_MODIFY        ViewAction = "grant_modify"
+	VIEWACTION_CHANGE_OWNERSHIP    ViewAction = "change_ownership"
+	VIEWACTION_GET_TASKS           ViewAction = "get_tasks"
+	VIEWACTION_CONTROL_TASKS       ViewAction = "control_tasks"
+	VIEWACTION_SET_PROTECTION      ViewAction = "set_protection"
 )
 
 // All allowed values of ViewAction enum
@@ -44,9 +46,11 @@ var AllowedViewActionEnumValues = []ViewAction{
 	"get_metadata",
 	"select",
 	"rename",
+	"move",
 	"read_assignments",
 	"grant_pass_grants",
 	"grant_manage_grants",
+	"grant_manage_tags",
 	"grant_describe",
 	"grant_select",
 	"grant_modify",

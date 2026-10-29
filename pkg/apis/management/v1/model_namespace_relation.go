@@ -20,13 +20,14 @@ type NamespaceRelation string
 
 // List of NamespaceRelation
 const (
-	NamespaceRelationOwnership    NamespaceRelation = "ownership"
-	NamespaceRelationPassGrants   NamespaceRelation = "pass_grants"
-	NamespaceRelationManageGrants NamespaceRelation = "manage_grants"
-	NamespaceRelationDescribe     NamespaceRelation = "describe"
-	NamespaceRelationSelect       NamespaceRelation = "select"
-	NamespaceRelationCreate       NamespaceRelation = "create"
-	NamespaceRelationModify       NamespaceRelation = "modify"
+	NAMESPACERELATION_OWNERSHIP     NamespaceRelation = "ownership"
+	NAMESPACERELATION_PASS_GRANTS   NamespaceRelation = "pass_grants"
+	NAMESPACERELATION_MANAGE_GRANTS NamespaceRelation = "manage_grants"
+	NAMESPACERELATION_DESCRIBE      NamespaceRelation = "describe"
+	NAMESPACERELATION_SELECT        NamespaceRelation = "select"
+	NAMESPACERELATION_CREATE        NamespaceRelation = "create"
+	NAMESPACERELATION_MODIFY        NamespaceRelation = "modify"
+	NAMESPACERELATION_MANAGE_TAGS   NamespaceRelation = "manage_tags"
 )
 
 // All allowed values of NamespaceRelation enum
@@ -38,6 +39,7 @@ var AllowedNamespaceRelationEnumValues = []NamespaceRelation{
 	"select",
 	"create",
 	"modify",
+	"manage_tags",
 }
 
 func (v *NamespaceRelation) UnmarshalJSON(src []byte) error {

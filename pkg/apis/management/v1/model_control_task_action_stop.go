@@ -19,7 +19,7 @@ import (
 // checks if the ControlTaskActionStop type satisfies the MappedNullable interface at compile time
 var _ MappedNullable = &ControlTaskActionStop{}
 
-// ControlTaskActionStop Stop the task gracefully. The task will be retried.
+// ControlTaskActionStop Stop the task gracefully. The task will be retried. An attempt that does not stop before its heartbeat times out counts as failed; after its last try, the task fails.
 type ControlTaskActionStop struct {
 	ActionType string `json:"action-type"`
 }

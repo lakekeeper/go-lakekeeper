@@ -24,7 +24,7 @@ type CatalogActionCheckOperationViewView struct {
 	TableId     string   `json:"table-id"`
 	WarehouseId string   `json:"warehouse-id"`
 	Namespace   []string `json:"namespace"`
-	// Name of the table or view
+	// Name of the table, view, or generic table.
 	Table  string               `json:"table"`
 	Action LakekeeperViewAction `json:"action"`
 }

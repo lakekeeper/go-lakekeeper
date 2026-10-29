@@ -20,13 +20,14 @@ type OpenFGANamespaceAction string
 
 // List of OpenFGANamespaceAction
 const (
-	OpenFGANamespaceActionReadAssignments   OpenFGANamespaceAction = "read_assignments"
-	OpenFGANamespaceActionGrantCreate       OpenFGANamespaceAction = "grant_create"
-	OpenFGANamespaceActionGrantDescribe     OpenFGANamespaceAction = "grant_describe"
-	OpenFGANamespaceActionGrantModify       OpenFGANamespaceAction = "grant_modify"
-	OpenFGANamespaceActionGrantSelect       OpenFGANamespaceAction = "grant_select"
-	OpenFGANamespaceActionGrantPassGrants   OpenFGANamespaceAction = "grant_pass_grants"
-	OpenFGANamespaceActionGrantManageGrants OpenFGANamespaceAction = "grant_manage_grants"
+	OPENFGANAMESPACEACTION_READ_ASSIGNMENTS    OpenFGANamespaceAction = "read_assignments"
+	OPENFGANAMESPACEACTION_GRANT_CREATE        OpenFGANamespaceAction = "grant_create"
+	OPENFGANAMESPACEACTION_GRANT_DESCRIBE      OpenFGANamespaceAction = "grant_describe"
+	OPENFGANAMESPACEACTION_GRANT_MODIFY        OpenFGANamespaceAction = "grant_modify"
+	OPENFGANAMESPACEACTION_GRANT_SELECT        OpenFGANamespaceAction = "grant_select"
+	OPENFGANAMESPACEACTION_GRANT_PASS_GRANTS   OpenFGANamespaceAction = "grant_pass_grants"
+	OPENFGANAMESPACEACTION_GRANT_MANAGE_GRANTS OpenFGANamespaceAction = "grant_manage_grants"
+	OPENFGANAMESPACEACTION_GRANT_MANAGE_TAGS   OpenFGANamespaceAction = "grant_manage_tags"
 )
 
 // All allowed values of OpenFGANamespaceAction enum
@@ -38,6 +39,7 @@ var AllowedOpenFGANamespaceActionEnumValues = []OpenFGANamespaceAction{
 	"grant_select",
 	"grant_pass_grants",
 	"grant_manage_grants",
+	"grant_manage_tags",
 }
 
 func (v *OpenFGANamespaceAction) UnmarshalJSON(src []byte) error {

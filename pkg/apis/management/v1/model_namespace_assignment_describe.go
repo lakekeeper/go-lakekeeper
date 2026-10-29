@@ -11,101 +11,177 @@ API version: 0.0.0
 package managementv1
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 )
 
-// NamespaceAssignmentDescribe - struct for NamespaceAssignmentDescribe
+// checks if the NamespaceAssignmentDescribe type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &NamespaceAssignmentDescribe{}
+
+// NamespaceAssignmentDescribe struct for NamespaceAssignmentDescribe
 type NamespaceAssignmentDescribe struct {
-	NamespaceAssignmentDescribeRole *NamespaceAssignmentDescribeRole
-	NamespaceAssignmentDescribeUser *NamespaceAssignmentDescribeUser
+	// Id of the role
+	Role *string `json:"role,omitempty"`
+	// Id of the user
+	User *string `json:"user,omitempty"`
+	Type string  `json:"type"`
 }
 
-// NamespaceAssignmentDescribeRoleAsNamespaceAssignmentDescribe is a convenience function that returns NamespaceAssignmentDescribeRole wrapped in NamespaceAssignmentDescribe
-func NamespaceAssignmentDescribeRoleAsNamespaceAssignmentDescribe(v *NamespaceAssignmentDescribeRole) NamespaceAssignmentDescribe {
-	return NamespaceAssignmentDescribe{
-		NamespaceAssignmentDescribeRole: v,
+type _NamespaceAssignmentDescribe NamespaceAssignmentDescribe
+
+// NewNamespaceAssignmentDescribe instantiates a new NamespaceAssignmentDescribe object
+// This constructor will assign default values to properties that have it defined,
+// and makes sure properties required by API are set, but the set of arguments
+// will change when the set of required properties is changed
+func NewNamespaceAssignmentDescribe(type_ string) *NamespaceAssignmentDescribe {
+	this := NamespaceAssignmentDescribe{}
+	this.Type = type_
+	return &this
+}
+
+// NewNamespaceAssignmentDescribeWithDefaults instantiates a new NamespaceAssignmentDescribe object
+// This constructor will only assign default values to properties that have it defined,
+// but it doesn't guarantee that properties required by API are set
+func NewNamespaceAssignmentDescribeWithDefaults() *NamespaceAssignmentDescribe {
+	this := NamespaceAssignmentDescribe{}
+	return &this
+}
+
+// GetRole returns the Role field value if set, zero value otherwise.
+func (o *NamespaceAssignmentDescribe) GetRole() string {
+	if o == nil || IsNil(o.Role) {
+		var ret string
+		return ret
 	}
+	return *o.Role
 }
 
-// NamespaceAssignmentDescribeUserAsNamespaceAssignmentDescribe is a convenience function that returns NamespaceAssignmentDescribeUser wrapped in NamespaceAssignmentDescribe
-func NamespaceAssignmentDescribeUserAsNamespaceAssignmentDescribe(v *NamespaceAssignmentDescribeUser) NamespaceAssignmentDescribe {
-	return NamespaceAssignmentDescribe{
-		NamespaceAssignmentDescribeUser: v,
+// GetRoleOk returns a tuple with the Role field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *NamespaceAssignmentDescribe) GetRoleOk() (*string, bool) {
+	if o == nil || IsNil(o.Role) {
+		return nil, false
 	}
+	return o.Role, true
 }
 
-// Unmarshal JSON data into one of the pointers in the struct
-func (dst *NamespaceAssignmentDescribe) UnmarshalJSON(data []byte) error {
-	var err error
-	match := 0
-	// try to unmarshal data into NamespaceAssignmentDescribeRole
-	err = json.Unmarshal(data, &dst.NamespaceAssignmentDescribeRole)
-	if err == nil {
-		jsonNamespaceAssignmentDescribeRole, _ := json.Marshal(dst.NamespaceAssignmentDescribeRole)
-		if string(jsonNamespaceAssignmentDescribeRole) == "{}" { // empty struct
-			dst.NamespaceAssignmentDescribeRole = nil
-		} else {
-			match++
+// HasRole returns a boolean if a field has been set.
+func (o *NamespaceAssignmentDescribe) HasRole() bool {
+	if o != nil && !IsNil(o.Role) {
+		return true
+	}
+
+	return false
+}
+
+// SetRole gets a reference to the given string and assigns it to the Role field.
+func (o *NamespaceAssignmentDescribe) SetRole(v string) {
+	o.Role = &v
+}
+
+// GetUser returns the User field value if set, zero value otherwise.
+func (o *NamespaceAssignmentDescribe) GetUser() string {
+	if o == nil || IsNil(o.User) {
+		var ret string
+		return ret
+	}
+	return *o.User
+}
+
+// GetUserOk returns a tuple with the User field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *NamespaceAssignmentDescribe) GetUserOk() (*string, bool) {
+	if o == nil || IsNil(o.User) {
+		return nil, false
+	}
+	return o.User, true
+}
+
+// HasUser returns a boolean if a field has been set.
+func (o *NamespaceAssignmentDescribe) HasUser() bool {
+	if o != nil && !IsNil(o.User) {
+		return true
+	}
+
+	return false
+}
+
+// SetUser gets a reference to the given string and assigns it to the User field.
+func (o *NamespaceAssignmentDescribe) SetUser(v string) {
+	o.User = &v
+}
+
+// GetType returns the Type field value
+func (o *NamespaceAssignmentDescribe) GetType() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.Type
+}
+
+// GetTypeOk returns a tuple with the Type field value
+// and a boolean to check if the value has been set.
+func (o *NamespaceAssignmentDescribe) GetTypeOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Type, true
+}
+
+// SetType sets field value
+func (o *NamespaceAssignmentDescribe) SetType(v string) {
+	o.Type = v
+}
+
+func (o NamespaceAssignmentDescribe) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.Role) {
+		toSerialize["role"] = o.Role
+	}
+	if !IsNil(o.User) {
+		toSerialize["user"] = o.User
+	}
+	toSerialize["type"] = o.Type
+	return toSerialize, nil
+}
+
+func (o *NamespaceAssignmentDescribe) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"type",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err
+	}
+
+	for _, requiredProperty := range requiredProperties {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
-	} else {
-		dst.NamespaceAssignmentDescribeRole = nil
 	}
 
-	// try to unmarshal data into NamespaceAssignmentDescribeUser
-	err = json.Unmarshal(data, &dst.NamespaceAssignmentDescribeUser)
-	if err == nil {
-		jsonNamespaceAssignmentDescribeUser, _ := json.Marshal(dst.NamespaceAssignmentDescribeUser)
-		if string(jsonNamespaceAssignmentDescribeUser) == "{}" { // empty struct
-			dst.NamespaceAssignmentDescribeUser = nil
-		} else {
-			match++
-		}
-	} else {
-		dst.NamespaceAssignmentDescribeUser = nil
+	varNamespaceAssignmentDescribe := _NamespaceAssignmentDescribe{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	err = decoder.Decode(&varNamespaceAssignmentDescribe)
+
+	if err != nil {
+		return err
 	}
 
-	if match > 1 { // more than 1 match
-		// reset to nil
-		dst.NamespaceAssignmentDescribeRole = nil
-		dst.NamespaceAssignmentDescribeUser = nil
+	*o = NamespaceAssignmentDescribe(varNamespaceAssignmentDescribe)
 
-		return fmt.Errorf("data matches more than one schema in oneOf(NamespaceAssignmentDescribe)")
-	} else if match == 1 {
-		return nil // exactly one match
-	} else { // no match
-		return fmt.Errorf("data failed to match schemas in oneOf(NamespaceAssignmentDescribe)")
-	}
-}
-
-// Marshal data from the first non-nil pointers in the struct to JSON
-func (src NamespaceAssignmentDescribe) MarshalJSON() ([]byte, error) {
-	if src.NamespaceAssignmentDescribeRole != nil {
-		return json.Marshal(&src.NamespaceAssignmentDescribeRole)
-	}
-
-	if src.NamespaceAssignmentDescribeUser != nil {
-		return json.Marshal(&src.NamespaceAssignmentDescribeUser)
-	}
-
-	return nil, nil // no data in oneOf schemas
-}
-
-// Get the actual instance
-func (obj *NamespaceAssignmentDescribe) GetActualInstance() interface{} {
-	if obj == nil {
-		return nil
-	}
-	if obj.NamespaceAssignmentDescribeRole != nil {
-		return obj.NamespaceAssignmentDescribeRole
-	}
-
-	if obj.NamespaceAssignmentDescribeUser != nil {
-		return obj.NamespaceAssignmentDescribeUser
-	}
-
-	// all schemas are nil
-	return nil
+	return err
 }
 
 type NullableNamespaceAssignmentDescribe struct {

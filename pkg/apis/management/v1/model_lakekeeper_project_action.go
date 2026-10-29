@@ -19,6 +19,7 @@ import (
 type LakekeeperProjectAction struct {
 	LakekeeperProjectActionControlProjectTasks   *LakekeeperProjectActionControlProjectTasks
 	LakekeeperProjectActionCreateRole            *LakekeeperProjectActionCreateRole
+	LakekeeperProjectActionCreateTag             *LakekeeperProjectActionCreateTag
 	LakekeeperProjectActionCreateWarehouse       *LakekeeperProjectActionCreateWarehouse
 	LakekeeperProjectActionDelete                *LakekeeperProjectActionDelete
 	LakekeeperProjectActionGetEndpointStatistics *LakekeeperProjectActionGetEndpointStatistics
@@ -27,8 +28,11 @@ type LakekeeperProjectAction struct {
 	LakekeeperProjectActionGetTaskQueueConfig    *LakekeeperProjectActionGetTaskQueueConfig
 	LakekeeperProjectActionIncludeInList         *LakekeeperProjectActionIncludeInList
 	LakekeeperProjectActionListRoles             *LakekeeperProjectActionListRoles
+	LakekeeperProjectActionListTags              *LakekeeperProjectActionListTags
 	LakekeeperProjectActionListWarehouses        *LakekeeperProjectActionListWarehouses
 	LakekeeperProjectActionModifyTaskQueueConfig *LakekeeperProjectActionModifyTaskQueueConfig
+	LakekeeperProjectActionReadGrants            *LakekeeperProjectActionReadGrants
+	LakekeeperProjectActionReadSubtreeGrants     *LakekeeperProjectActionReadSubtreeGrants
 	LakekeeperProjectActionRename                *LakekeeperProjectActionRename
 	LakekeeperProjectActionSearchRoles           *LakekeeperProjectActionSearchRoles
 }
@@ -44,6 +48,13 @@ func LakekeeperProjectActionControlProjectTasksAsLakekeeperProjectAction(v *Lake
 func LakekeeperProjectActionCreateRoleAsLakekeeperProjectAction(v *LakekeeperProjectActionCreateRole) LakekeeperProjectAction {
 	return LakekeeperProjectAction{
 		LakekeeperProjectActionCreateRole: v,
+	}
+}
+
+// LakekeeperProjectActionCreateTagAsLakekeeperProjectAction is a convenience function that returns LakekeeperProjectActionCreateTag wrapped in LakekeeperProjectAction
+func LakekeeperProjectActionCreateTagAsLakekeeperProjectAction(v *LakekeeperProjectActionCreateTag) LakekeeperProjectAction {
+	return LakekeeperProjectAction{
+		LakekeeperProjectActionCreateTag: v,
 	}
 }
 
@@ -103,6 +114,13 @@ func LakekeeperProjectActionListRolesAsLakekeeperProjectAction(v *LakekeeperProj
 	}
 }
 
+// LakekeeperProjectActionListTagsAsLakekeeperProjectAction is a convenience function that returns LakekeeperProjectActionListTags wrapped in LakekeeperProjectAction
+func LakekeeperProjectActionListTagsAsLakekeeperProjectAction(v *LakekeeperProjectActionListTags) LakekeeperProjectAction {
+	return LakekeeperProjectAction{
+		LakekeeperProjectActionListTags: v,
+	}
+}
+
 // LakekeeperProjectActionListWarehousesAsLakekeeperProjectAction is a convenience function that returns LakekeeperProjectActionListWarehouses wrapped in LakekeeperProjectAction
 func LakekeeperProjectActionListWarehousesAsLakekeeperProjectAction(v *LakekeeperProjectActionListWarehouses) LakekeeperProjectAction {
 	return LakekeeperProjectAction{
@@ -114,6 +132,20 @@ func LakekeeperProjectActionListWarehousesAsLakekeeperProjectAction(v *Lakekeepe
 func LakekeeperProjectActionModifyTaskQueueConfigAsLakekeeperProjectAction(v *LakekeeperProjectActionModifyTaskQueueConfig) LakekeeperProjectAction {
 	return LakekeeperProjectAction{
 		LakekeeperProjectActionModifyTaskQueueConfig: v,
+	}
+}
+
+// LakekeeperProjectActionReadGrantsAsLakekeeperProjectAction is a convenience function that returns LakekeeperProjectActionReadGrants wrapped in LakekeeperProjectAction
+func LakekeeperProjectActionReadGrantsAsLakekeeperProjectAction(v *LakekeeperProjectActionReadGrants) LakekeeperProjectAction {
+	return LakekeeperProjectAction{
+		LakekeeperProjectActionReadGrants: v,
+	}
+}
+
+// LakekeeperProjectActionReadSubtreeGrantsAsLakekeeperProjectAction is a convenience function that returns LakekeeperProjectActionReadSubtreeGrants wrapped in LakekeeperProjectAction
+func LakekeeperProjectActionReadSubtreeGrantsAsLakekeeperProjectAction(v *LakekeeperProjectActionReadSubtreeGrants) LakekeeperProjectAction {
+	return LakekeeperProjectAction{
+		LakekeeperProjectActionReadSubtreeGrants: v,
 	}
 }
 
@@ -162,6 +194,18 @@ func (dst *LakekeeperProjectAction) UnmarshalJSON(data []byte) error {
 		} else {
 			dst.LakekeeperProjectActionCreateRole = nil
 			return fmt.Errorf("failed to unmarshal LakekeeperProjectAction as LakekeeperProjectActionCreateRole: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'create_tag'
+	if jsonDict["action"] == "create_tag" {
+		// try to unmarshal JSON data into LakekeeperProjectActionCreateTag
+		err = json.Unmarshal(data, &dst.LakekeeperProjectActionCreateTag)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperProjectActionCreateTag, return on the first match
+		} else {
+			dst.LakekeeperProjectActionCreateTag = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperProjectAction as LakekeeperProjectActionCreateTag: %s", err.Error())
 		}
 	}
 
@@ -261,6 +305,18 @@ func (dst *LakekeeperProjectAction) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	// check if the discriminator value is 'list_tags'
+	if jsonDict["action"] == "list_tags" {
+		// try to unmarshal JSON data into LakekeeperProjectActionListTags
+		err = json.Unmarshal(data, &dst.LakekeeperProjectActionListTags)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperProjectActionListTags, return on the first match
+		} else {
+			dst.LakekeeperProjectActionListTags = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperProjectAction as LakekeeperProjectActionListTags: %s", err.Error())
+		}
+	}
+
 	// check if the discriminator value is 'list_warehouses'
 	if jsonDict["action"] == "list_warehouses" {
 		// try to unmarshal JSON data into LakekeeperProjectActionListWarehouses
@@ -282,6 +338,30 @@ func (dst *LakekeeperProjectAction) UnmarshalJSON(data []byte) error {
 		} else {
 			dst.LakekeeperProjectActionModifyTaskQueueConfig = nil
 			return fmt.Errorf("failed to unmarshal LakekeeperProjectAction as LakekeeperProjectActionModifyTaskQueueConfig: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'read_grants'
+	if jsonDict["action"] == "read_grants" {
+		// try to unmarshal JSON data into LakekeeperProjectActionReadGrants
+		err = json.Unmarshal(data, &dst.LakekeeperProjectActionReadGrants)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperProjectActionReadGrants, return on the first match
+		} else {
+			dst.LakekeeperProjectActionReadGrants = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperProjectAction as LakekeeperProjectActionReadGrants: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'read_subtree_grants'
+	if jsonDict["action"] == "read_subtree_grants" {
+		// try to unmarshal JSON data into LakekeeperProjectActionReadSubtreeGrants
+		err = json.Unmarshal(data, &dst.LakekeeperProjectActionReadSubtreeGrants)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperProjectActionReadSubtreeGrants, return on the first match
+		} else {
+			dst.LakekeeperProjectActionReadSubtreeGrants = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperProjectAction as LakekeeperProjectActionReadSubtreeGrants: %s", err.Error())
 		}
 	}
 
@@ -330,6 +410,18 @@ func (dst *LakekeeperProjectAction) UnmarshalJSON(data []byte) error {
 		} else {
 			dst.LakekeeperProjectActionCreateRole = nil
 			return fmt.Errorf("failed to unmarshal LakekeeperProjectAction as LakekeeperProjectActionCreateRole: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'LakekeeperProjectActionCreateTag'
+	if jsonDict["action"] == "LakekeeperProjectActionCreateTag" {
+		// try to unmarshal JSON data into LakekeeperProjectActionCreateTag
+		err = json.Unmarshal(data, &dst.LakekeeperProjectActionCreateTag)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperProjectActionCreateTag, return on the first match
+		} else {
+			dst.LakekeeperProjectActionCreateTag = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperProjectAction as LakekeeperProjectActionCreateTag: %s", err.Error())
 		}
 	}
 
@@ -429,6 +521,18 @@ func (dst *LakekeeperProjectAction) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	// check if the discriminator value is 'LakekeeperProjectActionListTags'
+	if jsonDict["action"] == "LakekeeperProjectActionListTags" {
+		// try to unmarshal JSON data into LakekeeperProjectActionListTags
+		err = json.Unmarshal(data, &dst.LakekeeperProjectActionListTags)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperProjectActionListTags, return on the first match
+		} else {
+			dst.LakekeeperProjectActionListTags = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperProjectAction as LakekeeperProjectActionListTags: %s", err.Error())
+		}
+	}
+
 	// check if the discriminator value is 'LakekeeperProjectActionListWarehouses'
 	if jsonDict["action"] == "LakekeeperProjectActionListWarehouses" {
 		// try to unmarshal JSON data into LakekeeperProjectActionListWarehouses
@@ -450,6 +554,30 @@ func (dst *LakekeeperProjectAction) UnmarshalJSON(data []byte) error {
 		} else {
 			dst.LakekeeperProjectActionModifyTaskQueueConfig = nil
 			return fmt.Errorf("failed to unmarshal LakekeeperProjectAction as LakekeeperProjectActionModifyTaskQueueConfig: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'LakekeeperProjectActionReadGrants'
+	if jsonDict["action"] == "LakekeeperProjectActionReadGrants" {
+		// try to unmarshal JSON data into LakekeeperProjectActionReadGrants
+		err = json.Unmarshal(data, &dst.LakekeeperProjectActionReadGrants)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperProjectActionReadGrants, return on the first match
+		} else {
+			dst.LakekeeperProjectActionReadGrants = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperProjectAction as LakekeeperProjectActionReadGrants: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'LakekeeperProjectActionReadSubtreeGrants'
+	if jsonDict["action"] == "LakekeeperProjectActionReadSubtreeGrants" {
+		// try to unmarshal JSON data into LakekeeperProjectActionReadSubtreeGrants
+		err = json.Unmarshal(data, &dst.LakekeeperProjectActionReadSubtreeGrants)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperProjectActionReadSubtreeGrants, return on the first match
+		} else {
+			dst.LakekeeperProjectActionReadSubtreeGrants = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperProjectAction as LakekeeperProjectActionReadSubtreeGrants: %s", err.Error())
 		}
 	}
 
@@ -490,6 +618,10 @@ func (src LakekeeperProjectAction) MarshalJSON() ([]byte, error) {
 		return json.Marshal(&src.LakekeeperProjectActionCreateRole)
 	}
 
+	if src.LakekeeperProjectActionCreateTag != nil {
+		return json.Marshal(&src.LakekeeperProjectActionCreateTag)
+	}
+
 	if src.LakekeeperProjectActionCreateWarehouse != nil {
 		return json.Marshal(&src.LakekeeperProjectActionCreateWarehouse)
 	}
@@ -522,12 +654,24 @@ func (src LakekeeperProjectAction) MarshalJSON() ([]byte, error) {
 		return json.Marshal(&src.LakekeeperProjectActionListRoles)
 	}
 
+	if src.LakekeeperProjectActionListTags != nil {
+		return json.Marshal(&src.LakekeeperProjectActionListTags)
+	}
+
 	if src.LakekeeperProjectActionListWarehouses != nil {
 		return json.Marshal(&src.LakekeeperProjectActionListWarehouses)
 	}
 
 	if src.LakekeeperProjectActionModifyTaskQueueConfig != nil {
 		return json.Marshal(&src.LakekeeperProjectActionModifyTaskQueueConfig)
+	}
+
+	if src.LakekeeperProjectActionReadGrants != nil {
+		return json.Marshal(&src.LakekeeperProjectActionReadGrants)
+	}
+
+	if src.LakekeeperProjectActionReadSubtreeGrants != nil {
+		return json.Marshal(&src.LakekeeperProjectActionReadSubtreeGrants)
 	}
 
 	if src.LakekeeperProjectActionRename != nil {
@@ -552,6 +696,10 @@ func (obj *LakekeeperProjectAction) GetActualInstance() interface{} {
 
 	if obj.LakekeeperProjectActionCreateRole != nil {
 		return obj.LakekeeperProjectActionCreateRole
+	}
+
+	if obj.LakekeeperProjectActionCreateTag != nil {
+		return obj.LakekeeperProjectActionCreateTag
 	}
 
 	if obj.LakekeeperProjectActionCreateWarehouse != nil {
@@ -586,12 +734,24 @@ func (obj *LakekeeperProjectAction) GetActualInstance() interface{} {
 		return obj.LakekeeperProjectActionListRoles
 	}
 
+	if obj.LakekeeperProjectActionListTags != nil {
+		return obj.LakekeeperProjectActionListTags
+	}
+
 	if obj.LakekeeperProjectActionListWarehouses != nil {
 		return obj.LakekeeperProjectActionListWarehouses
 	}
 
 	if obj.LakekeeperProjectActionModifyTaskQueueConfig != nil {
 		return obj.LakekeeperProjectActionModifyTaskQueueConfig
+	}
+
+	if obj.LakekeeperProjectActionReadGrants != nil {
+		return obj.LakekeeperProjectActionReadGrants
+	}
+
+	if obj.LakekeeperProjectActionReadSubtreeGrants != nil {
+		return obj.LakekeeperProjectActionReadSubtreeGrants
 	}
 
 	if obj.LakekeeperProjectActionRename != nil {

@@ -11,101 +11,177 @@ API version: 0.0.0
 package managementv1
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 )
 
-// NamespaceAssignmentModify - struct for NamespaceAssignmentModify
+// checks if the NamespaceAssignmentModify type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &NamespaceAssignmentModify{}
+
+// NamespaceAssignmentModify struct for NamespaceAssignmentModify
 type NamespaceAssignmentModify struct {
-	NamespaceAssignmentModifyRole *NamespaceAssignmentModifyRole
-	NamespaceAssignmentModifyUser *NamespaceAssignmentModifyUser
+	// Id of the role
+	Role *string `json:"role,omitempty"`
+	// Id of the user
+	User *string `json:"user,omitempty"`
+	Type string  `json:"type"`
 }
 
-// NamespaceAssignmentModifyRoleAsNamespaceAssignmentModify is a convenience function that returns NamespaceAssignmentModifyRole wrapped in NamespaceAssignmentModify
-func NamespaceAssignmentModifyRoleAsNamespaceAssignmentModify(v *NamespaceAssignmentModifyRole) NamespaceAssignmentModify {
-	return NamespaceAssignmentModify{
-		NamespaceAssignmentModifyRole: v,
+type _NamespaceAssignmentModify NamespaceAssignmentModify
+
+// NewNamespaceAssignmentModify instantiates a new NamespaceAssignmentModify object
+// This constructor will assign default values to properties that have it defined,
+// and makes sure properties required by API are set, but the set of arguments
+// will change when the set of required properties is changed
+func NewNamespaceAssignmentModify(type_ string) *NamespaceAssignmentModify {
+	this := NamespaceAssignmentModify{}
+	this.Type = type_
+	return &this
+}
+
+// NewNamespaceAssignmentModifyWithDefaults instantiates a new NamespaceAssignmentModify object
+// This constructor will only assign default values to properties that have it defined,
+// but it doesn't guarantee that properties required by API are set
+func NewNamespaceAssignmentModifyWithDefaults() *NamespaceAssignmentModify {
+	this := NamespaceAssignmentModify{}
+	return &this
+}
+
+// GetRole returns the Role field value if set, zero value otherwise.
+func (o *NamespaceAssignmentModify) GetRole() string {
+	if o == nil || IsNil(o.Role) {
+		var ret string
+		return ret
 	}
+	return *o.Role
 }
 
-// NamespaceAssignmentModifyUserAsNamespaceAssignmentModify is a convenience function that returns NamespaceAssignmentModifyUser wrapped in NamespaceAssignmentModify
-func NamespaceAssignmentModifyUserAsNamespaceAssignmentModify(v *NamespaceAssignmentModifyUser) NamespaceAssignmentModify {
-	return NamespaceAssignmentModify{
-		NamespaceAssignmentModifyUser: v,
+// GetRoleOk returns a tuple with the Role field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *NamespaceAssignmentModify) GetRoleOk() (*string, bool) {
+	if o == nil || IsNil(o.Role) {
+		return nil, false
 	}
+	return o.Role, true
 }
 
-// Unmarshal JSON data into one of the pointers in the struct
-func (dst *NamespaceAssignmentModify) UnmarshalJSON(data []byte) error {
-	var err error
-	match := 0
-	// try to unmarshal data into NamespaceAssignmentModifyRole
-	err = json.Unmarshal(data, &dst.NamespaceAssignmentModifyRole)
-	if err == nil {
-		jsonNamespaceAssignmentModifyRole, _ := json.Marshal(dst.NamespaceAssignmentModifyRole)
-		if string(jsonNamespaceAssignmentModifyRole) == "{}" { // empty struct
-			dst.NamespaceAssignmentModifyRole = nil
-		} else {
-			match++
+// HasRole returns a boolean if a field has been set.
+func (o *NamespaceAssignmentModify) HasRole() bool {
+	if o != nil && !IsNil(o.Role) {
+		return true
+	}
+
+	return false
+}
+
+// SetRole gets a reference to the given string and assigns it to the Role field.
+func (o *NamespaceAssignmentModify) SetRole(v string) {
+	o.Role = &v
+}
+
+// GetUser returns the User field value if set, zero value otherwise.
+func (o *NamespaceAssignmentModify) GetUser() string {
+	if o == nil || IsNil(o.User) {
+		var ret string
+		return ret
+	}
+	return *o.User
+}
+
+// GetUserOk returns a tuple with the User field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *NamespaceAssignmentModify) GetUserOk() (*string, bool) {
+	if o == nil || IsNil(o.User) {
+		return nil, false
+	}
+	return o.User, true
+}
+
+// HasUser returns a boolean if a field has been set.
+func (o *NamespaceAssignmentModify) HasUser() bool {
+	if o != nil && !IsNil(o.User) {
+		return true
+	}
+
+	return false
+}
+
+// SetUser gets a reference to the given string and assigns it to the User field.
+func (o *NamespaceAssignmentModify) SetUser(v string) {
+	o.User = &v
+}
+
+// GetType returns the Type field value
+func (o *NamespaceAssignmentModify) GetType() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.Type
+}
+
+// GetTypeOk returns a tuple with the Type field value
+// and a boolean to check if the value has been set.
+func (o *NamespaceAssignmentModify) GetTypeOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Type, true
+}
+
+// SetType sets field value
+func (o *NamespaceAssignmentModify) SetType(v string) {
+	o.Type = v
+}
+
+func (o NamespaceAssignmentModify) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.Role) {
+		toSerialize["role"] = o.Role
+	}
+	if !IsNil(o.User) {
+		toSerialize["user"] = o.User
+	}
+	toSerialize["type"] = o.Type
+	return toSerialize, nil
+}
+
+func (o *NamespaceAssignmentModify) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"type",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err
+	}
+
+	for _, requiredProperty := range requiredProperties {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
-	} else {
-		dst.NamespaceAssignmentModifyRole = nil
 	}
 
-	// try to unmarshal data into NamespaceAssignmentModifyUser
-	err = json.Unmarshal(data, &dst.NamespaceAssignmentModifyUser)
-	if err == nil {
-		jsonNamespaceAssignmentModifyUser, _ := json.Marshal(dst.NamespaceAssignmentModifyUser)
-		if string(jsonNamespaceAssignmentModifyUser) == "{}" { // empty struct
-			dst.NamespaceAssignmentModifyUser = nil
-		} else {
-			match++
-		}
-	} else {
-		dst.NamespaceAssignmentModifyUser = nil
+	varNamespaceAssignmentModify := _NamespaceAssignmentModify{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	err = decoder.Decode(&varNamespaceAssignmentModify)
+
+	if err != nil {
+		return err
 	}
 
-	if match > 1 { // more than 1 match
-		// reset to nil
-		dst.NamespaceAssignmentModifyRole = nil
-		dst.NamespaceAssignmentModifyUser = nil
+	*o = NamespaceAssignmentModify(varNamespaceAssignmentModify)
 
-		return fmt.Errorf("data matches more than one schema in oneOf(NamespaceAssignmentModify)")
-	} else if match == 1 {
-		return nil // exactly one match
-	} else { // no match
-		return fmt.Errorf("data failed to match schemas in oneOf(NamespaceAssignmentModify)")
-	}
-}
-
-// Marshal data from the first non-nil pointers in the struct to JSON
-func (src NamespaceAssignmentModify) MarshalJSON() ([]byte, error) {
-	if src.NamespaceAssignmentModifyRole != nil {
-		return json.Marshal(&src.NamespaceAssignmentModifyRole)
-	}
-
-	if src.NamespaceAssignmentModifyUser != nil {
-		return json.Marshal(&src.NamespaceAssignmentModifyUser)
-	}
-
-	return nil, nil // no data in oneOf schemas
-}
-
-// Get the actual instance
-func (obj *NamespaceAssignmentModify) GetActualInstance() interface{} {
-	if obj == nil {
-		return nil
-	}
-	if obj.NamespaceAssignmentModifyRole != nil {
-		return obj.NamespaceAssignmentModifyRole
-	}
-
-	if obj.NamespaceAssignmentModifyUser != nil {
-		return obj.NamespaceAssignmentModifyUser
-	}
-
-	// all schemas are nil
-	return nil
+	return err
 }
 
 type NullableNamespaceAssignmentModify struct {

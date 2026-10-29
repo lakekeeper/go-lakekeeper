@@ -20,9 +20,9 @@ type AzCredentialType string
 
 // List of AzCredentialType
 const (
-	AzCredentialTypeClientCredentials   AzCredentialType = "client-credentials"
-	AzCredentialTypeSharedAccessKey     AzCredentialType = "shared-access-key"
-	AzCredentialTypeAzureSystemIdentity AzCredentialType = "azure-system-identity"
+	AZCREDENTIALTYPE_CLIENT_CREDENTIALS    AzCredentialType = "client-credentials"
+	AZCREDENTIALTYPE_SHARED_ACCESS_KEY     AzCredentialType = "shared-access-key"
+	AZCREDENTIALTYPE_AZURE_SYSTEM_IDENTITY AzCredentialType = "azure-system-identity"
 )
 
 // All allowed values of AzCredentialType enum

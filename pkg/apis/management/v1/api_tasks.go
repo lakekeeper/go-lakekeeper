@@ -638,27 +638,27 @@ func (a *TasksAPIService) GetTaskDetailsExecute(r ApiGetTaskDetailsRequest) (*Ge
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
-type ApiGetTaskQueueConfigTabularExpirationRequest struct {
+type ApiGetTaskQueueConfigSoftDeletionRequest struct {
 	ctx         context.Context
 	ApiService  *TasksAPIService
 	warehouseId string
 }
 
-func (r ApiGetTaskQueueConfigTabularExpirationRequest) Execute() (*GetTabularExpirationQueueConfig, *http.Response, error) {
-	return r.ApiService.GetTaskQueueConfigTabularExpirationExecute(r)
+func (r ApiGetTaskQueueConfigSoftDeletionRequest) Execute() (*GetSoftDeletionQueueConfig, *http.Response, error) {
+	return r.ApiService.GetTaskQueueConfigSoftDeletionExecute(r)
 }
 
 /*
-GetTaskQueueConfigTabularExpiration Get the configuration for a Task Queue.
+GetTaskQueueConfigSoftDeletion Get the configuration for a Task Queue.
 
 These configurations are global per warehouse and shared across all instances of this kind of task.
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 	@param warehouseId
-	@return ApiGetTaskQueueConfigTabularExpirationRequest
+	@return ApiGetTaskQueueConfigSoftDeletionRequest
 */
-func (a *TasksAPIService) GetTaskQueueConfigTabularExpiration(ctx context.Context, warehouseId string) ApiGetTaskQueueConfigTabularExpirationRequest {
-	return ApiGetTaskQueueConfigTabularExpirationRequest{
+func (a *TasksAPIService) GetTaskQueueConfigSoftDeletion(ctx context.Context, warehouseId string) ApiGetTaskQueueConfigSoftDeletionRequest {
+	return ApiGetTaskQueueConfigSoftDeletionRequest{
 		ApiService:  a,
 		ctx:         ctx,
 		warehouseId: warehouseId,
@@ -667,21 +667,21 @@ func (a *TasksAPIService) GetTaskQueueConfigTabularExpiration(ctx context.Contex
 
 // Execute executes the request
 //
-//	@return GetTabularExpirationQueueConfig
-func (a *TasksAPIService) GetTaskQueueConfigTabularExpirationExecute(r ApiGetTaskQueueConfigTabularExpirationRequest) (*GetTabularExpirationQueueConfig, *http.Response, error) {
+//	@return GetSoftDeletionQueueConfig
+func (a *TasksAPIService) GetTaskQueueConfigSoftDeletionExecute(r ApiGetTaskQueueConfigSoftDeletionRequest) (*GetSoftDeletionQueueConfig, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
 		formFiles           []formFile
-		localVarReturnValue *GetTabularExpirationQueueConfig
+		localVarReturnValue *GetSoftDeletionQueueConfig
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "TasksAPIService.GetTaskQueueConfigTabularExpiration")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "TasksAPIService.GetTaskQueueConfigSoftDeletion")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/management/v1/warehouse/{warehouse_id}/task-queue/tabular_expiration/config"
+	localVarPath := localBasePath + "/management/v1/warehouse/{warehouse_id}/task-queue/soft_deletion/config"
 	localVarPath = strings.Replace(localVarPath, "{"+"warehouse_id"+"}", url.PathEscape(parameterValueToString(r.warehouseId, "warehouseId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -1237,33 +1237,33 @@ func (a *TasksAPIService) SetProjectTaskQueueConfigTaskLogCleanupExecute(r ApiSe
 	return localVarHTTPResponse, nil
 }
 
-type ApiSetTaskQueueConfigTabularExpirationRequest struct {
-	ctx                             context.Context
-	ApiService                      *TasksAPIService
-	warehouseId                     string
-	setTabularExpirationQueueConfig *SetTabularExpirationQueueConfig
+type ApiSetTaskQueueConfigSoftDeletionRequest struct {
+	ctx                        context.Context
+	ApiService                 *TasksAPIService
+	warehouseId                string
+	setSoftDeletionQueueConfig *SetSoftDeletionQueueConfig
 }
 
-func (r ApiSetTaskQueueConfigTabularExpirationRequest) SetTabularExpirationQueueConfig(setTabularExpirationQueueConfig SetTabularExpirationQueueConfig) ApiSetTaskQueueConfigTabularExpirationRequest {
-	r.setTabularExpirationQueueConfig = &setTabularExpirationQueueConfig
+func (r ApiSetTaskQueueConfigSoftDeletionRequest) SetSoftDeletionQueueConfig(setSoftDeletionQueueConfig SetSoftDeletionQueueConfig) ApiSetTaskQueueConfigSoftDeletionRequest {
+	r.setSoftDeletionQueueConfig = &setSoftDeletionQueueConfig
 	return r
 }
 
-func (r ApiSetTaskQueueConfigTabularExpirationRequest) Execute() (*http.Response, error) {
-	return r.ApiService.SetTaskQueueConfigTabularExpirationExecute(r)
+func (r ApiSetTaskQueueConfigSoftDeletionRequest) Execute() (*http.Response, error) {
+	return r.ApiService.SetTaskQueueConfigSoftDeletionExecute(r)
 }
 
 /*
-SetTaskQueueConfigTabularExpiration Set the configuration for a Task Queue.
+SetTaskQueueConfigSoftDeletion Set the configuration for a Task Queue.
 
 These configurations are global per warehouse and shared across all instances of this kind of task.
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 	@param warehouseId
-	@return ApiSetTaskQueueConfigTabularExpirationRequest
+	@return ApiSetTaskQueueConfigSoftDeletionRequest
 */
-func (a *TasksAPIService) SetTaskQueueConfigTabularExpiration(ctx context.Context, warehouseId string) ApiSetTaskQueueConfigTabularExpirationRequest {
-	return ApiSetTaskQueueConfigTabularExpirationRequest{
+func (a *TasksAPIService) SetTaskQueueConfigSoftDeletion(ctx context.Context, warehouseId string) ApiSetTaskQueueConfigSoftDeletionRequest {
+	return ApiSetTaskQueueConfigSoftDeletionRequest{
 		ApiService:  a,
 		ctx:         ctx,
 		warehouseId: warehouseId,
@@ -1271,26 +1271,26 @@ func (a *TasksAPIService) SetTaskQueueConfigTabularExpiration(ctx context.Contex
 }
 
 // Execute executes the request
-func (a *TasksAPIService) SetTaskQueueConfigTabularExpirationExecute(r ApiSetTaskQueueConfigTabularExpirationRequest) (*http.Response, error) {
+func (a *TasksAPIService) SetTaskQueueConfigSoftDeletionExecute(r ApiSetTaskQueueConfigSoftDeletionRequest) (*http.Response, error) {
 	var (
 		localVarHTTPMethod = http.MethodPost
 		localVarPostBody   interface{}
 		formFiles          []formFile
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "TasksAPIService.SetTaskQueueConfigTabularExpiration")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "TasksAPIService.SetTaskQueueConfigSoftDeletion")
 	if err != nil {
 		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/management/v1/warehouse/{warehouse_id}/task-queue/tabular_expiration/config"
+	localVarPath := localBasePath + "/management/v1/warehouse/{warehouse_id}/task-queue/soft_deletion/config"
 	localVarPath = strings.Replace(localVarPath, "{"+"warehouse_id"+"}", url.PathEscape(parameterValueToString(r.warehouseId, "warehouseId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
-	if r.setTabularExpirationQueueConfig == nil {
-		return nil, reportError("setTabularExpirationQueueConfig is required and must be specified")
+	if r.setSoftDeletionQueueConfig == nil {
+		return nil, reportError("setSoftDeletionQueueConfig is required and must be specified")
 	}
 
 	// to determine the Content-Type header
@@ -1311,7 +1311,7 @@ func (a *TasksAPIService) SetTaskQueueConfigTabularExpirationExecute(r ApiSetTas
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.setTabularExpirationQueueConfig
+	localVarPostBody = r.setSoftDeletionQueueConfig
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return nil, err

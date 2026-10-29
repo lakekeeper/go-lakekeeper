@@ -20,12 +20,13 @@ type TableRelation string
 
 // List of TableRelation
 const (
-	TableRelationOwnership    TableRelation = "ownership"
-	TableRelationPassGrants   TableRelation = "pass_grants"
-	TableRelationManageGrants TableRelation = "manage_grants"
-	TableRelationDescribe     TableRelation = "describe"
-	TableRelationSelect       TableRelation = "select"
-	TableRelationModify       TableRelation = "modify"
+	TABLERELATION_OWNERSHIP     TableRelation = "ownership"
+	TABLERELATION_PASS_GRANTS   TableRelation = "pass_grants"
+	TABLERELATION_MANAGE_GRANTS TableRelation = "manage_grants"
+	TABLERELATION_DESCRIBE      TableRelation = "describe"
+	TABLERELATION_SELECT        TableRelation = "select"
+	TABLERELATION_MODIFY        TableRelation = "modify"
+	TABLERELATION_MANAGE_TAGS   TableRelation = "manage_tags"
 )
 
 // All allowed values of TableRelation enum
@@ -36,6 +37,7 @@ var AllowedTableRelationEnumValues = []TableRelation{
 	"describe",
 	"select",
 	"modify",
+	"manage_tags",
 }
 
 func (v *TableRelation) UnmarshalJSON(src []byte) error {

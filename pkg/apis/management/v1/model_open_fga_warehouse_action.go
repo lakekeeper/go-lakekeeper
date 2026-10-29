@@ -20,14 +20,15 @@ type OpenFGAWarehouseAction string
 
 // List of OpenFGAWarehouseAction
 const (
-	OpenFGAWarehouseActionReadAssignments   OpenFGAWarehouseAction = "read_assignments"
-	OpenFGAWarehouseActionGrantCreate       OpenFGAWarehouseAction = "grant_create"
-	OpenFGAWarehouseActionGrantDescribe     OpenFGAWarehouseAction = "grant_describe"
-	OpenFGAWarehouseActionGrantModify       OpenFGAWarehouseAction = "grant_modify"
-	OpenFGAWarehouseActionGrantSelect       OpenFGAWarehouseAction = "grant_select"
-	OpenFGAWarehouseActionGrantPassGrants   OpenFGAWarehouseAction = "grant_pass_grants"
-	OpenFGAWarehouseActionGrantManageGrants OpenFGAWarehouseAction = "grant_manage_grants"
-	OpenFGAWarehouseActionChangeOwnership   OpenFGAWarehouseAction = "change_ownership"
+	OPENFGAWAREHOUSEACTION_READ_ASSIGNMENTS    OpenFGAWarehouseAction = "read_assignments"
+	OPENFGAWAREHOUSEACTION_GRANT_CREATE        OpenFGAWarehouseAction = "grant_create"
+	OPENFGAWAREHOUSEACTION_GRANT_DESCRIBE      OpenFGAWarehouseAction = "grant_describe"
+	OPENFGAWAREHOUSEACTION_GRANT_MODIFY        OpenFGAWarehouseAction = "grant_modify"
+	OPENFGAWAREHOUSEACTION_GRANT_SELECT        OpenFGAWarehouseAction = "grant_select"
+	OPENFGAWAREHOUSEACTION_GRANT_PASS_GRANTS   OpenFGAWarehouseAction = "grant_pass_grants"
+	OPENFGAWAREHOUSEACTION_GRANT_MANAGE_GRANTS OpenFGAWarehouseAction = "grant_manage_grants"
+	OPENFGAWAREHOUSEACTION_GRANT_MANAGE_TAGS   OpenFGAWarehouseAction = "grant_manage_tags"
+	OPENFGAWAREHOUSEACTION_CHANGE_OWNERSHIP    OpenFGAWarehouseAction = "change_ownership"
 )
 
 // All allowed values of OpenFGAWarehouseAction enum
@@ -39,6 +40,7 @@ var AllowedOpenFGAWarehouseActionEnumValues = []OpenFGAWarehouseAction{
 	"grant_select",
 	"grant_pass_grants",
 	"grant_manage_grants",
+	"grant_manage_tags",
 	"change_ownership",
 }
 

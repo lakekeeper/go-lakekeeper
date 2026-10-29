@@ -17,8 +17,16 @@ import (
 
 // TabularIdentUuid - struct for TabularIdentUuid
 type TabularIdentUuid struct {
-	TabularIdentUuidTable *TabularIdentUuidTable
-	TabularIdentUuidView  *TabularIdentUuidView
+	TabularIdentUuidGenericTable *TabularIdentUuidGenericTable
+	TabularIdentUuidTable        *TabularIdentUuidTable
+	TabularIdentUuidView         *TabularIdentUuidView
+}
+
+// TabularIdentUuidGenericTableAsTabularIdentUuid is a convenience function that returns TabularIdentUuidGenericTable wrapped in TabularIdentUuid
+func TabularIdentUuidGenericTableAsTabularIdentUuid(v *TabularIdentUuidGenericTable) TabularIdentUuid {
+	return TabularIdentUuid{
+		TabularIdentUuidGenericTable: v,
+	}
 }
 
 // TabularIdentUuidTableAsTabularIdentUuid is a convenience function that returns TabularIdentUuidTable wrapped in TabularIdentUuid
@@ -45,6 +53,18 @@ func (dst *TabularIdentUuid) UnmarshalJSON(data []byte) error {
 		return fmt.Errorf("failed to unmarshal JSON into map for the discriminator lookup")
 	}
 
+	// check if the discriminator value is 'generic-table'
+	if jsonDict["type"] == "generic-table" {
+		// try to unmarshal JSON data into TabularIdentUuidGenericTable
+		err = json.Unmarshal(data, &dst.TabularIdentUuidGenericTable)
+		if err == nil {
+			return nil // data stored in dst.TabularIdentUuidGenericTable, return on the first match
+		} else {
+			dst.TabularIdentUuidGenericTable = nil
+			return fmt.Errorf("failed to unmarshal TabularIdentUuid as TabularIdentUuidGenericTable: %s", err.Error())
+		}
+	}
+
 	// check if the discriminator value is 'table'
 	if jsonDict["type"] == "table" {
 		// try to unmarshal JSON data into TabularIdentUuidTable
@@ -66,6 +86,18 @@ func (dst *TabularIdentUuid) UnmarshalJSON(data []byte) error {
 		} else {
 			dst.TabularIdentUuidView = nil
 			return fmt.Errorf("failed to unmarshal TabularIdentUuid as TabularIdentUuidView: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'TabularIdentUuidGenericTable'
+	if jsonDict["type"] == "TabularIdentUuidGenericTable" {
+		// try to unmarshal JSON data into TabularIdentUuidGenericTable
+		err = json.Unmarshal(data, &dst.TabularIdentUuidGenericTable)
+		if err == nil {
+			return nil // data stored in dst.TabularIdentUuidGenericTable, return on the first match
+		} else {
+			dst.TabularIdentUuidGenericTable = nil
+			return fmt.Errorf("failed to unmarshal TabularIdentUuid as TabularIdentUuidGenericTable: %s", err.Error())
 		}
 	}
 
@@ -98,6 +130,10 @@ func (dst *TabularIdentUuid) UnmarshalJSON(data []byte) error {
 
 // Marshal data from the first non-nil pointers in the struct to JSON
 func (src TabularIdentUuid) MarshalJSON() ([]byte, error) {
+	if src.TabularIdentUuidGenericTable != nil {
+		return json.Marshal(&src.TabularIdentUuidGenericTable)
+	}
+
 	if src.TabularIdentUuidTable != nil {
 		return json.Marshal(&src.TabularIdentUuidTable)
 	}
@@ -114,6 +150,10 @@ func (obj *TabularIdentUuid) GetActualInstance() interface{} {
 	if obj == nil {
 		return nil
 	}
+	if obj.TabularIdentUuidGenericTable != nil {
+		return obj.TabularIdentUuidGenericTable
+	}
+
 	if obj.TabularIdentUuidTable != nil {
 		return obj.TabularIdentUuidTable
 	}
