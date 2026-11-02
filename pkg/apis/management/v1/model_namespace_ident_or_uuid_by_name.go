@@ -94,6 +94,14 @@ func (o *NamespaceIdentOrUuidByName) SetWarehouseId(v string) {
 	o.WarehouseId = v
 }
 
+func (o NamespaceIdentOrUuidByName) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o NamespaceIdentOrUuidByName) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["namespace"] = o.Namespace

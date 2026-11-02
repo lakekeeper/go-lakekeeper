@@ -153,6 +153,14 @@ func (o *S3CredentialAliyunOss) SetCredentialType(v string) {
 	o.CredentialType = v
 }
 
+func (o S3CredentialAliyunOss) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o S3CredentialAliyunOss) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["access-key-id"] = o.AccessKeyId

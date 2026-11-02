@@ -563,6 +563,14 @@ func (o *GetProjectTaskDetailsResponse) SetTaskData(v map[string]interface{}) {
 	o.TaskData = v
 }
 
+func (o GetProjectTaskDetailsResponse) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o GetProjectTaskDetailsResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["attempt"] = o.Attempt

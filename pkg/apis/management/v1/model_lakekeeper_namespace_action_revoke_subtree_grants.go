@@ -112,6 +112,14 @@ func (o *LakekeeperNamespaceActionRevokeSubtreeGrants) UnsetScope() {
 	o.Scope.Unset()
 }
 
+func (o LakekeeperNamespaceActionRevokeSubtreeGrants) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o LakekeeperNamespaceActionRevokeSubtreeGrants) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["action"] = o.Action

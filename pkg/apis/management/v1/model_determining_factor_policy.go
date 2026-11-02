@@ -212,6 +212,14 @@ func (o *DeterminingFactorPolicy) SetType(v string) {
 	o.Type = v
 }
 
+func (o DeterminingFactorPolicy) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o DeterminingFactorPolicy) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["effect"] = o.Effect

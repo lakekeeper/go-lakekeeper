@@ -379,6 +379,14 @@ func (o *CreateWarehouseRequest) SetWarehouseName(v string) {
 	o.WarehouseName = v
 }
 
+func (o CreateWarehouseRequest) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o CreateWarehouseRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if o.AllowedFormatVersions != nil {

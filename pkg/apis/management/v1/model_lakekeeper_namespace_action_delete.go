@@ -170,6 +170,14 @@ func (o *LakekeeperNamespaceActionDelete) SetRecursive(v bool) {
 	o.Recursive = &v
 }
 
+func (o LakekeeperNamespaceActionDelete) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o LakekeeperNamespaceActionDelete) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["action"] = o.Action

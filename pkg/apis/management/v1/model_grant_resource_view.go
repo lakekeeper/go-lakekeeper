@@ -120,6 +120,14 @@ func (o *GrantResourceView) SetWarehouseId(v string) {
 	o.WarehouseId = v
 }
 
+func (o GrantResourceView) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o GrantResourceView) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["type"] = o.Type

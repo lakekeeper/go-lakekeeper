@@ -102,6 +102,14 @@ func (o *LakekeeperNamespaceActionAcceptMovedNamespace) SetSource(v []string) {
 	o.Source = v
 }
 
+func (o LakekeeperNamespaceActionAcceptMovedNamespace) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o LakekeeperNamespaceActionAcceptMovedNamespace) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["action"] = o.Action

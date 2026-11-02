@@ -120,6 +120,14 @@ func (o *TagAttachmentTargetGenericTable) SetWarehouseId(v string) {
 	o.WarehouseId = v
 }
 
+func (o TagAttachmentTargetGenericTable) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o TagAttachmentTargetGenericTable) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["generic-table-id"] = o.GenericTableId

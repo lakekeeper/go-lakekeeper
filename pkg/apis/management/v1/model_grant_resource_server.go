@@ -68,6 +68,14 @@ func (o *GrantResourceServer) SetType(v string) {
 	o.Type = v
 }
 
+func (o GrantResourceServer) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o GrantResourceServer) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["type"] = o.Type

@@ -252,6 +252,14 @@ func (o *CreateUserRequest) UnsetUserType() {
 	o.UserType.Unset()
 }
 
+func (o CreateUserRequest) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o CreateUserRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Email.IsSet() {

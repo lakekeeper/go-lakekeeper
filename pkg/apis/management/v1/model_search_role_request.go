@@ -114,6 +114,14 @@ func (o *SearchRoleRequest) SetSearch(v string) {
 	o.Search = v
 }
 
+func (o SearchRoleRequest) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o SearchRoleRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if o.ProjectId.IsSet() {

@@ -273,6 +273,14 @@ func (o *WhoamiResponse) SetIsInstanceAdmin(v bool) {
 	o.IsInstanceAdmin = v
 }
 
+func (o WhoamiResponse) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o WhoamiResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["created-at"] = o.CreatedAt

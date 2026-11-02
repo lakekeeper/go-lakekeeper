@@ -95,6 +95,14 @@ func (o *GrantEntry) SetPrivilege(v string) {
 	o.Privilege = v
 }
 
+func (o GrantEntry) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o GrantEntry) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["principal"] = o.Principal

@@ -212,6 +212,14 @@ func (o *PrivilegeDescriptor) SetResourceType(v ResourceType) {
 	o.ResourceType = v
 }
 
+func (o PrivilegeDescriptor) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o PrivilegeDescriptor) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Category.IsSet() {

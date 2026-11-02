@@ -68,6 +68,14 @@ func (o *ListTagsResponse) SetTags(v []TargetTag) {
 	o.Tags = v
 }
 
+func (o ListTagsResponse) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o ListTagsResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["tags"] = o.Tags

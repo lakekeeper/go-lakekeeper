@@ -69,6 +69,14 @@ func (o *SubtreeGrantPrincipalOne) SetOne(v UserOrRole) {
 	o.One = v
 }
 
+func (o SubtreeGrantPrincipalOne) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o SubtreeGrantPrincipalOne) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["one"] = o.One

@@ -94,6 +94,14 @@ func (o *TabularIdentOrUuidById) SetWarehouseId(v string) {
 	o.WarehouseId = v
 }
 
+func (o TabularIdentOrUuidById) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o TabularIdentOrUuidById) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["table-id"] = o.TableId

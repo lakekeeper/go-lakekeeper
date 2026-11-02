@@ -168,6 +168,14 @@ func (o *SearchUser) SetUserType(v UserType) {
 	o.UserType = v
 }
 
+func (o SearchUser) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o SearchUser) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Email.IsSet() {

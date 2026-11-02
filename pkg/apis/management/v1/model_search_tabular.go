@@ -168,6 +168,14 @@ func (o *SearchTabular) SetTabularName(v string) {
 	o.TabularName = v
 }
 
+func (o SearchTabular) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o SearchTabular) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Distance.IsSet() {

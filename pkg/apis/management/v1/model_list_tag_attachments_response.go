@@ -113,6 +113,14 @@ func (o *ListTagAttachmentsResponse) UnsetNextPageToken() {
 	o.NextPageToken.Unset()
 }
 
+func (o ListTagAttachmentsResponse) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o ListTagAttachmentsResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["attachments"] = o.Attachments

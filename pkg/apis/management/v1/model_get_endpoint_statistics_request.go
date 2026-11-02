@@ -149,6 +149,14 @@ func (o *GetEndpointStatisticsRequest) SetWarehouse(v WarehouseFilter) {
 	o.Warehouse = v
 }
 
+func (o GetEndpointStatisticsRequest) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o GetEndpointStatisticsRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if o.RangeSpecifier.IsSet() {

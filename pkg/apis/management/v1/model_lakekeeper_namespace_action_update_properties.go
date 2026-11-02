@@ -134,6 +134,14 @@ func (o *LakekeeperNamespaceActionUpdateProperties) SetUpdatedProperties(v map[s
 	o.UpdatedProperties = v
 }
 
+func (o LakekeeperNamespaceActionUpdateProperties) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o LakekeeperNamespaceActionUpdateProperties) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["action"] = o.Action

@@ -446,6 +446,14 @@ func (o *StackitProfile) SetStsTokenValiditySeconds(v int64) {
 	o.StsTokenValiditySeconds = &v
 }
 
+func (o StackitProfile) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o StackitProfile) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["bucket"] = o.Bucket

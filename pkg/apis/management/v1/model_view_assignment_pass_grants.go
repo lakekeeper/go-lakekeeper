@@ -136,6 +136,14 @@ func (o *ViewAssignmentPassGrants) SetType(v string) {
 	o.Type = v
 }
 
+func (o ViewAssignmentPassGrants) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o ViewAssignmentPassGrants) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if !IsNil(o.Role) {

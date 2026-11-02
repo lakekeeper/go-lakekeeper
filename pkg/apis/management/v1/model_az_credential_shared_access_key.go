@@ -94,6 +94,14 @@ func (o *AzCredentialSharedAccessKey) SetKey(v string) {
 	o.Key = v
 }
 
+func (o AzCredentialSharedAccessKey) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o AzCredentialSharedAccessKey) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["credential-type"] = o.CredentialType

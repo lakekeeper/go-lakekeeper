@@ -115,6 +115,14 @@ func (o *ProtectionResponse) UnsetUpdatedAt() {
 	o.UpdatedAt.Unset()
 }
 
+func (o ProtectionResponse) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o ProtectionResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["protected"] = o.Protected

@@ -369,6 +369,14 @@ func (o *ListTasksRequest) SetStatus(v []TaskStatus) {
 	o.Status = v
 }
 
+func (o ListTasksRequest) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o ListTasksRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if o.CreatedAfter.IsSet() {

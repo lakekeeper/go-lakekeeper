@@ -120,6 +120,14 @@ func (o *GrantResourceTable) SetWarehouseId(v string) {
 	o.WarehouseId = v
 }
 
+func (o GrantResourceTable) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o GrantResourceTable) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["table-id"] = o.TableId

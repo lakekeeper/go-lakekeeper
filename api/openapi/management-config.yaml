@@ -16,12 +16,6 @@ useOneOfDiscriminatorLookup: true
 # various `*Action` enums) collide as package-level constants.
 enumClassPrefix: true
 
-# Drop per-leaf-struct MarshalJSON. The default Go encoder on the struct's
-# json tags produces byte-identical wire format (each optional field carries
-# `omitempty`), and the oneOf/Nullable wrappers' MarshalJSON come from
-# different templates and are unaffected. Saves ~8 lines per model file.
-generateMarshalJSON: false
-
 # Keep per-leaf-struct UnmarshalJSON. It enforces required-property presence on
 # inbound responses (catching a server that drops a field clients depend on),
 # which is also what lets unions without a discriminator in the spec (e.g.

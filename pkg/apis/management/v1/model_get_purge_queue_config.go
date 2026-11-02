@@ -112,6 +112,14 @@ func (o *GetPurgeQueueConfig) SetQueueConfig(v map[string]interface{}) {
 	o.QueueConfig = v
 }
 
+func (o GetPurgeQueueConfig) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o GetPurgeQueueConfig) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if o.MaxSecondsSinceLastHeartbeat.IsSet() {

@@ -69,6 +69,14 @@ func (o *GrantablePrivilegesResponse) SetPrivileges(v map[string][]PrivilegeDesc
 	o.Privileges = v
 }
 
+func (o GrantablePrivilegesResponse) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o GrantablePrivilegesResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["privileges"] = o.Privileges

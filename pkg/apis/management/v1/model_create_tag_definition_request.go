@@ -203,6 +203,14 @@ func (o *CreateTagDefinitionRequest) SetValueKind(v TagValueKind) {
 	o.ValueKind = v
 }
 
+func (o CreateTagDefinitionRequest) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o CreateTagDefinitionRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if o.AllowedValues != nil {

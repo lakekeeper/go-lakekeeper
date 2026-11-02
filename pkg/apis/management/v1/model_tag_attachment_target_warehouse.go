@@ -94,6 +94,14 @@ func (o *TagAttachmentTargetWarehouse) SetWarehouseId(v string) {
 	o.WarehouseId = v
 }
 
+func (o TagAttachmentTargetWarehouse) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o TagAttachmentTargetWarehouse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["type"] = o.Type

@@ -68,6 +68,14 @@ func (o *LakekeeperTagActionReadGrants) SetAction(v string) {
 	o.Action = v
 }
 
+func (o LakekeeperTagActionReadGrants) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o LakekeeperTagActionReadGrants) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["action"] = o.Action

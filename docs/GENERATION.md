@@ -137,7 +137,6 @@ choices, with the intent behind each:
 |---|---|---|
 | `useOneOfDiscriminatorLookup` | `true` | Lets the generator emit unambiguous unmarshal logic for unions that carry a `discriminator` block in the spec |
 | `enumClassPrefix` | `true` | Prefixes enum constants with their type (`S3FLAVOR_AWS`); without it, values shared across enums (`create`, `delete`, `select` on several `*Action` enums) collide as package-level constants |
-| `generateMarshalJSON` | `false` | Default Go encoding via the struct's `json:` tags is byte-identical to the custom `ToMap`-driven `MarshalJSON` (every optional field carries `omitempty`). Saves ~8 lines per model file with no wire-format change |
 | `generateUnmarshalJSON` | `true` | Kept on for the required-field presence check, which also lets unions without a spec discriminator pick their matching variant. Its `DisallowUnknownFields` side effect (and the strict enum-value validation) is the wrong posture for a client library, so the **postprocessor** strips it after generation — see below. Net result: required checks + discriminator decode retained, additive server fields/enum values tolerated |
 | `generateInterfaces` | `false` | We expose the generated client through `pkg/client`, so the additional `XxxAPI` interface variants are not needed |
 | `withGoMod`, `isGoSubmodule` | `false`, `true` | Embed the generated package inside this module instead of producing a standalone Go SDK |

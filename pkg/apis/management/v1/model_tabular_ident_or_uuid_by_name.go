@@ -121,6 +121,14 @@ func (o *TabularIdentOrUuidByName) SetWarehouseId(v string) {
 	o.WarehouseId = v
 }
 
+func (o TabularIdentOrUuidByName) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o TabularIdentOrUuidByName) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["namespace"] = o.Namespace

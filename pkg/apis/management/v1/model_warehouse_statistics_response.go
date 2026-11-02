@@ -141,6 +141,14 @@ func (o *WarehouseStatisticsResponse) SetWarehouseIdent(v string) {
 	o.WarehouseIdent = v
 }
 
+func (o WarehouseStatisticsResponse) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o WarehouseStatisticsResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if o.NextPageToken.IsSet() {

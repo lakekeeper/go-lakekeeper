@@ -114,6 +114,14 @@ func (o *CreateProjectRequest) SetProjectName(v string) {
 	o.ProjectName = v
 }
 
+func (o CreateProjectRequest) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o CreateProjectRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if o.ProjectId.IsSet() {

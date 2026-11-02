@@ -68,6 +68,14 @@ func (o *StorageLayoutDefault) SetType(v string) {
 	o.Type = v
 }
 
+func (o StorageLayoutDefault) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o StorageLayoutDefault) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["type"] = o.Type

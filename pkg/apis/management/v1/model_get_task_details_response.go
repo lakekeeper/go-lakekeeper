@@ -658,6 +658,14 @@ func (o *GetTaskDetailsResponse) SetTaskData(v map[string]interface{}) {
 	o.TaskData = v
 }
 
+func (o GetTaskDetailsResponse) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o GetTaskDetailsResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["attempt"] = o.Attempt

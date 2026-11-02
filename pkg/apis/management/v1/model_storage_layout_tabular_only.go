@@ -95,6 +95,14 @@ func (o *StorageLayoutTabularOnly) SetType(v string) {
 	o.Type = v
 }
 
+func (o StorageLayoutTabularOnly) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o StorageLayoutTabularOnly) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["tabular"] = o.Tabular

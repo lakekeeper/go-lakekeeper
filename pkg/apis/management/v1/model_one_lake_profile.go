@@ -378,6 +378,14 @@ func (o *OneLakeProfile) SetWorkspaceId(v string) {
 	o.WorkspaceId = v
 }
 
+func (o OneLakeProfile) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o OneLakeProfile) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if o.AuthorityHost.IsSet() {

@@ -102,6 +102,14 @@ func (o *LakekeeperViewActionMove) SetDestination(v []string) {
 	o.Destination = v
 }
 
+func (o LakekeeperViewActionMove) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o LakekeeperViewActionMove) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["action"] = o.Action

@@ -459,6 +459,14 @@ func (o *GetWarehouseResponse) SetWarehouseId(v string) {
 	o.WarehouseId = v
 }
 
+func (o GetWarehouseResponse) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o GetWarehouseResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["allowed-format-versions"] = o.AllowedFormatVersions

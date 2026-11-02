@@ -148,6 +148,14 @@ func (o *StorageCredentialStackitAccessKey) SetType(v string) {
 	o.Type = v
 }
 
+func (o StorageCredentialStackitAccessKey) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o StorageCredentialStackitAccessKey) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["access-key-id"] = o.AccessKeyId

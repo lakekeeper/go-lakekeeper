@@ -96,6 +96,14 @@ func (o *ColumnTags) SetTags(v []TargetTag) {
 	o.Tags = v
 }
 
+func (o ColumnTags) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o ColumnTags) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["field-id"] = o.FieldId

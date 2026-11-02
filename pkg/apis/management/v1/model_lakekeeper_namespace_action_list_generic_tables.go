@@ -68,6 +68,14 @@ func (o *LakekeeperNamespaceActionListGenericTables) SetAction(v string) {
 	o.Action = v
 }
 
+func (o LakekeeperNamespaceActionListGenericTables) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o LakekeeperNamespaceActionListGenericTables) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["action"] = o.Action

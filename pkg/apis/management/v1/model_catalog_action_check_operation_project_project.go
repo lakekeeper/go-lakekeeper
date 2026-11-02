@@ -112,6 +112,14 @@ func (o *CatalogActionCheckOperationProjectProject) UnsetProjectId() {
 	o.ProjectId.Unset()
 }
 
+func (o CatalogActionCheckOperationProjectProject) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o CatalogActionCheckOperationProjectProject) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["action"] = o.Action

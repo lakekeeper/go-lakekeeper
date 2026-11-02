@@ -68,6 +68,14 @@ func (o *GetGenericTableAssignmentsResponse) SetAssignments(v []GenericTableAssi
 	o.Assignments = v
 }
 
+func (o GetGenericTableAssignmentsResponse) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o GetGenericTableAssignmentsResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["assignments"] = o.Assignments

@@ -96,6 +96,14 @@ func (o *ValidateWarehouseResponse) SetValid(v bool) {
 	o.Valid = v
 }
 
+func (o ValidateWarehouseResponse) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o ValidateWarehouseResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["checks"] = o.Checks

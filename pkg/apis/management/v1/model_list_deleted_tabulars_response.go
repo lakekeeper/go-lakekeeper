@@ -114,6 +114,14 @@ func (o *ListDeletedTabularsResponse) SetTabulars(v []DeletedTabularResponse) {
 	o.Tabulars = v
 }
 
+func (o ListDeletedTabularsResponse) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o ListDeletedTabularsResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if o.NextPageToken.IsSet() {

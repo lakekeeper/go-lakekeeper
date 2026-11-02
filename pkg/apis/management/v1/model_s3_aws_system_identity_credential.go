@@ -82,6 +82,14 @@ func (o *S3AwsSystemIdentityCredential) UnsetExternalId() {
 	o.ExternalId.Unset()
 }
 
+func (o S3AwsSystemIdentityCredential) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o S3AwsSystemIdentityCredential) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if o.ExternalId.IsSet() {
