@@ -6,7 +6,7 @@ upstream Lakekeeper OpenAPI spec. Everything else in the repo — including the
 packages — is hand-written.
 
 This document is the single source of truth for **what is generated**, **how
-to regenerate it**, and **why a YAML preprocessor is involved**.
+to regenerate it**, and **why a pre- and postprocessor are involved**.
 
 ## What is generated
 

@@ -1,6 +1,9 @@
 package main
 
 import (
+	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 
 	"gopkg.in/yaml.v3"
@@ -179,5 +182,52 @@ paths:
 	}
 	if got := scalarValue(p, "explode"); got != "false" {
 		t.Errorf("explode: got %q, want %q", got, "false")
+	}
+}
+
+func TestForceBracketsOnRelations_MatchesNullableArrayType(t *testing.T) {
+	src := `
+paths:
+  /assignments:
+    get:
+      parameters:
+        - name: relations
+          in: query
+          schema:
+            type: [array, 'null']
+            items:
+              type: string
+`
+	root := loadDoc(t, src)
+	if got := forceBracketsOnRelations(root); got != 1 {
+		t.Fatalf("rewritten: got %d, want 1", got)
+	}
+
+	p := findGetQueryParam(t, root, "/assignments", "relations")
+	if got := scalarValue(p, "style"); got != "deepObject" {
+		t.Errorf("style: got %q, want %q", got, "deepObject")
+	}
+}
+
+func TestRun_FailsWhenNoRelationsParamRewritten(t *testing.T) {
+	dir := t.TempDir()
+	in := filepath.Join(dir, "in.yaml")
+	src := `
+paths:
+  /things:
+    get:
+      parameters:
+        - name: tags
+          in: query
+          schema:
+            type: array
+`
+	if err := os.WriteFile(in, []byte(src), 0o600); err != nil {
+		t.Fatal(err)
+	}
+
+	err := run(in, filepath.Join(dir, "out.yaml"))
+	if err == nil || !strings.Contains(err.Error(), "relations") {
+		t.Fatalf("run: got err %v, want an error mentioning relations", err)
 	}
 }

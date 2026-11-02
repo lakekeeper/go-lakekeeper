@@ -111,7 +111,7 @@ What it re-exports:
   underlying `managementv1` import without conversion.
 
 What it does **not** re-export:
-- The full ~189-schema Management API surface. Reach for `managementv1`
+- The full Management API surface. Reach for `managementv1`
   when you need a less-common type.
 - Generated enum constants. Use `managementv1.<ENUM>_<VALUE>` directly
   (`managementv1.WAREHOUSESTATUS_ACTIVE`, `managementv1.S3FLAVOR_AWS`);
