@@ -14,6 +14,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -48,6 +49,9 @@ func run(inPath, outPath string) error {
 	// backend with 400. Idempotent — already-styled params are overwritten
 	// in place.
 	bracketed := forceBracketsOnRelations(docRoot(&doc))
+	if bracketed == 0 {
+		return errors.New("no relations array query parameter found; the spec changed shape, so check whether this rewrite is still needed")
+	}
 
 	out, err := os.Create(outPath)
 	if err != nil {
@@ -121,7 +125,7 @@ func forceBracketsOnRelations(root *yaml.Node) int {
 				if scalarValueOf(p, "name") != "relations" {
 					continue
 				}
-				if scalarValueOf(lookup(p, "schema"), "type") != "array" {
+				if !isArrayType(lookup(lookup(p, "schema"), "type")) {
 					continue
 				}
 				setOrInsertScalar(p, "style", "deepObject")
@@ -131,6 +135,25 @@ func forceBracketsOnRelations(root *yaml.Node) int {
 		}
 	}
 	return count
+}
+
+// isArrayType reports whether a schema `type` node names an array, either as
+// `type: array` or as an OAS-3.1 type list such as `type: [array, 'null']`.
+func isArrayType(t *yaml.Node) bool {
+	if t == nil {
+		return false
+	}
+	switch t.Kind {
+	case yaml.ScalarNode:
+		return t.Value == "array"
+	case yaml.SequenceNode:
+		for _, c := range t.Content {
+			if c.Kind == yaml.ScalarNode && c.Value == "array" {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 // scalarValueOf returns the scalar value of m[key], or "" if the key is
