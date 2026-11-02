@@ -113,6 +113,14 @@ func (o *GetSoftDeletionQueueConfig) SetQueueConfig(v map[string]interface{}) {
 	o.QueueConfig = v
 }
 
+func (o GetSoftDeletionQueueConfig) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o GetSoftDeletionQueueConfig) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if o.MaxSecondsSinceLastHeartbeat.IsSet() {

@@ -96,6 +96,14 @@ func (o *StorageLayoutFull) SetTabular(v string) {
 	o.Tabular = v
 }
 
+func (o StorageLayoutFull) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o StorageLayoutFull) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["namespace"] = o.Namespace

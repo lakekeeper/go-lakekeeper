@@ -113,6 +113,14 @@ func (o *LakekeeperProjectActionCreateWarehouse) UnsetName() {
 	o.Name.Unset()
 }
 
+func (o LakekeeperProjectActionCreateWarehouse) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o LakekeeperProjectActionCreateWarehouse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["action"] = o.Action

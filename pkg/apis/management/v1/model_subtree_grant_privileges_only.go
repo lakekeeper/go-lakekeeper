@@ -68,6 +68,14 @@ func (o *SubtreeGrantPrivilegesOnly) SetOnly(v SubtreeGrantPrivilegesOnlyOnly) {
 	o.Only = v
 }
 
+func (o SubtreeGrantPrivilegesOnly) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o SubtreeGrantPrivilegesOnly) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["only"] = o.Only

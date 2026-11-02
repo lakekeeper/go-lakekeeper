@@ -177,6 +177,14 @@ func (o *SubtreeGrantScope) SetRootLevel(v RootLevelGrants) {
 	o.RootLevel = v
 }
 
+func (o SubtreeGrantScope) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o SubtreeGrantScope) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["dry_run"] = o.DryRun

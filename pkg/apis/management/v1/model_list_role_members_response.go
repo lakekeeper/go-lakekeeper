@@ -113,6 +113,14 @@ func (o *ListRoleMembersResponse) UnsetNextPageToken() {
 	o.NextPageToken.Unset()
 }
 
+func (o ListRoleMembersResponse) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o ListRoleMembersResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["members"] = o.Members

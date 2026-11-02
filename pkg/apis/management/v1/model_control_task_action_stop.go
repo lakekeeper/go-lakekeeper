@@ -68,6 +68,14 @@ func (o *ControlTaskActionStop) SetActionType(v string) {
 	o.ActionType = v
 }
 
+func (o ControlTaskActionStop) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o ControlTaskActionStop) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["action-type"] = o.ActionType

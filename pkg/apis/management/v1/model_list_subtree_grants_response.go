@@ -142,6 +142,14 @@ func (o *ListSubtreeGrantsResponse) UnsetNextPageToken() {
 	o.NextPageToken.Unset()
 }
 
+func (o ListSubtreeGrantsResponse) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o ListSubtreeGrantsResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["as-of"] = o.AsOf

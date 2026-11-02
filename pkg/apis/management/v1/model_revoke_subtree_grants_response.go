@@ -159,6 +159,14 @@ func (o *RevokeSubtreeGrantsResponse) SetRevoked(v int32) {
 	o.Revoked = v
 }
 
+func (o RevokeSubtreeGrantsResponse) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o RevokeSubtreeGrantsResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["created-before"] = o.CreatedBefore

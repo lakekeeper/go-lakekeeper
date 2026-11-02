@@ -268,6 +268,14 @@ func (o *User) SetUserType(v UserType) {
 	o.UserType = v
 }
 
+func (o User) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o User) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["created-at"] = o.CreatedAt

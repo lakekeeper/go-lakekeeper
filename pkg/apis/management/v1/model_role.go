@@ -322,6 +322,14 @@ func (o *Role) UnsetUpdatedAt() {
 	o.UpdatedAt.Unset()
 }
 
+func (o Role) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o Role) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["created-at"] = o.CreatedAt

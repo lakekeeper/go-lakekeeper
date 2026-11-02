@@ -173,6 +173,14 @@ func (o *CatalogActionCheckOperationGenericTableGenericTable) SetAction(v Lakeke
 	o.Action = v
 }
 
+func (o CatalogActionCheckOperationGenericTableGenericTable) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o CatalogActionCheckOperationGenericTableGenericTable) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["table-id"] = o.TableId

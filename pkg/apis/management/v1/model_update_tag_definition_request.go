@@ -176,6 +176,14 @@ func (o *UpdateTagDefinitionRequest) SetScope(v []TagScope) {
 	o.Scope = v
 }
 
+func (o UpdateTagDefinitionRequest) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o UpdateTagDefinitionRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if o.AddAllowedValues != nil {

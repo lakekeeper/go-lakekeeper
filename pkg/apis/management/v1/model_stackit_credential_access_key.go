@@ -122,6 +122,14 @@ func (o *StackitCredentialAccessKey) SetCredentialType(v string) {
 	o.CredentialType = v
 }
 
+func (o StackitCredentialAccessKey) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o StackitCredentialAccessKey) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["access-key-id"] = o.AccessKeyId

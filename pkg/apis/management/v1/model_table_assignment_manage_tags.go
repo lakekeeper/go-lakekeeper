@@ -136,6 +136,14 @@ func (o *TableAssignmentManageTags) SetType(v string) {
 	o.Type = v
 }
 
+func (o TableAssignmentManageTags) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o TableAssignmentManageTags) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if !IsNil(o.Role) {

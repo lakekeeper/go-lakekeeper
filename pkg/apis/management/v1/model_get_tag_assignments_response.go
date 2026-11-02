@@ -68,6 +68,14 @@ func (o *GetTagAssignmentsResponse) SetAssignments(v []TagAssignment) {
 	o.Assignments = v
 }
 
+func (o GetTagAssignmentsResponse) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o GetTagAssignmentsResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["assignments"] = o.Assignments

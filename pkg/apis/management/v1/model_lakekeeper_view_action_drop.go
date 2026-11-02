@@ -136,6 +136,14 @@ func (o *LakekeeperViewActionDrop) SetPurge(v bool) {
 	o.Purge = &v
 }
 
+func (o LakekeeperViewActionDrop) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o LakekeeperViewActionDrop) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["action"] = o.Action

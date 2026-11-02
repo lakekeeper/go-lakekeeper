@@ -69,6 +69,14 @@ func (o *SetMaintenanceModeRequest) SetMode(v MaintenanceMode) {
 	o.Mode = v
 }
 
+func (o SetMaintenanceModeRequest) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o SetMaintenanceModeRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["mode"] = o.Mode

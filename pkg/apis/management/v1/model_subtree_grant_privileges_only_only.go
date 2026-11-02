@@ -69,6 +69,14 @@ func (o *SubtreeGrantPrivilegesOnlyOnly) SetNames(v []string) {
 	o.Names = v
 }
 
+func (o SubtreeGrantPrivilegesOnlyOnly) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o SubtreeGrantPrivilegesOnlyOnly) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["names"] = o.Names

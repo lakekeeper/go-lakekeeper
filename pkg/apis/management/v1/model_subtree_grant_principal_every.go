@@ -69,6 +69,14 @@ func (o *SubtreeGrantPrincipalEvery) SetEvery(v map[string]interface{}) {
 	o.Every = v
 }
 
+func (o SubtreeGrantPrincipalEvery) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o SubtreeGrantPrincipalEvery) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["every"] = o.Every

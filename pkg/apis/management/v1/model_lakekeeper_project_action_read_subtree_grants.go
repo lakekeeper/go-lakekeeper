@@ -112,6 +112,14 @@ func (o *LakekeeperProjectActionReadSubtreeGrants) UnsetScope() {
 	o.Scope.Unset()
 }
 
+func (o LakekeeperProjectActionReadSubtreeGrants) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o LakekeeperProjectActionReadSubtreeGrants) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["action"] = o.Action

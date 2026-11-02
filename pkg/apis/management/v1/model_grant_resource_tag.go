@@ -94,6 +94,14 @@ func (o *GrantResourceTag) SetType(v string) {
 	o.Type = v
 }
 
+func (o GrantResourceTag) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o GrantResourceTag) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["tag-definition-id"] = o.TagDefinitionId

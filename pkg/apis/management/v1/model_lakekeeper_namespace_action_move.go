@@ -129,6 +129,14 @@ func (o *LakekeeperNamespaceActionMove) SetForce(v bool) {
 	o.Force = &v
 }
 
+func (o LakekeeperNamespaceActionMove) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o LakekeeperNamespaceActionMove) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["action"] = o.Action

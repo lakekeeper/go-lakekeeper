@@ -393,6 +393,14 @@ func (o *TaskAttempt) SetStatus(v TaskStatus) {
 	o.Status = v
 }
 
+func (o TaskAttempt) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o TaskAttempt) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["attempt"] = o.Attempt

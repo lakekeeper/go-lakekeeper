@@ -136,6 +136,14 @@ func (o *NamespaceAssignmentModify) SetType(v string) {
 	o.Type = v
 }
 
+func (o NamespaceAssignmentModify) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o NamespaceAssignmentModify) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if !IsNil(o.Role) {

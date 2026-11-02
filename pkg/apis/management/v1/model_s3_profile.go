@@ -821,6 +821,14 @@ func (o *S3Profile) SetStsTokenValiditySeconds(v int64) {
 	o.StsTokenValiditySeconds = &v
 }
 
+func (o S3Profile) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o S3Profile) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if o.AllowAlternativeProtocols.IsSet() {

@@ -367,6 +367,14 @@ func (o *LicenseStatus) SetValid(v bool) {
 	o.Valid = v
 }
 
+func (o LicenseStatus) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o LicenseStatus) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Audience.IsSet() {

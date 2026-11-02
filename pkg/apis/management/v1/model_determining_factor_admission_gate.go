@@ -140,6 +140,14 @@ func (o *DeterminingFactorAdmissionGate) SetType(v string) {
 	o.Type = v
 }
 
+func (o DeterminingFactorAdmissionGate) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o DeterminingFactorAdmissionGate) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Check.IsSet() {

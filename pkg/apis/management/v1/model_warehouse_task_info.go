@@ -591,6 +591,14 @@ func (o *WarehouseTaskInfo) SetWarehouseId(v string) {
 	o.WarehouseId = v
 }
 
+func (o WarehouseTaskInfo) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o WarehouseTaskInfo) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["attempt"] = o.Attempt

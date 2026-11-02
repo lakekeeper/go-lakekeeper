@@ -192,6 +192,14 @@ func (o *GrantResponse) SetResource(v GrantResourceResponse) {
 	o.Resource = v
 }
 
+func (o GrantResponse) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o GrantResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if o.CreatedAt.IsSet() {

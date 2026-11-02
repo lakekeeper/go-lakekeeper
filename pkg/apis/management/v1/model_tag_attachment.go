@@ -214,6 +214,14 @@ func (o *TagAttachment) UnsetValue() {
 	o.Value.Unset()
 }
 
+func (o TagAttachment) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o TagAttachment) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["created-at"] = o.CreatedAt

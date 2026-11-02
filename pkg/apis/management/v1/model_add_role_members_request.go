@@ -68,6 +68,14 @@ func (o *AddRoleMembersRequest) SetMembers(v []RoleMemberRef) {
 	o.Members = v
 }
 
+func (o AddRoleMembersRequest) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o AddRoleMembersRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["members"] = o.Members

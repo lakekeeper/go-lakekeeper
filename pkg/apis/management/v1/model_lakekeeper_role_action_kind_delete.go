@@ -68,6 +68,14 @@ func (o *LakekeeperRoleActionKindDelete) SetAction(v string) {
 	o.Action = v
 }
 
+func (o LakekeeperRoleActionKindDelete) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o LakekeeperRoleActionKindDelete) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["action"] = o.Action

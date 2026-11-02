@@ -120,6 +120,14 @@ func (o *TagInheritanceSourceNamespace) SetWarehouseId(v string) {
 	o.WarehouseId = v
 }
 
+func (o TagInheritanceSourceNamespace) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o TagInheritanceSourceNamespace) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["namespace-id"] = o.NamespaceId

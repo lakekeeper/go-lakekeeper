@@ -484,6 +484,14 @@ func (o *ProjectTaskInfo) UnsetUpdatedAt() {
 	o.UpdatedAt.Unset()
 }
 
+func (o ProjectTaskInfo) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o ProjectTaskInfo) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["attempt"] = o.Attempt

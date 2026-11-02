@@ -68,6 +68,14 @@ func (o *ListColumnTagsResponse) SetColumns(v []ColumnTags) {
 	o.Columns = v
 }
 
+func (o ListColumnTagsResponse) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o ListColumnTagsResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["columns"] = o.Columns

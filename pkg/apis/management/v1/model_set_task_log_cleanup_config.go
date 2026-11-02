@@ -112,6 +112,14 @@ func (o *SetTaskLogCleanupConfig) SetQueueConfig(v TaskLogCleanupConfig) {
 	o.QueueConfig = v
 }
 
+func (o SetTaskLogCleanupConfig) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o SetTaskLogCleanupConfig) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if o.MaxSecondsSinceLastHeartbeat.IsSet() {

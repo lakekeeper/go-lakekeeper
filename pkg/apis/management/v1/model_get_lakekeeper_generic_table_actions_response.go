@@ -68,6 +68,14 @@ func (o *GetLakekeeperGenericTableActionsResponse) SetAllowedActions(v []Lakekee
 	o.AllowedActions = v
 }
 
+func (o GetLakekeeperGenericTableActionsResponse) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o GetLakekeeperGenericTableActionsResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["allowed-actions"] = o.AllowedActions

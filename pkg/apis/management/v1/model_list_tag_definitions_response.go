@@ -112,6 +112,14 @@ func (o *ListTagDefinitionsResponse) SetTagDefinitions(v []TagDefinition) {
 	o.TagDefinitions = v
 }
 
+func (o ListTagDefinitionsResponse) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o ListTagDefinitionsResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if o.NextPageToken.IsSet() {

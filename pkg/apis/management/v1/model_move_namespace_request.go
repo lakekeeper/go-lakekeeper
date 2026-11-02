@@ -103,6 +103,14 @@ func (o *MoveNamespaceRequest) SetForce(v bool) {
 	o.Force = &v
 }
 
+func (o MoveNamespaceRequest) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o MoveNamespaceRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["destination"] = o.Destination

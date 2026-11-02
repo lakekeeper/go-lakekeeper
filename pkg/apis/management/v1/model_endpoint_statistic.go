@@ -286,6 +286,14 @@ func (o *EndpointStatistic) UnsetWarehouseName() {
 	o.WarehouseName.Unset()
 }
 
+func (o EndpointStatistic) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o EndpointStatistic) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["count"] = o.Count

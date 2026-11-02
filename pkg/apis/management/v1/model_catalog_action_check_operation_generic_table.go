@@ -68,6 +68,14 @@ func (o *CatalogActionCheckOperationGenericTable) SetGenericTable(v CatalogActio
 	o.GenericTable = v
 }
 
+func (o CatalogActionCheckOperationGenericTable) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o CatalogActionCheckOperationGenericTable) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["generic-table"] = o.GenericTable

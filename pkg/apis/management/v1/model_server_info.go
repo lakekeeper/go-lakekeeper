@@ -568,6 +568,14 @@ func (o *ServerInfo) SetVersion(v string) {
 	o.Version = v
 }
 
+func (o ServerInfo) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o ServerInfo) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["authz-backend"] = o.AuthzBackend

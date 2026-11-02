@@ -148,6 +148,14 @@ func (o *CatalogActionsBatchCheckResult) UnsetId() {
 	o.Id.Unset()
 }
 
+func (o CatalogActionsBatchCheckResult) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o CatalogActionsBatchCheckResult) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["allowed"] = o.Allowed

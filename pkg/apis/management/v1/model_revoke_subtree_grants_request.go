@@ -348,6 +348,14 @@ func (o *RevokeSubtreeGrantsRequest) SetResourceType(v []ResourceType) {
 	o.ResourceType = v
 }
 
+func (o RevokeSubtreeGrantsRequest) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o RevokeSubtreeGrantsRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if !IsNil(o.AllowPartial) {

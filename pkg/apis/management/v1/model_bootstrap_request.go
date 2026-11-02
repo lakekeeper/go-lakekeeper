@@ -238,6 +238,14 @@ func (o *BootstrapRequest) UnsetUserType() {
 	o.UserType.Unset()
 }
 
+func (o BootstrapRequest) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o BootstrapRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["accept-terms-of-use"] = o.AcceptTermsOfUse
