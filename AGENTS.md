@@ -55,6 +55,4 @@ Import aliases are enforced by `importas`; use exactly these:
 
 ## Commits and branches
 
-- Conventional Commits, parsed by release-please for versioning and `CHANGELOG.md`. Use only `feat`, `fix`, `docs`, `chore`: the only types release-please is configured for.
-- Branches: `type/name`, using the commit types above (e.g. `fix/role-list-pagination`).
-- `CHANGELOG.md` and `.release-please-manifest.json` belong to release-please; leave them untouched.
+[`CONTRIBUTING.md`](CONTRIBUTING.md#commits-and-branches) is the source of truth for commit messages, PR titles, and branch names. Read it before committing or opening a pull request.

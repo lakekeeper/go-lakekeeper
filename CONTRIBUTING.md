@@ -16,6 +16,7 @@ Please take a moment to review this guide before submitting a pull request.
     - [Suggesting Features](#suggesting-features)
     - [Submitting Changes](#submitting-changes)
   - [Coding Guidelines](#coding-guidelines)
+  - [Commits and branches](#commits-and-branches)
   - [Testing](#testing)
   - [Pull Request Process](#pull-request-process)
   - [License](#license)
@@ -59,8 +60,14 @@ Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md) to help create 
 
 - Use `gofmt`, `golangci-lint`, and `go vet` before submitting.
 - Keep your changes focused: small, atomic PRs are easier to review.
-- Use [Conventional Commits](https://www.conventionalcommits.org) for commit messages and PR titles, with one of the types `feat`, `fix`, `docs`, or `chore` (e.g. `fix: handle empty role list`). release-please derives versions and the changelog from them, and CI rejects PR titles that don't match.
 - Follow the [Effective Go](https://golang.org/doc/effective_go.html) guidelines.
+
+## Commits and branches
+
+- Commits and pull request titles follow [Conventional Commits](https://www.conventionalcommits.org), e.g. `fix: handle empty role list` or `feat(storage): support GCS`. Start the description with a lowercase letter, use the imperative mood, and leave off the trailing period; this is convention, not checked by CI. CI checks the PR title's format and accepts the types `build`, `chore`, `ci`, `docs`, `feat`, `fix`, `perf`, `refactor`, `revert`, `style`, and `test`; [release-please](https://github.com/googleapis/release-please) derives versions and `CHANGELOG.md` from it.
+- Mark a breaking change with `!` (e.g. `feat!: rename client option`) and describe the migration in the PR.
+- Name branches `type/short-description` using the commit type, e.g. `fix/role-list-pagination`.
+- `CHANGELOG.md` and `.release-please-manifest.json` are maintained by release-please; leave them untouched.
 
 ## Regenerating the API client
 
