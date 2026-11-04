@@ -18,6 +18,7 @@ Please take a moment to review this guide before submitting a pull request.
   - [Coding Guidelines](#coding-guidelines)
   - [Commits and branches](#commits-and-branches)
   - [Testing](#testing)
+  - [Knowledge graph (optional)](#knowledge-graph-optional)
   - [Pull Request Process](#pull-request-process)
   - [License](#license)
 
@@ -102,6 +103,13 @@ make test-e2e-compose
 `make test-e2e-kind` runs the `lkctl` end-to-end tests against a kind cluster; it needs `kind`, `kubectl` and `helm` installed.
 
 If adding a feature or fixing a bug, include relevant unit and/or integration tests.
+
+## Knowledge graph (optional)
+
+If you use a coding agent, the [graphify](https://github.com/safishamsi/graphify) knowledge graph of the code in `graphify-out/graph.json` gives it a map of the repository. The graph is committed and shared, following graphify's [shared team graph](https://docs.graphify.com/cookbooks/shared-team-graph) recipe; the other files in `graphify-out/` are gitignored and rebuilt locally. `.graphifyignore` lists files the graph skips.
+
+- `make graph` rebuilds the graph (needs [`uv`](https://docs.astral.sh/uv/)). It runs locally, costs no API tokens, and takes a few seconds. Rerun it after code changes and commit the updated `graph.json` with them.
+- `make graph-setup` registers graphify's union merge driver in your clone, once. `.gitattributes` routes `graph.json` through it, so two branches that both changed the graph merge without a conflict.
 
 ## Pull Request Process
 
