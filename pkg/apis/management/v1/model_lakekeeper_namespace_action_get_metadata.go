@@ -68,6 +68,14 @@ func (o *LakekeeperNamespaceActionGetMetadata) SetAction(v string) {
 	o.Action = v
 }
 
+func (o LakekeeperNamespaceActionGetMetadata) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o LakekeeperNamespaceActionGetMetadata) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["action"] = o.Action

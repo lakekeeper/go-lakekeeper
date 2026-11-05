@@ -20,12 +20,13 @@ type ViewRelation string
 
 // List of ViewRelation
 const (
-	ViewRelationOwnership    ViewRelation = "ownership"
-	ViewRelationPassGrants   ViewRelation = "pass_grants"
-	ViewRelationManageGrants ViewRelation = "manage_grants"
-	ViewRelationDescribe     ViewRelation = "describe"
-	ViewRelationSelect       ViewRelation = "select"
-	ViewRelationModify       ViewRelation = "modify"
+	VIEWRELATION_OWNERSHIP     ViewRelation = "ownership"
+	VIEWRELATION_PASS_GRANTS   ViewRelation = "pass_grants"
+	VIEWRELATION_MANAGE_GRANTS ViewRelation = "manage_grants"
+	VIEWRELATION_DESCRIBE      ViewRelation = "describe"
+	VIEWRELATION_SELECT        ViewRelation = "select"
+	VIEWRELATION_MODIFY        ViewRelation = "modify"
+	VIEWRELATION_MANAGE_TAGS   ViewRelation = "manage_tags"
 )
 
 // All allowed values of ViewRelation enum
@@ -36,6 +37,7 @@ var AllowedViewRelationEnumValues = []ViewRelation{
 	"describe",
 	"select",
 	"modify",
+	"manage_tags",
 }
 
 func (v *ViewRelation) UnmarshalJSON(src []byte) error {

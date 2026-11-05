@@ -19,6 +19,7 @@ import (
 type ViewAssignment struct {
 	ViewAssignmentDescribe     *ViewAssignmentDescribe
 	ViewAssignmentManageGrants *ViewAssignmentManageGrants
+	ViewAssignmentManageTags   *ViewAssignmentManageTags
 	ViewAssignmentModify       *ViewAssignmentModify
 	ViewAssignmentOwnership    *ViewAssignmentOwnership
 	ViewAssignmentPassGrants   *ViewAssignmentPassGrants
@@ -36,6 +37,13 @@ func ViewAssignmentDescribeAsViewAssignment(v *ViewAssignmentDescribe) ViewAssig
 func ViewAssignmentManageGrantsAsViewAssignment(v *ViewAssignmentManageGrants) ViewAssignment {
 	return ViewAssignment{
 		ViewAssignmentManageGrants: v,
+	}
+}
+
+// ViewAssignmentManageTagsAsViewAssignment is a convenience function that returns ViewAssignmentManageTags wrapped in ViewAssignment
+func ViewAssignmentManageTagsAsViewAssignment(v *ViewAssignmentManageTags) ViewAssignment {
+	return ViewAssignment{
+		ViewAssignmentManageTags: v,
 	}
 }
 
@@ -98,6 +106,18 @@ func (dst *ViewAssignment) UnmarshalJSON(data []byte) error {
 		} else {
 			dst.ViewAssignmentManageGrants = nil
 			return fmt.Errorf("failed to unmarshal ViewAssignment as ViewAssignmentManageGrants: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'manage_tags'
+	if jsonDict["type"] == "manage_tags" {
+		// try to unmarshal JSON data into ViewAssignmentManageTags
+		err = json.Unmarshal(data, &dst.ViewAssignmentManageTags)
+		if err == nil {
+			return nil // data stored in dst.ViewAssignmentManageTags, return on the first match
+		} else {
+			dst.ViewAssignmentManageTags = nil
+			return fmt.Errorf("failed to unmarshal ViewAssignment as ViewAssignmentManageTags: %s", err.Error())
 		}
 	}
 
@@ -173,6 +193,18 @@ func (dst *ViewAssignment) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	// check if the discriminator value is 'ViewAssignmentManageTags'
+	if jsonDict["type"] == "ViewAssignmentManageTags" {
+		// try to unmarshal JSON data into ViewAssignmentManageTags
+		err = json.Unmarshal(data, &dst.ViewAssignmentManageTags)
+		if err == nil {
+			return nil // data stored in dst.ViewAssignmentManageTags, return on the first match
+		} else {
+			dst.ViewAssignmentManageTags = nil
+			return fmt.Errorf("failed to unmarshal ViewAssignment as ViewAssignmentManageTags: %s", err.Error())
+		}
+	}
+
 	// check if the discriminator value is 'ViewAssignmentModify'
 	if jsonDict["type"] == "ViewAssignmentModify" {
 		// try to unmarshal JSON data into ViewAssignmentModify
@@ -234,6 +266,10 @@ func (src ViewAssignment) MarshalJSON() ([]byte, error) {
 		return json.Marshal(&src.ViewAssignmentManageGrants)
 	}
 
+	if src.ViewAssignmentManageTags != nil {
+		return json.Marshal(&src.ViewAssignmentManageTags)
+	}
+
 	if src.ViewAssignmentModify != nil {
 		return json.Marshal(&src.ViewAssignmentModify)
 	}
@@ -264,6 +300,10 @@ func (obj *ViewAssignment) GetActualInstance() interface{} {
 
 	if obj.ViewAssignmentManageGrants != nil {
 		return obj.ViewAssignmentManageGrants
+	}
+
+	if obj.ViewAssignmentManageTags != nil {
+		return obj.ViewAssignmentManageTags
 	}
 
 	if obj.ViewAssignmentModify != nil {

@@ -23,6 +23,154 @@ import (
 // RoleAPIService RoleAPI service
 type RoleAPIService service
 
+type ApiAddRoleMembersRequest struct {
+	ctx                   context.Context
+	ApiService            *RoleAPIService
+	roleId                string
+	addRoleMembersRequest *AddRoleMembersRequest
+	xProjectId            *string
+}
+
+func (r ApiAddRoleMembersRequest) AddRoleMembersRequest(addRoleMembersRequest AddRoleMembersRequest) ApiAddRoleMembersRequest {
+	r.addRoleMembersRequest = &addRoleMembersRequest
+	return r
+}
+
+// Project ID (optional; falls back to the default project if not provided)
+func (r ApiAddRoleMembersRequest) XProjectId(xProjectId string) ApiAddRoleMembersRequest {
+	r.xProjectId = &xProjectId
+	return r
+}
+
+func (r ApiAddRoleMembersRequest) Execute() (*AddRoleMembersResponse, *http.Response, error) {
+	return r.ApiService.AddRoleMembersExecute(r)
+}
+
+/*
+AddRoleMembers Add Role Members
+
+Adds one or more members (users and/or roles) to a role in a single atomic
+(all-or-nothing) batch. Idempotent — already-present members are accepted.
+Returns the requested members confirmed present.
+
+Handling of a not-yet-provisioned member depends on the configured
+authorization backend: a backend that stores assignments itself accepts the
+member by id, whereas catalog-backed authorization requires the member to
+exist first and otherwise returns `404` — provision the user (via
+`POST /user`) or create the role before assigning. Behavior is consistent
+within a deployment.
+
+Roles from the `system` provider are provisioned, not self-service: adding a
+member requires an instance admin (`403`), and a role may not be added as a
+member of one (`400`) — they hold users directly.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param roleId Role ID
+	@return ApiAddRoleMembersRequest
+*/
+func (a *RoleAPIService) AddRoleMembers(ctx context.Context, roleId string) ApiAddRoleMembersRequest {
+	return ApiAddRoleMembersRequest{
+		ApiService: a,
+		ctx:        ctx,
+		roleId:     roleId,
+	}
+}
+
+// Execute executes the request
+//
+//	@return AddRoleMembersResponse
+func (a *RoleAPIService) AddRoleMembersExecute(r ApiAddRoleMembersRequest) (*AddRoleMembersResponse, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodPost
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *AddRoleMembersResponse
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "RoleAPIService.AddRoleMembers")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/management/v1/role/{role_id}/members"
+	localVarPath = strings.Replace(localVarPath, "{"+"role_id"+"}", url.PathEscape(parameterValueToString(r.roleId, "roleId")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.addRoleMembersRequest == nil {
+		return localVarReturnValue, nil, reportError("addRoleMembersRequest is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	if r.xProjectId != nil {
+		parameterAddToHeaderOrQuery(localVarHeaderParams, "x-project-id", r.xProjectId, "simple", "")
+	}
+	// body params
+	localVarPostBody = r.addRoleMembersRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode >= 400 && localVarHTTPResponse.StatusCode < 500 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 type ApiCreateRoleRequest struct {
 	ctx               context.Context
 	ApiService        *RoleAPIService
@@ -158,7 +306,14 @@ type ApiDeleteRoleRequest struct {
 	ctx        context.Context
 	ApiService *RoleAPIService
 	roleId     string
+	force      *bool
 	xProjectId *string
+}
+
+// Delete the role even if it holds grants. Its grants are revoked with it. Checked where Lakekeeper stores grants in its database; under OpenFGA a role&#39;s grants are always removed with it.
+func (r ApiDeleteRoleRequest) Force(force bool) ApiDeleteRoleRequest {
+	r.force = &force
+	return r
 }
 
 // Project ID (optional; falls back to the default project if not provided)
@@ -174,7 +329,9 @@ func (r ApiDeleteRoleRequest) Execute() (*http.Response, error) {
 /*
 DeleteRole Delete Role
 
-Permanently removes a role and all its associated permissions.
+Permanently removes a role, its member assignments and its grants.
+Where Lakekeeper stores grants in its database (every built-in authorizer except OpenFGA), a role that holds grants is only deleted with `force=true`; otherwise the request fails with `409 RoleHasGrants`. Under OpenFGA the role's grants are removed with it.
+Roles maintained by a configured role provider can be deleted too. Their members are re-synced from the provider on their next request, and if the provider still reports the group, it recreates the role, without the deleted grants. Other Lakekeeper instances follow once their user assignments cache entry expires.
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 	@param roleId Role ID
@@ -208,6 +365,9 @@ func (a *RoleAPIService) DeleteRoleExecute(r ApiDeleteRoleRequest) (*http.Respon
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
 
+	if r.force != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "force", r.force, "form", "")
+	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
 
@@ -648,6 +808,628 @@ func (a *RoleAPIService) GetRoleMetadataExecute(r ApiGetRoleMetadataRequest) (*R
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+type ApiListRoleMemberOfRequest struct {
+	ctx        context.Context
+	ApiService *RoleAPIService
+	roleId     string
+	pageToken  *string
+	pageSize   *int64
+	xProjectId *string
+}
+
+func (r ApiListRoleMemberOfRequest) PageToken(pageToken string) ApiListRoleMemberOfRequest {
+	r.pageToken = &pageToken
+	return r
+}
+
+// Upper bound on the number of results returned. Default: 100.
+func (r ApiListRoleMemberOfRequest) PageSize(pageSize int64) ApiListRoleMemberOfRequest {
+	r.pageSize = &pageSize
+	return r
+}
+
+// Project ID (optional; falls back to the default project if not provided)
+func (r ApiListRoleMemberOfRequest) XProjectId(xProjectId string) ApiListRoleMemberOfRequest {
+	r.xProjectId = &xProjectId
+	return r
+}
+
+func (r ApiListRoleMemberOfRequest) Execute() (*ListRoleMembershipsResponse, *http.Response, error) {
+	return r.ApiService.ListRoleMemberOfExecute(r)
+}
+
+/*
+ListRoleMemberOf List Roles a Role Is a Member Of
+
+Lists the roles that the given role is a direct member of, keyset-paginated.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param roleId Role ID
+	@return ApiListRoleMemberOfRequest
+*/
+func (a *RoleAPIService) ListRoleMemberOf(ctx context.Context, roleId string) ApiListRoleMemberOfRequest {
+	return ApiListRoleMemberOfRequest{
+		ApiService: a,
+		ctx:        ctx,
+		roleId:     roleId,
+	}
+}
+
+// Execute executes the request
+//
+//	@return ListRoleMembershipsResponse
+func (a *RoleAPIService) ListRoleMemberOfExecute(r ApiListRoleMemberOfRequest) (*ListRoleMembershipsResponse, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *ListRoleMembershipsResponse
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "RoleAPIService.ListRoleMemberOf")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/management/v1/role/{role_id}/member-of"
+	localVarPath = strings.Replace(localVarPath, "{"+"role_id"+"}", url.PathEscape(parameterValueToString(r.roleId, "roleId")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if r.pageToken != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "pageToken", r.pageToken, "form", "")
+	}
+	if r.pageSize != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "pageSize", r.pageSize, "form", "")
+	}
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	if r.xProjectId != nil {
+		parameterAddToHeaderOrQuery(localVarHeaderParams, "x-project-id", r.xProjectId, "simple", "")
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode >= 400 && localVarHTTPResponse.StatusCode < 500 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiListRoleMembersRequest struct {
+	ctx        context.Context
+	ApiService *RoleAPIService
+	roleId     string
+	type_      *RoleMemberType
+	pageToken  *string
+	pageSize   *int64
+	xProjectId *string
+}
+
+// Restrict to one member kind (&#x60;user&#x60; or &#x60;role&#x60;). Both kinds when omitted.
+func (r ApiListRoleMembersRequest) Type_(type_ RoleMemberType) ApiListRoleMembersRequest {
+	r.type_ = &type_
+	return r
+}
+
+func (r ApiListRoleMembersRequest) PageToken(pageToken string) ApiListRoleMembersRequest {
+	r.pageToken = &pageToken
+	return r
+}
+
+// Upper bound on the number of results returned. Default: 100.
+func (r ApiListRoleMembersRequest) PageSize(pageSize int64) ApiListRoleMembersRequest {
+	r.pageSize = &pageSize
+	return r
+}
+
+// Project ID (optional; falls back to the default project if not provided)
+func (r ApiListRoleMembersRequest) XProjectId(xProjectId string) ApiListRoleMembersRequest {
+	r.xProjectId = &xProjectId
+	return r
+}
+
+func (r ApiListRoleMembersRequest) Execute() (*ListRoleMembersResponse, *http.Response, error) {
+	return r.ApiService.ListRoleMembersExecute(r)
+}
+
+/*
+ListRoleMembers List Role Members
+
+Lists the direct members of a role — users and member roles — as one merged,
+keyset-paginated page. Optionally filtered to a single member kind via `?type=`.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param roleId Role ID
+	@return ApiListRoleMembersRequest
+*/
+func (a *RoleAPIService) ListRoleMembers(ctx context.Context, roleId string) ApiListRoleMembersRequest {
+	return ApiListRoleMembersRequest{
+		ApiService: a,
+		ctx:        ctx,
+		roleId:     roleId,
+	}
+}
+
+// Execute executes the request
+//
+//	@return ListRoleMembersResponse
+func (a *RoleAPIService) ListRoleMembersExecute(r ApiListRoleMembersRequest) (*ListRoleMembersResponse, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *ListRoleMembersResponse
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "RoleAPIService.ListRoleMembers")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/management/v1/role/{role_id}/members"
+	localVarPath = strings.Replace(localVarPath, "{"+"role_id"+"}", url.PathEscape(parameterValueToString(r.roleId, "roleId")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if r.type_ != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "type", r.type_, "form", "")
+	}
+	if r.pageToken != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "pageToken", r.pageToken, "form", "")
+	}
+	if r.pageSize != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "pageSize", r.pageSize, "form", "")
+	}
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	if r.xProjectId != nil {
+		parameterAddToHeaderOrQuery(localVarHeaderParams, "x-project-id", r.xProjectId, "simple", "")
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode >= 400 && localVarHTTPResponse.StatusCode < 500 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiListRoleTransitiveMemberOfRequest struct {
+	ctx        context.Context
+	ApiService *RoleAPIService
+	roleId     string
+	pageToken  *string
+	pageSize   *int64
+	xProjectId *string
+}
+
+func (r ApiListRoleTransitiveMemberOfRequest) PageToken(pageToken string) ApiListRoleTransitiveMemberOfRequest {
+	r.pageToken = &pageToken
+	return r
+}
+
+// Upper bound on the number of results returned. Default: 100.
+func (r ApiListRoleTransitiveMemberOfRequest) PageSize(pageSize int64) ApiListRoleTransitiveMemberOfRequest {
+	r.pageSize = &pageSize
+	return r
+}
+
+// Project ID (optional; falls back to the default project if not provided)
+func (r ApiListRoleTransitiveMemberOfRequest) XProjectId(xProjectId string) ApiListRoleTransitiveMemberOfRequest {
+	r.xProjectId = &xProjectId
+	return r
+}
+
+func (r ApiListRoleTransitiveMemberOfRequest) Execute() (*ListRoleMembershipsResponse, *http.Response, error) {
+	return r.ApiService.ListRoleTransitiveMemberOfExecute(r)
+}
+
+/*
+ListRoleTransitiveMemberOf List Transitive Role Member-Of
+
+Lists the full transitive member-of set of a role — every role it
+effectively belongs to, reachable upward through membership — keyset-
+paginated. Supported only when assignments are catalog-managed; an
+assignment-managing authorizer (e.g. OpenFGA) returns `501`.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param roleId Role ID
+	@return ApiListRoleTransitiveMemberOfRequest
+*/
+func (a *RoleAPIService) ListRoleTransitiveMemberOf(ctx context.Context, roleId string) ApiListRoleTransitiveMemberOfRequest {
+	return ApiListRoleTransitiveMemberOfRequest{
+		ApiService: a,
+		ctx:        ctx,
+		roleId:     roleId,
+	}
+}
+
+// Execute executes the request
+//
+//	@return ListRoleMembershipsResponse
+func (a *RoleAPIService) ListRoleTransitiveMemberOfExecute(r ApiListRoleTransitiveMemberOfRequest) (*ListRoleMembershipsResponse, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *ListRoleMembershipsResponse
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "RoleAPIService.ListRoleTransitiveMemberOf")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/management/v1/role/{role_id}/member-of/transitive"
+	localVarPath = strings.Replace(localVarPath, "{"+"role_id"+"}", url.PathEscape(parameterValueToString(r.roleId, "roleId")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if r.pageToken != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "pageToken", r.pageToken, "form", "")
+	}
+	if r.pageSize != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "pageSize", r.pageSize, "form", "")
+	}
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	if r.xProjectId != nil {
+		parameterAddToHeaderOrQuery(localVarHeaderParams, "x-project-id", r.xProjectId, "simple", "")
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 501 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode >= 400 && localVarHTTPResponse.StatusCode < 500 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiListRoleTransitiveMembersRequest struct {
+	ctx        context.Context
+	ApiService *RoleAPIService
+	roleId     string
+	type_      *RoleMemberType
+	pageToken  *string
+	pageSize   *int64
+	xProjectId *string
+}
+
+// Restrict to one member kind (&#x60;user&#x60; or &#x60;role&#x60;). Both kinds when omitted.
+func (r ApiListRoleTransitiveMembersRequest) Type_(type_ RoleMemberType) ApiListRoleTransitiveMembersRequest {
+	r.type_ = &type_
+	return r
+}
+
+func (r ApiListRoleTransitiveMembersRequest) PageToken(pageToken string) ApiListRoleTransitiveMembersRequest {
+	r.pageToken = &pageToken
+	return r
+}
+
+// Upper bound on the number of results returned. Default: 100.
+func (r ApiListRoleTransitiveMembersRequest) PageSize(pageSize int64) ApiListRoleTransitiveMembersRequest {
+	r.pageSize = &pageSize
+	return r
+}
+
+// Project ID (optional; falls back to the default project if not provided)
+func (r ApiListRoleTransitiveMembersRequest) XProjectId(xProjectId string) ApiListRoleTransitiveMembersRequest {
+	r.xProjectId = &xProjectId
+	return r
+}
+
+func (r ApiListRoleTransitiveMembersRequest) Execute() (*ListRoleMembersResponse, *http.Response, error) {
+	return r.ApiService.ListRoleTransitiveMembersExecute(r)
+}
+
+/*
+ListRoleTransitiveMembers List Transitive Role Members
+
+Lists the role's transitive members — users assigned to the role or any role
+in its downward membership closure, plus every role in that closure — as one
+keyset-paginated page, optionally filtered to one kind. Supported only when
+assignments are catalog-managed; an assignment-managing authorizer (e.g.
+OpenFGA) returns `501`.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param roleId Role ID
+	@return ApiListRoleTransitiveMembersRequest
+*/
+func (a *RoleAPIService) ListRoleTransitiveMembers(ctx context.Context, roleId string) ApiListRoleTransitiveMembersRequest {
+	return ApiListRoleTransitiveMembersRequest{
+		ApiService: a,
+		ctx:        ctx,
+		roleId:     roleId,
+	}
+}
+
+// Execute executes the request
+//
+//	@return ListRoleMembersResponse
+func (a *RoleAPIService) ListRoleTransitiveMembersExecute(r ApiListRoleTransitiveMembersRequest) (*ListRoleMembersResponse, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *ListRoleMembersResponse
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "RoleAPIService.ListRoleTransitiveMembers")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/management/v1/role/{role_id}/members/transitive"
+	localVarPath = strings.Replace(localVarPath, "{"+"role_id"+"}", url.PathEscape(parameterValueToString(r.roleId, "roleId")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if r.type_ != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "type", r.type_, "form", "")
+	}
+	if r.pageToken != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "pageToken", r.pageToken, "form", "")
+	}
+	if r.pageSize != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "pageSize", r.pageSize, "form", "")
+	}
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	if r.xProjectId != nil {
+		parameterAddToHeaderOrQuery(localVarHeaderParams, "x-project-id", r.xProjectId, "simple", "")
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 501 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode >= 400 && localVarHTTPResponse.StatusCode < 500 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 type ApiListRolesRequest struct {
 	ctx         context.Context
 	ApiService  *RoleAPIService
@@ -850,6 +1632,131 @@ func (a *RoleAPIService) ListRolesExecute(r ApiListRolesRequest) (*ListRolesResp
 	}
 
 	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiRemoveRoleMemberRequest struct {
+	ctx        context.Context
+	ApiService *RoleAPIService
+	roleId     string
+	memberType RoleMemberType
+	memberId   string
+	xProjectId *string
+}
+
+// Project ID (optional; falls back to the default project if not provided)
+func (r ApiRemoveRoleMemberRequest) XProjectId(xProjectId string) ApiRemoveRoleMemberRequest {
+	r.xProjectId = &xProjectId
+	return r
+}
+
+func (r ApiRemoveRoleMemberRequest) Execute() (*http.Response, error) {
+	return r.ApiService.RemoveRoleMemberExecute(r)
+}
+
+/*
+RemoveRoleMember Remove Role Member
+
+Removes a single member (a user or a role) from a role. Idempotent — removing
+an absent member is a no-op and still returns `204`.
+
+Removing a member of a `system`-provider role requires an instance admin
+(`403`). Unlike adding, removing a role-type member is permitted, so an
+existing nesting can be cleaned up.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param roleId Role ID
+	@param memberType Member kind: `user` or `role`
+	@param memberId User id or role UUID
+	@return ApiRemoveRoleMemberRequest
+*/
+func (a *RoleAPIService) RemoveRoleMember(ctx context.Context, roleId string, memberType RoleMemberType, memberId string) ApiRemoveRoleMemberRequest {
+	return ApiRemoveRoleMemberRequest{
+		ApiService: a,
+		ctx:        ctx,
+		roleId:     roleId,
+		memberType: memberType,
+		memberId:   memberId,
+	}
+}
+
+// Execute executes the request
+func (a *RoleAPIService) RemoveRoleMemberExecute(r ApiRemoveRoleMemberRequest) (*http.Response, error) {
+	var (
+		localVarHTTPMethod = http.MethodDelete
+		localVarPostBody   interface{}
+		formFiles          []formFile
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "RoleAPIService.RemoveRoleMember")
+	if err != nil {
+		return nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/management/v1/role/{role_id}/members/{member_type}/{member_id}"
+	localVarPath = strings.Replace(localVarPath, "{"+"role_id"+"}", url.PathEscape(parameterValueToString(r.roleId, "roleId")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"member_type"+"}", url.PathEscape(parameterValueToString(r.memberType, "memberType")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"member_id"+"}", url.PathEscape(parameterValueToString(r.memberId, "memberId")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	if r.xProjectId != nil {
+		parameterAddToHeaderOrQuery(localVarHeaderParams, "x-project-id", r.xProjectId, "simple", "")
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode >= 400 && localVarHTTPResponse.StatusCode < 500 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+		}
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
 }
 
 type ApiSearchRoleRequest struct {

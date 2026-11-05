@@ -15,103 +15,131 @@ import (
 	"fmt"
 )
 
-// StorageLayout - Controls how namespace and tabular paths are constructed under the warehouse base location.  - `default` / omitted: one directory per direct-parent namespace, one per tabular, both with `\"{uuid}\"` segments. - `full-hierarchy`: one directory per namespace level, one per tabular. - `tabular-only`: no namespace directories; all tabulars are placed directly under the base location.  Segment templates may use `{uuid}` and `{name}` as placeholders.
+// StorageLayout - Controls how namespace and tabular paths are constructed under the warehouse base location.  - `default` / omitted: flat — no namespace directories; all tabulars are placed directly under   the base location with a fixed `\"{uuid}\"` segment. (Changed in 0.13; before 0.13 the default   emitted a `\"{uuid}\"` directory for the direct-parent namespace. Existing namespaces created   before 0.13 keep their persisted location, so only namespaces created on/after 0.13 use the   flat default.) - `full-hierarchy`: one directory per namespace level, one per tabular. - `tabular-only`: no namespace directories; all tabulars are placed directly under the base   location, with a configurable tabular template (which must contain `{uuid}`).  Segment templates may use `{uuid}` and `{name}` as placeholders.
 type StorageLayout struct {
-	StorageLayoutOneOf  *StorageLayoutOneOf
-	StorageLayoutOneOf1 *StorageLayoutOneOf1
-	StorageLayoutOneOf2 *StorageLayoutOneOf2
+	StorageLayoutDefault       *StorageLayoutDefault
+	StorageLayoutFullHierarchy *StorageLayoutFullHierarchy
+	StorageLayoutTabularOnly   *StorageLayoutTabularOnly
 }
 
-// StorageLayoutOneOfAsStorageLayout is a convenience function that returns StorageLayoutOneOf wrapped in StorageLayout
-func StorageLayoutOneOfAsStorageLayout(v *StorageLayoutOneOf) StorageLayout {
+// StorageLayoutDefaultAsStorageLayout is a convenience function that returns StorageLayoutDefault wrapped in StorageLayout
+func StorageLayoutDefaultAsStorageLayout(v *StorageLayoutDefault) StorageLayout {
 	return StorageLayout{
-		StorageLayoutOneOf: v,
+		StorageLayoutDefault: v,
 	}
 }
 
-// StorageLayoutOneOf1AsStorageLayout is a convenience function that returns StorageLayoutOneOf1 wrapped in StorageLayout
-func StorageLayoutOneOf1AsStorageLayout(v *StorageLayoutOneOf1) StorageLayout {
+// StorageLayoutFullHierarchyAsStorageLayout is a convenience function that returns StorageLayoutFullHierarchy wrapped in StorageLayout
+func StorageLayoutFullHierarchyAsStorageLayout(v *StorageLayoutFullHierarchy) StorageLayout {
 	return StorageLayout{
-		StorageLayoutOneOf1: v,
+		StorageLayoutFullHierarchy: v,
 	}
 }
 
-// StorageLayoutOneOf2AsStorageLayout is a convenience function that returns StorageLayoutOneOf2 wrapped in StorageLayout
-func StorageLayoutOneOf2AsStorageLayout(v *StorageLayoutOneOf2) StorageLayout {
+// StorageLayoutTabularOnlyAsStorageLayout is a convenience function that returns StorageLayoutTabularOnly wrapped in StorageLayout
+func StorageLayoutTabularOnlyAsStorageLayout(v *StorageLayoutTabularOnly) StorageLayout {
 	return StorageLayout{
-		StorageLayoutOneOf2: v,
+		StorageLayoutTabularOnly: v,
 	}
 }
 
 // Unmarshal JSON data into one of the pointers in the struct
 func (dst *StorageLayout) UnmarshalJSON(data []byte) error {
 	var err error
-	match := 0
-	// try to unmarshal data into StorageLayoutOneOf
-	err = json.Unmarshal(data, &dst.StorageLayoutOneOf)
-	if err == nil {
-		jsonStorageLayoutOneOf, _ := json.Marshal(dst.StorageLayoutOneOf)
-		if string(jsonStorageLayoutOneOf) == "{}" { // empty struct
-			dst.StorageLayoutOneOf = nil
+	// use discriminator value to speed up the lookup
+	var jsonDict map[string]interface{}
+	err = newStrictDecoder(data).Decode(&jsonDict)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal JSON into map for the discriminator lookup")
+	}
+
+	// check if the discriminator value is 'default'
+	if jsonDict["type"] == "default" {
+		// try to unmarshal JSON data into StorageLayoutDefault
+		err = json.Unmarshal(data, &dst.StorageLayoutDefault)
+		if err == nil {
+			return nil // data stored in dst.StorageLayoutDefault, return on the first match
 		} else {
-			match++
+			dst.StorageLayoutDefault = nil
+			return fmt.Errorf("failed to unmarshal StorageLayout as StorageLayoutDefault: %s", err.Error())
 		}
-	} else {
-		dst.StorageLayoutOneOf = nil
 	}
 
-	// try to unmarshal data into StorageLayoutOneOf1
-	err = json.Unmarshal(data, &dst.StorageLayoutOneOf1)
-	if err == nil {
-		jsonStorageLayoutOneOf1, _ := json.Marshal(dst.StorageLayoutOneOf1)
-		if string(jsonStorageLayoutOneOf1) == "{}" { // empty struct
-			dst.StorageLayoutOneOf1 = nil
+	// check if the discriminator value is 'full-hierarchy'
+	if jsonDict["type"] == "full-hierarchy" {
+		// try to unmarshal JSON data into StorageLayoutFullHierarchy
+		err = json.Unmarshal(data, &dst.StorageLayoutFullHierarchy)
+		if err == nil {
+			return nil // data stored in dst.StorageLayoutFullHierarchy, return on the first match
 		} else {
-			match++
+			dst.StorageLayoutFullHierarchy = nil
+			return fmt.Errorf("failed to unmarshal StorageLayout as StorageLayoutFullHierarchy: %s", err.Error())
 		}
-	} else {
-		dst.StorageLayoutOneOf1 = nil
 	}
 
-	// try to unmarshal data into StorageLayoutOneOf2
-	err = json.Unmarshal(data, &dst.StorageLayoutOneOf2)
-	if err == nil {
-		jsonStorageLayoutOneOf2, _ := json.Marshal(dst.StorageLayoutOneOf2)
-		if string(jsonStorageLayoutOneOf2) == "{}" { // empty struct
-			dst.StorageLayoutOneOf2 = nil
+	// check if the discriminator value is 'tabular-only'
+	if jsonDict["type"] == "tabular-only" {
+		// try to unmarshal JSON data into StorageLayoutTabularOnly
+		err = json.Unmarshal(data, &dst.StorageLayoutTabularOnly)
+		if err == nil {
+			return nil // data stored in dst.StorageLayoutTabularOnly, return on the first match
 		} else {
-			match++
+			dst.StorageLayoutTabularOnly = nil
+			return fmt.Errorf("failed to unmarshal StorageLayout as StorageLayoutTabularOnly: %s", err.Error())
 		}
-	} else {
-		dst.StorageLayoutOneOf2 = nil
 	}
 
-	if match > 1 { // more than 1 match
-		// reset to nil
-		dst.StorageLayoutOneOf = nil
-		dst.StorageLayoutOneOf1 = nil
-		dst.StorageLayoutOneOf2 = nil
-
-		return fmt.Errorf("data matches more than one schema in oneOf(StorageLayout)")
-	} else if match == 1 {
-		return nil // exactly one match
-	} else { // no match
-		return fmt.Errorf("data failed to match schemas in oneOf(StorageLayout)")
+	// check if the discriminator value is 'StorageLayoutDefault'
+	if jsonDict["type"] == "StorageLayoutDefault" {
+		// try to unmarshal JSON data into StorageLayoutDefault
+		err = json.Unmarshal(data, &dst.StorageLayoutDefault)
+		if err == nil {
+			return nil // data stored in dst.StorageLayoutDefault, return on the first match
+		} else {
+			dst.StorageLayoutDefault = nil
+			return fmt.Errorf("failed to unmarshal StorageLayout as StorageLayoutDefault: %s", err.Error())
+		}
 	}
+
+	// check if the discriminator value is 'StorageLayoutFullHierarchy'
+	if jsonDict["type"] == "StorageLayoutFullHierarchy" {
+		// try to unmarshal JSON data into StorageLayoutFullHierarchy
+		err = json.Unmarshal(data, &dst.StorageLayoutFullHierarchy)
+		if err == nil {
+			return nil // data stored in dst.StorageLayoutFullHierarchy, return on the first match
+		} else {
+			dst.StorageLayoutFullHierarchy = nil
+			return fmt.Errorf("failed to unmarshal StorageLayout as StorageLayoutFullHierarchy: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'StorageLayoutTabularOnly'
+	if jsonDict["type"] == "StorageLayoutTabularOnly" {
+		// try to unmarshal JSON data into StorageLayoutTabularOnly
+		err = json.Unmarshal(data, &dst.StorageLayoutTabularOnly)
+		if err == nil {
+			return nil // data stored in dst.StorageLayoutTabularOnly, return on the first match
+		} else {
+			dst.StorageLayoutTabularOnly = nil
+			return fmt.Errorf("failed to unmarshal StorageLayout as StorageLayoutTabularOnly: %s", err.Error())
+		}
+	}
+
+	return nil
 }
 
 // Marshal data from the first non-nil pointers in the struct to JSON
 func (src StorageLayout) MarshalJSON() ([]byte, error) {
-	if src.StorageLayoutOneOf != nil {
-		return json.Marshal(&src.StorageLayoutOneOf)
+	if src.StorageLayoutDefault != nil {
+		return json.Marshal(&src.StorageLayoutDefault)
 	}
 
-	if src.StorageLayoutOneOf1 != nil {
-		return json.Marshal(&src.StorageLayoutOneOf1)
+	if src.StorageLayoutFullHierarchy != nil {
+		return json.Marshal(&src.StorageLayoutFullHierarchy)
 	}
 
-	if src.StorageLayoutOneOf2 != nil {
-		return json.Marshal(&src.StorageLayoutOneOf2)
+	if src.StorageLayoutTabularOnly != nil {
+		return json.Marshal(&src.StorageLayoutTabularOnly)
 	}
 
 	return nil, nil // no data in oneOf schemas
@@ -122,16 +150,16 @@ func (obj *StorageLayout) GetActualInstance() interface{} {
 	if obj == nil {
 		return nil
 	}
-	if obj.StorageLayoutOneOf != nil {
-		return obj.StorageLayoutOneOf
+	if obj.StorageLayoutDefault != nil {
+		return obj.StorageLayoutDefault
 	}
 
-	if obj.StorageLayoutOneOf1 != nil {
-		return obj.StorageLayoutOneOf1
+	if obj.StorageLayoutFullHierarchy != nil {
+		return obj.StorageLayoutFullHierarchy
 	}
 
-	if obj.StorageLayoutOneOf2 != nil {
-		return obj.StorageLayoutOneOf2
+	if obj.StorageLayoutTabularOnly != nil {
+		return obj.StorageLayoutTabularOnly
 	}
 
 	// all schemas are nil

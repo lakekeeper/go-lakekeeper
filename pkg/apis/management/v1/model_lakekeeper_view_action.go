@@ -23,6 +23,9 @@ type LakekeeperViewAction struct {
 	LakekeeperViewActionGetMetadata   *LakekeeperViewActionGetMetadata
 	LakekeeperViewActionGetTasks      *LakekeeperViewActionGetTasks
 	LakekeeperViewActionIncludeInList *LakekeeperViewActionIncludeInList
+	LakekeeperViewActionManageTags    *LakekeeperViewActionManageTags
+	LakekeeperViewActionMove          *LakekeeperViewActionMove
+	LakekeeperViewActionReadGrants    *LakekeeperViewActionReadGrants
 	LakekeeperViewActionRename        *LakekeeperViewActionRename
 	LakekeeperViewActionSelect        *LakekeeperViewActionSelect
 	LakekeeperViewActionSetProtection *LakekeeperViewActionSetProtection
@@ -68,6 +71,27 @@ func LakekeeperViewActionGetTasksAsLakekeeperViewAction(v *LakekeeperViewActionG
 func LakekeeperViewActionIncludeInListAsLakekeeperViewAction(v *LakekeeperViewActionIncludeInList) LakekeeperViewAction {
 	return LakekeeperViewAction{
 		LakekeeperViewActionIncludeInList: v,
+	}
+}
+
+// LakekeeperViewActionManageTagsAsLakekeeperViewAction is a convenience function that returns LakekeeperViewActionManageTags wrapped in LakekeeperViewAction
+func LakekeeperViewActionManageTagsAsLakekeeperViewAction(v *LakekeeperViewActionManageTags) LakekeeperViewAction {
+	return LakekeeperViewAction{
+		LakekeeperViewActionManageTags: v,
+	}
+}
+
+// LakekeeperViewActionMoveAsLakekeeperViewAction is a convenience function that returns LakekeeperViewActionMove wrapped in LakekeeperViewAction
+func LakekeeperViewActionMoveAsLakekeeperViewAction(v *LakekeeperViewActionMove) LakekeeperViewAction {
+	return LakekeeperViewAction{
+		LakekeeperViewActionMove: v,
+	}
+}
+
+// LakekeeperViewActionReadGrantsAsLakekeeperViewAction is a convenience function that returns LakekeeperViewActionReadGrants wrapped in LakekeeperViewAction
+func LakekeeperViewActionReadGrantsAsLakekeeperViewAction(v *LakekeeperViewActionReadGrants) LakekeeperViewAction {
+	return LakekeeperViewAction{
+		LakekeeperViewActionReadGrants: v,
 	}
 }
 
@@ -178,6 +202,42 @@ func (dst *LakekeeperViewAction) UnmarshalJSON(data []byte) error {
 		} else {
 			dst.LakekeeperViewActionIncludeInList = nil
 			return fmt.Errorf("failed to unmarshal LakekeeperViewAction as LakekeeperViewActionIncludeInList: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'manage_tags'
+	if jsonDict["action"] == "manage_tags" {
+		// try to unmarshal JSON data into LakekeeperViewActionManageTags
+		err = json.Unmarshal(data, &dst.LakekeeperViewActionManageTags)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperViewActionManageTags, return on the first match
+		} else {
+			dst.LakekeeperViewActionManageTags = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperViewAction as LakekeeperViewActionManageTags: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'move'
+	if jsonDict["action"] == "move" {
+		// try to unmarshal JSON data into LakekeeperViewActionMove
+		err = json.Unmarshal(data, &dst.LakekeeperViewActionMove)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperViewActionMove, return on the first match
+		} else {
+			dst.LakekeeperViewActionMove = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperViewAction as LakekeeperViewActionMove: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'read_grants'
+	if jsonDict["action"] == "read_grants" {
+		// try to unmarshal JSON data into LakekeeperViewActionReadGrants
+		err = json.Unmarshal(data, &dst.LakekeeperViewActionReadGrants)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperViewActionReadGrants, return on the first match
+		} else {
+			dst.LakekeeperViewActionReadGrants = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperViewAction as LakekeeperViewActionReadGrants: %s", err.Error())
 		}
 	}
 
@@ -301,6 +361,42 @@ func (dst *LakekeeperViewAction) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	// check if the discriminator value is 'LakekeeperViewActionManageTags'
+	if jsonDict["action"] == "LakekeeperViewActionManageTags" {
+		// try to unmarshal JSON data into LakekeeperViewActionManageTags
+		err = json.Unmarshal(data, &dst.LakekeeperViewActionManageTags)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperViewActionManageTags, return on the first match
+		} else {
+			dst.LakekeeperViewActionManageTags = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperViewAction as LakekeeperViewActionManageTags: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'LakekeeperViewActionMove'
+	if jsonDict["action"] == "LakekeeperViewActionMove" {
+		// try to unmarshal JSON data into LakekeeperViewActionMove
+		err = json.Unmarshal(data, &dst.LakekeeperViewActionMove)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperViewActionMove, return on the first match
+		} else {
+			dst.LakekeeperViewActionMove = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperViewAction as LakekeeperViewActionMove: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'LakekeeperViewActionReadGrants'
+	if jsonDict["action"] == "LakekeeperViewActionReadGrants" {
+		// try to unmarshal JSON data into LakekeeperViewActionReadGrants
+		err = json.Unmarshal(data, &dst.LakekeeperViewActionReadGrants)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperViewActionReadGrants, return on the first match
+		} else {
+			dst.LakekeeperViewActionReadGrants = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperViewAction as LakekeeperViewActionReadGrants: %s", err.Error())
+		}
+	}
+
 	// check if the discriminator value is 'LakekeeperViewActionRename'
 	if jsonDict["action"] == "LakekeeperViewActionRename" {
 		// try to unmarshal JSON data into LakekeeperViewActionRename
@@ -378,6 +474,18 @@ func (src LakekeeperViewAction) MarshalJSON() ([]byte, error) {
 		return json.Marshal(&src.LakekeeperViewActionIncludeInList)
 	}
 
+	if src.LakekeeperViewActionManageTags != nil {
+		return json.Marshal(&src.LakekeeperViewActionManageTags)
+	}
+
+	if src.LakekeeperViewActionMove != nil {
+		return json.Marshal(&src.LakekeeperViewActionMove)
+	}
+
+	if src.LakekeeperViewActionReadGrants != nil {
+		return json.Marshal(&src.LakekeeperViewActionReadGrants)
+	}
+
 	if src.LakekeeperViewActionRename != nil {
 		return json.Marshal(&src.LakekeeperViewActionRename)
 	}
@@ -424,6 +532,18 @@ func (obj *LakekeeperViewAction) GetActualInstance() interface{} {
 
 	if obj.LakekeeperViewActionIncludeInList != nil {
 		return obj.LakekeeperViewActionIncludeInList
+	}
+
+	if obj.LakekeeperViewActionManageTags != nil {
+		return obj.LakekeeperViewActionManageTags
+	}
+
+	if obj.LakekeeperViewActionMove != nil {
+		return obj.LakekeeperViewActionMove
+	}
+
+	if obj.LakekeeperViewActionReadGrants != nil {
+		return obj.LakekeeperViewActionReadGrants
 	}
 
 	if obj.LakekeeperViewActionRename != nil {

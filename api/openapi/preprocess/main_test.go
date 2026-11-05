@@ -1,6 +1,9 @@
 package main
 
 import (
+	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 
 	"gopkg.in/yaml.v3"
@@ -182,102 +185,49 @@ paths:
 	}
 }
 
-// schemasOf returns the components.schemas mapping node from a parsed doc.
-func schemasOf(t *testing.T, root *yaml.Node) *yaml.Node {
-	t.Helper()
-	schemas := lookup(lookup(root, "components"), "schemas")
-	if schemas == nil || schemas.Kind != yaml.MappingNode {
-		t.Fatal("components.schemas not found")
-	}
-	return schemas
-}
-
-// TestExtractAndDiscriminate_FlatEnumUnion covers a oneOf whose members are
-// `allOf([{$ref}, {type: single-enum}])` with no nested oneOf — the shape that
-// expandOneOf leaves untouched. After the loop stopped gating on expandOneOf,
-// such unions must still be extracted into named leaf schemas and gain a
-// discriminator, so the generator emits discriminator-based (not match-counting)
-// decode. This is the StorageProfile / TabularDeleteProfile case.
-func TestExtractAndDiscriminate_FlatEnumUnion(t *testing.T) {
+func TestForceBracketsOnRelations_MatchesNullableArrayType(t *testing.T) {
 	src := `
-components:
-  schemas:
-    S3Profile:
-      type: object
-      properties:
-        bucket:
-          type: string
-    GcsProfile:
-      type: object
-      properties:
-        bucket:
-          type: string
-    StorageProfile:
-      oneOf:
-        - allOf:
-            - $ref: '#/components/schemas/S3Profile'
-            - type: object
-              required:
-                - type
-              properties:
-                type:
-                  type: string
-                  enum:
-                    - s3
-        - allOf:
-            - $ref: '#/components/schemas/GcsProfile'
-            - type: object
-              required:
-                - type
-              properties:
-                type:
-                  type: string
-                  enum:
-                    - gcs
+paths:
+  /assignments:
+    get:
+      parameters:
+        - name: relations
+          in: query
+          schema:
+            type: [array, 'null']
+            items:
+              type: string
 `
 	root := loadDoc(t, src)
-	schemas := schemasOf(t, root)
-	sp := lookupSchema(schemas, "StorageProfile")
-
-	// Mirror the main loop: expandOneOf is a no-op here, then discriminate.
-	expandOneOf(sp, schemas)
-	if err := extractAndDiscriminate("StorageProfile", sp, schemas); err != nil {
-		t.Fatalf("extractAndDiscriminate: %v", err)
+	if got := forceBracketsOnRelations(root); got != 1 {
+		t.Fatalf("rewritten: got %d, want 1", got)
 	}
 
-	// A discriminator on `type` with a mapping to the synthesized leaves.
-	disc := lookup(sp, "discriminator")
-	if disc == nil {
-		t.Fatal("no discriminator block emitted")
+	p := findGetQueryParam(t, root, "/assignments", "relations")
+	if got := scalarValue(p, "style"); got != "deepObject" {
+		t.Errorf("style: got %q, want %q", got, "deepObject")
 	}
-	if got := scalarValue(disc, "propertyName"); got != "type" {
-		t.Errorf("discriminator propertyName: got %q, want %q", got, "type")
-	}
-	mapping := lookup(disc, "mapping")
-	if mapping == nil || mapping.Kind != yaml.MappingNode {
-		t.Fatal("discriminator mapping not found")
-	}
-	if got := scalarValue(mapping, "s3"); got != refPrefix+"StorageProfileS3" {
-		t.Errorf("mapping[s3]: got %q, want %q", got, refPrefix+"StorageProfileS3")
-	}
-	if got := scalarValue(mapping, "gcs"); got != refPrefix+"StorageProfileGcs" {
-		t.Errorf("mapping[gcs]: got %q, want %q", got, refPrefix+"StorageProfileGcs")
+}
+
+func TestRun_FailsWhenNoRelationsParamRewritten(t *testing.T) {
+	dir := t.TempDir()
+	in := filepath.Join(dir, "in.yaml")
+	src := `
+paths:
+  /things:
+    get:
+      parameters:
+        - name: tags
+          in: query
+          schema:
+            type: array
+`
+	if err := os.WriteFile(in, []byte(src), 0o600); err != nil {
+		t.Fatal(err)
 	}
 
-	// Each oneOf member is now a $ref to a named leaf schema.
-	oneOf := lookup(sp, "oneOf")
-	if oneOf == nil || len(oneOf.Content) != 2 {
-		t.Fatalf("oneOf: want 2 members, got %v", oneOf)
-	}
-	for _, m := range oneOf.Content {
-		if lookup(m, "$ref") == nil {
-			t.Errorf("oneOf member is not a $ref: %+v", m)
-		}
-	}
-	if lookupSchema(schemas, "StorageProfileS3") == nil {
-		t.Error("leaf schema StorageProfileS3 was not appended")
-	}
-	if lookupSchema(schemas, "StorageProfileGcs") == nil {
-		t.Error("leaf schema StorageProfileGcs was not appended")
+	err := run(in, filepath.Join(dir, "out.yaml"))
+	if err == nil || !strings.Contains(err.Error(), "relations") {
+		t.Fatalf("run: got err %v, want an error mentioning relations", err)
 	}
 }

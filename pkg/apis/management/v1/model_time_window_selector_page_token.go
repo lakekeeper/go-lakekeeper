@@ -95,6 +95,14 @@ func (o *TimeWindowSelectorPageToken) SetType(v string) {
 	o.Type = v
 }
 
+func (o TimeWindowSelectorPageToken) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o TimeWindowSelectorPageToken) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["token"] = o.Token

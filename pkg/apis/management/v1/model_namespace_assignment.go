@@ -20,6 +20,7 @@ type NamespaceAssignment struct {
 	NamespaceAssignmentCreate       *NamespaceAssignmentCreate
 	NamespaceAssignmentDescribe     *NamespaceAssignmentDescribe
 	NamespaceAssignmentManageGrants *NamespaceAssignmentManageGrants
+	NamespaceAssignmentManageTags   *NamespaceAssignmentManageTags
 	NamespaceAssignmentModify       *NamespaceAssignmentModify
 	NamespaceAssignmentOwnership    *NamespaceAssignmentOwnership
 	NamespaceAssignmentPassGrants   *NamespaceAssignmentPassGrants
@@ -44,6 +45,13 @@ func NamespaceAssignmentDescribeAsNamespaceAssignment(v *NamespaceAssignmentDesc
 func NamespaceAssignmentManageGrantsAsNamespaceAssignment(v *NamespaceAssignmentManageGrants) NamespaceAssignment {
 	return NamespaceAssignment{
 		NamespaceAssignmentManageGrants: v,
+	}
+}
+
+// NamespaceAssignmentManageTagsAsNamespaceAssignment is a convenience function that returns NamespaceAssignmentManageTags wrapped in NamespaceAssignment
+func NamespaceAssignmentManageTagsAsNamespaceAssignment(v *NamespaceAssignmentManageTags) NamespaceAssignment {
+	return NamespaceAssignment{
+		NamespaceAssignmentManageTags: v,
 	}
 }
 
@@ -118,6 +126,18 @@ func (dst *NamespaceAssignment) UnmarshalJSON(data []byte) error {
 		} else {
 			dst.NamespaceAssignmentManageGrants = nil
 			return fmt.Errorf("failed to unmarshal NamespaceAssignment as NamespaceAssignmentManageGrants: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'manage_tags'
+	if jsonDict["type"] == "manage_tags" {
+		// try to unmarshal JSON data into NamespaceAssignmentManageTags
+		err = json.Unmarshal(data, &dst.NamespaceAssignmentManageTags)
+		if err == nil {
+			return nil // data stored in dst.NamespaceAssignmentManageTags, return on the first match
+		} else {
+			dst.NamespaceAssignmentManageTags = nil
+			return fmt.Errorf("failed to unmarshal NamespaceAssignment as NamespaceAssignmentManageTags: %s", err.Error())
 		}
 	}
 
@@ -205,6 +225,18 @@ func (dst *NamespaceAssignment) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	// check if the discriminator value is 'NamespaceAssignmentManageTags'
+	if jsonDict["type"] == "NamespaceAssignmentManageTags" {
+		// try to unmarshal JSON data into NamespaceAssignmentManageTags
+		err = json.Unmarshal(data, &dst.NamespaceAssignmentManageTags)
+		if err == nil {
+			return nil // data stored in dst.NamespaceAssignmentManageTags, return on the first match
+		} else {
+			dst.NamespaceAssignmentManageTags = nil
+			return fmt.Errorf("failed to unmarshal NamespaceAssignment as NamespaceAssignmentManageTags: %s", err.Error())
+		}
+	}
+
 	// check if the discriminator value is 'NamespaceAssignmentModify'
 	if jsonDict["type"] == "NamespaceAssignmentModify" {
 		// try to unmarshal JSON data into NamespaceAssignmentModify
@@ -270,6 +302,10 @@ func (src NamespaceAssignment) MarshalJSON() ([]byte, error) {
 		return json.Marshal(&src.NamespaceAssignmentManageGrants)
 	}
 
+	if src.NamespaceAssignmentManageTags != nil {
+		return json.Marshal(&src.NamespaceAssignmentManageTags)
+	}
+
 	if src.NamespaceAssignmentModify != nil {
 		return json.Marshal(&src.NamespaceAssignmentModify)
 	}
@@ -304,6 +340,10 @@ func (obj *NamespaceAssignment) GetActualInstance() interface{} {
 
 	if obj.NamespaceAssignmentManageGrants != nil {
 		return obj.NamespaceAssignmentManageGrants
+	}
+
+	if obj.NamespaceAssignmentManageTags != nil {
+		return obj.NamespaceAssignmentManageTags
 	}
 
 	if obj.NamespaceAssignmentModify != nil {

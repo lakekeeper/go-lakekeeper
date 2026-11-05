@@ -28,7 +28,7 @@ graph LR
 - [Package Reference](docs/PACKAGES.md) — every `pkg/` package, including `pkg/core` auth (`OAuthTokenSource`, `AccessTokenAuthSource`, `K8sServiceAccountAuthSource`)
 - [Authentication](docs/AUTHENTICATION.md) — choose a flow (OAuth2, static token, k8s) with CLI ↔ SDK side-by-side examples
 - [Authorization](docs/AUTHORIZATION.md) — the permission model and end-to-end grant/revoke workflows
-- [Generated client](docs/GENERATION.md) — what's generated, how to regenerate, why a YAML preprocessor is involved
+- [Generated client](docs/GENERATION.md) — what's generated, how to regenerate, why a pre- and postprocessor are involved
 - [CLI Reference](docs/CLI.md) — `lkctl` command tree, environment variables, examples
 
 ## Compatibility

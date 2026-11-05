@@ -24,7 +24,7 @@ type CatalogActionCheckOperationViewView struct {
 	TableId     string   `json:"table-id"`
 	WarehouseId string   `json:"warehouse-id"`
 	Namespace   []string `json:"namespace"`
-	// Name of the table or view
+	// Name of the table, view, or generic table.
 	Table  string               `json:"table"`
 	Action LakekeeperViewAction `json:"action"`
 }
@@ -171,6 +171,14 @@ func (o *CatalogActionCheckOperationViewView) GetActionOk() (*LakekeeperViewActi
 // SetAction sets field value
 func (o *CatalogActionCheckOperationViewView) SetAction(v LakekeeperViewAction) {
 	o.Action = v
+}
+
+func (o CatalogActionCheckOperationViewView) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
 }
 
 func (o CatalogActionCheckOperationViewView) ToMap() (map[string]interface{}, error) {

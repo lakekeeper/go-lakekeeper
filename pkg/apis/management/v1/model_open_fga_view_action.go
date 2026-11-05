@@ -20,13 +20,14 @@ type OpenFGAViewAction string
 
 // List of OpenFGAViewAction
 const (
-	OpenFGAViewActionReadAssignments   OpenFGAViewAction = "read_assignments"
-	OpenFGAViewActionGrantPassGrants   OpenFGAViewAction = "grant_pass_grants"
-	OpenFGAViewActionGrantManageGrants OpenFGAViewAction = "grant_manage_grants"
-	OpenFGAViewActionGrantDescribe     OpenFGAViewAction = "grant_describe"
-	OpenFGAViewActionGrantSelect       OpenFGAViewAction = "grant_select"
-	OpenFGAViewActionGrantModify       OpenFGAViewAction = "grant_modify"
-	OpenFGAViewActionChangeOwnership   OpenFGAViewAction = "change_ownership"
+	OPENFGAVIEWACTION_READ_ASSIGNMENTS    OpenFGAViewAction = "read_assignments"
+	OPENFGAVIEWACTION_GRANT_PASS_GRANTS   OpenFGAViewAction = "grant_pass_grants"
+	OPENFGAVIEWACTION_GRANT_MANAGE_GRANTS OpenFGAViewAction = "grant_manage_grants"
+	OPENFGAVIEWACTION_GRANT_MANAGE_TAGS   OpenFGAViewAction = "grant_manage_tags"
+	OPENFGAVIEWACTION_GRANT_DESCRIBE      OpenFGAViewAction = "grant_describe"
+	OPENFGAVIEWACTION_GRANT_SELECT        OpenFGAViewAction = "grant_select"
+	OPENFGAVIEWACTION_GRANT_MODIFY        OpenFGAViewAction = "grant_modify"
+	OPENFGAVIEWACTION_CHANGE_OWNERSHIP    OpenFGAViewAction = "change_ownership"
 )
 
 // All allowed values of OpenFGAViewAction enum
@@ -34,6 +35,7 @@ var AllowedOpenFGAViewActionEnumValues = []OpenFGAViewAction{
 	"read_assignments",
 	"grant_pass_grants",
 	"grant_manage_grants",
+	"grant_manage_tags",
 	"grant_describe",
 	"grant_select",
 	"grant_modify",

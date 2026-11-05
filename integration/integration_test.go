@@ -94,7 +94,7 @@ func TestMain(m *testing.M) {
 		context.Background(),
 		os.Getenv("LAKEKEEPER_BASE_URL"),
 		authSource,
-		client.WithInitialBootstrap(true, true, core.Ptr(managementv1.UserTypeApplication)),
+		client.WithInitialBootstrap(true, true, core.Ptr(managementv1.USERTYPE_APPLICATION)),
 	)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "create client: %v\n", err)
@@ -122,7 +122,7 @@ func MustProvisionUser(t *testing.T, c *client.Client) *managementv1.User {
 	req.SetId(id)
 	req.SetName(name)
 	req.SetEmail(email)
-	req.SetUserType(managementv1.UserTypeHuman)
+	req.SetUserType(managementv1.USERTYPE_HUMAN)
 	req.SetUpdateIfExists(false)
 
 	user, _, err := c.UserAPI.CreateUser(t.Context()).CreateUserRequest(*req).Execute()
