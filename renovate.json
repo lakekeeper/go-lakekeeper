@@ -6,7 +6,6 @@
     ":automergePatch",
     "helpers:pinGitHubActionDigests"
   ],
-  "postUpdateOptions": ["gomodTidy"],
   "packageRules": [
     {
       "matchDepNames": ["go", "golang"],
