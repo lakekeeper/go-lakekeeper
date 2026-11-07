@@ -46,7 +46,7 @@ CONTAINER_ENGINE ?= $(shell command -v docker >/dev/null 2>&1 && echo docker || 
 CONTAINER_COMPOSE_ENGINE ?= $(shell $(CONTAINER_ENGINE) compose version >/dev/null 2>&1 && echo '$(CONTAINER_ENGINE) compose' || echo '$(CONTAINER_ENGINE)-compose')
 
 # renovate: datasource=docker depName=openapitools/openapi-generator-cli
-OPENAPI_GENERATOR_VERSION ?= v7.10.0
+OPENAPI_GENERATOR_VERSION ?= v7.27.0
 OPENAPI_GENERATOR_IMAGE   ?= openapitools/openapi-generator-cli:$(OPENAPI_GENERATOR_VERSION)
 OPENAPI_DIR               := $(SELF_DIR)/api/openapi
 MANAGEMENT_API_OUTPUT     := pkg/apis/management/v1
