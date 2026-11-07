@@ -8,10 +8,14 @@
   ],
   "packageRules": [
     {
+      "matchManagers": ["gomod"],
+      "postUpdateOptions": ["gomodTidy", "gomodUpdateImportPaths"]
+    },
+    {
       "description": "One PR for all non-major Go module updates",
       "matchManagers": ["gomod"],
       "matchUpdateTypes": ["minor", "patch"],
-      "groupName": "go-modules (non-major)"
+      "groupName": "go-modules (non-major)",
     },
     {
       "matchDepNames": ["go", "golang"],
