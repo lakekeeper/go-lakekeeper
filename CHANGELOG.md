@@ -1,5 +1,37 @@
 # Changelog
 
+## [0.1.1](https://github.com/lakekeeper/go-lakekeeper/compare/v0.1.0...v0.1.1) (2026-11-07)
+
+
+### Bug Fixes
+
+* decode oneOf unions by discriminator and tolerate unknown response fields and enum values ([#16](https://github.com/lakekeeper/go-lakekeeper/issues/16)) ([f8aca55](https://github.com/lakekeeper/go-lakekeeper/commit/f8aca55e113652b702e8e1574629c81d933c52db))
+* **deps:** update go-modules (non-major) ([#46](https://github.com/lakekeeper/go-lakekeeper/issues/46)) ([e221bac](https://github.com/lakekeeper/go-lakekeeper/commit/e221bace87d2e2c9e0f7627439cdb9edbb36eefc))
+* resolve latest kind version before kind-action in nightly ([#24](https://github.com/lakekeeper/go-lakekeeper/issues/24)) ([a0b6102](https://github.com/lakekeeper/go-lakekeeper/commit/a0b6102aef12a4bf04fcd50ffb1355c686f43d98))
+
+
+### Miscellaneous Chores
+
+* add shared .claude/settings.json with deny rules ([#22](https://github.com/lakekeeper/go-lakekeeper/issues/22)) ([c0fca4c](https://github.com/lakekeeper/go-lakekeeper/commit/c0fca4c66164f838ebf8c07e2abd8efabd2c722d))
+* allow all conventional commit types ([#26](https://github.com/lakekeeper/go-lakekeeper/issues/26)) ([1071522](https://github.com/lakekeeper/go-lakekeeper/commit/10715220244958ca9bae62053c5bf9cd7c96badf))
+* **deps:** bump brotli and klauspost/compress for govulncheck ([#43](https://github.com/lakekeeper/go-lakekeeper/issues/43)) ([f521028](https://github.com/lakekeeper/go-lakekeeper/commit/f52102827d2c36e9759583111758cde213843273))
+* **deps:** update alpine docker tag to v3.24 ([#31](https://github.com/lakekeeper/go-lakekeeper/issues/31)) ([9d9f29b](https://github.com/lakekeeper/go-lakekeeper/commit/9d9f29ba8c509eff0d90a72100bf4df8bf70b8ef))
+* **deps:** update dependency goreleaser/goreleaser to v2.20.0 ([#32](https://github.com/lakekeeper/go-lakekeeper/issues/32)) ([7fe936d](https://github.com/lakekeeper/go-lakekeeper/commit/7fe936d13b207cb880bac74a5b024826ba702484))
+* **deps:** update dependency graphifyy to v0.9.103 ([#33](https://github.com/lakekeeper/go-lakekeeper/issues/33)) ([7b262a3](https://github.com/lakekeeper/go-lakekeeper/commit/7b262a398c2f5b43c86f8863e4ec6b11372fb7fa))
+* **deps:** update docker/login-action action to v4.8.0 ([#49](https://github.com/lakekeeper/go-lakekeeper/issues/49)) ([dac128c](https://github.com/lakekeeper/go-lakekeeper/commit/dac128c5cec7e9d1bc0ddbe662b4871c3bbe9fa9))
+* **deps:** update helm/kind-action action to v1.15.2 ([#48](https://github.com/lakekeeper/go-lakekeeper/issues/48)) ([04c7cdf](https://github.com/lakekeeper/go-lakekeeper/commit/04c7cdf93a2c84afe09767feeaa146039ebf4366))
+* **deps:** update kindest/node docker tag to v1.31.14 ([#28](https://github.com/lakekeeper/go-lakekeeper/issues/28)) ([62d95a7](https://github.com/lakekeeper/go-lakekeeper/commit/62d95a723513c64bc14a77883b7ed13de3583a9c))
+* **deps:** update kindest/node docker tag to v1.37.0 ([#36](https://github.com/lakekeeper/go-lakekeeper/issues/36)) ([4f0572e](https://github.com/lakekeeper/go-lakekeeper/commit/4f0572e01003d992a00e84ed60d63d73017a1318))
+* **deps:** update openfga/openfga docker tag to v1.22 ([#40](https://github.com/lakekeeper/go-lakekeeper/issues/40)) ([bdd462f](https://github.com/lakekeeper/go-lakekeeper/commit/bdd462fc09c1caf9d601fc47b12c4d4b296deb53))
+* **deps:** update quay.io/keycloak/keycloak docker tag to v26.6.4 ([#29](https://github.com/lakekeeper/go-lakekeeper/issues/29)) ([dccdc6a](https://github.com/lakekeeper/go-lakekeeper/commit/dccdc6a336562de6590f542d443616dabe9d11a9))
+* **deps:** update quay.io/keycloak/keycloak docker tag to v26.8.2 ([#41](https://github.com/lakekeeper/go-lakekeeper/issues/41)) ([5a1ecdb](https://github.com/lakekeeper/go-lakekeeper/commit/5a1ecdb6cc0b9eac3422782abc42911ef3a5ed59))
+* harden CI checks, pin tool versions, gate latest-main image ([#20](https://github.com/lakekeeper/go-lakekeeper/issues/20)) ([98b99dc](https://github.com/lakekeeper/go-lakekeeper/commit/98b99dc919579c5b76a432b97f2cc085612314ec))
+* move agent guidance into AGENTS.md and refresh contributor docs ([#19](https://github.com/lakekeeper/go-lakekeeper/issues/19)) ([66fd402](https://github.com/lakekeeper/go-lakekeeper/commit/66fd4024b3efad38576378d91e9c9686295b3c67))
+* remove dead config, fix Makefile, align docs ([#21](https://github.com/lakekeeper/go-lakekeeper/issues/21)) ([35eb070](https://github.com/lakekeeper/go-lakekeeper/commit/35eb070bfeb8eca859391917dc62f167b6c32b12))
+* **renovate:** Enable go mod tidy ([#47](https://github.com/lakekeeper/go-lakekeeper/issues/47)) ([821d10f](https://github.com/lakekeeper/go-lakekeeper/commit/821d10f809182137ba9be9bbe5052ee5231f22bd))
+* **renovate:** group gomod minor and patch version bumps ([#45](https://github.com/lakekeeper/go-lakekeeper/issues/45)) ([fcff111](https://github.com/lakekeeper/go-lakekeeper/commit/fcff11137c2c5245069acf29cb25a3497df36e04))
+* share the graphify knowledge graph with the team ([#27](https://github.com/lakekeeper/go-lakekeeper/issues/27)) ([1880100](https://github.com/lakekeeper/go-lakekeeper/commit/18801000d774d2bf9380b8adc8186d9643c5b539))
+
 ## [0.1.0](https://github.com/lakekeeper/go-lakekeeper/compare/v0.0.23...v0.1.0) (2026-05-12)
 
 
