@@ -8,6 +8,10 @@
   ],
   "packageRules": [
     {
+      "matchManagers": ["gomod"],
+      "postUpdateOptions": ["gomodTidy", "gomodUpdateImportPaths"]
+    },
+    {
       "description": "One PR for all non-major Go module updates",
       "matchManagers": ["gomod"],
       "matchUpdateTypes": ["minor", "patch"],
