@@ -160,7 +160,7 @@ generate: ## Regenerate Go bindings from OpenAPI specs.
 	@$(MAKE) fmt
 
 # renovate: datasource=pypi depName=graphifyy
-GRAPHIFY_VERSION ?= 0.9.103
+GRAPHIFY_VERSION ?= 0.9.104
 
 GRAPHIFY = uvx --from 'graphifyy==$(GRAPHIFY_VERSION)' graphify
 
