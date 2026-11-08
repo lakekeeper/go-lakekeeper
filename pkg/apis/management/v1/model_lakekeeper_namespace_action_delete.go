@@ -22,7 +22,7 @@ var _ MappedNullable = &LakekeeperNamespaceActionDelete{}
 // LakekeeperNamespaceActionDelete struct for LakekeeperNamespaceActionDelete
 type LakekeeperNamespaceActionDelete struct {
 	Action string `json:"action"`
-	// Whether the warehouse-configured soft-deletion is bypassed: contained tabulars are hard-deleted at once, not kept for the configured grace period.
+	// Whether protection is skipped: of the namespace, and with `recursive` of everything below it. A recursive delete in a warehouse with soft deletion requires it: namespaces have no soft-deleted state, so every table, view and generic table below is hard-deleted at once, dropped ones included.
 	Force *bool `json:"force,omitempty"`
 	// Whether the underlying data/metadata files are physically purged.
 	Purge *bool `json:"purge,omitempty"`

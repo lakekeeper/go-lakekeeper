@@ -17,13 +17,15 @@ import (
 
 // CatalogActionCheckOperation - Represents an action on an object
 type CatalogActionCheckOperation struct {
-	CatalogActionCheckOperationGenericTable *CatalogActionCheckOperationGenericTable
-	CatalogActionCheckOperationNamespace    *CatalogActionCheckOperationNamespace
-	CatalogActionCheckOperationProject      *CatalogActionCheckOperationProject
-	CatalogActionCheckOperationServer       *CatalogActionCheckOperationServer
-	CatalogActionCheckOperationTable        *CatalogActionCheckOperationTable
-	CatalogActionCheckOperationView         *CatalogActionCheckOperationView
-	CatalogActionCheckOperationWarehouse    *CatalogActionCheckOperationWarehouse
+	CatalogActionCheckOperationGenericTable      *CatalogActionCheckOperationGenericTable
+	CatalogActionCheckOperationNamespace         *CatalogActionCheckOperationNamespace
+	CatalogActionCheckOperationProject           *CatalogActionCheckOperationProject
+	CatalogActionCheckOperationServer            *CatalogActionCheckOperationServer
+	CatalogActionCheckOperationTable             *CatalogActionCheckOperationTable
+	CatalogActionCheckOperationView              *CatalogActionCheckOperationView
+	CatalogActionCheckOperationViewInDefinerView *CatalogActionCheckOperationViewInDefinerView
+	CatalogActionCheckOperationViewReplace       *CatalogActionCheckOperationViewReplace
+	CatalogActionCheckOperationWarehouse         *CatalogActionCheckOperationWarehouse
 }
 
 // CatalogActionCheckOperationGenericTableAsCatalogActionCheckOperation is a convenience function that returns CatalogActionCheckOperationGenericTable wrapped in CatalogActionCheckOperation
@@ -65,6 +67,20 @@ func CatalogActionCheckOperationTableAsCatalogActionCheckOperation(v *CatalogAct
 func CatalogActionCheckOperationViewAsCatalogActionCheckOperation(v *CatalogActionCheckOperationView) CatalogActionCheckOperation {
 	return CatalogActionCheckOperation{
 		CatalogActionCheckOperationView: v,
+	}
+}
+
+// CatalogActionCheckOperationViewInDefinerViewAsCatalogActionCheckOperation is a convenience function that returns CatalogActionCheckOperationViewInDefinerView wrapped in CatalogActionCheckOperation
+func CatalogActionCheckOperationViewInDefinerViewAsCatalogActionCheckOperation(v *CatalogActionCheckOperationViewInDefinerView) CatalogActionCheckOperation {
+	return CatalogActionCheckOperation{
+		CatalogActionCheckOperationViewInDefinerView: v,
+	}
+}
+
+// CatalogActionCheckOperationViewReplaceAsCatalogActionCheckOperation is a convenience function that returns CatalogActionCheckOperationViewReplace wrapped in CatalogActionCheckOperation
+func CatalogActionCheckOperationViewReplaceAsCatalogActionCheckOperation(v *CatalogActionCheckOperationViewReplace) CatalogActionCheckOperation {
+	return CatalogActionCheckOperation{
+		CatalogActionCheckOperationViewReplace: v,
 	}
 }
 
@@ -157,6 +173,32 @@ func (dst *CatalogActionCheckOperation) UnmarshalJSON(data []byte) error {
 		dst.CatalogActionCheckOperationView = nil
 	}
 
+	// try to unmarshal data into CatalogActionCheckOperationViewInDefinerView
+	err = json.Unmarshal(data, &dst.CatalogActionCheckOperationViewInDefinerView)
+	if err == nil {
+		jsonCatalogActionCheckOperationViewInDefinerView, _ := json.Marshal(dst.CatalogActionCheckOperationViewInDefinerView)
+		if string(jsonCatalogActionCheckOperationViewInDefinerView) == "{}" { // empty struct
+			dst.CatalogActionCheckOperationViewInDefinerView = nil
+		} else {
+			match++
+		}
+	} else {
+		dst.CatalogActionCheckOperationViewInDefinerView = nil
+	}
+
+	// try to unmarshal data into CatalogActionCheckOperationViewReplace
+	err = json.Unmarshal(data, &dst.CatalogActionCheckOperationViewReplace)
+	if err == nil {
+		jsonCatalogActionCheckOperationViewReplace, _ := json.Marshal(dst.CatalogActionCheckOperationViewReplace)
+		if string(jsonCatalogActionCheckOperationViewReplace) == "{}" { // empty struct
+			dst.CatalogActionCheckOperationViewReplace = nil
+		} else {
+			match++
+		}
+	} else {
+		dst.CatalogActionCheckOperationViewReplace = nil
+	}
+
 	// try to unmarshal data into CatalogActionCheckOperationWarehouse
 	err = json.Unmarshal(data, &dst.CatalogActionCheckOperationWarehouse)
 	if err == nil {
@@ -178,6 +220,8 @@ func (dst *CatalogActionCheckOperation) UnmarshalJSON(data []byte) error {
 		dst.CatalogActionCheckOperationServer = nil
 		dst.CatalogActionCheckOperationTable = nil
 		dst.CatalogActionCheckOperationView = nil
+		dst.CatalogActionCheckOperationViewInDefinerView = nil
+		dst.CatalogActionCheckOperationViewReplace = nil
 		dst.CatalogActionCheckOperationWarehouse = nil
 
 		return fmt.Errorf("data matches more than one schema in oneOf(CatalogActionCheckOperation)")
@@ -214,6 +258,14 @@ func (src CatalogActionCheckOperation) MarshalJSON() ([]byte, error) {
 		return json.Marshal(&src.CatalogActionCheckOperationView)
 	}
 
+	if src.CatalogActionCheckOperationViewInDefinerView != nil {
+		return json.Marshal(&src.CatalogActionCheckOperationViewInDefinerView)
+	}
+
+	if src.CatalogActionCheckOperationViewReplace != nil {
+		return json.Marshal(&src.CatalogActionCheckOperationViewReplace)
+	}
+
 	if src.CatalogActionCheckOperationWarehouse != nil {
 		return json.Marshal(&src.CatalogActionCheckOperationWarehouse)
 	}
@@ -248,6 +300,14 @@ func (obj *CatalogActionCheckOperation) GetActualInstance() interface{} {
 
 	if obj.CatalogActionCheckOperationView != nil {
 		return obj.CatalogActionCheckOperationView
+	}
+
+	if obj.CatalogActionCheckOperationViewInDefinerView != nil {
+		return obj.CatalogActionCheckOperationViewInDefinerView
+	}
+
+	if obj.CatalogActionCheckOperationViewReplace != nil {
+		return obj.CatalogActionCheckOperationViewReplace
 	}
 
 	if obj.CatalogActionCheckOperationWarehouse != nil {

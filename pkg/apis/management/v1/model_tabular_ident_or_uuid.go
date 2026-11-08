@@ -15,7 +15,7 @@ import (
 	"fmt"
 )
 
-// TabularIdentOrUuid - Identifier for a tabular (table, view, or generic table) — either a UUID or its name and namespace. Wire format primary names are `table-id` and `table`; `view_id` / `view` and `generic_table_id` / `generic_table` are accepted as input aliases for client ergonomics.
+// TabularIdentOrUuid - Identifier for a tabular (table, view, or generic table) — either a UUID or its name and namespace. Wire format primary names are `table-id` and `table`; `view_id` / `view` and `generic_table_id` / `generic_table` are accepted as input aliases for client ergonomics. A name addresses the live tabular. A dropped tabular that can still be restored and a staged table that was not committed yet are addressed by their UUID.
 type TabularIdentOrUuid struct {
 	TabularIdentOrUuidById   *TabularIdentOrUuidById
 	TabularIdentOrUuidByName *TabularIdentOrUuidByName

@@ -33,6 +33,7 @@ const (
 	NAMESPACEACTION_READ_ASSIGNMENTS       NamespaceAction = "read_assignments"
 	NAMESPACEACTION_GRANT_CREATE           NamespaceAction = "grant_create"
 	NAMESPACEACTION_GRANT_DESCRIBE         NamespaceAction = "grant_describe"
+	NAMESPACEACTION_GRANT_WRITE            NamespaceAction = "grant_write"
 	NAMESPACEACTION_GRANT_MODIFY           NamespaceAction = "grant_modify"
 	NAMESPACEACTION_GRANT_SELECT           NamespaceAction = "grant_select"
 	NAMESPACEACTION_GRANT_PASS_GRANTS      NamespaceAction = "grant_pass_grants"
@@ -56,6 +57,7 @@ var AllowedNamespaceActionEnumValues = []NamespaceAction{
 	"read_assignments",
 	"grant_create",
 	"grant_describe",
+	"grant_write",
 	"grant_modify",
 	"grant_select",
 	"grant_pass_grants",

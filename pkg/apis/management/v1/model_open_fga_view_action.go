@@ -26,6 +26,7 @@ const (
 	OPENFGAVIEWACTION_GRANT_MANAGE_TAGS   OpenFGAViewAction = "grant_manage_tags"
 	OPENFGAVIEWACTION_GRANT_DESCRIBE      OpenFGAViewAction = "grant_describe"
 	OPENFGAVIEWACTION_GRANT_SELECT        OpenFGAViewAction = "grant_select"
+	OPENFGAVIEWACTION_GRANT_WRITE         OpenFGAViewAction = "grant_write"
 	OPENFGAVIEWACTION_GRANT_MODIFY        OpenFGAViewAction = "grant_modify"
 	OPENFGAVIEWACTION_CHANGE_OWNERSHIP    OpenFGAViewAction = "change_ownership"
 )
@@ -38,6 +39,7 @@ var AllowedOpenFGAViewActionEnumValues = []OpenFGAViewAction{
 	"grant_manage_tags",
 	"grant_describe",
 	"grant_select",
+	"grant_write",
 	"grant_modify",
 	"change_ownership",
 }

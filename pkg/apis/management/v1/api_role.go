@@ -36,7 +36,7 @@ func (r ApiAddRoleMembersRequest) AddRoleMembersRequest(addRoleMembersRequest Ad
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiAddRoleMembersRequest) XProjectId(xProjectId string) ApiAddRoleMembersRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -183,7 +183,7 @@ func (r ApiCreateRoleRequest) CreateRoleRequest(createRoleRequest CreateRoleRequ
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). The deprecated &#x60;project-id&#x60; body field takes precedence over this header. If neither is set, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiCreateRoleRequest) XProjectId(xProjectId string) ApiCreateRoleRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -316,7 +316,7 @@ func (r ApiDeleteRoleRequest) Force(force bool) ApiDeleteRoleRequest {
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiDeleteRoleRequest) XProjectId(xProjectId string) ApiDeleteRoleRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -433,7 +433,7 @@ type ApiGetRoleRequest struct {
 	xProjectId *string
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiGetRoleRequest) XProjectId(xProjectId string) ApiGetRoleRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -571,7 +571,7 @@ func (r ApiGetRoleActionsRequest) PrincipalRole(principalRole string) ApiGetRole
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiGetRoleActionsRequest) XProjectId(xProjectId string) ApiGetRoleActionsRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -828,7 +828,7 @@ func (r ApiListRoleMemberOfRequest) PageSize(pageSize int64) ApiListRoleMemberOf
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiListRoleMemberOfRequest) XProjectId(xProjectId string) ApiListRoleMemberOfRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -978,7 +978,7 @@ func (r ApiListRoleMembersRequest) PageSize(pageSize int64) ApiListRoleMembersRe
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiListRoleMembersRequest) XProjectId(xProjectId string) ApiListRoleMembersRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -1125,7 +1125,7 @@ func (r ApiListRoleTransitiveMemberOfRequest) PageSize(pageSize int64) ApiListRo
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiListRoleTransitiveMemberOfRequest) XProjectId(xProjectId string) ApiListRoleTransitiveMemberOfRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -1289,7 +1289,7 @@ func (r ApiListRoleTransitiveMembersRequest) PageSize(pageSize int64) ApiListRol
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiListRoleTransitiveMembersRequest) XProjectId(xProjectId string) ApiListRoleTransitiveMembersRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -1478,7 +1478,7 @@ func (r ApiListRolesRequest) ProviderIds(providerIds []string) ApiListRolesReque
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). The deprecated &#x60;projectId&#x60; query parameter takes precedence over this header. If neither is set, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiListRolesRequest) XProjectId(xProjectId string) ApiListRolesRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -1643,7 +1643,7 @@ type ApiRemoveRoleMemberRequest struct {
 	xProjectId *string
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiRemoveRoleMemberRequest) XProjectId(xProjectId string) ApiRemoveRoleMemberRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -1771,7 +1771,7 @@ func (r ApiSearchRoleRequest) SearchRoleRequest(searchRoleRequest SearchRoleRequ
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). The deprecated &#x60;project-id&#x60; body field takes precedence over this header. If neither is set, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiSearchRoleRequest) XProjectId(xProjectId string) ApiSearchRoleRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -1903,7 +1903,7 @@ func (r ApiUpdateRoleRequest) UpdateRoleRequest(updateRoleRequest UpdateRoleRequ
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiUpdateRoleRequest) XProjectId(xProjectId string) ApiUpdateRoleRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -2036,7 +2036,7 @@ func (r ApiUpdateRoleSourceSystemRequest) UpdateRoleSourceSystemRequest(updateRo
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiUpdateRoleSourceSystemRequest) XProjectId(xProjectId string) ApiUpdateRoleSourceSystemRequest {
 	r.xProjectId = &xProjectId
 	return r

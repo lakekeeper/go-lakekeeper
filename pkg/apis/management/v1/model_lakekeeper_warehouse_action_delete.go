@@ -22,7 +22,7 @@ var _ MappedNullable = &LakekeeperWarehouseActionDelete{}
 // LakekeeperWarehouseActionDelete struct for LakekeeperWarehouseActionDelete
 type LakekeeperWarehouseActionDelete struct {
 	Action string `json:"action"`
-	// Whether protection is bypassed, so a warehouse marked protected is deleted with everything in it.
+	// Whether protection is bypassed, so a warehouse marked protected can be deleted. The warehouse must still be empty, and unfinished tasks still block the delete, except tasks of queues that are cancelled when their warehouse is deleted.
 	Force *bool `json:"force,omitempty"`
 }
 

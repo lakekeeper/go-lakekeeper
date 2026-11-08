@@ -25,6 +25,7 @@ const (
 	GENERICTABLERELATION_MANAGE_GRANTS GenericTableRelation = "manage_grants"
 	GENERICTABLERELATION_DESCRIBE      GenericTableRelation = "describe"
 	GENERICTABLERELATION_SELECT        GenericTableRelation = "select"
+	GENERICTABLERELATION_WRITE         GenericTableRelation = "write"
 	GENERICTABLERELATION_MODIFY        GenericTableRelation = "modify"
 	GENERICTABLERELATION_MANAGE_TAGS   GenericTableRelation = "manage_tags"
 )
@@ -36,6 +37,7 @@ var AllowedGenericTableRelationEnumValues = []GenericTableRelation{
 	"manage_grants",
 	"describe",
 	"select",
+	"write",
 	"modify",
 	"manage_tags",
 }

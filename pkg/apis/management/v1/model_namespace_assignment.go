@@ -25,6 +25,7 @@ type NamespaceAssignment struct {
 	NamespaceAssignmentOwnership    *NamespaceAssignmentOwnership
 	NamespaceAssignmentPassGrants   *NamespaceAssignmentPassGrants
 	NamespaceAssignmentSelect       *NamespaceAssignmentSelect
+	NamespaceAssignmentWrite        *NamespaceAssignmentWrite
 }
 
 // NamespaceAssignmentCreateAsNamespaceAssignment is a convenience function that returns NamespaceAssignmentCreate wrapped in NamespaceAssignment
@@ -80,6 +81,13 @@ func NamespaceAssignmentPassGrantsAsNamespaceAssignment(v *NamespaceAssignmentPa
 func NamespaceAssignmentSelectAsNamespaceAssignment(v *NamespaceAssignmentSelect) NamespaceAssignment {
 	return NamespaceAssignment{
 		NamespaceAssignmentSelect: v,
+	}
+}
+
+// NamespaceAssignmentWriteAsNamespaceAssignment is a convenience function that returns NamespaceAssignmentWrite wrapped in NamespaceAssignment
+func NamespaceAssignmentWriteAsNamespaceAssignment(v *NamespaceAssignmentWrite) NamespaceAssignment {
+	return NamespaceAssignment{
+		NamespaceAssignmentWrite: v,
 	}
 }
 
@@ -189,6 +197,18 @@ func (dst *NamespaceAssignment) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	// check if the discriminator value is 'write'
+	if jsonDict["type"] == "write" {
+		// try to unmarshal JSON data into NamespaceAssignmentWrite
+		err = json.Unmarshal(data, &dst.NamespaceAssignmentWrite)
+		if err == nil {
+			return nil // data stored in dst.NamespaceAssignmentWrite, return on the first match
+		} else {
+			dst.NamespaceAssignmentWrite = nil
+			return fmt.Errorf("failed to unmarshal NamespaceAssignment as NamespaceAssignmentWrite: %s", err.Error())
+		}
+	}
+
 	// check if the discriminator value is 'NamespaceAssignmentCreate'
 	if jsonDict["type"] == "NamespaceAssignmentCreate" {
 		// try to unmarshal JSON data into NamespaceAssignmentCreate
@@ -285,6 +305,18 @@ func (dst *NamespaceAssignment) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	// check if the discriminator value is 'NamespaceAssignmentWrite'
+	if jsonDict["type"] == "NamespaceAssignmentWrite" {
+		// try to unmarshal JSON data into NamespaceAssignmentWrite
+		err = json.Unmarshal(data, &dst.NamespaceAssignmentWrite)
+		if err == nil {
+			return nil // data stored in dst.NamespaceAssignmentWrite, return on the first match
+		} else {
+			dst.NamespaceAssignmentWrite = nil
+			return fmt.Errorf("failed to unmarshal NamespaceAssignment as NamespaceAssignmentWrite: %s", err.Error())
+		}
+	}
+
 	return nil
 }
 
@@ -320,6 +352,10 @@ func (src NamespaceAssignment) MarshalJSON() ([]byte, error) {
 
 	if src.NamespaceAssignmentSelect != nil {
 		return json.Marshal(&src.NamespaceAssignmentSelect)
+	}
+
+	if src.NamespaceAssignmentWrite != nil {
+		return json.Marshal(&src.NamespaceAssignmentWrite)
 	}
 
 	return nil, nil // no data in oneOf schemas
@@ -360,6 +396,10 @@ func (obj *NamespaceAssignment) GetActualInstance() interface{} {
 
 	if obj.NamespaceAssignmentSelect != nil {
 		return obj.NamespaceAssignmentSelect
+	}
+
+	if obj.NamespaceAssignmentWrite != nil {
+		return obj.NamespaceAssignmentWrite
 	}
 
 	// all schemas are nil

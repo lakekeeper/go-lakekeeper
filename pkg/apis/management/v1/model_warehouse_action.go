@@ -36,6 +36,7 @@ const (
 	WAREHOUSEACTION_READ_ASSIGNMENTS          WarehouseAction = "read_assignments"
 	WAREHOUSEACTION_GRANT_CREATE              WarehouseAction = "grant_create"
 	WAREHOUSEACTION_GRANT_DESCRIBE            WarehouseAction = "grant_describe"
+	WAREHOUSEACTION_GRANT_WRITE               WarehouseAction = "grant_write"
 	WAREHOUSEACTION_GRANT_MODIFY              WarehouseAction = "grant_modify"
 	WAREHOUSEACTION_GRANT_SELECT              WarehouseAction = "grant_select"
 	WAREHOUSEACTION_GRANT_PASS_GRANTS         WarehouseAction = "grant_pass_grants"
@@ -67,6 +68,7 @@ var AllowedWarehouseActionEnumValues = []WarehouseAction{
 	"read_assignments",
 	"grant_create",
 	"grant_describe",
+	"grant_write",
 	"grant_modify",
 	"grant_select",
 	"grant_pass_grants",

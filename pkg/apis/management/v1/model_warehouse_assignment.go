@@ -25,6 +25,7 @@ type WarehouseAssignment struct {
 	WarehouseAssignmentOwnership    *WarehouseAssignmentOwnership
 	WarehouseAssignmentPassGrants   *WarehouseAssignmentPassGrants
 	WarehouseAssignmentSelect       *WarehouseAssignmentSelect
+	WarehouseAssignmentWrite        *WarehouseAssignmentWrite
 }
 
 // WarehouseAssignmentCreateAsWarehouseAssignment is a convenience function that returns WarehouseAssignmentCreate wrapped in WarehouseAssignment
@@ -80,6 +81,13 @@ func WarehouseAssignmentPassGrantsAsWarehouseAssignment(v *WarehouseAssignmentPa
 func WarehouseAssignmentSelectAsWarehouseAssignment(v *WarehouseAssignmentSelect) WarehouseAssignment {
 	return WarehouseAssignment{
 		WarehouseAssignmentSelect: v,
+	}
+}
+
+// WarehouseAssignmentWriteAsWarehouseAssignment is a convenience function that returns WarehouseAssignmentWrite wrapped in WarehouseAssignment
+func WarehouseAssignmentWriteAsWarehouseAssignment(v *WarehouseAssignmentWrite) WarehouseAssignment {
+	return WarehouseAssignment{
+		WarehouseAssignmentWrite: v,
 	}
 }
 
@@ -189,6 +197,18 @@ func (dst *WarehouseAssignment) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	// check if the discriminator value is 'write'
+	if jsonDict["type"] == "write" {
+		// try to unmarshal JSON data into WarehouseAssignmentWrite
+		err = json.Unmarshal(data, &dst.WarehouseAssignmentWrite)
+		if err == nil {
+			return nil // data stored in dst.WarehouseAssignmentWrite, return on the first match
+		} else {
+			dst.WarehouseAssignmentWrite = nil
+			return fmt.Errorf("failed to unmarshal WarehouseAssignment as WarehouseAssignmentWrite: %s", err.Error())
+		}
+	}
+
 	// check if the discriminator value is 'WarehouseAssignmentCreate'
 	if jsonDict["type"] == "WarehouseAssignmentCreate" {
 		// try to unmarshal JSON data into WarehouseAssignmentCreate
@@ -285,6 +305,18 @@ func (dst *WarehouseAssignment) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	// check if the discriminator value is 'WarehouseAssignmentWrite'
+	if jsonDict["type"] == "WarehouseAssignmentWrite" {
+		// try to unmarshal JSON data into WarehouseAssignmentWrite
+		err = json.Unmarshal(data, &dst.WarehouseAssignmentWrite)
+		if err == nil {
+			return nil // data stored in dst.WarehouseAssignmentWrite, return on the first match
+		} else {
+			dst.WarehouseAssignmentWrite = nil
+			return fmt.Errorf("failed to unmarshal WarehouseAssignment as WarehouseAssignmentWrite: %s", err.Error())
+		}
+	}
+
 	return nil
 }
 
@@ -320,6 +352,10 @@ func (src WarehouseAssignment) MarshalJSON() ([]byte, error) {
 
 	if src.WarehouseAssignmentSelect != nil {
 		return json.Marshal(&src.WarehouseAssignmentSelect)
+	}
+
+	if src.WarehouseAssignmentWrite != nil {
+		return json.Marshal(&src.WarehouseAssignmentWrite)
 	}
 
 	return nil, nil // no data in oneOf schemas
@@ -360,6 +396,10 @@ func (obj *WarehouseAssignment) GetActualInstance() interface{} {
 
 	if obj.WarehouseAssignmentSelect != nil {
 		return obj.WarehouseAssignmentSelect
+	}
+
+	if obj.WarehouseAssignmentWrite != nil {
+		return obj.WarehouseAssignmentWrite
 	}
 
 	// all schemas are nil

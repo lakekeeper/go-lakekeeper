@@ -22,7 +22,7 @@ var _ MappedNullable = &LakekeeperViewActionDrop{}
 // LakekeeperViewActionDrop struct for LakekeeperViewActionDrop
 type LakekeeperViewActionDrop struct {
 	Action string `json:"action"`
-	// Whether the warehouse-configured soft-deletion is bypassed: the view is hard-deleted at once, not kept for the configured grace period. Extra destructive — irreversible right away.
+	// Whether the drop skips the view's protection and, in a warehouse with soft deletion, the soft-deletion window: the view is hard-deleted at once.
 	Force *bool `json:"force,omitempty"`
 	// Whether the underlying metadata files are physically purged from storage.
 	Purge *bool `json:"purge,omitempty"`

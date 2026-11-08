@@ -22,7 +22,7 @@ var _ MappedNullable = &LakekeeperTableActionDrop{}
 // LakekeeperTableActionDrop struct for LakekeeperTableActionDrop
 type LakekeeperTableActionDrop struct {
 	Action string `json:"action"`
-	// Whether the warehouse-configured soft-deletion is bypassed: the table is hard-deleted at once, not kept for the configured grace period. Extra destructive — irreversible right away.
+	// Whether the drop skips the table's protection and, in a warehouse with soft deletion, the soft-deletion window: the table is hard-deleted at once. Also set for the drop of an active table that a register with `overwrite` replaces with another table (a different table UUID) in a warehouse with soft deletion. That drop skips only the window; protection holds.
 	Force *bool `json:"force,omitempty"`
 	// Whether the underlying data files are physically purged from storage.
 	Purge *bool `json:"purge,omitempty"`

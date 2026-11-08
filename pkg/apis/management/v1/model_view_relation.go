@@ -25,6 +25,7 @@ const (
 	VIEWRELATION_MANAGE_GRANTS ViewRelation = "manage_grants"
 	VIEWRELATION_DESCRIBE      ViewRelation = "describe"
 	VIEWRELATION_SELECT        ViewRelation = "select"
+	VIEWRELATION_WRITE         ViewRelation = "write"
 	VIEWRELATION_MODIFY        ViewRelation = "modify"
 	VIEWRELATION_MANAGE_TAGS   ViewRelation = "manage_tags"
 )
@@ -36,6 +37,7 @@ var AllowedViewRelationEnumValues = []ViewRelation{
 	"manage_grants",
 	"describe",
 	"select",
+	"write",
 	"modify",
 	"manage_tags",
 }

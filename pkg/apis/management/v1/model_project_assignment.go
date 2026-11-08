@@ -26,6 +26,7 @@ type ProjectAssignment struct {
 	ProjectAssignmentSecurityAdmin *ProjectAssignmentSecurityAdmin
 	ProjectAssignmentSelect        *ProjectAssignmentSelect
 	ProjectAssignmentTagCreator    *ProjectAssignmentTagCreator
+	ProjectAssignmentWrite         *ProjectAssignmentWrite
 }
 
 // ProjectAssignmentCreateAsProjectAssignment is a convenience function that returns ProjectAssignmentCreate wrapped in ProjectAssignment
@@ -88,6 +89,13 @@ func ProjectAssignmentSelectAsProjectAssignment(v *ProjectAssignmentSelect) Proj
 func ProjectAssignmentTagCreatorAsProjectAssignment(v *ProjectAssignmentTagCreator) ProjectAssignment {
 	return ProjectAssignment{
 		ProjectAssignmentTagCreator: v,
+	}
+}
+
+// ProjectAssignmentWriteAsProjectAssignment is a convenience function that returns ProjectAssignmentWrite wrapped in ProjectAssignment
+func ProjectAssignmentWriteAsProjectAssignment(v *ProjectAssignmentWrite) ProjectAssignment {
+	return ProjectAssignment{
+		ProjectAssignmentWrite: v,
 	}
 }
 
@@ -209,6 +217,18 @@ func (dst *ProjectAssignment) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	// check if the discriminator value is 'write'
+	if jsonDict["type"] == "write" {
+		// try to unmarshal JSON data into ProjectAssignmentWrite
+		err = json.Unmarshal(data, &dst.ProjectAssignmentWrite)
+		if err == nil {
+			return nil // data stored in dst.ProjectAssignmentWrite, return on the first match
+		} else {
+			dst.ProjectAssignmentWrite = nil
+			return fmt.Errorf("failed to unmarshal ProjectAssignment as ProjectAssignmentWrite: %s", err.Error())
+		}
+	}
+
 	// check if the discriminator value is 'ProjectAssignmentCreate'
 	if jsonDict["type"] == "ProjectAssignmentCreate" {
 		// try to unmarshal JSON data into ProjectAssignmentCreate
@@ -317,6 +337,18 @@ func (dst *ProjectAssignment) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	// check if the discriminator value is 'ProjectAssignmentWrite'
+	if jsonDict["type"] == "ProjectAssignmentWrite" {
+		// try to unmarshal JSON data into ProjectAssignmentWrite
+		err = json.Unmarshal(data, &dst.ProjectAssignmentWrite)
+		if err == nil {
+			return nil // data stored in dst.ProjectAssignmentWrite, return on the first match
+		} else {
+			dst.ProjectAssignmentWrite = nil
+			return fmt.Errorf("failed to unmarshal ProjectAssignment as ProjectAssignmentWrite: %s", err.Error())
+		}
+	}
+
 	return nil
 }
 
@@ -356,6 +388,10 @@ func (src ProjectAssignment) MarshalJSON() ([]byte, error) {
 
 	if src.ProjectAssignmentTagCreator != nil {
 		return json.Marshal(&src.ProjectAssignmentTagCreator)
+	}
+
+	if src.ProjectAssignmentWrite != nil {
+		return json.Marshal(&src.ProjectAssignmentWrite)
 	}
 
 	return nil, nil // no data in oneOf schemas
@@ -400,6 +436,10 @@ func (obj *ProjectAssignment) GetActualInstance() interface{} {
 
 	if obj.ProjectAssignmentTagCreator != nil {
 		return obj.ProjectAssignmentTagCreator
+	}
+
+	if obj.ProjectAssignmentWrite != nil {
+		return obj.ProjectAssignmentWrite
 	}
 
 	// all schemas are nil

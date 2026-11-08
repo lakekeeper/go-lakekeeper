@@ -26,6 +26,7 @@ const (
 	OPENFGAGENERICTABLEACTION_GRANT_MANAGE_TAGS   OpenFGAGenericTableAction = "grant_manage_tags"
 	OPENFGAGENERICTABLEACTION_GRANT_DESCRIBE      OpenFGAGenericTableAction = "grant_describe"
 	OPENFGAGENERICTABLEACTION_GRANT_SELECT        OpenFGAGenericTableAction = "grant_select"
+	OPENFGAGENERICTABLEACTION_GRANT_WRITE         OpenFGAGenericTableAction = "grant_write"
 	OPENFGAGENERICTABLEACTION_GRANT_MODIFY        OpenFGAGenericTableAction = "grant_modify"
 	OPENFGAGENERICTABLEACTION_CHANGE_OWNERSHIP    OpenFGAGenericTableAction = "change_ownership"
 )
@@ -38,6 +39,7 @@ var AllowedOpenFGAGenericTableActionEnumValues = []OpenFGAGenericTableAction{
 	"grant_manage_tags",
 	"grant_describe",
 	"grant_select",
+	"grant_write",
 	"grant_modify",
 	"change_ownership",
 }

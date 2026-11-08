@@ -26,6 +26,7 @@ const (
 	OPENFGATABLEACTION_GRANT_MANAGE_TAGS   OpenFGATableAction = "grant_manage_tags"
 	OPENFGATABLEACTION_GRANT_DESCRIBE      OpenFGATableAction = "grant_describe"
 	OPENFGATABLEACTION_GRANT_SELECT        OpenFGATableAction = "grant_select"
+	OPENFGATABLEACTION_GRANT_WRITE         OpenFGATableAction = "grant_write"
 	OPENFGATABLEACTION_GRANT_MODIFY        OpenFGATableAction = "grant_modify"
 	OPENFGATABLEACTION_CHANGE_OWNERSHIP    OpenFGATableAction = "change_ownership"
 )
@@ -38,6 +39,7 @@ var AllowedOpenFGATableActionEnumValues = []OpenFGATableAction{
 	"grant_manage_tags",
 	"grant_describe",
 	"grant_select",
+	"grant_write",
 	"grant_modify",
 	"change_ownership",
 }

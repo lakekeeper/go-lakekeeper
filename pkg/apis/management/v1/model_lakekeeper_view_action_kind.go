@@ -17,19 +17,27 @@ import (
 
 // LakekeeperViewActionKind - struct for LakekeeperViewActionKind
 type LakekeeperViewActionKind struct {
-	LakekeeperViewActionKindCommit        *LakekeeperViewActionKindCommit
-	LakekeeperViewActionKindControlTasks  *LakekeeperViewActionKindControlTasks
-	LakekeeperViewActionKindDrop          *LakekeeperViewActionKindDrop
-	LakekeeperViewActionKindGetMetadata   *LakekeeperViewActionKindGetMetadata
-	LakekeeperViewActionKindGetTasks      *LakekeeperViewActionKindGetTasks
-	LakekeeperViewActionKindIncludeInList *LakekeeperViewActionKindIncludeInList
-	LakekeeperViewActionKindManageTags    *LakekeeperViewActionKindManageTags
-	LakekeeperViewActionKindMove          *LakekeeperViewActionKindMove
-	LakekeeperViewActionKindReadGrants    *LakekeeperViewActionKindReadGrants
-	LakekeeperViewActionKindRename        *LakekeeperViewActionKindRename
-	LakekeeperViewActionKindSelect        *LakekeeperViewActionKindSelect
-	LakekeeperViewActionKindSetProtection *LakekeeperViewActionKindSetProtection
-	LakekeeperViewActionKindUndrop        *LakekeeperViewActionKindUndrop
+	LakekeeperViewActionKindChangeSecurityMode *LakekeeperViewActionKindChangeSecurityMode
+	LakekeeperViewActionKindCommit             *LakekeeperViewActionKindCommit
+	LakekeeperViewActionKindControlTasks       *LakekeeperViewActionKindControlTasks
+	LakekeeperViewActionKindDrop               *LakekeeperViewActionKindDrop
+	LakekeeperViewActionKindGetMetadata        *LakekeeperViewActionKindGetMetadata
+	LakekeeperViewActionKindGetTasks           *LakekeeperViewActionKindGetTasks
+	LakekeeperViewActionKindIncludeInList      *LakekeeperViewActionKindIncludeInList
+	LakekeeperViewActionKindManageTags         *LakekeeperViewActionKindManageTags
+	LakekeeperViewActionKindMove               *LakekeeperViewActionKindMove
+	LakekeeperViewActionKindReadGrants         *LakekeeperViewActionKindReadGrants
+	LakekeeperViewActionKindRename             *LakekeeperViewActionKindRename
+	LakekeeperViewActionKindSelect             *LakekeeperViewActionKindSelect
+	LakekeeperViewActionKindSetProtection      *LakekeeperViewActionKindSetProtection
+	LakekeeperViewActionKindUndrop             *LakekeeperViewActionKindUndrop
+}
+
+// LakekeeperViewActionKindChangeSecurityModeAsLakekeeperViewActionKind is a convenience function that returns LakekeeperViewActionKindChangeSecurityMode wrapped in LakekeeperViewActionKind
+func LakekeeperViewActionKindChangeSecurityModeAsLakekeeperViewActionKind(v *LakekeeperViewActionKindChangeSecurityMode) LakekeeperViewActionKind {
+	return LakekeeperViewActionKind{
+		LakekeeperViewActionKindChangeSecurityMode: v,
+	}
 }
 
 // LakekeeperViewActionKindCommitAsLakekeeperViewActionKind is a convenience function that returns LakekeeperViewActionKindCommit wrapped in LakekeeperViewActionKind
@@ -131,6 +139,18 @@ func (dst *LakekeeperViewActionKind) UnmarshalJSON(data []byte) error {
 	err = newStrictDecoder(data).Decode(&jsonDict)
 	if err != nil {
 		return fmt.Errorf("failed to unmarshal JSON into map for the discriminator lookup")
+	}
+
+	// check if the discriminator value is 'change_security_mode'
+	if jsonDict["action"] == "change_security_mode" {
+		// try to unmarshal JSON data into LakekeeperViewActionKindChangeSecurityMode
+		err = json.Unmarshal(data, &dst.LakekeeperViewActionKindChangeSecurityMode)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperViewActionKindChangeSecurityMode, return on the first match
+		} else {
+			dst.LakekeeperViewActionKindChangeSecurityMode = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperViewActionKind as LakekeeperViewActionKindChangeSecurityMode: %s", err.Error())
+		}
 	}
 
 	// check if the discriminator value is 'commit'
@@ -286,6 +306,18 @@ func (dst *LakekeeperViewActionKind) UnmarshalJSON(data []byte) error {
 		} else {
 			dst.LakekeeperViewActionKindUndrop = nil
 			return fmt.Errorf("failed to unmarshal LakekeeperViewActionKind as LakekeeperViewActionKindUndrop: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'LakekeeperViewActionKindChangeSecurityMode'
+	if jsonDict["action"] == "LakekeeperViewActionKindChangeSecurityMode" {
+		// try to unmarshal JSON data into LakekeeperViewActionKindChangeSecurityMode
+		err = json.Unmarshal(data, &dst.LakekeeperViewActionKindChangeSecurityMode)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperViewActionKindChangeSecurityMode, return on the first match
+		} else {
+			dst.LakekeeperViewActionKindChangeSecurityMode = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperViewActionKind as LakekeeperViewActionKindChangeSecurityMode: %s", err.Error())
 		}
 	}
 
@@ -450,6 +482,10 @@ func (dst *LakekeeperViewActionKind) UnmarshalJSON(data []byte) error {
 
 // Marshal data from the first non-nil pointers in the struct to JSON
 func (src LakekeeperViewActionKind) MarshalJSON() ([]byte, error) {
+	if src.LakekeeperViewActionKindChangeSecurityMode != nil {
+		return json.Marshal(&src.LakekeeperViewActionKindChangeSecurityMode)
+	}
+
 	if src.LakekeeperViewActionKindCommit != nil {
 		return json.Marshal(&src.LakekeeperViewActionKindCommit)
 	}
@@ -510,6 +546,10 @@ func (obj *LakekeeperViewActionKind) GetActualInstance() interface{} {
 	if obj == nil {
 		return nil
 	}
+	if obj.LakekeeperViewActionKindChangeSecurityMode != nil {
+		return obj.LakekeeperViewActionKindChangeSecurityMode
+	}
+
 	if obj.LakekeeperViewActionKindCommit != nil {
 		return obj.LakekeeperViewActionKindCommit
 	}

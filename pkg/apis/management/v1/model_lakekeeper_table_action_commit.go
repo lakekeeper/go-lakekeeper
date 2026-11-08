@@ -25,7 +25,7 @@ type LakekeeperTableActionCommit struct {
 	RemovedProperties []string `json:"removed_properties,omitempty"`
 	// The branch and tag names this commit creates, moves, or removes. Empty when the commit targets no ref by name.
 	TargetRefs []string `json:"target_refs,omitempty"`
-	// The kinds of metadata updates this commit contains.
+	// The kinds of metadata updates this commit contains. A check that names none asks about a commit of any kind.
 	UpdateKinds       []TableUpdateKind `json:"update_kinds,omitempty"`
 	UpdatedProperties map[string]string `json:"updated_properties,omitempty"`
 }

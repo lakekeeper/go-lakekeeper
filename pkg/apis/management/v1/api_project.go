@@ -149,7 +149,7 @@ type ApiDeleteProjectRequest struct {
 	xProjectId *string
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiDeleteProjectRequest) XProjectId(xProjectId string) ApiDeleteProjectRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -358,10 +358,17 @@ type ApiGetEndpointStatisticsRequest struct {
 	ctx                          context.Context
 	ApiService                   *ProjectAPIService
 	getEndpointStatisticsRequest *GetEndpointStatisticsRequest
+	xProjectId                   *string
 }
 
 func (r ApiGetEndpointStatisticsRequest) GetEndpointStatisticsRequest(getEndpointStatisticsRequest GetEndpointStatisticsRequest) ApiGetEndpointStatisticsRequest {
 	r.getEndpointStatisticsRequest = &getEndpointStatisticsRequest
+	return r
+}
+
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
+func (r ApiGetEndpointStatisticsRequest) XProjectId(xProjectId string) ApiGetEndpointStatisticsRequest {
+	r.xProjectId = &xProjectId
 	return r
 }
 
@@ -466,6 +473,9 @@ func (a *ProjectAPIService) GetEndpointStatisticsExecute(r ApiGetEndpointStatist
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
+	if r.xProjectId != nil {
+		parameterAddToHeaderOrQuery(localVarHeaderParams, "x-project-id", r.xProjectId, "simple", "")
+	}
 	// body params
 	localVarPostBody = r.getEndpointStatisticsRequest
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
@@ -521,7 +531,7 @@ type ApiGetProjectRequest struct {
 	xProjectId *string
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiGetProjectRequest) XProjectId(xProjectId string) ApiGetProjectRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -655,7 +665,7 @@ func (r ApiGetProjectActionsRequest) PrincipalRole(principalRole string) ApiGetP
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiGetProjectActionsRequest) XProjectId(xProjectId string) ApiGetProjectActionsRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -1011,7 +1021,7 @@ func (r ApiRenameProjectRequest) RenameProjectRequest(renameProjectRequest Renam
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiRenameProjectRequest) XProjectId(xProjectId string) ApiRenameProjectRequest {
 	r.xProjectId = &xProjectId
 	return r

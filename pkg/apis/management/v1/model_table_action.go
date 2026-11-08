@@ -33,6 +33,7 @@ const (
 	TABLEACTION_GRANT_MANAGE_TAGS   TableAction = "grant_manage_tags"
 	TABLEACTION_GRANT_DESCRIBE      TableAction = "grant_describe"
 	TABLEACTION_GRANT_SELECT        TableAction = "grant_select"
+	TABLEACTION_GRANT_WRITE         TableAction = "grant_write"
 	TABLEACTION_GRANT_MODIFY        TableAction = "grant_modify"
 	TABLEACTION_CHANGE_OWNERSHIP    TableAction = "change_ownership"
 	TABLEACTION_GET_TASKS           TableAction = "get_tasks"
@@ -55,6 +56,7 @@ var AllowedTableActionEnumValues = []TableAction{
 	"grant_manage_tags",
 	"grant_describe",
 	"grant_select",
+	"grant_write",
 	"grant_modify",
 	"change_ownership",
 	"get_tasks",

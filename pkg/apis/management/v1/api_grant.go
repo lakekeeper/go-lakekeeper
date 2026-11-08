@@ -38,7 +38,7 @@ func (r ApiApplyGenericTableGrantsRequest) ApplyGrantsRequest(applyGrantsRequest
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiApplyGenericTableGrantsRequest) XProjectId(xProjectId string) ApiApplyGenericTableGrantsRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -180,7 +180,7 @@ func (r ApiApplyNamespaceGrantsRequest) ApplyGrantsRequest(applyGrantsRequest Ap
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiApplyNamespaceGrantsRequest) XProjectId(xProjectId string) ApiApplyNamespaceGrantsRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -320,7 +320,7 @@ func (r ApiApplyProjectGrantsRequest) ApplyGrantsRequest(applyGrantsRequest Appl
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiApplyProjectGrantsRequest) XProjectId(xProjectId string) ApiApplyProjectGrantsRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -584,7 +584,7 @@ func (r ApiApplyTableGrantsRequest) ApplyGrantsRequest(applyGrantsRequest ApplyG
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiApplyTableGrantsRequest) XProjectId(xProjectId string) ApiApplyTableGrantsRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -725,7 +725,7 @@ func (r ApiApplyTagGrantsRequest) ApplyGrantsRequest(applyGrantsRequest ApplyGra
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiApplyTagGrantsRequest) XProjectId(xProjectId string) ApiApplyTagGrantsRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -864,7 +864,7 @@ func (r ApiApplyViewGrantsRequest) ApplyGrantsRequest(applyGrantsRequest ApplyGr
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiApplyViewGrantsRequest) XProjectId(xProjectId string) ApiApplyViewGrantsRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -1005,7 +1005,7 @@ func (r ApiApplyWarehouseGrantsRequest) ApplyGrantsRequest(applyGrantsRequest Ap
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiApplyWarehouseGrantsRequest) XProjectId(xProjectId string) ApiApplyWarehouseGrantsRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -1156,7 +1156,7 @@ func (r ApiGetGenericTableGrantablePrivilegesRequest) PrincipalRole(principalRol
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiGetGenericTableGrantablePrivilegesRequest) XProjectId(xProjectId string) ApiGetGenericTableGrantablePrivilegesRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -1424,7 +1424,7 @@ func (r ApiGetNamespaceGrantablePrivilegesRequest) PrincipalRole(principalRole s
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiGetNamespaceGrantablePrivilegesRequest) XProjectId(xProjectId string) ApiGetNamespaceGrantablePrivilegesRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -1576,7 +1576,7 @@ func (r ApiGetProjectGrantablePrivilegesRequest) PrincipalRole(principalRole str
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiGetProjectGrantablePrivilegesRequest) XProjectId(xProjectId string) ApiGetProjectGrantablePrivilegesRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -1860,7 +1860,7 @@ func (r ApiGetTableGrantablePrivilegesRequest) PrincipalRole(principalRole strin
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiGetTableGrantablePrivilegesRequest) XProjectId(xProjectId string) ApiGetTableGrantablePrivilegesRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -2013,7 +2013,7 @@ func (r ApiGetTagGrantablePrivilegesRequest) PrincipalRole(principalRole string)
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiGetTagGrantablePrivilegesRequest) XProjectId(xProjectId string) ApiGetTagGrantablePrivilegesRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -2164,7 +2164,7 @@ func (r ApiGetViewGrantablePrivilegesRequest) PrincipalRole(principalRole string
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiGetViewGrantablePrivilegesRequest) XProjectId(xProjectId string) ApiGetViewGrantablePrivilegesRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -2317,7 +2317,7 @@ func (r ApiGetWarehouseGrantablePrivilegesRequest) PrincipalRole(principalRole s
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiGetWarehouseGrantablePrivilegesRequest) XProjectId(xProjectId string) ApiGetWarehouseGrantablePrivilegesRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -2482,7 +2482,7 @@ func (r ApiListGenericTableGrantsRequest) PageSize(pageSize int64) ApiListGeneri
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiListGenericTableGrantsRequest) XProjectId(xProjectId string) ApiListGenericTableGrantsRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -2654,7 +2654,7 @@ func (r ApiListGrantsRequest) PageSize(pageSize int64) ApiListGrantsRequest {
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiListGrantsRequest) XProjectId(xProjectId string) ApiListGrantsRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -2849,7 +2849,7 @@ func (r ApiListNamespaceGrantsRequest) PageSize(pageSize int64) ApiListNamespace
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiListNamespaceGrantsRequest) XProjectId(xProjectId string) ApiListNamespaceGrantsRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -3059,7 +3059,7 @@ func (r ApiListNamespaceSubtreeGrantsRequest) PageSize(pageSize int64) ApiListNa
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiListNamespaceSubtreeGrantsRequest) XProjectId(xProjectId string) ApiListNamespaceSubtreeGrantsRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -3306,7 +3306,7 @@ func (r ApiListProjectGrantsRequest) PageSize(pageSize int64) ApiListProjectGran
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiListProjectGrantsRequest) XProjectId(xProjectId string) ApiListProjectGrantsRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -3634,7 +3634,7 @@ func (r ApiListTableGrantsRequest) PageSize(pageSize int64) ApiListTableGrantsRe
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiListTableGrantsRequest) XProjectId(xProjectId string) ApiListTableGrantsRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -3810,7 +3810,7 @@ func (r ApiListTagGrantsRequest) PageSize(pageSize int64) ApiListTagGrantsReques
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiListTagGrantsRequest) XProjectId(xProjectId string) ApiListTagGrantsRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -3982,7 +3982,7 @@ func (r ApiListViewGrantsRequest) PageSize(pageSize int64) ApiListViewGrantsRequ
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiListViewGrantsRequest) XProjectId(xProjectId string) ApiListViewGrantsRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -4155,7 +4155,7 @@ func (r ApiListWarehouseGrantsRequest) PageSize(pageSize int64) ApiListWarehouse
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiListWarehouseGrantsRequest) XProjectId(xProjectId string) ApiListWarehouseGrantsRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -4363,7 +4363,7 @@ func (r ApiListWarehouseSubtreeGrantsRequest) PageSize(pageSize int64) ApiListWa
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiListWarehouseSubtreeGrantsRequest) XProjectId(xProjectId string) ApiListWarehouseSubtreeGrantsRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -4564,7 +4564,7 @@ func (r ApiRevokeNamespaceSubtreeGrantsRequest) RevokeSubtreeGrantsRequest(revok
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiRevokeNamespaceSubtreeGrantsRequest) XProjectId(xProjectId string) ApiRevokeNamespaceSubtreeGrantsRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -4752,7 +4752,7 @@ func (r ApiRevokeWarehouseSubtreeGrantsRequest) RevokeSubtreeGrantsRequest(revok
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiRevokeWarehouseSubtreeGrantsRequest) XProjectId(xProjectId string) ApiRevokeWarehouseSubtreeGrantsRequest {
 	r.xProjectId = &xProjectId
 	return r

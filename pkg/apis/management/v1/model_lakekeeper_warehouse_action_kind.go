@@ -17,32 +17,34 @@ import (
 
 // LakekeeperWarehouseActionKind - struct for LakekeeperWarehouseActionKind
 type LakekeeperWarehouseActionKind struct {
-	LakekeeperWarehouseActionKindAcceptMovedNamespace   *LakekeeperWarehouseActionKindAcceptMovedNamespace
-	LakekeeperWarehouseActionKindActivate               *LakekeeperWarehouseActionKindActivate
-	LakekeeperWarehouseActionKindControlAllTasks        *LakekeeperWarehouseActionKindControlAllTasks
-	LakekeeperWarehouseActionKindCreateNamespace        *LakekeeperWarehouseActionKindCreateNamespace
-	LakekeeperWarehouseActionKindDeactivate             *LakekeeperWarehouseActionKindDeactivate
-	LakekeeperWarehouseActionKindDelete                 *LakekeeperWarehouseActionKindDelete
-	LakekeeperWarehouseActionKindGetAllTasks            *LakekeeperWarehouseActionKindGetAllTasks
-	LakekeeperWarehouseActionKindGetConfig              *LakekeeperWarehouseActionKindGetConfig
-	LakekeeperWarehouseActionKindGetEndpointStatistics  *LakekeeperWarehouseActionKindGetEndpointStatistics
-	LakekeeperWarehouseActionKindGetMetadata            *LakekeeperWarehouseActionKindGetMetadata
-	LakekeeperWarehouseActionKindGetTaskQueueConfig     *LakekeeperWarehouseActionKindGetTaskQueueConfig
-	LakekeeperWarehouseActionKindIncludeInList          *LakekeeperWarehouseActionKindIncludeInList
-	LakekeeperWarehouseActionKindListDeletedTabulars    *LakekeeperWarehouseActionKindListDeletedTabulars
-	LakekeeperWarehouseActionKindListEverything         *LakekeeperWarehouseActionKindListEverything
-	LakekeeperWarehouseActionKindListNamespaces         *LakekeeperWarehouseActionKindListNamespaces
-	LakekeeperWarehouseActionKindManageTags             *LakekeeperWarehouseActionKindManageTags
-	LakekeeperWarehouseActionKindModifySoftDeletion     *LakekeeperWarehouseActionKindModifySoftDeletion
-	LakekeeperWarehouseActionKindModifyTaskQueueConfig  *LakekeeperWarehouseActionKindModifyTaskQueueConfig
-	LakekeeperWarehouseActionKindReadGrants             *LakekeeperWarehouseActionKindReadGrants
-	LakekeeperWarehouseActionKindReadSubtreeGrants      *LakekeeperWarehouseActionKindReadSubtreeGrants
-	LakekeeperWarehouseActionKindRename                 *LakekeeperWarehouseActionKindRename
-	LakekeeperWarehouseActionKindRevokeSubtreeGrants    *LakekeeperWarehouseActionKindRevokeSubtreeGrants
-	LakekeeperWarehouseActionKindSetFormatVersionPolicy *LakekeeperWarehouseActionKindSetFormatVersionPolicy
-	LakekeeperWarehouseActionKindSetProtection          *LakekeeperWarehouseActionKindSetProtection
-	LakekeeperWarehouseActionKindUpdateStorage          *LakekeeperWarehouseActionKindUpdateStorage
-	LakekeeperWarehouseActionKindUse                    *LakekeeperWarehouseActionKindUse
+	LakekeeperWarehouseActionKindAcceptMovedNamespace    *LakekeeperWarehouseActionKindAcceptMovedNamespace
+	LakekeeperWarehouseActionKindActivate                *LakekeeperWarehouseActionKindActivate
+	LakekeeperWarehouseActionKindControlAllTasks         *LakekeeperWarehouseActionKindControlAllTasks
+	LakekeeperWarehouseActionKindCreateNamespace         *LakekeeperWarehouseActionKindCreateNamespace
+	LakekeeperWarehouseActionKindDeactivate              *LakekeeperWarehouseActionKindDeactivate
+	LakekeeperWarehouseActionKindDelete                  *LakekeeperWarehouseActionKindDelete
+	LakekeeperWarehouseActionKindGetAllTasks             *LakekeeperWarehouseActionKindGetAllTasks
+	LakekeeperWarehouseActionKindGetConfig               *LakekeeperWarehouseActionKindGetConfig
+	LakekeeperWarehouseActionKindGetEndpointStatistics   *LakekeeperWarehouseActionKindGetEndpointStatistics
+	LakekeeperWarehouseActionKindGetMetadata             *LakekeeperWarehouseActionKindGetMetadata
+	LakekeeperWarehouseActionKindGetTaskQueueConfig      *LakekeeperWarehouseActionKindGetTaskQueueConfig
+	LakekeeperWarehouseActionKindIncludeInList           *LakekeeperWarehouseActionKindIncludeInList
+	LakekeeperWarehouseActionKindListDeletedTabulars     *LakekeeperWarehouseActionKindListDeletedTabulars
+	LakekeeperWarehouseActionKindListEverything          *LakekeeperWarehouseActionKindListEverything
+	LakekeeperWarehouseActionKindListNamespaces          *LakekeeperWarehouseActionKindListNamespaces
+	LakekeeperWarehouseActionKindManageTags              *LakekeeperWarehouseActionKindManageTags
+	LakekeeperWarehouseActionKindModifySoftDeletion      *LakekeeperWarehouseActionKindModifySoftDeletion
+	LakekeeperWarehouseActionKindModifyTaskQueueConfig   *LakekeeperWarehouseActionKindModifyTaskQueueConfig
+	LakekeeperWarehouseActionKindReadGrants              *LakekeeperWarehouseActionKindReadGrants
+	LakekeeperWarehouseActionKindReadSubtreeGrants       *LakekeeperWarehouseActionKindReadSubtreeGrants
+	LakekeeperWarehouseActionKindRegisterTable           *LakekeeperWarehouseActionKindRegisterTable
+	LakekeeperWarehouseActionKindRename                  *LakekeeperWarehouseActionKindRename
+	LakekeeperWarehouseActionKindRevokeSubtreeGrants     *LakekeeperWarehouseActionKindRevokeSubtreeGrants
+	LakekeeperWarehouseActionKindSetFormatVersionPolicy  *LakekeeperWarehouseActionKindSetFormatVersionPolicy
+	LakekeeperWarehouseActionKindSetProtection           *LakekeeperWarehouseActionKindSetProtection
+	LakekeeperWarehouseActionKindUpdateStorage           *LakekeeperWarehouseActionKindUpdateStorage
+	LakekeeperWarehouseActionKindUpdateStorageCredential *LakekeeperWarehouseActionKindUpdateStorageCredential
+	LakekeeperWarehouseActionKindUse                     *LakekeeperWarehouseActionKindUse
 }
 
 // LakekeeperWarehouseActionKindAcceptMovedNamespaceAsLakekeeperWarehouseActionKind is a convenience function that returns LakekeeperWarehouseActionKindAcceptMovedNamespace wrapped in LakekeeperWarehouseActionKind
@@ -185,6 +187,13 @@ func LakekeeperWarehouseActionKindReadSubtreeGrantsAsLakekeeperWarehouseActionKi
 	}
 }
 
+// LakekeeperWarehouseActionKindRegisterTableAsLakekeeperWarehouseActionKind is a convenience function that returns LakekeeperWarehouseActionKindRegisterTable wrapped in LakekeeperWarehouseActionKind
+func LakekeeperWarehouseActionKindRegisterTableAsLakekeeperWarehouseActionKind(v *LakekeeperWarehouseActionKindRegisterTable) LakekeeperWarehouseActionKind {
+	return LakekeeperWarehouseActionKind{
+		LakekeeperWarehouseActionKindRegisterTable: v,
+	}
+}
+
 // LakekeeperWarehouseActionKindRenameAsLakekeeperWarehouseActionKind is a convenience function that returns LakekeeperWarehouseActionKindRename wrapped in LakekeeperWarehouseActionKind
 func LakekeeperWarehouseActionKindRenameAsLakekeeperWarehouseActionKind(v *LakekeeperWarehouseActionKindRename) LakekeeperWarehouseActionKind {
 	return LakekeeperWarehouseActionKind{
@@ -217,6 +226,13 @@ func LakekeeperWarehouseActionKindSetProtectionAsLakekeeperWarehouseActionKind(v
 func LakekeeperWarehouseActionKindUpdateStorageAsLakekeeperWarehouseActionKind(v *LakekeeperWarehouseActionKindUpdateStorage) LakekeeperWarehouseActionKind {
 	return LakekeeperWarehouseActionKind{
 		LakekeeperWarehouseActionKindUpdateStorage: v,
+	}
+}
+
+// LakekeeperWarehouseActionKindUpdateStorageCredentialAsLakekeeperWarehouseActionKind is a convenience function that returns LakekeeperWarehouseActionKindUpdateStorageCredential wrapped in LakekeeperWarehouseActionKind
+func LakekeeperWarehouseActionKindUpdateStorageCredentialAsLakekeeperWarehouseActionKind(v *LakekeeperWarehouseActionKindUpdateStorageCredential) LakekeeperWarehouseActionKind {
+	return LakekeeperWarehouseActionKind{
+		LakekeeperWarehouseActionKindUpdateStorageCredential: v,
 	}
 }
 
@@ -477,6 +493,18 @@ func (dst *LakekeeperWarehouseActionKind) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	// check if the discriminator value is 'register_table'
+	if jsonDict["action"] == "register_table" {
+		// try to unmarshal JSON data into LakekeeperWarehouseActionKindRegisterTable
+		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionKindRegisterTable)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperWarehouseActionKindRegisterTable, return on the first match
+		} else {
+			dst.LakekeeperWarehouseActionKindRegisterTable = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseActionKind as LakekeeperWarehouseActionKindRegisterTable: %s", err.Error())
+		}
+	}
+
 	// check if the discriminator value is 'rename'
 	if jsonDict["action"] == "rename" {
 		// try to unmarshal JSON data into LakekeeperWarehouseActionKindRename
@@ -534,6 +562,18 @@ func (dst *LakekeeperWarehouseActionKind) UnmarshalJSON(data []byte) error {
 		} else {
 			dst.LakekeeperWarehouseActionKindUpdateStorage = nil
 			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseActionKind as LakekeeperWarehouseActionKindUpdateStorage: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'update_storage_credential'
+	if jsonDict["action"] == "update_storage_credential" {
+		// try to unmarshal JSON data into LakekeeperWarehouseActionKindUpdateStorageCredential
+		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionKindUpdateStorageCredential)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperWarehouseActionKindUpdateStorageCredential, return on the first match
+		} else {
+			dst.LakekeeperWarehouseActionKindUpdateStorageCredential = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseActionKind as LakekeeperWarehouseActionKindUpdateStorageCredential: %s", err.Error())
 		}
 	}
 
@@ -789,6 +829,18 @@ func (dst *LakekeeperWarehouseActionKind) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	// check if the discriminator value is 'LakekeeperWarehouseActionKindRegisterTable'
+	if jsonDict["action"] == "LakekeeperWarehouseActionKindRegisterTable" {
+		// try to unmarshal JSON data into LakekeeperWarehouseActionKindRegisterTable
+		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionKindRegisterTable)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperWarehouseActionKindRegisterTable, return on the first match
+		} else {
+			dst.LakekeeperWarehouseActionKindRegisterTable = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseActionKind as LakekeeperWarehouseActionKindRegisterTable: %s", err.Error())
+		}
+	}
+
 	// check if the discriminator value is 'LakekeeperWarehouseActionKindRename'
 	if jsonDict["action"] == "LakekeeperWarehouseActionKindRename" {
 		// try to unmarshal JSON data into LakekeeperWarehouseActionKindRename
@@ -846,6 +898,18 @@ func (dst *LakekeeperWarehouseActionKind) UnmarshalJSON(data []byte) error {
 		} else {
 			dst.LakekeeperWarehouseActionKindUpdateStorage = nil
 			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseActionKind as LakekeeperWarehouseActionKindUpdateStorage: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'LakekeeperWarehouseActionKindUpdateStorageCredential'
+	if jsonDict["action"] == "LakekeeperWarehouseActionKindUpdateStorageCredential" {
+		// try to unmarshal JSON data into LakekeeperWarehouseActionKindUpdateStorageCredential
+		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionKindUpdateStorageCredential)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperWarehouseActionKindUpdateStorageCredential, return on the first match
+		} else {
+			dst.LakekeeperWarehouseActionKindUpdateStorageCredential = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseActionKind as LakekeeperWarehouseActionKindUpdateStorageCredential: %s", err.Error())
 		}
 	}
 
@@ -946,6 +1010,10 @@ func (src LakekeeperWarehouseActionKind) MarshalJSON() ([]byte, error) {
 		return json.Marshal(&src.LakekeeperWarehouseActionKindReadSubtreeGrants)
 	}
 
+	if src.LakekeeperWarehouseActionKindRegisterTable != nil {
+		return json.Marshal(&src.LakekeeperWarehouseActionKindRegisterTable)
+	}
+
 	if src.LakekeeperWarehouseActionKindRename != nil {
 		return json.Marshal(&src.LakekeeperWarehouseActionKindRename)
 	}
@@ -964,6 +1032,10 @@ func (src LakekeeperWarehouseActionKind) MarshalJSON() ([]byte, error) {
 
 	if src.LakekeeperWarehouseActionKindUpdateStorage != nil {
 		return json.Marshal(&src.LakekeeperWarehouseActionKindUpdateStorage)
+	}
+
+	if src.LakekeeperWarehouseActionKindUpdateStorageCredential != nil {
+		return json.Marshal(&src.LakekeeperWarehouseActionKindUpdateStorageCredential)
 	}
 
 	if src.LakekeeperWarehouseActionKindUse != nil {
@@ -1058,6 +1130,10 @@ func (obj *LakekeeperWarehouseActionKind) GetActualInstance() interface{} {
 		return obj.LakekeeperWarehouseActionKindReadSubtreeGrants
 	}
 
+	if obj.LakekeeperWarehouseActionKindRegisterTable != nil {
+		return obj.LakekeeperWarehouseActionKindRegisterTable
+	}
+
 	if obj.LakekeeperWarehouseActionKindRename != nil {
 		return obj.LakekeeperWarehouseActionKindRename
 	}
@@ -1076,6 +1152,10 @@ func (obj *LakekeeperWarehouseActionKind) GetActualInstance() interface{} {
 
 	if obj.LakekeeperWarehouseActionKindUpdateStorage != nil {
 		return obj.LakekeeperWarehouseActionKindUpdateStorage
+	}
+
+	if obj.LakekeeperWarehouseActionKindUpdateStorageCredential != nil {
+		return obj.LakekeeperWarehouseActionKindUpdateStorageCredential
 	}
 
 	if obj.LakekeeperWarehouseActionKindUse != nil {

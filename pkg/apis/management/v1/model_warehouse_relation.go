@@ -26,6 +26,7 @@ const (
 	WAREHOUSERELATION_DESCRIBE      WarehouseRelation = "describe"
 	WAREHOUSERELATION_SELECT        WarehouseRelation = "select"
 	WAREHOUSERELATION_CREATE        WarehouseRelation = "create"
+	WAREHOUSERELATION_WRITE         WarehouseRelation = "write"
 	WAREHOUSERELATION_MODIFY        WarehouseRelation = "modify"
 	WAREHOUSERELATION_MANAGE_TAGS   WarehouseRelation = "manage_tags"
 )
@@ -38,6 +39,7 @@ var AllowedWarehouseRelationEnumValues = []WarehouseRelation{
 	"describe",
 	"select",
 	"create",
+	"write",
 	"modify",
 	"manage_tags",
 }

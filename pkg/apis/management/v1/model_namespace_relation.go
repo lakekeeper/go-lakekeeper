@@ -26,6 +26,7 @@ const (
 	NAMESPACERELATION_DESCRIBE      NamespaceRelation = "describe"
 	NAMESPACERELATION_SELECT        NamespaceRelation = "select"
 	NAMESPACERELATION_CREATE        NamespaceRelation = "create"
+	NAMESPACERELATION_WRITE         NamespaceRelation = "write"
 	NAMESPACERELATION_MODIFY        NamespaceRelation = "modify"
 	NAMESPACERELATION_MANAGE_TAGS   NamespaceRelation = "manage_tags"
 )
@@ -38,6 +39,7 @@ var AllowedNamespaceRelationEnumValues = []NamespaceRelation{
 	"describe",
 	"select",
 	"create",
+	"write",
 	"modify",
 	"manage_tags",
 }

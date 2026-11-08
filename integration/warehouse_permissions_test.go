@@ -89,6 +89,7 @@ func TestPermissions_Warehouse_GetAccess(t *testing.T) {
 		managementv1.WAREHOUSEACTION_ACCEPT_MOVED_NAMESPACE,
 		managementv1.WAREHOUSEACTION_GRANT_MANAGE_TAGS,
 		managementv1.WAREHOUSEACTION_SET_FORMAT_VERSION_POLICY,
+		managementv1.WAREHOUSEACTION_GRANT_WRITE,
 	}
 	assertAllowedActionsSubset(t, want, resp.AllowedActions, managementv1.AllowedWarehouseActionEnumValues)
 }

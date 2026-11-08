@@ -129,10 +129,17 @@ type ApiCreateWarehouseRequest struct {
 	ctx                    context.Context
 	ApiService             *WarehouseAPIService
 	createWarehouseRequest *CreateWarehouseRequest
+	xProjectId             *string
 }
 
 func (r ApiCreateWarehouseRequest) CreateWarehouseRequest(createWarehouseRequest CreateWarehouseRequest) ApiCreateWarehouseRequest {
 	r.createWarehouseRequest = &createWarehouseRequest
+	return r
+}
+
+// Project ID (optional). The deprecated &#x60;project-id&#x60; body field takes precedence over this header. If neither is set, the default project is used when it is enabled; otherwise the request fails.
+func (r ApiCreateWarehouseRequest) XProjectId(xProjectId string) ApiCreateWarehouseRequest {
+	r.xProjectId = &xProjectId
 	return r
 }
 
@@ -198,6 +205,9 @@ func (a *WarehouseAPIService) CreateWarehouseExecute(r ApiCreateWarehouseRequest
 	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	if r.xProjectId != nil {
+		parameterAddToHeaderOrQuery(localVarHeaderParams, "x-project-id", r.xProjectId, "simple", "")
 	}
 	// body params
 	localVarPostBody = r.createWarehouseRequest
@@ -354,6 +364,13 @@ type ApiDeleteWarehouseRequest struct {
 	ctx         context.Context
 	ApiService  *WarehouseAPIService
 	warehouseId string
+	force       *bool
+}
+
+// Delete the warehouse also if it is protected.
+func (r ApiDeleteWarehouseRequest) Force(force bool) ApiDeleteWarehouseRequest {
+	r.force = &force
+	return r
 }
 
 func (r ApiDeleteWarehouseRequest) Execute() (*http.Response, error) {
@@ -363,8 +380,9 @@ func (r ApiDeleteWarehouseRequest) Execute() (*http.Response, error) {
 /*
 DeleteWarehouse Delete Warehouse
 
-Permanently removes a warehouse and all its associated resources.
-Use the `force` parameter to delete protected warehouses.
+Deletes an empty warehouse. Unfinished tasks block the delete, except tasks of queues that
+are cancelled when their warehouse is deleted; those are cancelled, running ones included.
+Use the `force` parameter to delete a protected warehouse.
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 	@param warehouseId
@@ -398,6 +416,9 @@ func (a *WarehouseAPIService) DeleteWarehouseExecute(r ApiDeleteWarehouseRequest
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
 
+	if r.force != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "force", r.force, "form", "")
+	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
 
@@ -2019,6 +2040,7 @@ type ApiListWarehousesRequest struct {
 	ApiService      *WarehouseAPIService
 	warehouseStatus *[]WarehouseStatus
 	projectId       *string
+	xProjectId      *string
 }
 
 // Optional filter to return only warehouses with the specified status. If not provided, only active warehouses are returned.
@@ -2030,6 +2052,12 @@ func (r ApiListWarehousesRequest) WarehouseStatus(warehouseStatus []WarehouseSta
 // The project ID to list warehouses for. Deprecated: Please use the &#x60;x-project-id&#x60; header instead.
 func (r ApiListWarehousesRequest) ProjectId(projectId string) ApiListWarehousesRequest {
 	r.projectId = &projectId
+	return r
+}
+
+// Project ID (optional). The deprecated &#x60;projectId&#x60; query parameter takes precedence over this header. If neither is set, the default project is used when it is enabled; otherwise the request fails.
+func (r ApiListWarehousesRequest) XProjectId(xProjectId string) ApiListWarehousesRequest {
+	r.xProjectId = &xProjectId
 	return r
 }
 
@@ -2106,6 +2134,9 @@ func (a *WarehouseAPIService) ListWarehousesExecute(r ApiListWarehousesRequest) 
 	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	if r.xProjectId != nil {
+		parameterAddToHeaderOrQuery(localVarHeaderParams, "x-project-id", r.xProjectId, "simple", "")
 	}
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
@@ -4332,7 +4363,7 @@ func (r ApiValidateWarehouseRequest) CreateWarehouseRequest(createWarehouseReque
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). The deprecated &#x60;project-id&#x60; body field takes precedence over this header. If neither is set, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiValidateWarehouseRequest) XProjectId(xProjectId string) ApiValidateWarehouseRequest {
 	r.xProjectId = &xProjectId
 	return r

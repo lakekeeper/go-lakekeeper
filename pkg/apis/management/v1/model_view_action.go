@@ -32,6 +32,7 @@ const (
 	VIEWACTION_GRANT_MANAGE_TAGS   ViewAction = "grant_manage_tags"
 	VIEWACTION_GRANT_DESCRIBE      ViewAction = "grant_describe"
 	VIEWACTION_GRANT_SELECT        ViewAction = "grant_select"
+	VIEWACTION_GRANT_WRITE         ViewAction = "grant_write"
 	VIEWACTION_GRANT_MODIFY        ViewAction = "grant_modify"
 	VIEWACTION_CHANGE_OWNERSHIP    ViewAction = "change_ownership"
 	VIEWACTION_GET_TASKS           ViewAction = "get_tasks"
@@ -53,6 +54,7 @@ var AllowedViewActionEnumValues = []ViewAction{
 	"grant_manage_tags",
 	"grant_describe",
 	"grant_select",
+	"grant_write",
 	"grant_modify",
 	"change_ownership",
 	"get_tasks",
