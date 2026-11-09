@@ -17,11 +17,11 @@ import (
 )
 
 // TestWireFormat_CredentialVariants confirms — does not discover — that the
-// preprocessor + generator combination keeps each S3 credential variant's JSON
+// spec + generator combination keeps each S3 credential variant's JSON
 // wire shape isolated: the discriminator + variant-specific fields appear,
 // and zero-valued fields from sibling variants do not bleed through. If this
-// ever fails, that's a regression in the preprocessor (api/openapi/preprocess)
-// or the spec, not a fresh discovery — bisect those, not this test.
+// ever fails, that's a regression in the spec or the generator config, not a
+// fresh discovery — bisect those, not this test.
 //
 // Each variant is checked locally (CreateWarehouseRequest → JSON) and the
 // access-key variant is also pushed end-to-end against the docker-compose
@@ -111,7 +111,7 @@ func TestWireFormat_CredentialVariants(t *testing.T) {
 // StorageProfile JSON also stays clean (no sibling-union bleed-through on the
 // way back). The credential isn't returned by the server, so we can only
 // inspect the StorageProfile half of the round-trip — but that exercises the
-// same preprocessor-generated *AsStorageProfile / oneOf code paths.
+// same generated *AsStorageProfile / oneOf code paths.
 func TestWireFormat_AccessKeyEndToEnd(t *testing.T) {
 	c := sharedClient
 

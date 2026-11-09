@@ -63,11 +63,22 @@ req.SetStorageCredential(sc)                               // optional
 
 This is mildly more verbose than the AWS SDK's struct-literal idiom
 (`&ec2.RunInstancesInput{...}`). The trade-off is that the `Set*` mutators
-absorb the `*string`/`*bool` ceremony for optional scalars — `req.SetDescription("x")`
-takes a value, the mutator stores `&v` internally. If you'd rather use
-struct literals, you can; you just have to wrap optional scalars yourself
-(`Description: managementv1.PtrString("x")` or with a `s := "x"; ... &s`
-temp). The setters are the recommended idiom for that reason.
+take plain values and hide the wrapper each optional field needs:
+
+- Optional fields are pointers (`*string`, `*bool`, …); `req.SetX(v)` stores
+  `&v`.
+- Optional fields the spec marks nullable (e.g. `Description` on
+  `CreateRoleRequest`) are `NullableX` wrappers with three states:
+  - `req.SetDescription("x")` sends the value;
+  - `req.SetDescriptionNil()` sends an explicit `null`;
+  - leaving it unset (or `req.UnsetDescription()`) omits the field.
+
+  Read them back with `.Get()`, which returns `nil` for both null and unset.
+
+Struct literals work too, but you wrap each field yourself:
+`managementv1.PtrString("x")` for a pointer field,
+`*managementv1.NewNullableString(managementv1.PtrString("x"))` for a nullable
+one. The setters are the recommended idiom for that reason.
 
 For request types whose only required input is the body itself
 (`SetProtectionRequest`, `RenameWarehouseRequest`, …), the umbrella's
@@ -111,12 +122,11 @@ What it re-exports:
   underlying `managementv1` import without conversion.
 
 What it does **not** re-export:
-- The full ~189-schema Management API surface. Reach for `managementv1`
+- The full Management API surface. Reach for `managementv1`
   when you need a less-common type.
-- Generated enum constants. Use `managementv1.<EnumValue>` directly; the
-  preprocessor produces idiomatic Go names there
-  (`managementv1.WarehouseStatusActive`, `managementv1.S3FlavorAws`),
-  so an alias would only add a second name for the same value.
+- Generated enum constants. Use `managementv1.<ENUM>_<VALUE>` directly
+  (`managementv1.WAREHOUSESTATUS_ACTIVE`, `managementv1.S3FLAVOR_AWS`);
+  an alias would only add a second name for the same value.
 
 The umbrella is a thin file (~150 LoC) that runs `go vet` clean and
 provides no behaviour of its own — every symbol resolves through
@@ -438,13 +448,13 @@ to keep them resource-generic, but the spec exports a typed enum per
 resource: `managementv1.WarehouseRelation`, `ProjectRelation`,
 `RoleRelation`, `ServerRelation`, `NamespaceRelation`, `TableRelation`,
 `ViewRelation`. Their constants
-(`managementv1.WarehouseRelationOwnership`,
-`managementv1.ProjectRelationDescribe`, …) are typed strings that pass
+(`managementv1.WAREHOUSERELATION_OWNERSHIP`,
+`managementv1.PROJECTRELATION_DESCRIBE`, …) are typed strings that pass
 straight in via conversion:
 
 ```go
 writes, err := permissions.BuildAssignmentSet[managementv1.WarehouseAssignment](
-    []string{string(managementv1.WarehouseRelationOwnership)},
+    []string{string(managementv1.WAREHOUSERELATION_OWNERSHIP)},
     permissions.PrincipalSet{Users: []string{userID}},
 )
 ```
@@ -533,7 +543,7 @@ Wire-format round-trip tests for the generated assignment models. Lives
 **outside** `pkg/apis/management/v1/` so test fixtures don't bleed into the
 generated package (which is rebuilt wholesale by `make generate`).
 
-When the OpenAPI preprocessor changes shape, the tests in here are the
+When the spec or the generator config changes shape, the tests in here are the
 fastest signal that something has broken.
 
 ---

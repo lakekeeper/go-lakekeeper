@@ -114,6 +114,14 @@ func (o *CheckRequest) SetOperation(v CheckOperation) {
 	o.Operation = v
 }
 
+func (o CheckRequest) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o CheckRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Identity.IsSet() {

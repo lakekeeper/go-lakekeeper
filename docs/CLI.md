@@ -254,7 +254,7 @@ when the user already exists.
 
 ```sh
 lkctl version       # version, commit, date, tree state
-lkctl whoami        # the identity of the authenticated principal
+lkctl whoami        # the authenticated principal, including whether it is an instance admin
 ```
 
 ---

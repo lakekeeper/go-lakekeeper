@@ -23,13 +23,12 @@
 //
 // What it does NOT re-export:
 //
-//   - The full ~189-schema Management API surface. Reach for managementv1
-//     when you need a less-common type — type aliases here preserve type
-//     identity, so values flow between the two packages without conversion.
-//   - Generated enum constants. Use managementv1.<EnumValue> directly; the
-//     enum-varnames preprocessor pass produces idiomatic Go names there
-//     (e.g. managementv1.WarehouseStatusActive) so an alias would only add
-//     a second name for the same value.
+//   - The full Management API surface. Reach for managementv1 when you need
+//     a less-common type — type aliases here preserve type identity, so
+//     values flow between the two packages without conversion.
+//   - Generated enum constants. Use managementv1.<ENUM>_<VALUE> directly
+//     (e.g. managementv1.WAREHOUSESTATUS_ACTIVE); an alias would only add a
+//     second name for the same value.
 package lakekeeper
 
 import (
@@ -220,6 +219,7 @@ type (
 	UserType          = managementv1.UserType
 	CreateUserRequest = managementv1.CreateUserRequest
 	UpdateUserRequest = managementv1.UpdateUserRequest
+	WhoamiResponse    = managementv1.WhoamiResponse
 
 	// Server types.
 	ServerInfo       = managementv1.ServerInfo

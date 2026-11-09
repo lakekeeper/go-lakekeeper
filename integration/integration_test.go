@@ -94,7 +94,7 @@ func TestMain(m *testing.M) {
 		context.Background(),
 		os.Getenv("LAKEKEEPER_BASE_URL"),
 		authSource,
-		client.WithInitialBootstrap(true, true, core.Ptr(managementv1.UserTypeApplication)),
+		client.WithInitialBootstrap(true, true, core.Ptr(managementv1.USERTYPE_APPLICATION)),
 	)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "create client: %v\n", err)
@@ -122,7 +122,7 @@ func MustProvisionUser(t *testing.T, c *client.Client) *managementv1.User {
 	req.SetId(id)
 	req.SetName(name)
 	req.SetEmail(email)
-	req.SetUserType(managementv1.UserTypeHuman)
+	req.SetUserType(managementv1.USERTYPE_HUMAN)
 	req.SetUpdateIfExists(false)
 
 	user, _, err := c.UserAPI.CreateUser(t.Context()).CreateUserRequest(*req).Execute()
@@ -217,9 +217,9 @@ func MustCreateWarehouse(t *testing.T, c *client.Client, projectID string) (stri
 //   - KNOWN actions must satisfy known ⊆ want. A newly *supported* action (one
 //     in our enum but missing from `want`) FAILS — surfaced as news that should
 //     be reviewed and reflected in `want`. This tripwire is meaningful on the
-//     pinned/floor Lakekeeper (ci.yml v0.12.0), where every action is known.
-//   - UNKNOWN actions (a server newer than our spec, e.g. latest-main's
-//     `set_format_version_policy`) are LOGGED, not failed. We can't add them to
+//     pinned/floor Lakekeeper (ci.yml v0.15.0), where every action is known.
+//   - UNKNOWN actions (from a server newer than our spec, as
+//     `set_format_version_policy` once was) are LOGGED, not failed. We can't add them to
 //     `want` without the enum constant, which only ships with a release; failing
 //     on them would make the latest-main canary permanently, unactionably red.
 //   - server-side removals PASS — deprecations don't break the suite. For strict

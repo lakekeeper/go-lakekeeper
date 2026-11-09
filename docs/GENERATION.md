@@ -6,14 +6,14 @@ upstream Lakekeeper OpenAPI spec. Everything else in the repo — including the
 packages — is hand-written.
 
 This document is the single source of truth for **what is generated**, **how
-to regenerate it**, and **why a YAML preprocessor is involved**.
+to regenerate it**, and **why a postprocessor is involved**.
 
 ## What is generated
 
 Everything under [`pkg/apis/management/v1/`](../pkg/apis/management/v1/) is
 regenerated wholesale on every `make generate` run. The Makefile `rm -rf`s
 the directory before invoking the generator (see
-[Makefile:159](../Makefile#L159)), so any hand-edits there are silently
+[Makefile:138](../Makefile#L138)), so any hand-edits there are silently
 discarded the next time someone regenerates.
 
 Files carrying this header are generator output and **must not be
@@ -51,25 +51,21 @@ adds or removes files produces an obvious diff.
 make generate
 ```
 
-The pipeline (see [Makefile:151-174](../Makefile#L151-L174)):
+The pipeline (see [Makefile:135-155](../Makefile#L135-L155)):
 
-1. `go run ./api/openapi/preprocess` rewrites
-   `api/openapi/management-open-api.yaml` →
-   `api/openapi/management-open-api.processed.yaml`. See
-   [The preprocessor](#the-preprocessor) below.
-2. `rm -rf pkg/apis/management/v1` and recreate the directory.
-3. Copy the top-level [`.openapi-generator-ignore`](../api/openapi/.openapi-generator-ignore)
+1. `rm -rf pkg/apis/management/v1` and recreate the directory.
+2. Copy the top-level [`.openapi-generator-ignore`](../api/openapi/.openapi-generator-ignore)
    into the output directory.
-4. Run `openapitools/openapi-generator-cli:v7.10.0 generate` in a container.
-   Input spec (`-i`): the preprocessed
-   `api/openapi/management-open-api.processed.yaml` from step 1.
-   Generator config (`-c`):
+3. Run `openapitools/openapi-generator-cli:v7.10.0 generate` in a container.
+   Input spec (`-i`): the committed
+   [`api/openapi/management-open-api.yaml`](../api/openapi/management-open-api.yaml),
+   unmodified. Generator config (`-c`):
    [`api/openapi/management-config.yaml`](../api/openapi/management-config.yaml).
-5. Delete the processed YAML.
-6. `goimports -w` + `go mod tidy` + `make fmt`.
+4. `go run ./api/openapi/postprocess`. See [The postprocessor](#the-postprocessor) below.
+5. `goimports -w` + `go mod tidy` + `make fmt`.
 
 The container engine resolves to `docker` or `podman` depending on what's on
-PATH (see [Makefile:69](../Makefile#L69)), so `make generate` works on either.
+PATH (see [Makefile:45](../Makefile#L45)), so `make generate` works on either.
 
 The generator config is intentionally minimal —
 [`management-config.yaml`](../api/openapi/management-config.yaml) lists only
@@ -79,39 +75,20 @@ explaining each.
 ## Updating the spec
 
 The committed [`management-open-api.yaml`](../api/openapi/management-open-api.yaml)
-is the source of truth. Update it by replacing the file with a fresh export
-from the Lakekeeper server (`/api-docs/openapi.json`, converted to YAML),
-then run `make generate` and commit the spec and the regenerated tree in the
-**same commit** so the diff stays reviewable.
+is the source of truth. Update it by copying
+[`docs/docs/api/management-open-api.yaml`](https://github.com/lakekeeper/lakekeeper/tree/main/docs/docs/api)
+from the Lakekeeper repository at the release tag (or commit) the client
+targets, then run `make generate` and commit the spec and the regenerated tree in the
+**same commit** so the diff stays reviewable. Name the Lakekeeper tag or
+commit in the commit message.
 
-## The preprocessor
-
-Located at [`api/openapi/preprocess/`](../api/openapi/preprocess/). The
-package doc on [`main.go`](../api/openapi/preprocess/main.go#L1-L37) is the
-authoritative description of the transformation phases — read it before
-extending the preprocessor.
-
-The short version: openapi-generator cannot represent
-`allOf(oneOf, extra-properties)`. It collapses such constructs into a single
-struct holding the union of all variant fields, breaking both marshal
-(zero-valued fields ship on the wire) and unmarshal (correct payloads get
-rejected for missing fields they shouldn't contain). The preprocessor walks
-`components.schemas` to flatten these constructs into named leaf schemas
-with disambiguating discriminators, so the generator can emit clean union
-types.
-
-This is what unlocks the correct wire format for `StorageCredential` (commit
-`cb74e97`) and the `*Assignment` families (commit `372cdc9`).
-
-Discrimination also covers **flat** unions whose members are
-`allOf([{$ref|inline}, {prop: single-enum}])` with no nested oneOf — e.g.
-`StorageProfile` and `TabularDeleteProfile`. The transformation is attempted for
-every oneOf (not just expandable ones) and rolls back any schema it can't
-cleanly discriminate, so this is generic: a future union of the same shape is
-picked up with no code change. Unions referenced as a building block
-(`allOf[0].$ref`) inside another union's members are skipped in the flat pass —
-they're consumed by their parent's cartesian expansion, and discriminating them
-first would break that.
+The spec goes into the generator unmodified: unions, enum names, nullable
+fields and query-parameter encoding all come straight from the spec and the
+generator config. Array query parameters such as `relations` use the OpenAPI
+default (`form`, exploded), so the client sends `?relations=a&relations=b`,
+which is the form Lakekeeper (v0.15.0 and later) parses. It silently ignores
+bracket notation (`relations[0]=a`), so a filter sent that way returns
+unfiltered results instead of failing.
 
 ## The postprocessor
 
@@ -122,46 +99,23 @@ older spec keeps working against a newer Lakekeeper (additive server changes
 must not break decoding):
 
 - **Strip `decoder.DisallowUnknownFields()`** from model `UnmarshalJSON`s, so
-  responses carrying a field the SDK's spec predates (e.g. latest-main's
-  `allowed-format-versions` on the warehouse object) decode instead of erroring.
+  responses carrying a field the SDK's spec predates (as
+  `allowed-format-versions` on the warehouse object once was) decode instead of
+  erroring.
   The required-property presence check (a separate phase) and the oneOf
   discriminator dispatch are untouched; `newStrictDecoder` in `utils.go` (used
   only for the discriminator-lookup map) is preserved.
 - **Relax enum validation** — rewrite each enum `UnmarshalJSON`'s
   `return fmt.Errorf("%+v is not a valid X", value)` to store the value and
-  return nil. A newer server's enum value (e.g. the `set_format_version_policy`
-  `WarehouseAction`) is preserved as the raw string rather than failing the whole
+  return nil. A newer server's enum value (as the `set_format_version_policy`
+  `WarehouseAction` once was) is preserved as the raw string rather than failing the whole
   response; callers compare against the generated `AllowedXEnumValues`.
 
-This pairs with discriminator decode: relaxing strict decoding is only safe
-because unions no longer rely on `DisallowUnknownFields` to disambiguate
-variants. The integration `*_GetAccess` tests treat unknown (newer-than-spec)
-actions as logged, not failures (see `assertAllowedActionsSubset`).
-
-The preprocessor also runs two ergonomic passes that the generator alone
-cannot deliver:
-
-- **Phase 5 — strip `'null'` from `type: [<X>, 'null']` arrays.** OAS 3.1
-  nullable type-arrays trigger `NullableX` 200-line wrappers in the Go
-  generator output. Stripping the `'null'` member produces plain `*X`
-  fields with `omitempty` instead. The wire format on absent values is
-  identical; the lost capability is sending an explicit JSON `null`
-  distinct from absent. Lakekeeper has no fields where that distinction is
-  load-bearing today; for the ones that ever do, `keepNullable` in the
-  preprocessor is a per-field opt-out list.
-- **Phase 6 — inject `x-enum-varnames` on every named enum schema.** The
-  Go generator's default constant naming
-  (`<UPPER_SCHEMA>_<UPPER_VALUE>` — e.g. `S3FLAVOR_AWS`) is not Go
-  idiomatic. The preprocessor synthesises
-  `<PascalSchema><PascalValue>` per value (`S3FlavorAws`) and the
-  generator config drops `enumClassPrefix`. The synthesised varnames
-  preserve cross-enum uniqueness, so values that repeat across enums
-  (`create`, `delete`, `select` on several `*Action` enums) still produce
-  distinct constants like `ProjectActionCreate` and `ServerActionCreate`.
-
-When the spec adds a **new** `allOf(oneOf, extras)` shape and the round-trip
-tests in [`pkg/apis/management/v1tests/`](../pkg/apis/management/v1tests/)
-start failing, the preprocessor is the place to extend.
+Relaxing strict decoding is safe for unions: they decode by discriminator, or
+— for the few without one in the spec (e.g. `NamespaceIdentOrUuid`) — by
+required-field presence, neither of which relies on `DisallowUnknownFields`.
+The integration `*_GetAccess` tests treat unknown (newer-than-spec) actions as
+logged, not failures (see `assertAllowedActionsSubset`).
 
 ## Generator configuration
 
@@ -171,9 +125,8 @@ choices, with the intent behind each:
 
 | Key | Value | Why |
 |---|---|---|
-| `useOneOfDiscriminatorLookup` | `true` | Lets the generator emit unambiguous unmarshal logic when the preprocessor adds a `discriminator` block |
-| `enumClassPrefix` | `false` | Pairs with the preprocessor's `x-enum-varnames` injection; without this, the prefix would stack and produce names like `S3FLAVOR_S3FlavorAws` |
-| `generateMarshalJSON` | `false` | Default Go encoding via the struct's `json:` tags is byte-identical to the custom `ToMap`-driven `MarshalJSON` (every optional field carries `omitempty`). Saves ~8 lines per model file with no wire-format change |
-| `generateUnmarshalJSON` | `true` | Kept on for the required-field presence check and the oneOf discriminator dispatch. Its `DisallowUnknownFields` side effect (and the strict enum-value validation) is the wrong posture for a client library, so the **postprocessor** strips it after generation — see below. Net result: required checks + discriminator decode retained, additive server fields/enum values tolerated |
+| `useOneOfDiscriminatorLookup` | `true` | Lets the generator emit unambiguous unmarshal logic for unions that carry a `discriminator` block in the spec |
+| `enumClassPrefix` | `true` | Prefixes enum constants with their type (`S3FLAVOR_AWS`); without it, values shared across enums (`create`, `delete`, `select` on several `*Action` enums) collide as package-level constants |
+| `generateUnmarshalJSON` | `true` | Kept on for the required-field presence check, which also lets unions without a spec discriminator pick their matching variant. Its `DisallowUnknownFields` side effect (and the strict enum-value validation) is the wrong posture for a client library, so the **postprocessor** strips it after generation — see below. Net result: required checks + discriminator decode retained, additive server fields/enum values tolerated |
 | `generateInterfaces` | `false` | We expose the generated client through `pkg/client`, so the additional `XxxAPI` interface variants are not needed |
 | `withGoMod`, `isGoSubmodule` | `false`, `true` | Embed the generated package inside this module instead of producing a standalone Go SDK |

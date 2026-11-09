@@ -20,10 +20,12 @@ type NamespaceAssignment struct {
 	NamespaceAssignmentCreate       *NamespaceAssignmentCreate
 	NamespaceAssignmentDescribe     *NamespaceAssignmentDescribe
 	NamespaceAssignmentManageGrants *NamespaceAssignmentManageGrants
+	NamespaceAssignmentManageTags   *NamespaceAssignmentManageTags
 	NamespaceAssignmentModify       *NamespaceAssignmentModify
 	NamespaceAssignmentOwnership    *NamespaceAssignmentOwnership
 	NamespaceAssignmentPassGrants   *NamespaceAssignmentPassGrants
 	NamespaceAssignmentSelect       *NamespaceAssignmentSelect
+	NamespaceAssignmentWrite        *NamespaceAssignmentWrite
 }
 
 // NamespaceAssignmentCreateAsNamespaceAssignment is a convenience function that returns NamespaceAssignmentCreate wrapped in NamespaceAssignment
@@ -44,6 +46,13 @@ func NamespaceAssignmentDescribeAsNamespaceAssignment(v *NamespaceAssignmentDesc
 func NamespaceAssignmentManageGrantsAsNamespaceAssignment(v *NamespaceAssignmentManageGrants) NamespaceAssignment {
 	return NamespaceAssignment{
 		NamespaceAssignmentManageGrants: v,
+	}
+}
+
+// NamespaceAssignmentManageTagsAsNamespaceAssignment is a convenience function that returns NamespaceAssignmentManageTags wrapped in NamespaceAssignment
+func NamespaceAssignmentManageTagsAsNamespaceAssignment(v *NamespaceAssignmentManageTags) NamespaceAssignment {
+	return NamespaceAssignment{
+		NamespaceAssignmentManageTags: v,
 	}
 }
 
@@ -72,6 +81,13 @@ func NamespaceAssignmentPassGrantsAsNamespaceAssignment(v *NamespaceAssignmentPa
 func NamespaceAssignmentSelectAsNamespaceAssignment(v *NamespaceAssignmentSelect) NamespaceAssignment {
 	return NamespaceAssignment{
 		NamespaceAssignmentSelect: v,
+	}
+}
+
+// NamespaceAssignmentWriteAsNamespaceAssignment is a convenience function that returns NamespaceAssignmentWrite wrapped in NamespaceAssignment
+func NamespaceAssignmentWriteAsNamespaceAssignment(v *NamespaceAssignmentWrite) NamespaceAssignment {
+	return NamespaceAssignment{
+		NamespaceAssignmentWrite: v,
 	}
 }
 
@@ -118,6 +134,18 @@ func (dst *NamespaceAssignment) UnmarshalJSON(data []byte) error {
 		} else {
 			dst.NamespaceAssignmentManageGrants = nil
 			return fmt.Errorf("failed to unmarshal NamespaceAssignment as NamespaceAssignmentManageGrants: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'manage_tags'
+	if jsonDict["type"] == "manage_tags" {
+		// try to unmarshal JSON data into NamespaceAssignmentManageTags
+		err = json.Unmarshal(data, &dst.NamespaceAssignmentManageTags)
+		if err == nil {
+			return nil // data stored in dst.NamespaceAssignmentManageTags, return on the first match
+		} else {
+			dst.NamespaceAssignmentManageTags = nil
+			return fmt.Errorf("failed to unmarshal NamespaceAssignment as NamespaceAssignmentManageTags: %s", err.Error())
 		}
 	}
 
@@ -169,6 +197,18 @@ func (dst *NamespaceAssignment) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	// check if the discriminator value is 'write'
+	if jsonDict["type"] == "write" {
+		// try to unmarshal JSON data into NamespaceAssignmentWrite
+		err = json.Unmarshal(data, &dst.NamespaceAssignmentWrite)
+		if err == nil {
+			return nil // data stored in dst.NamespaceAssignmentWrite, return on the first match
+		} else {
+			dst.NamespaceAssignmentWrite = nil
+			return fmt.Errorf("failed to unmarshal NamespaceAssignment as NamespaceAssignmentWrite: %s", err.Error())
+		}
+	}
+
 	// check if the discriminator value is 'NamespaceAssignmentCreate'
 	if jsonDict["type"] == "NamespaceAssignmentCreate" {
 		// try to unmarshal JSON data into NamespaceAssignmentCreate
@@ -202,6 +242,18 @@ func (dst *NamespaceAssignment) UnmarshalJSON(data []byte) error {
 		} else {
 			dst.NamespaceAssignmentManageGrants = nil
 			return fmt.Errorf("failed to unmarshal NamespaceAssignment as NamespaceAssignmentManageGrants: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'NamespaceAssignmentManageTags'
+	if jsonDict["type"] == "NamespaceAssignmentManageTags" {
+		// try to unmarshal JSON data into NamespaceAssignmentManageTags
+		err = json.Unmarshal(data, &dst.NamespaceAssignmentManageTags)
+		if err == nil {
+			return nil // data stored in dst.NamespaceAssignmentManageTags, return on the first match
+		} else {
+			dst.NamespaceAssignmentManageTags = nil
+			return fmt.Errorf("failed to unmarshal NamespaceAssignment as NamespaceAssignmentManageTags: %s", err.Error())
 		}
 	}
 
@@ -253,6 +305,18 @@ func (dst *NamespaceAssignment) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	// check if the discriminator value is 'NamespaceAssignmentWrite'
+	if jsonDict["type"] == "NamespaceAssignmentWrite" {
+		// try to unmarshal JSON data into NamespaceAssignmentWrite
+		err = json.Unmarshal(data, &dst.NamespaceAssignmentWrite)
+		if err == nil {
+			return nil // data stored in dst.NamespaceAssignmentWrite, return on the first match
+		} else {
+			dst.NamespaceAssignmentWrite = nil
+			return fmt.Errorf("failed to unmarshal NamespaceAssignment as NamespaceAssignmentWrite: %s", err.Error())
+		}
+	}
+
 	return nil
 }
 
@@ -270,6 +334,10 @@ func (src NamespaceAssignment) MarshalJSON() ([]byte, error) {
 		return json.Marshal(&src.NamespaceAssignmentManageGrants)
 	}
 
+	if src.NamespaceAssignmentManageTags != nil {
+		return json.Marshal(&src.NamespaceAssignmentManageTags)
+	}
+
 	if src.NamespaceAssignmentModify != nil {
 		return json.Marshal(&src.NamespaceAssignmentModify)
 	}
@@ -284,6 +352,10 @@ func (src NamespaceAssignment) MarshalJSON() ([]byte, error) {
 
 	if src.NamespaceAssignmentSelect != nil {
 		return json.Marshal(&src.NamespaceAssignmentSelect)
+	}
+
+	if src.NamespaceAssignmentWrite != nil {
+		return json.Marshal(&src.NamespaceAssignmentWrite)
 	}
 
 	return nil, nil // no data in oneOf schemas
@@ -306,6 +378,10 @@ func (obj *NamespaceAssignment) GetActualInstance() interface{} {
 		return obj.NamespaceAssignmentManageGrants
 	}
 
+	if obj.NamespaceAssignmentManageTags != nil {
+		return obj.NamespaceAssignmentManageTags
+	}
+
 	if obj.NamespaceAssignmentModify != nil {
 		return obj.NamespaceAssignmentModify
 	}
@@ -320,6 +396,10 @@ func (obj *NamespaceAssignment) GetActualInstance() interface{} {
 
 	if obj.NamespaceAssignmentSelect != nil {
 		return obj.NamespaceAssignmentSelect
+	}
+
+	if obj.NamespaceAssignmentWrite != nil {
+		return obj.NamespaceAssignmentWrite
 	}
 
 	// all schemas are nil

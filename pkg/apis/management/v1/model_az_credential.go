@@ -46,58 +46,86 @@ func AzCredentialSharedAccessKeyAsAzCredential(v *AzCredentialSharedAccessKey) A
 // Unmarshal JSON data into one of the pointers in the struct
 func (dst *AzCredential) UnmarshalJSON(data []byte) error {
 	var err error
-	match := 0
-	// try to unmarshal data into AzCredentialClientCredentials
-	err = json.Unmarshal(data, &dst.AzCredentialClientCredentials)
-	if err == nil {
-		jsonAzCredentialClientCredentials, _ := json.Marshal(dst.AzCredentialClientCredentials)
-		if string(jsonAzCredentialClientCredentials) == "{}" { // empty struct
-			dst.AzCredentialClientCredentials = nil
-		} else {
-			match++
-		}
-	} else {
-		dst.AzCredentialClientCredentials = nil
+	// use discriminator value to speed up the lookup
+	var jsonDict map[string]interface{}
+	err = newStrictDecoder(data).Decode(&jsonDict)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal JSON into map for the discriminator lookup")
 	}
 
-	// try to unmarshal data into AzCredentialManagedIdentity
-	err = json.Unmarshal(data, &dst.AzCredentialManagedIdentity)
-	if err == nil {
-		jsonAzCredentialManagedIdentity, _ := json.Marshal(dst.AzCredentialManagedIdentity)
-		if string(jsonAzCredentialManagedIdentity) == "{}" { // empty struct
+	// check if the discriminator value is 'azure-system-identity'
+	if jsonDict["credential-type"] == "azure-system-identity" {
+		// try to unmarshal JSON data into AzCredentialManagedIdentity
+		err = json.Unmarshal(data, &dst.AzCredentialManagedIdentity)
+		if err == nil {
+			return nil // data stored in dst.AzCredentialManagedIdentity, return on the first match
+		} else {
 			dst.AzCredentialManagedIdentity = nil
-		} else {
-			match++
+			return fmt.Errorf("failed to unmarshal AzCredential as AzCredentialManagedIdentity: %s", err.Error())
 		}
-	} else {
-		dst.AzCredentialManagedIdentity = nil
 	}
 
-	// try to unmarshal data into AzCredentialSharedAccessKey
-	err = json.Unmarshal(data, &dst.AzCredentialSharedAccessKey)
-	if err == nil {
-		jsonAzCredentialSharedAccessKey, _ := json.Marshal(dst.AzCredentialSharedAccessKey)
-		if string(jsonAzCredentialSharedAccessKey) == "{}" { // empty struct
+	// check if the discriminator value is 'client-credentials'
+	if jsonDict["credential-type"] == "client-credentials" {
+		// try to unmarshal JSON data into AzCredentialClientCredentials
+		err = json.Unmarshal(data, &dst.AzCredentialClientCredentials)
+		if err == nil {
+			return nil // data stored in dst.AzCredentialClientCredentials, return on the first match
+		} else {
+			dst.AzCredentialClientCredentials = nil
+			return fmt.Errorf("failed to unmarshal AzCredential as AzCredentialClientCredentials: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'shared-access-key'
+	if jsonDict["credential-type"] == "shared-access-key" {
+		// try to unmarshal JSON data into AzCredentialSharedAccessKey
+		err = json.Unmarshal(data, &dst.AzCredentialSharedAccessKey)
+		if err == nil {
+			return nil // data stored in dst.AzCredentialSharedAccessKey, return on the first match
+		} else {
 			dst.AzCredentialSharedAccessKey = nil
-		} else {
-			match++
+			return fmt.Errorf("failed to unmarshal AzCredential as AzCredentialSharedAccessKey: %s", err.Error())
 		}
-	} else {
-		dst.AzCredentialSharedAccessKey = nil
 	}
 
-	if match > 1 { // more than 1 match
-		// reset to nil
-		dst.AzCredentialClientCredentials = nil
-		dst.AzCredentialManagedIdentity = nil
-		dst.AzCredentialSharedAccessKey = nil
-
-		return fmt.Errorf("data matches more than one schema in oneOf(AzCredential)")
-	} else if match == 1 {
-		return nil // exactly one match
-	} else { // no match
-		return fmt.Errorf("data failed to match schemas in oneOf(AzCredential)")
+	// check if the discriminator value is 'AzCredentialClientCredentials'
+	if jsonDict["credential-type"] == "AzCredentialClientCredentials" {
+		// try to unmarshal JSON data into AzCredentialClientCredentials
+		err = json.Unmarshal(data, &dst.AzCredentialClientCredentials)
+		if err == nil {
+			return nil // data stored in dst.AzCredentialClientCredentials, return on the first match
+		} else {
+			dst.AzCredentialClientCredentials = nil
+			return fmt.Errorf("failed to unmarshal AzCredential as AzCredentialClientCredentials: %s", err.Error())
+		}
 	}
+
+	// check if the discriminator value is 'AzCredentialManagedIdentity'
+	if jsonDict["credential-type"] == "AzCredentialManagedIdentity" {
+		// try to unmarshal JSON data into AzCredentialManagedIdentity
+		err = json.Unmarshal(data, &dst.AzCredentialManagedIdentity)
+		if err == nil {
+			return nil // data stored in dst.AzCredentialManagedIdentity, return on the first match
+		} else {
+			dst.AzCredentialManagedIdentity = nil
+			return fmt.Errorf("failed to unmarshal AzCredential as AzCredentialManagedIdentity: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'AzCredentialSharedAccessKey'
+	if jsonDict["credential-type"] == "AzCredentialSharedAccessKey" {
+		// try to unmarshal JSON data into AzCredentialSharedAccessKey
+		err = json.Unmarshal(data, &dst.AzCredentialSharedAccessKey)
+		if err == nil {
+			return nil // data stored in dst.AzCredentialSharedAccessKey, return on the first match
+		} else {
+			dst.AzCredentialSharedAccessKey = nil
+			return fmt.Errorf("failed to unmarshal AzCredential as AzCredentialSharedAccessKey: %s", err.Error())
+		}
+	}
+
+	return nil
 }
 
 // Marshal data from the first non-nil pointers in the struct to JSON

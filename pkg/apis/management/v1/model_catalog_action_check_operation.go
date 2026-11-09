@@ -17,12 +17,22 @@ import (
 
 // CatalogActionCheckOperation - Represents an action on an object
 type CatalogActionCheckOperation struct {
-	CatalogActionCheckOperationNamespace *CatalogActionCheckOperationNamespace
-	CatalogActionCheckOperationProject   *CatalogActionCheckOperationProject
-	CatalogActionCheckOperationServer    *CatalogActionCheckOperationServer
-	CatalogActionCheckOperationTable     *CatalogActionCheckOperationTable
-	CatalogActionCheckOperationView      *CatalogActionCheckOperationView
-	CatalogActionCheckOperationWarehouse *CatalogActionCheckOperationWarehouse
+	CatalogActionCheckOperationGenericTable      *CatalogActionCheckOperationGenericTable
+	CatalogActionCheckOperationNamespace         *CatalogActionCheckOperationNamespace
+	CatalogActionCheckOperationProject           *CatalogActionCheckOperationProject
+	CatalogActionCheckOperationServer            *CatalogActionCheckOperationServer
+	CatalogActionCheckOperationTable             *CatalogActionCheckOperationTable
+	CatalogActionCheckOperationView              *CatalogActionCheckOperationView
+	CatalogActionCheckOperationViewInDefinerView *CatalogActionCheckOperationViewInDefinerView
+	CatalogActionCheckOperationViewReplace       *CatalogActionCheckOperationViewReplace
+	CatalogActionCheckOperationWarehouse         *CatalogActionCheckOperationWarehouse
+}
+
+// CatalogActionCheckOperationGenericTableAsCatalogActionCheckOperation is a convenience function that returns CatalogActionCheckOperationGenericTable wrapped in CatalogActionCheckOperation
+func CatalogActionCheckOperationGenericTableAsCatalogActionCheckOperation(v *CatalogActionCheckOperationGenericTable) CatalogActionCheckOperation {
+	return CatalogActionCheckOperation{
+		CatalogActionCheckOperationGenericTable: v,
+	}
 }
 
 // CatalogActionCheckOperationNamespaceAsCatalogActionCheckOperation is a convenience function that returns CatalogActionCheckOperationNamespace wrapped in CatalogActionCheckOperation
@@ -60,6 +70,20 @@ func CatalogActionCheckOperationViewAsCatalogActionCheckOperation(v *CatalogActi
 	}
 }
 
+// CatalogActionCheckOperationViewInDefinerViewAsCatalogActionCheckOperation is a convenience function that returns CatalogActionCheckOperationViewInDefinerView wrapped in CatalogActionCheckOperation
+func CatalogActionCheckOperationViewInDefinerViewAsCatalogActionCheckOperation(v *CatalogActionCheckOperationViewInDefinerView) CatalogActionCheckOperation {
+	return CatalogActionCheckOperation{
+		CatalogActionCheckOperationViewInDefinerView: v,
+	}
+}
+
+// CatalogActionCheckOperationViewReplaceAsCatalogActionCheckOperation is a convenience function that returns CatalogActionCheckOperationViewReplace wrapped in CatalogActionCheckOperation
+func CatalogActionCheckOperationViewReplaceAsCatalogActionCheckOperation(v *CatalogActionCheckOperationViewReplace) CatalogActionCheckOperation {
+	return CatalogActionCheckOperation{
+		CatalogActionCheckOperationViewReplace: v,
+	}
+}
+
 // CatalogActionCheckOperationWarehouseAsCatalogActionCheckOperation is a convenience function that returns CatalogActionCheckOperationWarehouse wrapped in CatalogActionCheckOperation
 func CatalogActionCheckOperationWarehouseAsCatalogActionCheckOperation(v *CatalogActionCheckOperationWarehouse) CatalogActionCheckOperation {
 	return CatalogActionCheckOperation{
@@ -71,6 +95,19 @@ func CatalogActionCheckOperationWarehouseAsCatalogActionCheckOperation(v *Catalo
 func (dst *CatalogActionCheckOperation) UnmarshalJSON(data []byte) error {
 	var err error
 	match := 0
+	// try to unmarshal data into CatalogActionCheckOperationGenericTable
+	err = json.Unmarshal(data, &dst.CatalogActionCheckOperationGenericTable)
+	if err == nil {
+		jsonCatalogActionCheckOperationGenericTable, _ := json.Marshal(dst.CatalogActionCheckOperationGenericTable)
+		if string(jsonCatalogActionCheckOperationGenericTable) == "{}" { // empty struct
+			dst.CatalogActionCheckOperationGenericTable = nil
+		} else {
+			match++
+		}
+	} else {
+		dst.CatalogActionCheckOperationGenericTable = nil
+	}
+
 	// try to unmarshal data into CatalogActionCheckOperationNamespace
 	err = json.Unmarshal(data, &dst.CatalogActionCheckOperationNamespace)
 	if err == nil {
@@ -136,6 +173,32 @@ func (dst *CatalogActionCheckOperation) UnmarshalJSON(data []byte) error {
 		dst.CatalogActionCheckOperationView = nil
 	}
 
+	// try to unmarshal data into CatalogActionCheckOperationViewInDefinerView
+	err = json.Unmarshal(data, &dst.CatalogActionCheckOperationViewInDefinerView)
+	if err == nil {
+		jsonCatalogActionCheckOperationViewInDefinerView, _ := json.Marshal(dst.CatalogActionCheckOperationViewInDefinerView)
+		if string(jsonCatalogActionCheckOperationViewInDefinerView) == "{}" { // empty struct
+			dst.CatalogActionCheckOperationViewInDefinerView = nil
+		} else {
+			match++
+		}
+	} else {
+		dst.CatalogActionCheckOperationViewInDefinerView = nil
+	}
+
+	// try to unmarshal data into CatalogActionCheckOperationViewReplace
+	err = json.Unmarshal(data, &dst.CatalogActionCheckOperationViewReplace)
+	if err == nil {
+		jsonCatalogActionCheckOperationViewReplace, _ := json.Marshal(dst.CatalogActionCheckOperationViewReplace)
+		if string(jsonCatalogActionCheckOperationViewReplace) == "{}" { // empty struct
+			dst.CatalogActionCheckOperationViewReplace = nil
+		} else {
+			match++
+		}
+	} else {
+		dst.CatalogActionCheckOperationViewReplace = nil
+	}
+
 	// try to unmarshal data into CatalogActionCheckOperationWarehouse
 	err = json.Unmarshal(data, &dst.CatalogActionCheckOperationWarehouse)
 	if err == nil {
@@ -151,11 +214,14 @@ func (dst *CatalogActionCheckOperation) UnmarshalJSON(data []byte) error {
 
 	if match > 1 { // more than 1 match
 		// reset to nil
+		dst.CatalogActionCheckOperationGenericTable = nil
 		dst.CatalogActionCheckOperationNamespace = nil
 		dst.CatalogActionCheckOperationProject = nil
 		dst.CatalogActionCheckOperationServer = nil
 		dst.CatalogActionCheckOperationTable = nil
 		dst.CatalogActionCheckOperationView = nil
+		dst.CatalogActionCheckOperationViewInDefinerView = nil
+		dst.CatalogActionCheckOperationViewReplace = nil
 		dst.CatalogActionCheckOperationWarehouse = nil
 
 		return fmt.Errorf("data matches more than one schema in oneOf(CatalogActionCheckOperation)")
@@ -168,6 +234,10 @@ func (dst *CatalogActionCheckOperation) UnmarshalJSON(data []byte) error {
 
 // Marshal data from the first non-nil pointers in the struct to JSON
 func (src CatalogActionCheckOperation) MarshalJSON() ([]byte, error) {
+	if src.CatalogActionCheckOperationGenericTable != nil {
+		return json.Marshal(&src.CatalogActionCheckOperationGenericTable)
+	}
+
 	if src.CatalogActionCheckOperationNamespace != nil {
 		return json.Marshal(&src.CatalogActionCheckOperationNamespace)
 	}
@@ -188,6 +258,14 @@ func (src CatalogActionCheckOperation) MarshalJSON() ([]byte, error) {
 		return json.Marshal(&src.CatalogActionCheckOperationView)
 	}
 
+	if src.CatalogActionCheckOperationViewInDefinerView != nil {
+		return json.Marshal(&src.CatalogActionCheckOperationViewInDefinerView)
+	}
+
+	if src.CatalogActionCheckOperationViewReplace != nil {
+		return json.Marshal(&src.CatalogActionCheckOperationViewReplace)
+	}
+
 	if src.CatalogActionCheckOperationWarehouse != nil {
 		return json.Marshal(&src.CatalogActionCheckOperationWarehouse)
 	}
@@ -200,6 +278,10 @@ func (obj *CatalogActionCheckOperation) GetActualInstance() interface{} {
 	if obj == nil {
 		return nil
 	}
+	if obj.CatalogActionCheckOperationGenericTable != nil {
+		return obj.CatalogActionCheckOperationGenericTable
+	}
+
 	if obj.CatalogActionCheckOperationNamespace != nil {
 		return obj.CatalogActionCheckOperationNamespace
 	}
@@ -218,6 +300,14 @@ func (obj *CatalogActionCheckOperation) GetActualInstance() interface{} {
 
 	if obj.CatalogActionCheckOperationView != nil {
 		return obj.CatalogActionCheckOperationView
+	}
+
+	if obj.CatalogActionCheckOperationViewInDefinerView != nil {
+		return obj.CatalogActionCheckOperationViewInDefinerView
+	}
+
+	if obj.CatalogActionCheckOperationViewReplace != nil {
+		return obj.CatalogActionCheckOperationViewReplace
 	}
 
 	if obj.CatalogActionCheckOperationWarehouse != nil {

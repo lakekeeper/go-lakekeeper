@@ -52,7 +52,7 @@ func TestWarehouse_Create_Default(t *testing.T) {
 	assert.Equal(t, wh.WarehouseId, got.WarehouseId)
 	assert.Equal(t, name, got.Name)
 	assert.Equal(t, defaultProjectID, got.ProjectId)
-	assert.Equal(t, managementv1.WarehouseStatusActive, got.Status)
+	assert.Equal(t, managementv1.WAREHOUSESTATUS_ACTIVE, got.Status)
 	assert.False(t, got.Protected)
 	require.NotNil(t, got.StorageProfile.StorageProfileS3)
 	assert.Equal(t, "testacc", got.StorageProfile.StorageProfileS3.Bucket)
@@ -150,7 +150,7 @@ func TestWarehouse_DeactivateActivate(t *testing.T) {
 
 	got, _, err := c.WarehouseAPI.GetWarehouse(t.Context(), whID).Execute()
 	require.NoError(t, err)
-	assert.Equal(t, managementv1.WarehouseStatusInactive, got.Status)
+	assert.Equal(t, managementv1.WAREHOUSESTATUS_INACTIVE, got.Status)
 
 	r, err = c.WarehouseAPI.ActivateWarehouse(t.Context(), whID).Execute()
 	require.NoError(t, err)
@@ -158,7 +158,7 @@ func TestWarehouse_DeactivateActivate(t *testing.T) {
 
 	got, _, err = c.WarehouseAPI.GetWarehouse(t.Context(), whID).Execute()
 	require.NoError(t, err)
-	assert.Equal(t, managementv1.WarehouseStatusActive, got.Status)
+	assert.Equal(t, managementv1.WAREHOUSESTATUS_ACTIVE, got.Status)
 }
 
 func TestWarehouse_SetProtection(t *testing.T) {

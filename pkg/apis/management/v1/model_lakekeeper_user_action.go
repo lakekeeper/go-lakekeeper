@@ -17,9 +17,10 @@ import (
 
 // LakekeeperUserAction - struct for LakekeeperUserAction
 type LakekeeperUserAction struct {
-	LakekeeperUserActionDelete *LakekeeperUserActionDelete
-	LakekeeperUserActionRead   *LakekeeperUserActionRead
-	LakekeeperUserActionUpdate *LakekeeperUserActionUpdate
+	LakekeeperUserActionDelete              *LakekeeperUserActionDelete
+	LakekeeperUserActionRead                *LakekeeperUserActionRead
+	LakekeeperUserActionReadRoleAssignments *LakekeeperUserActionReadRoleAssignments
+	LakekeeperUserActionUpdate              *LakekeeperUserActionUpdate
 }
 
 // LakekeeperUserActionDeleteAsLakekeeperUserAction is a convenience function that returns LakekeeperUserActionDelete wrapped in LakekeeperUserAction
@@ -33,6 +34,13 @@ func LakekeeperUserActionDeleteAsLakekeeperUserAction(v *LakekeeperUserActionDel
 func LakekeeperUserActionReadAsLakekeeperUserAction(v *LakekeeperUserActionRead) LakekeeperUserAction {
 	return LakekeeperUserAction{
 		LakekeeperUserActionRead: v,
+	}
+}
+
+// LakekeeperUserActionReadRoleAssignmentsAsLakekeeperUserAction is a convenience function that returns LakekeeperUserActionReadRoleAssignments wrapped in LakekeeperUserAction
+func LakekeeperUserActionReadRoleAssignmentsAsLakekeeperUserAction(v *LakekeeperUserActionReadRoleAssignments) LakekeeperUserAction {
+	return LakekeeperUserAction{
+		LakekeeperUserActionReadRoleAssignments: v,
 	}
 }
 
@@ -77,6 +85,18 @@ func (dst *LakekeeperUserAction) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	// check if the discriminator value is 'read_role_assignments'
+	if jsonDict["action"] == "read_role_assignments" {
+		// try to unmarshal JSON data into LakekeeperUserActionReadRoleAssignments
+		err = json.Unmarshal(data, &dst.LakekeeperUserActionReadRoleAssignments)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperUserActionReadRoleAssignments, return on the first match
+		} else {
+			dst.LakekeeperUserActionReadRoleAssignments = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperUserAction as LakekeeperUserActionReadRoleAssignments: %s", err.Error())
+		}
+	}
+
 	// check if the discriminator value is 'update'
 	if jsonDict["action"] == "update" {
 		// try to unmarshal JSON data into LakekeeperUserActionUpdate
@@ -113,6 +133,18 @@ func (dst *LakekeeperUserAction) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	// check if the discriminator value is 'LakekeeperUserActionReadRoleAssignments'
+	if jsonDict["action"] == "LakekeeperUserActionReadRoleAssignments" {
+		// try to unmarshal JSON data into LakekeeperUserActionReadRoleAssignments
+		err = json.Unmarshal(data, &dst.LakekeeperUserActionReadRoleAssignments)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperUserActionReadRoleAssignments, return on the first match
+		} else {
+			dst.LakekeeperUserActionReadRoleAssignments = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperUserAction as LakekeeperUserActionReadRoleAssignments: %s", err.Error())
+		}
+	}
+
 	// check if the discriminator value is 'LakekeeperUserActionUpdate'
 	if jsonDict["action"] == "LakekeeperUserActionUpdate" {
 		// try to unmarshal JSON data into LakekeeperUserActionUpdate
@@ -138,6 +170,10 @@ func (src LakekeeperUserAction) MarshalJSON() ([]byte, error) {
 		return json.Marshal(&src.LakekeeperUserActionRead)
 	}
 
+	if src.LakekeeperUserActionReadRoleAssignments != nil {
+		return json.Marshal(&src.LakekeeperUserActionReadRoleAssignments)
+	}
+
 	if src.LakekeeperUserActionUpdate != nil {
 		return json.Marshal(&src.LakekeeperUserActionUpdate)
 	}
@@ -156,6 +192,10 @@ func (obj *LakekeeperUserAction) GetActualInstance() interface{} {
 
 	if obj.LakekeeperUserActionRead != nil {
 		return obj.LakekeeperUserActionRead
+	}
+
+	if obj.LakekeeperUserActionReadRoleAssignments != nil {
+		return obj.LakekeeperUserActionReadRoleAssignments
 	}
 
 	if obj.LakekeeperUserActionUpdate != nil {

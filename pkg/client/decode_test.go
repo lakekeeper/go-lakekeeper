@@ -11,10 +11,10 @@ import (
 )
 
 // warehouseResponseWithUnknownField is a real GetWarehouse response captured
-// from Lakekeeper latest-main. It carries `allowed-format-versions`, a field
-// added upstream after the v0.12.3 release that the committed spec does not
-// know about. A client library must tolerate such additive server fields rather
-// than reject the whole response.
+// from Lakekeeper, plus `x-future-field`, which no spec defines. It stands in
+// for a field a newer server adds after the committed spec. A client library
+// must tolerate such additive server fields rather than reject the whole
+// response.
 const warehouseResponseWithUnknownField = `{
   "id": "9d6651da-5f19-11f1-ad69-1b7104fe3cf7",
   "warehouse-id": "9d6651da-5f19-11f1-ad69-1b7104fe3cf7",
@@ -34,7 +34,8 @@ const warehouseResponseWithUnknownField = `{
   "status": "active",
   "protected": false,
   "allowed-format-versions": [1, 2, 3],
-  "updated-at": null
+  "updated-at": null,
+  "x-future-field": {"added-by": "a newer server"}
 }`
 
 func TestGetWarehouseResponse_ToleratesUnknownField(t *testing.T) {
@@ -46,7 +47,7 @@ func TestGetWarehouseResponse_ToleratesUnknownField(t *testing.T) {
 
 	// The known fields still decode correctly alongside the unknown one.
 	assert.Equal(t, "test-wh", wh.Name)
-	assert.Equal(t, managementv1.WarehouseStatusActive, wh.Status)
+	assert.Equal(t, managementv1.WAREHOUSESTATUS_ACTIVE, wh.Status)
 	require.NotNil(t, wh.StorageProfile.StorageProfileS3)
 	assert.Equal(t, "testacc", wh.StorageProfile.StorageProfileS3.Bucket)
 }

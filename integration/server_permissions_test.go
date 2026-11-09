@@ -27,13 +27,13 @@ func TestPermissions_Server_GetAccess(t *testing.T) {
 	assert.Equal(t, http.StatusOK, r.StatusCode)
 
 	want := []managementv1.ServerAction{
-		managementv1.ServerActionCreateProject,
-		managementv1.ServerActionUpdateUsers,
-		managementv1.ServerActionDeleteUsers,
-		managementv1.ServerActionListUsers,
-		managementv1.ServerActionGrantAdmin,
-		managementv1.ServerActionProvisionUsers,
-		managementv1.ServerActionReadAssignments,
+		managementv1.SERVERACTION_CREATE_PROJECT,
+		managementv1.SERVERACTION_UPDATE_USERS,
+		managementv1.SERVERACTION_DELETE_USERS,
+		managementv1.SERVERACTION_LIST_USERS,
+		managementv1.SERVERACTION_GRANT_ADMIN,
+		managementv1.SERVERACTION_PROVISION_USERS,
+		managementv1.SERVERACTION_READ_ASSIGNMENTS,
 	}
 	assertAllowedActionsSubset(t, want, resp.AllowedActions, managementv1.AllowedServerActionEnumValues)
 }
@@ -51,6 +51,30 @@ func TestPermissions_Server_GetAssignments(t *testing.T) {
 		Relation:      "operator",
 	}}
 	assert.ElementsMatch(t, want, describeAssignments(t, resp.Assignments))
+}
+
+func TestPermissions_Server_GetAssignments_RelationsFilter(t *testing.T) {
+	c := sharedClient
+
+	// The only server assignment is the admin's `operator`, so filtering on
+	// `admin` must return nothing. A server that ignores the parameter's
+	// encoding returns the unfiltered set instead of an error, which only a
+	// negative case like this one catches.
+	resp, r, err := c.PermissionsOpenfgaAPI.GetServerAssignments(t.Context()).
+		Relations([]managementv1.ServerRelation{managementv1.SERVERRELATION_ADMIN}).
+		Execute()
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusOK, r.StatusCode)
+	assert.Empty(t, describeAssignments(t, resp.Assignments))
+
+	resp, _, err = c.PermissionsOpenfgaAPI.GetServerAssignments(t.Context()).
+		Relations([]managementv1.ServerRelation{managementv1.SERVERRELATION_ADMIN, managementv1.SERVERRELATION_OPERATOR}).
+		Execute()
+	require.NoError(t, err)
+	assert.ElementsMatch(t,
+		[]permissions.AssignmentRow{{PrincipalType: "user", PrincipalID: adminID, Relation: "operator"}},
+		describeAssignments(t, resp.Assignments),
+	)
 }
 
 func TestPermissions_Server_Update(t *testing.T) {
@@ -72,6 +96,21 @@ func TestPermissions_Server_Update(t *testing.T) {
 	r, err := c.PermissionsOpenfgaAPI.UpdateServerAssignments(t.Context()).UpdateServerAssignmentsRequest(*addReq).Execute()
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusNoContent, r.StatusCode)
+	// Server is shared; if the test stops before its own delete below, remove
+	// the tuple so later tests asserting exact assignment sets don't see it.
+	// Cleanups run LIFO, so this fires before MustProvisionUser's user-delete
+	// cleanup.
+	removed := false
+	t.Cleanup(func() {
+		if removed {
+			return
+		}
+		delReq := managementv1.NewUpdateServerAssignmentsRequest()
+		delReq.Deletes = append(delReq.Deletes, userAssignment[managementv1.ServerAssignment](t, "admin", user.Id))
+		if _, err := c.PermissionsOpenfgaAPI.UpdateServerAssignments(context.Background()).UpdateServerAssignmentsRequest(*delReq).Execute(); err != nil {
+			t.Errorf("undo server admin assignment: %v", err)
+		}
+	})
 
 	resp, _, err = c.PermissionsOpenfgaAPI.GetServerAssignments(t.Context()).Execute()
 	require.NoError(t, err)
@@ -89,6 +128,7 @@ func TestPermissions_Server_Update(t *testing.T) {
 
 	r, err = c.PermissionsOpenfgaAPI.UpdateServerAssignments(t.Context()).UpdateServerAssignmentsRequest(*delReq).Execute()
 	require.NoError(t, err)
+	removed = true
 	assert.Equal(t, http.StatusNoContent, r.StatusCode)
 
 	resp, _, err = c.PermissionsOpenfgaAPI.GetServerAssignments(t.Context()).Execute()
@@ -160,13 +200,13 @@ func TestPermissions_Server_GetAccess_UserFilter(t *testing.T) {
 	require.NoError(t, err)
 
 	want := []managementv1.ServerAction{
-		managementv1.ServerActionCreateProject,
-		managementv1.ServerActionUpdateUsers,
-		managementv1.ServerActionDeleteUsers,
-		managementv1.ServerActionListUsers,
-		managementv1.ServerActionGrantAdmin,
-		managementv1.ServerActionProvisionUsers,
-		managementv1.ServerActionReadAssignments,
+		managementv1.SERVERACTION_CREATE_PROJECT,
+		managementv1.SERVERACTION_UPDATE_USERS,
+		managementv1.SERVERACTION_DELETE_USERS,
+		managementv1.SERVERACTION_LIST_USERS,
+		managementv1.SERVERACTION_GRANT_ADMIN,
+		managementv1.SERVERACTION_PROVISION_USERS,
+		managementv1.SERVERACTION_READ_ASSIGNMENTS,
 	}
 	assertAllowedActionsSubset(t, want, resp.AllowedActions, managementv1.AllowedServerActionEnumValues)
 }
@@ -199,13 +239,13 @@ func TestPermissions_Server_GetAccess_RoleFilter(t *testing.T) {
 	require.NoError(t, err)
 
 	want := []managementv1.ServerAction{
-		managementv1.ServerActionCreateProject,
-		managementv1.ServerActionUpdateUsers,
-		managementv1.ServerActionDeleteUsers,
-		managementv1.ServerActionListUsers,
-		managementv1.ServerActionGrantAdmin,
-		managementv1.ServerActionProvisionUsers,
-		managementv1.ServerActionReadAssignments,
+		managementv1.SERVERACTION_CREATE_PROJECT,
+		managementv1.SERVERACTION_UPDATE_USERS,
+		managementv1.SERVERACTION_DELETE_USERS,
+		managementv1.SERVERACTION_LIST_USERS,
+		managementv1.SERVERACTION_GRANT_ADMIN,
+		managementv1.SERVERACTION_PROVISION_USERS,
+		managementv1.SERVERACTION_READ_ASSIGNMENTS,
 	}
 	assertAllowedActionsSubset(t, want, resp.AllowedActions, managementv1.AllowedServerActionEnumValues)
 }

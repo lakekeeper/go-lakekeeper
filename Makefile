@@ -135,10 +135,6 @@ validate: vet lint
 generate: ## Regenerate Go bindings from OpenAPI specs.
 	@echo === regenerating management API from $(OPENAPI_DIR)/management-open-api.yaml
 	@test -f $(OPENAPI_DIR)/management-open-api.yaml || { echo "missing $(OPENAPI_DIR)/management-open-api.yaml"; exit 1; }
-	@echo === preprocessing spec to flatten allOf+oneOf compositions
-	@$(GO) run ./api/openapi/preprocess \
-		$(OPENAPI_DIR)/management-open-api.yaml \
-		$(OPENAPI_DIR)/management-open-api.processed.yaml
 	@rm -rf $(SELF_DIR)/$(MANAGEMENT_API_OUTPUT)
 	@mkdir -p $(SELF_DIR)/$(MANAGEMENT_API_OUTPUT)
 	@cp $(OPENAPI_DIR)/.openapi-generator-ignore $(SELF_DIR)/$(MANAGEMENT_API_OUTPUT)/
@@ -146,12 +142,11 @@ generate: ## Regenerate Go bindings from OpenAPI specs.
 		--user $$(id -u):$$(id -g) \
 		-v $(SELF_DIR):/local \
 		$(OPENAPI_GENERATOR_IMAGE) generate \
-		-i /local/api/openapi/management-open-api.processed.yaml \
+		-i /local/api/openapi/management-open-api.yaml \
 		-g go \
 		-c /local/api/openapi/management-config.yaml \
 		-o /local/$(MANAGEMENT_API_OUTPUT) \
 		--global-property=apiDocs=false,apiTests=false,modelDocs=false,modelTests=false
-	@rm -f $(OPENAPI_DIR)/management-open-api.processed.yaml
 	@echo === postprocessing generated tree to relax unknown-field decoding
 	@$(GO) run ./api/openapi/postprocess $(SELF_DIR)/$(MANAGEMENT_API_OUTPUT)
 	@echo === goimports on generated tree

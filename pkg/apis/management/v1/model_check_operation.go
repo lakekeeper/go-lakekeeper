@@ -17,12 +17,20 @@ import (
 
 // CheckOperation - Represents an action on an object
 type CheckOperation struct {
-	CheckOperationNamespace *CheckOperationNamespace
-	CheckOperationProject   *CheckOperationProject
-	CheckOperationServer    *CheckOperationServer
-	CheckOperationTable     *CheckOperationTable
-	CheckOperationView      *CheckOperationView
-	CheckOperationWarehouse *CheckOperationWarehouse
+	CheckOperationGenericTable *CheckOperationGenericTable
+	CheckOperationNamespace    *CheckOperationNamespace
+	CheckOperationProject      *CheckOperationProject
+	CheckOperationServer       *CheckOperationServer
+	CheckOperationTable        *CheckOperationTable
+	CheckOperationView         *CheckOperationView
+	CheckOperationWarehouse    *CheckOperationWarehouse
+}
+
+// CheckOperationGenericTableAsCheckOperation is a convenience function that returns CheckOperationGenericTable wrapped in CheckOperation
+func CheckOperationGenericTableAsCheckOperation(v *CheckOperationGenericTable) CheckOperation {
+	return CheckOperation{
+		CheckOperationGenericTable: v,
+	}
 }
 
 // CheckOperationNamespaceAsCheckOperation is a convenience function that returns CheckOperationNamespace wrapped in CheckOperation
@@ -71,6 +79,19 @@ func CheckOperationWarehouseAsCheckOperation(v *CheckOperationWarehouse) CheckOp
 func (dst *CheckOperation) UnmarshalJSON(data []byte) error {
 	var err error
 	match := 0
+	// try to unmarshal data into CheckOperationGenericTable
+	err = json.Unmarshal(data, &dst.CheckOperationGenericTable)
+	if err == nil {
+		jsonCheckOperationGenericTable, _ := json.Marshal(dst.CheckOperationGenericTable)
+		if string(jsonCheckOperationGenericTable) == "{}" { // empty struct
+			dst.CheckOperationGenericTable = nil
+		} else {
+			match++
+		}
+	} else {
+		dst.CheckOperationGenericTable = nil
+	}
+
 	// try to unmarshal data into CheckOperationNamespace
 	err = json.Unmarshal(data, &dst.CheckOperationNamespace)
 	if err == nil {
@@ -151,6 +172,7 @@ func (dst *CheckOperation) UnmarshalJSON(data []byte) error {
 
 	if match > 1 { // more than 1 match
 		// reset to nil
+		dst.CheckOperationGenericTable = nil
 		dst.CheckOperationNamespace = nil
 		dst.CheckOperationProject = nil
 		dst.CheckOperationServer = nil
@@ -168,6 +190,10 @@ func (dst *CheckOperation) UnmarshalJSON(data []byte) error {
 
 // Marshal data from the first non-nil pointers in the struct to JSON
 func (src CheckOperation) MarshalJSON() ([]byte, error) {
+	if src.CheckOperationGenericTable != nil {
+		return json.Marshal(&src.CheckOperationGenericTable)
+	}
+
 	if src.CheckOperationNamespace != nil {
 		return json.Marshal(&src.CheckOperationNamespace)
 	}
@@ -200,6 +226,10 @@ func (obj *CheckOperation) GetActualInstance() interface{} {
 	if obj == nil {
 		return nil
 	}
+	if obj.CheckOperationGenericTable != nil {
+		return obj.CheckOperationGenericTable
+	}
+
 	if obj.CheckOperationNamespace != nil {
 		return obj.CheckOperationNamespace
 	}

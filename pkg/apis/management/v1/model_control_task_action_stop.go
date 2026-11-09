@@ -19,7 +19,7 @@ import (
 // checks if the ControlTaskActionStop type satisfies the MappedNullable interface at compile time
 var _ MappedNullable = &ControlTaskActionStop{}
 
-// ControlTaskActionStop Stop the task gracefully. The task will be retried.
+// ControlTaskActionStop Stop the task gracefully. The task will be retried. An attempt that does not stop before its heartbeat times out counts as failed; after its last try, the task fails.
 type ControlTaskActionStop struct {
 	ActionType string `json:"action-type"`
 }
@@ -66,6 +66,14 @@ func (o *ControlTaskActionStop) GetActionTypeOk() (*string, bool) {
 // SetActionType sets field value
 func (o *ControlTaskActionStop) SetActionType(v string) {
 	o.ActionType = v
+}
+
+func (o ControlTaskActionStop) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
 }
 
 func (o ControlTaskActionStop) ToMap() (map[string]interface{}, error) {

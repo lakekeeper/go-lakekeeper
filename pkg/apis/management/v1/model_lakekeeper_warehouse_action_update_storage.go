@@ -19,7 +19,7 @@ import (
 // checks if the LakekeeperWarehouseActionUpdateStorage type satisfies the MappedNullable interface at compile time
 var _ MappedNullable = &LakekeeperWarehouseActionUpdateStorage{}
 
-// LakekeeperWarehouseActionUpdateStorage struct for LakekeeperWarehouseActionUpdateStorage
+// LakekeeperWarehouseActionUpdateStorage Change or validate the warehouse's storage profile, or validate the storage the warehouse currently runs with. Changing or validating a profile also requires `update_storage_credential`, because a profile change replaces or clears the credential.
 type LakekeeperWarehouseActionUpdateStorage struct {
 	Action string `json:"action"`
 }
@@ -66,6 +66,14 @@ func (o *LakekeeperWarehouseActionUpdateStorage) GetActionOk() (*string, bool) {
 // SetAction sets field value
 func (o *LakekeeperWarehouseActionUpdateStorage) SetAction(v string) {
 	o.Action = v
+}
+
+func (o LakekeeperWarehouseActionUpdateStorage) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
 }
 
 func (o LakekeeperWarehouseActionUpdateStorage) ToMap() (map[string]interface{}, error) {

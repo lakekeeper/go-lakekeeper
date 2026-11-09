@@ -3,9 +3,10 @@
 // openapi-generator (with generateUnmarshalJSON) emits a per-model UnmarshalJSON
 // that first validates required-property presence and then strict-decodes via
 // `decoder.DisallowUnknownFields()`. The strict decode is the wrong posture for
-// a client library: when Lakekeeper adds a field to a response (e.g. latest-main
-// added `allowed-format-versions` to the warehouse object after v0.12.3), a
-// client generated against an older spec would reject the whole response.
+// a client library: when Lakekeeper adds a field to a response (as it did with
+// `allowed-format-versions` on the warehouse object after v0.12.3, before the
+// spec we generated from declared it), a client generated against an older
+// spec would reject the whole response.
 //
 // This tool removes every per-model `decoder.DisallowUnknownFields()` call so
 // the decoder ignores unknown fields, while leaving intact:
@@ -25,7 +26,7 @@
 // reject any value not in the AllowedXEnumValues list with
 // `return fmt.Errorf("%+v is not a valid X", value)`. For the same forward-compat
 // reason — a newer Lakekeeper may return an enum value this SDK's spec predates
-// (e.g. latest-main's `set_format_version_policy` WarehouseAction) and that must
+// (as `set_format_version_policy` on WarehouseAction once was) and that must
 // not fail decoding of the whole response — the error return is rewritten to
 // store the unknown value (`*v = enumTypeValue; return nil`). The enum type is a
 // `string` alias, so the raw value is preserved for the caller, who can compare

@@ -22,6 +22,8 @@ var _ MappedNullable = &LakekeeperWarehouseActionDelete{}
 // LakekeeperWarehouseActionDelete struct for LakekeeperWarehouseActionDelete
 type LakekeeperWarehouseActionDelete struct {
 	Action string `json:"action"`
+	// Whether protection is bypassed, so a warehouse marked protected can be deleted. The warehouse must still be empty, and unfinished tasks still block the delete, except tasks of queues that are cancelled when their warehouse is deleted.
+	Force *bool `json:"force,omitempty"`
 }
 
 type _LakekeeperWarehouseActionDelete LakekeeperWarehouseActionDelete
@@ -68,9 +70,52 @@ func (o *LakekeeperWarehouseActionDelete) SetAction(v string) {
 	o.Action = v
 }
 
+// GetForce returns the Force field value if set, zero value otherwise.
+func (o *LakekeeperWarehouseActionDelete) GetForce() bool {
+	if o == nil || IsNil(o.Force) {
+		var ret bool
+		return ret
+	}
+	return *o.Force
+}
+
+// GetForceOk returns a tuple with the Force field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *LakekeeperWarehouseActionDelete) GetForceOk() (*bool, bool) {
+	if o == nil || IsNil(o.Force) {
+		return nil, false
+	}
+	return o.Force, true
+}
+
+// HasForce returns a boolean if a field has been set.
+func (o *LakekeeperWarehouseActionDelete) HasForce() bool {
+	if o != nil && !IsNil(o.Force) {
+		return true
+	}
+
+	return false
+}
+
+// SetForce gets a reference to the given bool and assigns it to the Force field.
+func (o *LakekeeperWarehouseActionDelete) SetForce(v bool) {
+	o.Force = &v
+}
+
+func (o LakekeeperWarehouseActionDelete) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
 func (o LakekeeperWarehouseActionDelete) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["action"] = o.Action
+	if !IsNil(o.Force) {
+		toSerialize["force"] = o.Force
+	}
 	return toSerialize, nil
 }
 

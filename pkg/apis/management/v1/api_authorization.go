@@ -25,10 +25,17 @@ type ApiBatchCheckActionsRequest struct {
 	ctx                             context.Context
 	ApiService                      *AuthorizationAPIService
 	catalogActionsBatchCheckRequest *CatalogActionsBatchCheckRequest
+	xProjectId                      *string
 }
 
 func (r ApiBatchCheckActionsRequest) CatalogActionsBatchCheckRequest(catalogActionsBatchCheckRequest CatalogActionsBatchCheckRequest) ApiBatchCheckActionsRequest {
 	r.catalogActionsBatchCheckRequest = &catalogActionsBatchCheckRequest
+	return r
+}
+
+// Project ID (optional). Used only for project checks whose body omits &#x60;project-id&#x60;; a &#x60;project-id&#x60; in the body takes precedence. In a batch check this applies to each item. If neither is set, the default project is used when it is enabled; otherwise the check fails.
+func (r ApiBatchCheckActionsRequest) XProjectId(xProjectId string) ApiBatchCheckActionsRequest {
+	r.xProjectId = &xProjectId
 	return r
 }
 
@@ -102,6 +109,9 @@ func (a *AuthorizationAPIService) BatchCheckActionsExecute(r ApiBatchCheckAction
 	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	if r.xProjectId != nil {
+		parameterAddToHeaderOrQuery(localVarHeaderParams, "x-project-id", r.xProjectId, "simple", "")
 	}
 	// body params
 	localVarPostBody = r.catalogActionsBatchCheckRequest

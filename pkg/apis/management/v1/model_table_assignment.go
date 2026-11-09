@@ -19,10 +19,12 @@ import (
 type TableAssignment struct {
 	TableAssignmentDescribe     *TableAssignmentDescribe
 	TableAssignmentManageGrants *TableAssignmentManageGrants
+	TableAssignmentManageTags   *TableAssignmentManageTags
 	TableAssignmentModify       *TableAssignmentModify
 	TableAssignmentOwnership    *TableAssignmentOwnership
 	TableAssignmentPassGrants   *TableAssignmentPassGrants
 	TableAssignmentSelect       *TableAssignmentSelect
+	TableAssignmentWrite        *TableAssignmentWrite
 }
 
 // TableAssignmentDescribeAsTableAssignment is a convenience function that returns TableAssignmentDescribe wrapped in TableAssignment
@@ -36,6 +38,13 @@ func TableAssignmentDescribeAsTableAssignment(v *TableAssignmentDescribe) TableA
 func TableAssignmentManageGrantsAsTableAssignment(v *TableAssignmentManageGrants) TableAssignment {
 	return TableAssignment{
 		TableAssignmentManageGrants: v,
+	}
+}
+
+// TableAssignmentManageTagsAsTableAssignment is a convenience function that returns TableAssignmentManageTags wrapped in TableAssignment
+func TableAssignmentManageTagsAsTableAssignment(v *TableAssignmentManageTags) TableAssignment {
+	return TableAssignment{
+		TableAssignmentManageTags: v,
 	}
 }
 
@@ -64,6 +73,13 @@ func TableAssignmentPassGrantsAsTableAssignment(v *TableAssignmentPassGrants) Ta
 func TableAssignmentSelectAsTableAssignment(v *TableAssignmentSelect) TableAssignment {
 	return TableAssignment{
 		TableAssignmentSelect: v,
+	}
+}
+
+// TableAssignmentWriteAsTableAssignment is a convenience function that returns TableAssignmentWrite wrapped in TableAssignment
+func TableAssignmentWriteAsTableAssignment(v *TableAssignmentWrite) TableAssignment {
+	return TableAssignment{
+		TableAssignmentWrite: v,
 	}
 }
 
@@ -98,6 +114,18 @@ func (dst *TableAssignment) UnmarshalJSON(data []byte) error {
 		} else {
 			dst.TableAssignmentManageGrants = nil
 			return fmt.Errorf("failed to unmarshal TableAssignment as TableAssignmentManageGrants: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'manage_tags'
+	if jsonDict["type"] == "manage_tags" {
+		// try to unmarshal JSON data into TableAssignmentManageTags
+		err = json.Unmarshal(data, &dst.TableAssignmentManageTags)
+		if err == nil {
+			return nil // data stored in dst.TableAssignmentManageTags, return on the first match
+		} else {
+			dst.TableAssignmentManageTags = nil
+			return fmt.Errorf("failed to unmarshal TableAssignment as TableAssignmentManageTags: %s", err.Error())
 		}
 	}
 
@@ -149,6 +177,18 @@ func (dst *TableAssignment) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	// check if the discriminator value is 'write'
+	if jsonDict["type"] == "write" {
+		// try to unmarshal JSON data into TableAssignmentWrite
+		err = json.Unmarshal(data, &dst.TableAssignmentWrite)
+		if err == nil {
+			return nil // data stored in dst.TableAssignmentWrite, return on the first match
+		} else {
+			dst.TableAssignmentWrite = nil
+			return fmt.Errorf("failed to unmarshal TableAssignment as TableAssignmentWrite: %s", err.Error())
+		}
+	}
+
 	// check if the discriminator value is 'TableAssignmentDescribe'
 	if jsonDict["type"] == "TableAssignmentDescribe" {
 		// try to unmarshal JSON data into TableAssignmentDescribe
@@ -170,6 +210,18 @@ func (dst *TableAssignment) UnmarshalJSON(data []byte) error {
 		} else {
 			dst.TableAssignmentManageGrants = nil
 			return fmt.Errorf("failed to unmarshal TableAssignment as TableAssignmentManageGrants: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'TableAssignmentManageTags'
+	if jsonDict["type"] == "TableAssignmentManageTags" {
+		// try to unmarshal JSON data into TableAssignmentManageTags
+		err = json.Unmarshal(data, &dst.TableAssignmentManageTags)
+		if err == nil {
+			return nil // data stored in dst.TableAssignmentManageTags, return on the first match
+		} else {
+			dst.TableAssignmentManageTags = nil
+			return fmt.Errorf("failed to unmarshal TableAssignment as TableAssignmentManageTags: %s", err.Error())
 		}
 	}
 
@@ -221,6 +273,18 @@ func (dst *TableAssignment) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	// check if the discriminator value is 'TableAssignmentWrite'
+	if jsonDict["type"] == "TableAssignmentWrite" {
+		// try to unmarshal JSON data into TableAssignmentWrite
+		err = json.Unmarshal(data, &dst.TableAssignmentWrite)
+		if err == nil {
+			return nil // data stored in dst.TableAssignmentWrite, return on the first match
+		} else {
+			dst.TableAssignmentWrite = nil
+			return fmt.Errorf("failed to unmarshal TableAssignment as TableAssignmentWrite: %s", err.Error())
+		}
+	}
+
 	return nil
 }
 
@@ -232,6 +296,10 @@ func (src TableAssignment) MarshalJSON() ([]byte, error) {
 
 	if src.TableAssignmentManageGrants != nil {
 		return json.Marshal(&src.TableAssignmentManageGrants)
+	}
+
+	if src.TableAssignmentManageTags != nil {
+		return json.Marshal(&src.TableAssignmentManageTags)
 	}
 
 	if src.TableAssignmentModify != nil {
@@ -250,6 +318,10 @@ func (src TableAssignment) MarshalJSON() ([]byte, error) {
 		return json.Marshal(&src.TableAssignmentSelect)
 	}
 
+	if src.TableAssignmentWrite != nil {
+		return json.Marshal(&src.TableAssignmentWrite)
+	}
+
 	return nil, nil // no data in oneOf schemas
 }
 
@@ -266,6 +338,10 @@ func (obj *TableAssignment) GetActualInstance() interface{} {
 		return obj.TableAssignmentManageGrants
 	}
 
+	if obj.TableAssignmentManageTags != nil {
+		return obj.TableAssignmentManageTags
+	}
+
 	if obj.TableAssignmentModify != nil {
 		return obj.TableAssignmentModify
 	}
@@ -280,6 +356,10 @@ func (obj *TableAssignment) GetActualInstance() interface{} {
 
 	if obj.TableAssignmentSelect != nil {
 		return obj.TableAssignmentSelect
+	}
+
+	if obj.TableAssignmentWrite != nil {
+		return obj.TableAssignmentWrite
 	}
 
 	// all schemas are nil
