@@ -169,10 +169,13 @@ a, err := permissions.BuildAssignment[managementv1.WarehouseAssignment](
 examples below all follow the same skeleton:
 
 1. Build one or more `*Assignment` values for the relation(s) you want.
-2. Append them to `req.Writes` (grant) or `req.Deletes` (revoke).
-3. Call the right `c.PermissionsOpenfgaAPI.Update<Resource>Assignments…`
-   method.
-4. Verify with the matching `Get<Resource>Assignments…`.
+2. Grant or revoke them. For warehouses and roles, pass them to the
+   permissions façade: `c.Permissions.<Resource>.Grant` or `.Revoke`.
+   For the server and projects, append them to `req.Writes` (grant) or
+   `req.Deletes` (revoke) and call the right
+   `c.PermissionsOpenfgaAPI.Update<Resource>Assignments…` method.
+3. Verify with `c.Permissions.<Resource>.Assignments` (warehouses,
+   roles) or the matching `Get<Resource>Assignments…`.
 
 The `PermissionsOpenfgaAPI` field name is a historical artifact of the
 OpenAPI tag — it is just Lakekeeper's permissions service, regardless of
@@ -223,19 +226,20 @@ if _, err := c.PermissionsOpenfgaAPI.UpdateProjectAssignmentsById(ctx, projectID
 ### Warehouse
 
 ```go
-req := managementv1.NewUpdateWarehouseAssignmentsRequest()
 a, err := permissions.BuildAssignment[managementv1.WarehouseAssignment](
     "select", permissions.PrincipalRole, roleID,
 )
 if err != nil {
     return err
 }
-req.Writes = append(req.Writes, a)
 
-if _, err := c.PermissionsOpenfgaAPI.UpdateWarehouseAssignmentsById(ctx, warehouseID).
-    UpdateWarehouseAssignmentsRequest(*req).Execute(); err != nil {
-    return fmt.Errorf("update warehouse assignments: %w", err)
+if err := c.Permissions.Warehouses.Grant(ctx, warehouseID,
+    []managementv1.WarehouseAssignment{a}); err != nil {
+    return err // *client.APIError on a server error
 }
+
+// Verify
+resp, err := c.Permissions.Warehouses.Assignments(ctx, warehouseID, nil)
 ```
 
 ### Role
@@ -244,23 +248,22 @@ Add a user to a role (so they inherit its grants) by writing an
 `assignee` assignment:
 
 ```go
-req := managementv1.NewUpdateRoleAssignmentsRequest()
 a, err := permissions.BuildAssignment[managementv1.RoleAssignment](
     "assignee", permissions.PrincipalUser, userID,
 )
 if err != nil {
     return err
 }
-req.Writes = append(req.Writes, a)
 
-if _, err := c.PermissionsOpenfgaAPI.UpdateRoleAssignmentsById(ctx, roleID).
-    UpdateRoleAssignmentsRequest(*req).Execute(); err != nil {
-    return fmt.Errorf("update role assignments: %w", err)
+if err := c.Permissions.Roles.Grant(ctx, roleID,
+    []managementv1.RoleAssignment{a}); err != nil {
+    return err
 }
 ```
 
-To revoke instead, use `req.Deletes = append(req.Deletes, a)` — same
-shape, opposite slice.
+To revoke instead, call `Revoke` with the same assignments (for the
+server and projects: `req.Deletes = append(req.Deletes, a)` — same
+shape, opposite slice).
 
 ## Reading effective access
 
@@ -275,20 +278,19 @@ lkctl warehouse access      <WAREHOUSE-ID> --user <USER-ID>
 lkctl warehouse assignments <WAREHOUSE-ID>
 ```
 
-**SDK.** Per-resource `Get<Resource>Access*` methods live on the
-permissions service field `c.PermissionsOpenfgaAPI`.
-`c.AuthorizationAPI.BatchCheckActions` covers batch checks across
-resource types.
+**SDK.** For warehouses and roles, `c.Permissions.<Resource>.Access`
+returns the allowed actions. For the server and projects, the
+`Get<Resource>Access*` methods live on the permissions service field
+`c.PermissionsOpenfgaAPI`. `c.AuthorizationAPI.BatchCheckActions` covers
+batch checks across resource types.
 
 ```go
 // Effective actions for the current principal on a warehouse.
-resp, _, err := c.PermissionsOpenfgaAPI.GetWarehouseAccessById(ctx, warehouseID).
-    Execute()
+resp, err := c.Permissions.Warehouses.Access(ctx, warehouseID, nil)
 
 // Or scope to a specific principal:
-resp, _, err = c.PermissionsOpenfgaAPI.GetWarehouseAccessById(ctx, warehouseID).
-    PrincipalUser(userID).
-    Execute()
+resp, err = c.Permissions.Warehouses.Access(ctx, warehouseID,
+    &client.GetWarehouseAccessByIDOptions{PrincipalUser: userID})
 ```
 
 `GetProjectAccessById` and `GetServerAccess` are flagged **Deprecated**
@@ -309,9 +311,9 @@ and the role granted `select` on a warehouse.
 | 1. Bootstrap | `lkctl server bootstrap --accept-terms-of-use --as-operator` | `client.NewWithAuthSource(ctx, baseURL, as, client.WithInitialBootstrap(true, true, core.Ptr(managementv1.USERTYPE_APPLICATION)))` |
 | 2. Create project | `PROJECT_ID=$(lkctl project create my-project -o json \| jq -r '."project-id"')` | `created, err := c.Projects.Create(ctx, managementv1.NewCreateProjectRequest("my-project"))` |
 | 3. Create role | `ROLE_ID=$(lkctl role create "data-readers" --project $PROJECT_ID -o json \| jq -r .id)` | `role, _, err := c.RoleAPI.CreateRole(ctx).XProjectId(projectID).CreateRoleRequest(*managementv1.NewCreateRoleRequest("data-readers")).Execute()` |
-| 4. Add user to role | `lkctl role grant $ROLE_ID --users $USER_ID --assignments assignee` | Build a `RoleAssignment` with wire shape `{"type": "assignee", "user": "<id>"}` via `permissions.BuildAssignment`, post via `UpdateRoleAssignmentsById` |
-| 5. Grant role on warehouse | `lkctl warehouse grant $WH_ID --roles $ROLE_ID --assignments select --project $PROJECT_ID` | Build a `WarehouseAssignment` with wire shape `{"type": "select", "role": "<id>"}`, post via `UpdateWarehouseAssignmentsById` |
-| 6. Verify | `lkctl warehouse access $WH_ID --user $USER_ID` | `c.PermissionsOpenfgaAPI.GetWarehouseAccessById(ctx, WH_ID).PrincipalUser(USER_ID).Execute()` |
+| 4. Add user to role | `lkctl role grant $ROLE_ID --users $USER_ID --assignments assignee` | Build a `RoleAssignment` with wire shape `{"type": "assignee", "user": "<id>"}` via `permissions.BuildAssignment`, pass it to `c.Permissions.Roles.Grant` |
+| 5. Grant role on warehouse | `lkctl warehouse grant $WH_ID --roles $ROLE_ID --assignments select --project $PROJECT_ID` | Build a `WarehouseAssignment` with wire shape `{"type": "select", "role": "<id>"}`, pass it to `c.Permissions.Warehouses.Grant` |
+| 6. Verify | `lkctl warehouse access $WH_ID --user $USER_ID` | `c.Permissions.Warehouses.Access(ctx, WH_ID, &client.GetWarehouseAccessByIDOptions{PrincipalUser: USER_ID})` |
 
 The SDK side, end-to-end, in one block. To keep the snippet focused, it
 picks up after step 1 (the caller passes in a constructed `*client.Client`)
@@ -353,10 +355,8 @@ func provision(ctx context.Context, c *client.Client, userID, warehouseID string
     if err != nil {
         return err
     }
-    raReq := managementv1.NewUpdateRoleAssignmentsRequest()
-    raReq.Writes = append(raReq.Writes, roleAssign)
-    if _, err := c.PermissionsOpenfgaAPI.UpdateRoleAssignmentsById(ctx, role.Id).
-        UpdateRoleAssignmentsRequest(*raReq).Execute(); err != nil {
+    if err := c.Permissions.Roles.Grant(ctx, role.Id,
+        []managementv1.RoleAssignment{roleAssign}); err != nil {
         return fmt.Errorf("assign user to role: %w", err)
     }
 
@@ -367,20 +367,18 @@ func provision(ctx context.Context, c *client.Client, userID, warehouseID string
     if err != nil {
         return err
     }
-    whReq := managementv1.NewUpdateWarehouseAssignmentsRequest()
-    whReq.Writes = append(whReq.Writes, whAssign)
-    if _, err := c.PermissionsOpenfgaAPI.UpdateWarehouseAssignmentsById(ctx, warehouseID).
-        UpdateWarehouseAssignmentsRequest(*whReq).Execute(); err != nil {
+    if err := c.Permissions.Warehouses.Grant(ctx, warehouseID,
+        []managementv1.WarehouseAssignment{whAssign}); err != nil {
         return fmt.Errorf("grant select on warehouse: %w", err)
     }
 
     // 6. Verify.
-    access, _, err := c.PermissionsOpenfgaAPI.GetWarehouseAccessById(ctx, warehouseID).
-        PrincipalUser(userID).Execute()
+    access, err := c.Permissions.Warehouses.Access(ctx, warehouseID,
+        &client.GetWarehouseAccessByIDOptions{PrincipalUser: userID})
     if err != nil {
         return fmt.Errorf("verify access: %w", err)
     }
-    fmt.Printf("user %s allowed actions on warehouse %s: %+v\n", userID, warehouseID, access.AllowedActions)
+    fmt.Printf("user %s allowed actions on warehouse %s: %+v\n", userID, warehouseID, access.GetAllowedActions())
     return nil
 }
 ```

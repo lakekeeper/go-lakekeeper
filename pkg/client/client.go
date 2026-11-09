@@ -44,6 +44,9 @@ type Client struct {
 	Users      *Users
 	Server     *Server
 
+	// Permissions manages access and assignments per resource kind.
+	Permissions *Permissions
+
 	baseURL    *url.URL
 	authSource core.AuthSource
 }
@@ -98,6 +101,10 @@ func NewWithAuthSource(ctx context.Context, baseURL string, as core.AuthSource, 
 		Roles:      &Roles{api: api.RoleAPI},
 		Users:      &Users{api: api.UserAPI},
 		Server:     &Server{api: api.ServerAPI},
+		Permissions: &Permissions{
+			Warehouses: &WarehousePermissions{api: api.PermissionsOpenfgaAPI},
+			Roles:      &RolePermissions{api: api.PermissionsOpenfgaAPI},
+		},
 		baseURL:    parsed,
 		authSource: as,
 	}

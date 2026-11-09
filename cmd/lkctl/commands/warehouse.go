@@ -396,16 +396,12 @@ func newWarehouseAccessCmd(opts *clientOptions) *cobra.Command {
 				return err
 			}
 
-			req := c.PermissionsOpenfgaAPI.GetWarehouseAccessById(ctx, args[0])
-			if access.user != "" {
-				req = req.PrincipalUser(access.user)
-			}
-			if access.role != "" {
-				req = req.PrincipalRole(access.role)
-			}
-			resp, _, err := req.Execute()
+			resp, err := c.Permissions.Warehouses.Access(ctx, args[0], &client.GetWarehouseAccessByIDOptions{
+				PrincipalUser: access.user,
+				PrincipalRole: access.role,
+			})
 			if err != nil {
-				return client.WrapAPIError("get warehouse access", err, nil)
+				return err
 			}
 
 			switch output {
@@ -441,17 +437,11 @@ func newWarehouseAssignmentsCmd(opts *clientOptions) *cobra.Command {
 				return err
 			}
 
-			req := c.PermissionsOpenfgaAPI.GetWarehouseAssignmentsById(ctx, args[0])
-			if len(assignments.relations) > 0 {
-				rels := make([]managementv1.WarehouseRelation, 0, len(assignments.relations))
-				for _, r := range assignments.relations {
-					rels = append(rels, managementv1.WarehouseRelation(r))
-				}
-				req = req.Relations(rels)
-			}
-			resp, _, err := req.Execute()
+			resp, err := c.Permissions.Warehouses.Assignments(ctx, args[0], &client.GetWarehouseAssignmentsByIDOptions{
+				Relations: toRelations[managementv1.WarehouseRelation](assignments.relations),
+			})
 			if err != nil {
-				return client.WrapAPIError("get warehouse assignments", err, nil)
+				return err
 			}
 
 			switch output {
@@ -492,16 +482,14 @@ func newWarehouseGrantCmd(opts *clientOptions) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			req := managementv1.NewUpdateWarehouseAssignmentsRequest()
-			req.Writes = set
 
 			ctx := cmd.Context()
 			c, err := newClient(ctx, opts)
 			if err != nil {
 				return err
 			}
-			if _, err := c.PermissionsOpenfgaAPI.UpdateWarehouseAssignmentsById(ctx, args[0]).UpdateWarehouseAssignmentsRequest(*req).Execute(); err != nil {
-				return client.WrapAPIError("update warehouse assignments", err, nil)
+			if err := c.Permissions.Warehouses.Grant(ctx, args[0], set); err != nil {
+				return err
 			}
 			fmt.Fprintln(cmd.OutOrStdout(), "Warehouse permissions updated")
 			return nil
@@ -539,16 +527,14 @@ func newWarehouseRevokeCmd(opts *clientOptions) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			req := managementv1.NewUpdateWarehouseAssignmentsRequest()
-			req.Deletes = set
 
 			ctx := cmd.Context()
 			c, err := newClient(ctx, opts)
 			if err != nil {
 				return err
 			}
-			if _, err := c.PermissionsOpenfgaAPI.UpdateWarehouseAssignmentsById(ctx, args[0]).UpdateWarehouseAssignmentsRequest(*req).Execute(); err != nil {
-				return client.WrapAPIError("update warehouse assignments", err, nil)
+			if err := c.Permissions.Warehouses.Revoke(ctx, args[0], set); err != nil {
+				return err
 			}
 			fmt.Fprintln(cmd.OutOrStdout(), "Warehouse permissions updated")
 			return nil

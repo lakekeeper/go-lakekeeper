@@ -88,6 +88,19 @@ type (
 
 	// ListWarehousesOptions holds the query parameters of Warehouses.List.
 	ListWarehousesOptions = client.ListWarehousesOptions
+
+	// GetWarehouseAccessByIDOptions holds the query parameters of
+	// Permissions.Warehouses.Access.
+	GetWarehouseAccessByIDOptions = client.GetWarehouseAccessByIDOptions
+	// GetWarehouseAssignmentsByIDOptions holds the query parameters of
+	// Permissions.Warehouses.Assignments.
+	GetWarehouseAssignmentsByIDOptions = client.GetWarehouseAssignmentsByIDOptions
+	// GetAuthorizerRoleActionsOptions holds the query parameters of
+	// Permissions.Roles.Access.
+	GetAuthorizerRoleActionsOptions = client.GetAuthorizerRoleActionsOptions
+	// GetRoleAssignmentsByIDOptions holds the query parameters of
+	// Permissions.Roles.Assignments.
+	GetRoleAssignmentsByIDOptions = client.GetRoleAssignmentsByIDOptions
 )
 
 var (

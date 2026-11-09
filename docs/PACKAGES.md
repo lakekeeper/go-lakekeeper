@@ -173,6 +173,7 @@ generator's `(value, *http.Response, error)` triple.
 | `c.Roles` | Create / Get / Delete / List / Update (project-scoped) |
 | `c.Users` | Create / Get / Delete / List / Update / Whoami |
 | `c.Server` | Info / Bootstrap |
+| `c.Permissions` | Access / Assignments / Grant / Revoke, per resource kind: `.Warehouses`, `.Roles` |
 
 ```go
 wh, err := c.Warehouses.Create(ctx, req)         // façade — one call
@@ -204,6 +205,43 @@ resp, err := c.Warehouses.List(ctx,
     &client.ListWarehousesOptions{Status: []managementv1.WarehouseStatus{managementv1.WAREHOUSESTATUS_ACTIVE}},
     client.WithProject(projectID))
 ```
+
+### Permissions façade
+
+`c.Permissions` holds one sub-façade per resource kind (`Warehouses`,
+`Roles`). Each has the same four methods, taking the resource id and the
+resource's generated types:
+
+| Method | Request | Returns |
+|---|---|---|
+| `Access(ctx, id, *<Op>Options)` | allowed actions; options name another principal (`PrincipalUser` / `PrincipalRole`) | generated access response |
+| `Assignments(ctx, id, *<Op>Options)` | assignments; options filter by `Relations` | generated assignments response |
+| `Grant(ctx, id, []<Resource>Assignment)` | the update request's `writes` | `error` |
+| `Revoke(ctx, id, []<Resource>Assignment)` | the update request's `deletes` | `error` |
+
+Grant and Revoke build the update request themselves and reject an empty
+slice before any request is sent. Pass what
+[`permissions.BuildAssignmentSet`](#pkgpermissions) builds. Warehouse and
+role ids select their project, so these methods take no
+`client.CallOption`.
+
+```go
+set, err := permissions.BuildAssignmentSet[managementv1.WarehouseAssignment](
+    []string{"select"}, permissions.PrincipalSet{Roles: []string{roleID}})
+if err != nil {
+    return err
+}
+if err := c.Permissions.Warehouses.Grant(ctx, warehouseID, set); err != nil {
+    return err
+}
+access, err := c.Permissions.Warehouses.Access(ctx, warehouseID,
+    &client.GetWarehouseAccessByIDOptions{PrincipalRole: roleID})
+```
+
+`Roles.Access` reads the role's authorizer actions
+(`GetAuthorizerRoleActions`); `Warehouses.Access` reads the warehouse's
+access (`GetWarehouseAccessById`, deprecated upstream; these are the
+endpoints `lkctl` already used, so its output is unchanged).
 
 ### Errors
 

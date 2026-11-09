@@ -14,6 +14,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
+	"github.com/lakekeeper/go-lakekeeper/pkg/client"
 	"github.com/lakekeeper/go-lakekeeper/pkg/permissions"
 )
 
@@ -22,12 +23,11 @@ func TestPermissions_Role_GetAccess(t *testing.T) {
 
 	role := MustCreateRole(t, c, defaultProjectID)
 
-	// The plan favors GetAuthorizerRoleActions over the deprecated
-	// GetRoleAccessById because the access surface is the only one the new
-	// endpoint covers cleanly.
-	resp, r, err := c.PermissionsOpenfgaAPI.GetAuthorizerRoleActions(t.Context(), role.Id).Execute()
+	// Permissions.Roles.Access reads GetAuthorizerRoleActions, not the
+	// deprecated GetRoleAccessById, because the access surface is the only
+	// one the new endpoint covers cleanly.
+	resp, err := c.Permissions.Roles.Access(t.Context(), role.Id, nil)
 	require.NoError(t, err)
-	assert.Equal(t, http.StatusOK, r.StatusCode)
 
 	// GetAuthorizerRoleActions reports the OpenFGA-level action set, which is
 	// narrower than the deprecated GetRoleAccessById's RoleAction set —
@@ -48,9 +48,8 @@ func TestPermissions_Role_GetAssignments(t *testing.T) {
 
 	role := MustCreateRole(t, c, defaultProjectID)
 
-	resp, r, err := c.PermissionsOpenfgaAPI.GetRoleAssignmentsById(t.Context(), role.Id).Execute()
+	resp, err := c.Permissions.Roles.Assignments(t.Context(), role.Id, nil)
 	require.NoError(t, err)
-	assert.Equal(t, http.StatusOK, r.StatusCode)
 
 	assert.ElementsMatch(t,
 		[]permissions.AssignmentRow{{PrincipalType: "user", PrincipalID: adminID, Relation: "ownership"}},
@@ -65,21 +64,17 @@ func TestPermissions_Role_Update(t *testing.T) {
 	role := MustCreateRole(t, c, projectID)
 	user := MustProvisionUser(t, c)
 
-	resp, _, err := c.PermissionsOpenfgaAPI.GetRoleAssignmentsById(t.Context(), role.Id).Execute()
+	resp, err := c.Permissions.Roles.Assignments(t.Context(), role.Id, nil)
 	require.NoError(t, err)
 	assert.ElementsMatch(t,
 		[]permissions.AssignmentRow{{PrincipalType: "user", PrincipalID: adminID, Relation: "ownership"}},
 		describeAssignments(t, resp.Assignments),
 	)
 
-	addReq := managementv1.NewUpdateRoleAssignmentsRequest()
-	addReq.Writes = append(addReq.Writes, userAssignment[managementv1.RoleAssignment](t, "assignee", user.Id))
+	assignee := []managementv1.RoleAssignment{userAssignment[managementv1.RoleAssignment](t, "assignee", user.Id)}
+	require.NoError(t, c.Permissions.Roles.Grant(t.Context(), role.Id, assignee))
 
-	r, err := c.PermissionsOpenfgaAPI.UpdateRoleAssignmentsById(t.Context(), role.Id).UpdateRoleAssignmentsRequest(*addReq).Execute()
-	require.NoError(t, err)
-	assert.Equal(t, http.StatusNoContent, r.StatusCode)
-
-	resp, _, err = c.PermissionsOpenfgaAPI.GetRoleAssignmentsById(t.Context(), role.Id).Execute()
+	resp, err = c.Permissions.Roles.Assignments(t.Context(), role.Id, nil)
 	require.NoError(t, err)
 	assert.ElementsMatch(t,
 		[]permissions.AssignmentRow{
@@ -89,14 +84,9 @@ func TestPermissions_Role_Update(t *testing.T) {
 		describeAssignments(t, resp.Assignments),
 	)
 
-	delReq := managementv1.NewUpdateRoleAssignmentsRequest()
-	delReq.Deletes = append(delReq.Deletes, userAssignment[managementv1.RoleAssignment](t, "assignee", user.Id))
+	require.NoError(t, c.Permissions.Roles.Revoke(t.Context(), role.Id, assignee))
 
-	r, err = c.PermissionsOpenfgaAPI.UpdateRoleAssignmentsById(t.Context(), role.Id).UpdateRoleAssignmentsRequest(*delReq).Execute()
-	require.NoError(t, err)
-	assert.Equal(t, http.StatusNoContent, r.StatusCode)
-
-	resp, _, err = c.PermissionsOpenfgaAPI.GetRoleAssignmentsById(t.Context(), role.Id).Execute()
+	resp, err = c.Permissions.Roles.Assignments(t.Context(), role.Id, nil)
 	require.NoError(t, err)
 	assert.ElementsMatch(t,
 		[]permissions.AssignmentRow{{PrincipalType: "user", PrincipalID: adminID, Relation: "ownership"}},
@@ -110,16 +100,12 @@ func TestPermissions_Role_SameAdd(t *testing.T) {
 	user := MustProvisionUser(t, c)
 	role := MustCreateRole(t, c, defaultProjectID)
 
-	req := managementv1.NewUpdateRoleAssignmentsRequest()
-	req.Writes = append(req.Writes, userAssignment[managementv1.RoleAssignment](t, "assignee", user.Id))
+	assignee := []managementv1.RoleAssignment{userAssignment[managementv1.RoleAssignment](t, "assignee", user.Id)}
+	require.NoError(t, c.Permissions.Roles.Grant(t.Context(), role.Id, assignee))
 
-	r, err := c.PermissionsOpenfgaAPI.UpdateRoleAssignmentsById(t.Context(), role.Id).UpdateRoleAssignmentsRequest(*req).Execute()
-	require.NoError(t, err)
-	assert.Equal(t, http.StatusNoContent, r.StatusCode)
-
-	r, err = c.PermissionsOpenfgaAPI.UpdateRoleAssignmentsById(t.Context(), role.Id).UpdateRoleAssignmentsRequest(*req).Execute()
-	require.Error(t, err)
-	require.NotNil(t, r)
-	assert.Equal(t, http.StatusConflict, r.StatusCode)
+	err := c.Permissions.Roles.Grant(t.Context(), role.Id, assignee)
+	var apiErr *client.APIError
+	require.ErrorAs(t, err, &apiErr)
+	assert.Equal(t, http.StatusConflict, apiErr.StatusCode)
 	assert.Contains(t, errorBody(err), "TupleAlreadyExistsError")
 }

@@ -274,16 +274,12 @@ func newRoleAccessCmd(opts *clientOptions) *cobra.Command {
 				return err
 			}
 
-			req := c.PermissionsOpenfgaAPI.GetAuthorizerRoleActions(ctx, args[0])
-			if access.user != "" {
-				req = req.PrincipalUser(access.user)
-			}
-			if access.role != "" {
-				req = req.PrincipalRole(access.role)
-			}
-			resp, _, err := req.Execute()
+			resp, err := c.Permissions.Roles.Access(ctx, args[0], &client.GetAuthorizerRoleActionsOptions{
+				PrincipalUser: access.user,
+				PrincipalRole: access.role,
+			})
 			if err != nil {
-				return client.WrapAPIError("get role access", err, nil)
+				return err
 			}
 
 			switch output {
@@ -319,18 +315,11 @@ func newRoleAssignmentsCmd(opts *clientOptions) *cobra.Command {
 				return err
 			}
 
-			req := c.PermissionsOpenfgaAPI.GetRoleAssignmentsById(ctx, args[0])
-			if len(assignments.relations) > 0 {
-				rels := make([]managementv1.RoleRelation, 0, len(assignments.relations))
-				for _, r := range assignments.relations {
-					rels = append(rels, managementv1.RoleRelation(r))
-				}
-				req = req.Relations(rels)
-			}
-
-			resp, _, err := req.Execute()
+			resp, err := c.Permissions.Roles.Assignments(ctx, args[0], &client.GetRoleAssignmentsByIDOptions{
+				Relations: toRelations[managementv1.RoleRelation](assignments.relations),
+			})
 			if err != nil {
-				return client.WrapAPIError("get role assignments", err, nil)
+				return err
 			}
 
 			switch output {
@@ -366,16 +355,14 @@ func newRoleGrantCmd(opts *clientOptions) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			req := managementv1.NewUpdateRoleAssignmentsRequest()
-			req.Writes = set
 
 			ctx := cmd.Context()
 			c, err := newClient(ctx, opts)
 			if err != nil {
 				return err
 			}
-			if _, err := c.PermissionsOpenfgaAPI.UpdateRoleAssignmentsById(ctx, args[0]).UpdateRoleAssignmentsRequest(*req).Execute(); err != nil {
-				return client.WrapAPIError("update role assignments", err, nil)
+			if err := c.Permissions.Roles.Grant(ctx, args[0], set); err != nil {
+				return err
 			}
 			fmt.Fprintln(cmd.OutOrStdout(), "Role permissions updated")
 			return nil
@@ -413,16 +400,14 @@ func newRoleRevokeCmd(opts *clientOptions) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			req := managementv1.NewUpdateRoleAssignmentsRequest()
-			req.Deletes = set
 
 			ctx := cmd.Context()
 			c, err := newClient(ctx, opts)
 			if err != nil {
 				return err
 			}
-			if _, err := c.PermissionsOpenfgaAPI.UpdateRoleAssignmentsById(ctx, args[0]).UpdateRoleAssignmentsRequest(*req).Execute(); err != nil {
-				return client.WrapAPIError("update role assignments", err, nil)
+			if err := c.Permissions.Roles.Revoke(ctx, args[0], set); err != nil {
+				return err
 			}
 			fmt.Fprintln(cmd.OutOrStdout(), "Role permissions updated")
 			return nil
