@@ -37,6 +37,7 @@ const (
 	GENERICTABLEACTION_GRANT_MANAGE_TAGS   GenericTableAction = "grant_manage_tags"
 	GENERICTABLEACTION_GRANT_DESCRIBE      GenericTableAction = "grant_describe"
 	GENERICTABLEACTION_GRANT_SELECT        GenericTableAction = "grant_select"
+	GENERICTABLEACTION_GRANT_WRITE         GenericTableAction = "grant_write"
 	GENERICTABLEACTION_GRANT_MODIFY        GenericTableAction = "grant_modify"
 	GENERICTABLEACTION_CHANGE_OWNERSHIP    GenericTableAction = "change_ownership"
 )
@@ -60,6 +61,7 @@ var AllowedGenericTableActionEnumValues = []GenericTableAction{
 	"grant_manage_tags",
 	"grant_describe",
 	"grant_select",
+	"grant_write",
 	"grant_modify",
 	"change_ownership",
 }

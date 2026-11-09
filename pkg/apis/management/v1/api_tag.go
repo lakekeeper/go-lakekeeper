@@ -35,7 +35,7 @@ func (r ApiCreateTagDefinitionRequest) CreateTagDefinitionRequest(createTagDefin
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiCreateTagDefinitionRequest) XProjectId(xProjectId string) ApiCreateTagDefinitionRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -163,7 +163,7 @@ type ApiDeleteGenericTableTagRequest struct {
 	xProjectId     *string
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiDeleteGenericTableTagRequest) XProjectId(xProjectId string) ApiDeleteGenericTableTagRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -284,7 +284,7 @@ type ApiDeleteNamespaceTagRequest struct {
 	xProjectId  *string
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiDeleteNamespaceTagRequest) XProjectId(xProjectId string) ApiDeleteNamespaceTagRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -406,7 +406,7 @@ type ApiDeleteTableColumnTagRequest struct {
 	xProjectId  *string
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiDeleteTableColumnTagRequest) XProjectId(xProjectId string) ApiDeleteTableColumnTagRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -530,7 +530,7 @@ type ApiDeleteTableTagRequest struct {
 	xProjectId  *string
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiDeleteTableTagRequest) XProjectId(xProjectId string) ApiDeleteTableTagRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -649,7 +649,7 @@ type ApiDeleteTagDefinitionRequest struct {
 	xProjectId      *string
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiDeleteTagDefinitionRequest) XProjectId(xProjectId string) ApiDeleteTagDefinitionRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -763,7 +763,7 @@ type ApiDeleteViewTagRequest struct {
 	xProjectId  *string
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiDeleteViewTagRequest) XProjectId(xProjectId string) ApiDeleteViewTagRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -883,7 +883,7 @@ type ApiDeleteWarehouseTagRequest struct {
 	xProjectId  *string
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiDeleteWarehouseTagRequest) XProjectId(xProjectId string) ApiDeleteWarehouseTagRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -998,6 +998,7 @@ type ApiGetTagActionsRequest struct {
 	tagDefinitionId string
 	principalUser   *string
 	principalRole   *string
+	xProjectId      *string
 }
 
 // The user to show actions for. If neither user nor role is specified, shows actions for the current user.
@@ -1009,6 +1010,12 @@ func (r ApiGetTagActionsRequest) PrincipalUser(principalUser string) ApiGetTagAc
 // The role to show actions for. If neither user nor role is specified, shows actions for the current user.
 func (r ApiGetTagActionsRequest) PrincipalRole(principalRole string) ApiGetTagActionsRequest {
 	r.principalRole = &principalRole
+	return r
+}
+
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
+func (r ApiGetTagActionsRequest) XProjectId(xProjectId string) ApiGetTagActionsRequest {
+	r.xProjectId = &xProjectId
 	return r
 }
 
@@ -1077,6 +1084,9 @@ func (a *TagAPIService) GetTagActionsExecute(r ApiGetTagActionsRequest) (*GetLak
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
+	if r.xProjectId != nil {
+		parameterAddToHeaderOrQuery(localVarHeaderParams, "x-project-id", r.xProjectId, "simple", "")
+	}
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -1131,7 +1141,7 @@ type ApiGetTagDefinitionRequest struct {
 	xProjectId      *string
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiGetTagDefinitionRequest) XProjectId(xProjectId string) ApiGetTagDefinitionRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -1257,7 +1267,7 @@ type ApiListColumnTagsRequest struct {
 	xProjectId  *string
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiListColumnTagsRequest) XProjectId(xProjectId string) ApiListColumnTagsRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -1394,7 +1404,7 @@ func (r ApiListGenericTableTagsRequest) Effective(effective bool) ApiListGeneric
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiListGenericTableTagsRequest) XProjectId(xProjectId string) ApiListGenericTableTagsRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -1532,7 +1542,7 @@ func (r ApiListNamespaceTagsRequest) Effective(effective bool) ApiListNamespaceT
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiListNamespaceTagsRequest) XProjectId(xProjectId string) ApiListNamespaceTagsRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -1671,7 +1681,7 @@ func (r ApiListTableColumnTagsRequest) Effective(effective bool) ApiListTableCol
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiListTableColumnTagsRequest) XProjectId(xProjectId string) ApiListTableColumnTagsRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -1812,7 +1822,7 @@ func (r ApiListTableTagsRequest) Effective(effective bool) ApiListTableTagsReque
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiListTableTagsRequest) XProjectId(xProjectId string) ApiListTableTagsRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -1991,7 +2001,7 @@ func (r ApiListTagAttachmentsRequest) WarehouseId(warehouseId string) ApiListTag
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiListTagAttachmentsRequest) XProjectId(xProjectId string) ApiListTagAttachmentsRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -2158,7 +2168,7 @@ func (r ApiListTagDefinitionsRequest) Name(name string) ApiListTagDefinitionsReq
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiListTagDefinitionsRequest) XProjectId(xProjectId string) ApiListTagDefinitionsRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -2296,7 +2306,7 @@ func (r ApiListViewTagsRequest) Effective(effective bool) ApiListViewTagsRequest
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiListViewTagsRequest) XProjectId(xProjectId string) ApiListViewTagsRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -2433,7 +2443,7 @@ func (r ApiListWarehouseTagsRequest) Effective(effective bool) ApiListWarehouseT
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiListWarehouseTagsRequest) XProjectId(xProjectId string) ApiListWarehouseTagsRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -2568,7 +2578,7 @@ func (r ApiSetGenericTableTagRequest) SetTagRequest(setTagRequest SetTagRequest)
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiSetGenericTableTagRequest) XProjectId(xProjectId string) ApiSetGenericTableTagRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -2712,7 +2722,7 @@ func (r ApiSetNamespaceTagRequest) SetTagRequest(setTagRequest SetTagRequest) Ap
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiSetNamespaceTagRequest) XProjectId(xProjectId string) ApiSetNamespaceTagRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -2856,7 +2866,7 @@ func (r ApiSetTableColumnTagRequest) SetTagRequest(setTagRequest SetTagRequest) 
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiSetTableColumnTagRequest) XProjectId(xProjectId string) ApiSetTableColumnTagRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -3004,7 +3014,7 @@ func (r ApiSetTableTagRequest) SetTagRequest(setTagRequest SetTagRequest) ApiSet
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiSetTableTagRequest) XProjectId(xProjectId string) ApiSetTableTagRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -3147,7 +3157,7 @@ func (r ApiSetViewTagRequest) SetTagRequest(setTagRequest SetTagRequest) ApiSetV
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiSetViewTagRequest) XProjectId(xProjectId string) ApiSetViewTagRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -3289,7 +3299,7 @@ func (r ApiSetWarehouseTagRequest) SetTagRequest(setTagRequest SetTagRequest) Ap
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiSetWarehouseTagRequest) XProjectId(xProjectId string) ApiSetWarehouseTagRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -3427,7 +3437,7 @@ func (r ApiUpdateTagDefinitionRequest) UpdateTagDefinitionRequest(updateTagDefin
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiUpdateTagDefinitionRequest) XProjectId(xProjectId string) ApiUpdateTagDefinitionRequest {
 	r.xProjectId = &xProjectId
 	return r

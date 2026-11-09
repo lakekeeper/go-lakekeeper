@@ -653,7 +653,7 @@ func (r ApiListUserRolesRequest) PageSize(pageSize int64) ApiListUserRolesReques
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiListUserRolesRequest) XProjectId(xProjectId string) ApiListUserRolesRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -796,7 +796,7 @@ func (r ApiListUserTransitiveRolesRequest) PageSize(pageSize int64) ApiListUserT
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiListUserTransitiveRolesRequest) XProjectId(xProjectId string) ApiListUserTransitiveRolesRequest {
 	r.xProjectId = &xProjectId
 	return r

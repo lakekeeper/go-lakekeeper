@@ -23,6 +23,7 @@ const (
 	OPENFGAWAREHOUSEACTION_READ_ASSIGNMENTS    OpenFGAWarehouseAction = "read_assignments"
 	OPENFGAWAREHOUSEACTION_GRANT_CREATE        OpenFGAWarehouseAction = "grant_create"
 	OPENFGAWAREHOUSEACTION_GRANT_DESCRIBE      OpenFGAWarehouseAction = "grant_describe"
+	OPENFGAWAREHOUSEACTION_GRANT_WRITE         OpenFGAWarehouseAction = "grant_write"
 	OPENFGAWAREHOUSEACTION_GRANT_MODIFY        OpenFGAWarehouseAction = "grant_modify"
 	OPENFGAWAREHOUSEACTION_GRANT_SELECT        OpenFGAWarehouseAction = "grant_select"
 	OPENFGAWAREHOUSEACTION_GRANT_PASS_GRANTS   OpenFGAWarehouseAction = "grant_pass_grants"
@@ -36,6 +37,7 @@ var AllowedOpenFGAWarehouseActionEnumValues = []OpenFGAWarehouseAction{
 	"read_assignments",
 	"grant_create",
 	"grant_describe",
+	"grant_write",
 	"grant_modify",
 	"grant_select",
 	"grant_pass_grants",

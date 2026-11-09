@@ -32,6 +32,7 @@ const (
 	PROJECTACTION_GRANT_TAG_CREATOR       ProjectAction = "grant_tag_creator"
 	PROJECTACTION_GRANT_CREATE            ProjectAction = "grant_create"
 	PROJECTACTION_GRANT_DESCRIBE          ProjectAction = "grant_describe"
+	PROJECTACTION_GRANT_WRITE             ProjectAction = "grant_write"
 	PROJECTACTION_GRANT_MODIFY            ProjectAction = "grant_modify"
 	PROJECTACTION_GRANT_SELECT            ProjectAction = "grant_select"
 	PROJECTACTION_GRANT_PROJECT_ADMIN     ProjectAction = "grant_project_admin"
@@ -54,6 +55,7 @@ var AllowedProjectActionEnumValues = []ProjectAction{
 	"grant_tag_creator",
 	"grant_create",
 	"grant_describe",
+	"grant_write",
 	"grant_modify",
 	"grant_select",
 	"grant_project_admin",

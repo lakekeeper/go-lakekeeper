@@ -24,6 +24,7 @@ type GenericTableAssignment struct {
 	GenericTableAssignmentOwnership    *GenericTableAssignmentOwnership
 	GenericTableAssignmentPassGrants   *GenericTableAssignmentPassGrants
 	GenericTableAssignmentSelect       *GenericTableAssignmentSelect
+	GenericTableAssignmentWrite        *GenericTableAssignmentWrite
 }
 
 // GenericTableAssignmentDescribeAsGenericTableAssignment is a convenience function that returns GenericTableAssignmentDescribe wrapped in GenericTableAssignment
@@ -72,6 +73,13 @@ func GenericTableAssignmentPassGrantsAsGenericTableAssignment(v *GenericTableAss
 func GenericTableAssignmentSelectAsGenericTableAssignment(v *GenericTableAssignmentSelect) GenericTableAssignment {
 	return GenericTableAssignment{
 		GenericTableAssignmentSelect: v,
+	}
+}
+
+// GenericTableAssignmentWriteAsGenericTableAssignment is a convenience function that returns GenericTableAssignmentWrite wrapped in GenericTableAssignment
+func GenericTableAssignmentWriteAsGenericTableAssignment(v *GenericTableAssignmentWrite) GenericTableAssignment {
+	return GenericTableAssignment{
+		GenericTableAssignmentWrite: v,
 	}
 }
 
@@ -169,6 +177,18 @@ func (dst *GenericTableAssignment) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	// check if the discriminator value is 'write'
+	if jsonDict["type"] == "write" {
+		// try to unmarshal JSON data into GenericTableAssignmentWrite
+		err = json.Unmarshal(data, &dst.GenericTableAssignmentWrite)
+		if err == nil {
+			return nil // data stored in dst.GenericTableAssignmentWrite, return on the first match
+		} else {
+			dst.GenericTableAssignmentWrite = nil
+			return fmt.Errorf("failed to unmarshal GenericTableAssignment as GenericTableAssignmentWrite: %s", err.Error())
+		}
+	}
+
 	// check if the discriminator value is 'GenericTableAssignmentDescribe'
 	if jsonDict["type"] == "GenericTableAssignmentDescribe" {
 		// try to unmarshal JSON data into GenericTableAssignmentDescribe
@@ -253,6 +273,18 @@ func (dst *GenericTableAssignment) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	// check if the discriminator value is 'GenericTableAssignmentWrite'
+	if jsonDict["type"] == "GenericTableAssignmentWrite" {
+		// try to unmarshal JSON data into GenericTableAssignmentWrite
+		err = json.Unmarshal(data, &dst.GenericTableAssignmentWrite)
+		if err == nil {
+			return nil // data stored in dst.GenericTableAssignmentWrite, return on the first match
+		} else {
+			dst.GenericTableAssignmentWrite = nil
+			return fmt.Errorf("failed to unmarshal GenericTableAssignment as GenericTableAssignmentWrite: %s", err.Error())
+		}
+	}
+
 	return nil
 }
 
@@ -284,6 +316,10 @@ func (src GenericTableAssignment) MarshalJSON() ([]byte, error) {
 
 	if src.GenericTableAssignmentSelect != nil {
 		return json.Marshal(&src.GenericTableAssignmentSelect)
+	}
+
+	if src.GenericTableAssignmentWrite != nil {
+		return json.Marshal(&src.GenericTableAssignmentWrite)
 	}
 
 	return nil, nil // no data in oneOf schemas
@@ -320,6 +356,10 @@ func (obj *GenericTableAssignment) GetActualInstance() interface{} {
 
 	if obj.GenericTableAssignmentSelect != nil {
 		return obj.GenericTableAssignmentSelect
+	}
+
+	if obj.GenericTableAssignmentWrite != nil {
+		return obj.GenericTableAssignmentWrite
 	}
 
 	// all schemas are nil

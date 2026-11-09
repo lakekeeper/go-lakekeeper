@@ -28,6 +28,7 @@ const (
 	PROJECTRELATION_DESCRIBE       ProjectRelation = "describe"
 	PROJECTRELATION_SELECT         ProjectRelation = "select"
 	PROJECTRELATION_CREATE         ProjectRelation = "create"
+	PROJECTRELATION_WRITE          ProjectRelation = "write"
 	PROJECTRELATION_MODIFY         ProjectRelation = "modify"
 )
 
@@ -41,6 +42,7 @@ var AllowedProjectRelationEnumValues = []ProjectRelation{
 	"describe",
 	"select",
 	"create",
+	"write",
 	"modify",
 }
 

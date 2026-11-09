@@ -34,7 +34,7 @@ func (r ApiControlProjectTasksRequest) ControlTasksRequest(controlTasksRequest C
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiControlProjectTasksRequest) XProjectId(xProjectId string) ApiControlProjectTasksRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -268,7 +268,7 @@ func (r ApiGetProjectTaskDetailsRequest) NumAttempts(numAttempts int32) ApiGetPr
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiGetProjectTaskDetailsRequest) XProjectId(xProjectId string) ApiGetProjectTaskDetailsRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -395,7 +395,7 @@ type ApiGetProjectTaskQueueConfigTaskLogCleanupRequest struct {
 	xProjectId *string
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiGetProjectTaskQueueConfigTaskLogCleanupRequest) XProjectId(xProjectId string) ApiGetProjectTaskQueueConfigTaskLogCleanupRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -878,7 +878,7 @@ func (r ApiListProjectTasksRequest) ListProjectTasksRequest(listProjectTasksRequ
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiListProjectTasksRequest) XProjectId(xProjectId string) ApiListProjectTasksRequest {
 	r.xProjectId = &xProjectId
 	return r
@@ -1130,7 +1130,7 @@ func (r ApiSetProjectTaskQueueConfigTaskLogCleanupRequest) SetTaskLogCleanupConf
 	return r
 }
 
-// Project ID (optional; falls back to the default project if not provided)
+// Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 func (r ApiSetProjectTaskQueueConfigTaskLogCleanupRequest) XProjectId(xProjectId string) ApiSetProjectTaskQueueConfigTaskLogCleanupRequest {
 	r.xProjectId = &xProjectId
 	return r

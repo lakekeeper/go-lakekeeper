@@ -23,6 +23,7 @@ const (
 	OPENFGANAMESPACEACTION_READ_ASSIGNMENTS    OpenFGANamespaceAction = "read_assignments"
 	OPENFGANAMESPACEACTION_GRANT_CREATE        OpenFGANamespaceAction = "grant_create"
 	OPENFGANAMESPACEACTION_GRANT_DESCRIBE      OpenFGANamespaceAction = "grant_describe"
+	OPENFGANAMESPACEACTION_GRANT_WRITE         OpenFGANamespaceAction = "grant_write"
 	OPENFGANAMESPACEACTION_GRANT_MODIFY        OpenFGANamespaceAction = "grant_modify"
 	OPENFGANAMESPACEACTION_GRANT_SELECT        OpenFGANamespaceAction = "grant_select"
 	OPENFGANAMESPACEACTION_GRANT_PASS_GRANTS   OpenFGANamespaceAction = "grant_pass_grants"
@@ -35,6 +36,7 @@ var AllowedOpenFGANamespaceActionEnumValues = []OpenFGANamespaceAction{
 	"read_assignments",
 	"grant_create",
 	"grant_describe",
+	"grant_write",
 	"grant_modify",
 	"grant_select",
 	"grant_pass_grants",

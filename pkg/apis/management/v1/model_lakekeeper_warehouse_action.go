@@ -17,32 +17,34 @@ import (
 
 // LakekeeperWarehouseAction - struct for LakekeeperWarehouseAction
 type LakekeeperWarehouseAction struct {
-	LakekeeperWarehouseActionAcceptMovedNamespace   *LakekeeperWarehouseActionAcceptMovedNamespace
-	LakekeeperWarehouseActionActivate               *LakekeeperWarehouseActionActivate
-	LakekeeperWarehouseActionControlAllTasks        *LakekeeperWarehouseActionControlAllTasks
-	LakekeeperWarehouseActionCreateNamespace        *LakekeeperWarehouseActionCreateNamespace
-	LakekeeperWarehouseActionDeactivate             *LakekeeperWarehouseActionDeactivate
-	LakekeeperWarehouseActionDelete                 *LakekeeperWarehouseActionDelete
-	LakekeeperWarehouseActionGetAllTasks            *LakekeeperWarehouseActionGetAllTasks
-	LakekeeperWarehouseActionGetConfig              *LakekeeperWarehouseActionGetConfig
-	LakekeeperWarehouseActionGetEndpointStatistics  *LakekeeperWarehouseActionGetEndpointStatistics
-	LakekeeperWarehouseActionGetMetadata            *LakekeeperWarehouseActionGetMetadata
-	LakekeeperWarehouseActionGetTaskQueueConfig     *LakekeeperWarehouseActionGetTaskQueueConfig
-	LakekeeperWarehouseActionIncludeInList          *LakekeeperWarehouseActionIncludeInList
-	LakekeeperWarehouseActionListDeletedTabulars    *LakekeeperWarehouseActionListDeletedTabulars
-	LakekeeperWarehouseActionListEverything         *LakekeeperWarehouseActionListEverything
-	LakekeeperWarehouseActionListNamespaces         *LakekeeperWarehouseActionListNamespaces
-	LakekeeperWarehouseActionManageTags             *LakekeeperWarehouseActionManageTags
-	LakekeeperWarehouseActionModifySoftDeletion     *LakekeeperWarehouseActionModifySoftDeletion
-	LakekeeperWarehouseActionModifyTaskQueueConfig  *LakekeeperWarehouseActionModifyTaskQueueConfig
-	LakekeeperWarehouseActionReadGrants             *LakekeeperWarehouseActionReadGrants
-	LakekeeperWarehouseActionReadSubtreeGrants      *LakekeeperWarehouseActionReadSubtreeGrants
-	LakekeeperWarehouseActionRename                 *LakekeeperWarehouseActionRename
-	LakekeeperWarehouseActionRevokeSubtreeGrants    *LakekeeperWarehouseActionRevokeSubtreeGrants
-	LakekeeperWarehouseActionSetFormatVersionPolicy *LakekeeperWarehouseActionSetFormatVersionPolicy
-	LakekeeperWarehouseActionSetProtection          *LakekeeperWarehouseActionSetProtection
-	LakekeeperWarehouseActionUpdateStorage          *LakekeeperWarehouseActionUpdateStorage
-	LakekeeperWarehouseActionUse                    *LakekeeperWarehouseActionUse
+	LakekeeperWarehouseActionAcceptMovedNamespace    *LakekeeperWarehouseActionAcceptMovedNamespace
+	LakekeeperWarehouseActionActivate                *LakekeeperWarehouseActionActivate
+	LakekeeperWarehouseActionControlAllTasks         *LakekeeperWarehouseActionControlAllTasks
+	LakekeeperWarehouseActionCreateNamespace         *LakekeeperWarehouseActionCreateNamespace
+	LakekeeperWarehouseActionDeactivate              *LakekeeperWarehouseActionDeactivate
+	LakekeeperWarehouseActionDelete                  *LakekeeperWarehouseActionDelete
+	LakekeeperWarehouseActionGetAllTasks             *LakekeeperWarehouseActionGetAllTasks
+	LakekeeperWarehouseActionGetConfig               *LakekeeperWarehouseActionGetConfig
+	LakekeeperWarehouseActionGetEndpointStatistics   *LakekeeperWarehouseActionGetEndpointStatistics
+	LakekeeperWarehouseActionGetMetadata             *LakekeeperWarehouseActionGetMetadata
+	LakekeeperWarehouseActionGetTaskQueueConfig      *LakekeeperWarehouseActionGetTaskQueueConfig
+	LakekeeperWarehouseActionIncludeInList           *LakekeeperWarehouseActionIncludeInList
+	LakekeeperWarehouseActionListDeletedTabulars     *LakekeeperWarehouseActionListDeletedTabulars
+	LakekeeperWarehouseActionListEverything          *LakekeeperWarehouseActionListEverything
+	LakekeeperWarehouseActionListNamespaces          *LakekeeperWarehouseActionListNamespaces
+	LakekeeperWarehouseActionManageTags              *LakekeeperWarehouseActionManageTags
+	LakekeeperWarehouseActionModifySoftDeletion      *LakekeeperWarehouseActionModifySoftDeletion
+	LakekeeperWarehouseActionModifyTaskQueueConfig   *LakekeeperWarehouseActionModifyTaskQueueConfig
+	LakekeeperWarehouseActionReadGrants              *LakekeeperWarehouseActionReadGrants
+	LakekeeperWarehouseActionReadSubtreeGrants       *LakekeeperWarehouseActionReadSubtreeGrants
+	LakekeeperWarehouseActionRegisterTable           *LakekeeperWarehouseActionRegisterTable
+	LakekeeperWarehouseActionRename                  *LakekeeperWarehouseActionRename
+	LakekeeperWarehouseActionRevokeSubtreeGrants     *LakekeeperWarehouseActionRevokeSubtreeGrants
+	LakekeeperWarehouseActionSetFormatVersionPolicy  *LakekeeperWarehouseActionSetFormatVersionPolicy
+	LakekeeperWarehouseActionSetProtection           *LakekeeperWarehouseActionSetProtection
+	LakekeeperWarehouseActionUpdateStorage           *LakekeeperWarehouseActionUpdateStorage
+	LakekeeperWarehouseActionUpdateStorageCredential *LakekeeperWarehouseActionUpdateStorageCredential
+	LakekeeperWarehouseActionUse                     *LakekeeperWarehouseActionUse
 }
 
 // LakekeeperWarehouseActionAcceptMovedNamespaceAsLakekeeperWarehouseAction is a convenience function that returns LakekeeperWarehouseActionAcceptMovedNamespace wrapped in LakekeeperWarehouseAction
@@ -185,6 +187,13 @@ func LakekeeperWarehouseActionReadSubtreeGrantsAsLakekeeperWarehouseAction(v *La
 	}
 }
 
+// LakekeeperWarehouseActionRegisterTableAsLakekeeperWarehouseAction is a convenience function that returns LakekeeperWarehouseActionRegisterTable wrapped in LakekeeperWarehouseAction
+func LakekeeperWarehouseActionRegisterTableAsLakekeeperWarehouseAction(v *LakekeeperWarehouseActionRegisterTable) LakekeeperWarehouseAction {
+	return LakekeeperWarehouseAction{
+		LakekeeperWarehouseActionRegisterTable: v,
+	}
+}
+
 // LakekeeperWarehouseActionRenameAsLakekeeperWarehouseAction is a convenience function that returns LakekeeperWarehouseActionRename wrapped in LakekeeperWarehouseAction
 func LakekeeperWarehouseActionRenameAsLakekeeperWarehouseAction(v *LakekeeperWarehouseActionRename) LakekeeperWarehouseAction {
 	return LakekeeperWarehouseAction{
@@ -217,6 +226,13 @@ func LakekeeperWarehouseActionSetProtectionAsLakekeeperWarehouseAction(v *Lakeke
 func LakekeeperWarehouseActionUpdateStorageAsLakekeeperWarehouseAction(v *LakekeeperWarehouseActionUpdateStorage) LakekeeperWarehouseAction {
 	return LakekeeperWarehouseAction{
 		LakekeeperWarehouseActionUpdateStorage: v,
+	}
+}
+
+// LakekeeperWarehouseActionUpdateStorageCredentialAsLakekeeperWarehouseAction is a convenience function that returns LakekeeperWarehouseActionUpdateStorageCredential wrapped in LakekeeperWarehouseAction
+func LakekeeperWarehouseActionUpdateStorageCredentialAsLakekeeperWarehouseAction(v *LakekeeperWarehouseActionUpdateStorageCredential) LakekeeperWarehouseAction {
+	return LakekeeperWarehouseAction{
+		LakekeeperWarehouseActionUpdateStorageCredential: v,
 	}
 }
 
@@ -477,6 +493,18 @@ func (dst *LakekeeperWarehouseAction) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	// check if the discriminator value is 'register_table'
+	if jsonDict["action"] == "register_table" {
+		// try to unmarshal JSON data into LakekeeperWarehouseActionRegisterTable
+		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionRegisterTable)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperWarehouseActionRegisterTable, return on the first match
+		} else {
+			dst.LakekeeperWarehouseActionRegisterTable = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionRegisterTable: %s", err.Error())
+		}
+	}
+
 	// check if the discriminator value is 'rename'
 	if jsonDict["action"] == "rename" {
 		// try to unmarshal JSON data into LakekeeperWarehouseActionRename
@@ -534,6 +562,18 @@ func (dst *LakekeeperWarehouseAction) UnmarshalJSON(data []byte) error {
 		} else {
 			dst.LakekeeperWarehouseActionUpdateStorage = nil
 			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionUpdateStorage: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'update_storage_credential'
+	if jsonDict["action"] == "update_storage_credential" {
+		// try to unmarshal JSON data into LakekeeperWarehouseActionUpdateStorageCredential
+		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionUpdateStorageCredential)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperWarehouseActionUpdateStorageCredential, return on the first match
+		} else {
+			dst.LakekeeperWarehouseActionUpdateStorageCredential = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionUpdateStorageCredential: %s", err.Error())
 		}
 	}
 
@@ -789,6 +829,18 @@ func (dst *LakekeeperWarehouseAction) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	// check if the discriminator value is 'LakekeeperWarehouseActionRegisterTable'
+	if jsonDict["action"] == "LakekeeperWarehouseActionRegisterTable" {
+		// try to unmarshal JSON data into LakekeeperWarehouseActionRegisterTable
+		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionRegisterTable)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperWarehouseActionRegisterTable, return on the first match
+		} else {
+			dst.LakekeeperWarehouseActionRegisterTable = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionRegisterTable: %s", err.Error())
+		}
+	}
+
 	// check if the discriminator value is 'LakekeeperWarehouseActionRename'
 	if jsonDict["action"] == "LakekeeperWarehouseActionRename" {
 		// try to unmarshal JSON data into LakekeeperWarehouseActionRename
@@ -846,6 +898,18 @@ func (dst *LakekeeperWarehouseAction) UnmarshalJSON(data []byte) error {
 		} else {
 			dst.LakekeeperWarehouseActionUpdateStorage = nil
 			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionUpdateStorage: %s", err.Error())
+		}
+	}
+
+	// check if the discriminator value is 'LakekeeperWarehouseActionUpdateStorageCredential'
+	if jsonDict["action"] == "LakekeeperWarehouseActionUpdateStorageCredential" {
+		// try to unmarshal JSON data into LakekeeperWarehouseActionUpdateStorageCredential
+		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionUpdateStorageCredential)
+		if err == nil {
+			return nil // data stored in dst.LakekeeperWarehouseActionUpdateStorageCredential, return on the first match
+		} else {
+			dst.LakekeeperWarehouseActionUpdateStorageCredential = nil
+			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionUpdateStorageCredential: %s", err.Error())
 		}
 	}
 
@@ -946,6 +1010,10 @@ func (src LakekeeperWarehouseAction) MarshalJSON() ([]byte, error) {
 		return json.Marshal(&src.LakekeeperWarehouseActionReadSubtreeGrants)
 	}
 
+	if src.LakekeeperWarehouseActionRegisterTable != nil {
+		return json.Marshal(&src.LakekeeperWarehouseActionRegisterTable)
+	}
+
 	if src.LakekeeperWarehouseActionRename != nil {
 		return json.Marshal(&src.LakekeeperWarehouseActionRename)
 	}
@@ -964,6 +1032,10 @@ func (src LakekeeperWarehouseAction) MarshalJSON() ([]byte, error) {
 
 	if src.LakekeeperWarehouseActionUpdateStorage != nil {
 		return json.Marshal(&src.LakekeeperWarehouseActionUpdateStorage)
+	}
+
+	if src.LakekeeperWarehouseActionUpdateStorageCredential != nil {
+		return json.Marshal(&src.LakekeeperWarehouseActionUpdateStorageCredential)
 	}
 
 	if src.LakekeeperWarehouseActionUse != nil {
@@ -1058,6 +1130,10 @@ func (obj *LakekeeperWarehouseAction) GetActualInstance() interface{} {
 		return obj.LakekeeperWarehouseActionReadSubtreeGrants
 	}
 
+	if obj.LakekeeperWarehouseActionRegisterTable != nil {
+		return obj.LakekeeperWarehouseActionRegisterTable
+	}
+
 	if obj.LakekeeperWarehouseActionRename != nil {
 		return obj.LakekeeperWarehouseActionRename
 	}
@@ -1076,6 +1152,10 @@ func (obj *LakekeeperWarehouseAction) GetActualInstance() interface{} {
 
 	if obj.LakekeeperWarehouseActionUpdateStorage != nil {
 		return obj.LakekeeperWarehouseActionUpdateStorage
+	}
+
+	if obj.LakekeeperWarehouseActionUpdateStorageCredential != nil {
+		return obj.LakekeeperWarehouseActionUpdateStorageCredential
 	}
 
 	if obj.LakekeeperWarehouseActionUse != nil {

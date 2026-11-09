@@ -25,6 +25,7 @@ const (
 	OPENFGAPROJECTACTION_GRANT_TAG_CREATOR    OpenFGAProjectAction = "grant_tag_creator"
 	OPENFGAPROJECTACTION_GRANT_CREATE         OpenFGAProjectAction = "grant_create"
 	OPENFGAPROJECTACTION_GRANT_DESCRIBE       OpenFGAProjectAction = "grant_describe"
+	OPENFGAPROJECTACTION_GRANT_WRITE          OpenFGAProjectAction = "grant_write"
 	OPENFGAPROJECTACTION_GRANT_MODIFY         OpenFGAProjectAction = "grant_modify"
 	OPENFGAPROJECTACTION_GRANT_SELECT         OpenFGAProjectAction = "grant_select"
 	OPENFGAPROJECTACTION_GRANT_PROJECT_ADMIN  OpenFGAProjectAction = "grant_project_admin"
@@ -39,6 +40,7 @@ var AllowedOpenFGAProjectActionEnumValues = []OpenFGAProjectAction{
 	"grant_tag_creator",
 	"grant_create",
 	"grant_describe",
+	"grant_write",
 	"grant_modify",
 	"grant_select",
 	"grant_project_admin",

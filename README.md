@@ -42,6 +42,7 @@ with an older Lakekeeper than the row below is unsupported.
 <!-- BEGIN compatibility-matrix -->
 | Client version | Minimum Lakekeeper version |
 | -------------- | -------------------------- |
+| `0.2.x`        | `v0.15.0`                  |
 | `0.1.x`        | `v0.12.0`                  |
 <!-- END compatibility-matrix -->
 

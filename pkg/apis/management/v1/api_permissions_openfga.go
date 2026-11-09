@@ -26,10 +26,17 @@ type ApiCheckRequest struct {
 	ctx          context.Context
 	ApiService   *PermissionsOpenfgaAPIService
 	checkRequest *CheckRequest
+	xProjectId   *string
 }
 
 func (r ApiCheckRequest) CheckRequest(checkRequest CheckRequest) ApiCheckRequest {
 	r.checkRequest = &checkRequest
+	return r
+}
+
+// Project ID (optional). Used only for project checks whose body omits &#x60;project-id&#x60;; a &#x60;project-id&#x60; in the body takes precedence. In a batch check this applies to each item. If neither is set, the default project is used when it is enabled; otherwise the check fails.
+func (r ApiCheckRequest) XProjectId(xProjectId string) ApiCheckRequest {
+	r.xProjectId = &xProjectId
 	return r
 }
 
@@ -91,6 +98,9 @@ func (a *PermissionsOpenfgaAPIService) CheckExecute(r ApiCheckRequest) (*CheckRe
 	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	if r.xProjectId != nil {
+		parameterAddToHeaderOrQuery(localVarHeaderParams, "x-project-id", r.xProjectId, "simple", "")
 	}
 	// body params
 	localVarPostBody = r.checkRequest
@@ -1609,6 +1619,7 @@ type ApiGetProjectAccessRequest struct {
 	ApiService    *PermissionsOpenfgaAPIService
 	principalUser *string
 	principalRole *string
+	xProjectId    *string
 }
 
 // The user to show actions for. If neither user nor role is specified, shows actions for the current user.
@@ -1620,6 +1631,12 @@ func (r ApiGetProjectAccessRequest) PrincipalUser(principalUser string) ApiGetPr
 // The role to show actions for. If neither user nor role is specified, shows actions for the current user.
 func (r ApiGetProjectAccessRequest) PrincipalRole(principalRole string) ApiGetProjectAccessRequest {
 	r.principalRole = &principalRole
+	return r
+}
+
+// Optional project ID
+func (r ApiGetProjectAccessRequest) XProjectId(xProjectId string) ApiGetProjectAccessRequest {
+	r.xProjectId = &xProjectId
 	return r
 }
 
@@ -1692,6 +1709,9 @@ func (a *PermissionsOpenfgaAPIService) GetProjectAccessExecute(r ApiGetProjectAc
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
+	if r.xProjectId != nil {
+		parameterAddToHeaderOrQuery(localVarHeaderParams, "x-project-id", r.xProjectId, "simple", "")
+	}
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -1760,7 +1780,7 @@ GetProjectAccessById Get my access to a project
 or `/management/v1/project/actions` for Catalog permissions instead.
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param projectId Project ID (optional; falls back to the default project if not provided)
+	@param projectId Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 	@return ApiGetProjectAccessByIdRequest
 
 Deprecated
@@ -1862,11 +1882,18 @@ type ApiGetProjectAssignmentsRequest struct {
 	ctx        context.Context
 	ApiService *PermissionsOpenfgaAPIService
 	relations  *[]ProjectRelation
+	xProjectId *string
 }
 
 // Relations to be loaded. If not specified, all relations are returned.
 func (r ApiGetProjectAssignmentsRequest) Relations(relations []ProjectRelation) ApiGetProjectAssignmentsRequest {
 	r.relations = &relations
+	return r
+}
+
+// Optional project ID
+func (r ApiGetProjectAssignmentsRequest) XProjectId(xProjectId string) ApiGetProjectAssignmentsRequest {
+	r.xProjectId = &xProjectId
 	return r
 }
 
@@ -1929,6 +1956,9 @@ func (a *PermissionsOpenfgaAPIService) GetProjectAssignmentsExecute(r ApiGetProj
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
+	if r.xProjectId != nil {
+		parameterAddToHeaderOrQuery(localVarHeaderParams, "x-project-id", r.xProjectId, "simple", "")
+	}
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -1989,7 +2019,7 @@ GetProjectAssignmentsById Get user and role assignments to a project
 **Deprecated:** Use `/management/v1/permissions/project/assignments` instead.
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param projectId Project ID (optional; falls back to the default project if not provided)
+	@param projectId Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 	@return ApiGetProjectAssignmentsByIdRequest
 
 Deprecated
@@ -3903,10 +3933,17 @@ type ApiUpdateProjectAssignmentsRequest struct {
 	ctx                             context.Context
 	ApiService                      *PermissionsOpenfgaAPIService
 	updateProjectAssignmentsRequest *UpdateProjectAssignmentsRequest
+	xProjectId                      *string
 }
 
 func (r ApiUpdateProjectAssignmentsRequest) UpdateProjectAssignmentsRequest(updateProjectAssignmentsRequest UpdateProjectAssignmentsRequest) ApiUpdateProjectAssignmentsRequest {
 	r.updateProjectAssignmentsRequest = &updateProjectAssignmentsRequest
+	return r
+}
+
+// Optional project ID
+func (r ApiUpdateProjectAssignmentsRequest) XProjectId(xProjectId string) ApiUpdateProjectAssignmentsRequest {
+	r.xProjectId = &xProjectId
 	return r
 }
 
@@ -3966,6 +4003,9 @@ func (a *PermissionsOpenfgaAPIService) UpdateProjectAssignmentsExecute(r ApiUpda
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
+	if r.xProjectId != nil {
+		parameterAddToHeaderOrQuery(localVarHeaderParams, "x-project-id", r.xProjectId, "simple", "")
+	}
 	// body params
 	localVarPostBody = r.updateProjectAssignmentsRequest
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
@@ -4016,7 +4056,7 @@ func (r ApiUpdateProjectAssignmentsByIdRequest) Execute() (*http.Response, error
 UpdateProjectAssignmentsById Update permissions for a project
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param projectId Project ID (optional; falls back to the default project if not provided)
+	@param projectId Project ID (optional). If omitted, the default project is used when it is enabled; otherwise the request fails.
 	@return ApiUpdateProjectAssignmentsByIdRequest
 */
 func (a *PermissionsOpenfgaAPIService) UpdateProjectAssignmentsById(ctx context.Context, projectId string) ApiUpdateProjectAssignmentsByIdRequest {

@@ -25,6 +25,7 @@ const (
 	TABLERELATION_MANAGE_GRANTS TableRelation = "manage_grants"
 	TABLERELATION_DESCRIBE      TableRelation = "describe"
 	TABLERELATION_SELECT        TableRelation = "select"
+	TABLERELATION_WRITE         TableRelation = "write"
 	TABLERELATION_MODIFY        TableRelation = "modify"
 	TABLERELATION_MANAGE_TAGS   TableRelation = "manage_tags"
 )
@@ -36,6 +37,7 @@ var AllowedTableRelationEnumValues = []TableRelation{
 	"manage_grants",
 	"describe",
 	"select",
+	"write",
 	"modify",
 	"manage_tags",
 }

@@ -24,6 +24,7 @@ type ViewAssignment struct {
 	ViewAssignmentOwnership    *ViewAssignmentOwnership
 	ViewAssignmentPassGrants   *ViewAssignmentPassGrants
 	ViewAssignmentSelect       *ViewAssignmentSelect
+	ViewAssignmentWrite        *ViewAssignmentWrite
 }
 
 // ViewAssignmentDescribeAsViewAssignment is a convenience function that returns ViewAssignmentDescribe wrapped in ViewAssignment
@@ -72,6 +73,13 @@ func ViewAssignmentPassGrantsAsViewAssignment(v *ViewAssignmentPassGrants) ViewA
 func ViewAssignmentSelectAsViewAssignment(v *ViewAssignmentSelect) ViewAssignment {
 	return ViewAssignment{
 		ViewAssignmentSelect: v,
+	}
+}
+
+// ViewAssignmentWriteAsViewAssignment is a convenience function that returns ViewAssignmentWrite wrapped in ViewAssignment
+func ViewAssignmentWriteAsViewAssignment(v *ViewAssignmentWrite) ViewAssignment {
+	return ViewAssignment{
+		ViewAssignmentWrite: v,
 	}
 }
 
@@ -169,6 +177,18 @@ func (dst *ViewAssignment) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	// check if the discriminator value is 'write'
+	if jsonDict["type"] == "write" {
+		// try to unmarshal JSON data into ViewAssignmentWrite
+		err = json.Unmarshal(data, &dst.ViewAssignmentWrite)
+		if err == nil {
+			return nil // data stored in dst.ViewAssignmentWrite, return on the first match
+		} else {
+			dst.ViewAssignmentWrite = nil
+			return fmt.Errorf("failed to unmarshal ViewAssignment as ViewAssignmentWrite: %s", err.Error())
+		}
+	}
+
 	// check if the discriminator value is 'ViewAssignmentDescribe'
 	if jsonDict["type"] == "ViewAssignmentDescribe" {
 		// try to unmarshal JSON data into ViewAssignmentDescribe
@@ -253,6 +273,18 @@ func (dst *ViewAssignment) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	// check if the discriminator value is 'ViewAssignmentWrite'
+	if jsonDict["type"] == "ViewAssignmentWrite" {
+		// try to unmarshal JSON data into ViewAssignmentWrite
+		err = json.Unmarshal(data, &dst.ViewAssignmentWrite)
+		if err == nil {
+			return nil // data stored in dst.ViewAssignmentWrite, return on the first match
+		} else {
+			dst.ViewAssignmentWrite = nil
+			return fmt.Errorf("failed to unmarshal ViewAssignment as ViewAssignmentWrite: %s", err.Error())
+		}
+	}
+
 	return nil
 }
 
@@ -284,6 +316,10 @@ func (src ViewAssignment) MarshalJSON() ([]byte, error) {
 
 	if src.ViewAssignmentSelect != nil {
 		return json.Marshal(&src.ViewAssignmentSelect)
+	}
+
+	if src.ViewAssignmentWrite != nil {
+		return json.Marshal(&src.ViewAssignmentWrite)
 	}
 
 	return nil, nil // no data in oneOf schemas
@@ -320,6 +356,10 @@ func (obj *ViewAssignment) GetActualInstance() interface{} {
 
 	if obj.ViewAssignmentSelect != nil {
 		return obj.ViewAssignmentSelect
+	}
+
+	if obj.ViewAssignmentWrite != nil {
+		return obj.ViewAssignmentWrite
 	}
 
 	// all schemas are nil

@@ -51,6 +51,7 @@ func TestPermissions_Project_GetAccess(t *testing.T) {
 		managementv1.PROJECTACTION_GRANT_DATA_ADMIN,
 		managementv1.PROJECTACTION_GET_ENDPOINT_STATISTICS,
 		managementv1.PROJECTACTION_GRANT_TAG_CREATOR,
+		managementv1.PROJECTACTION_GRANT_WRITE,
 	}
 	assertAllowedActionsSubset(t, want, resp.AllowedActions, managementv1.AllowedProjectActionEnumValues)
 }
