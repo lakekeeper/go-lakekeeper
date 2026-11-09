@@ -729,5 +729,6 @@ Façade tests live in `package client_test` (an internal test importing
 The CLI binary entry point. Delegates immediately to
 `cmd/lkctl/commands.NewCommand()`, which builds the Cobra command tree.
 Commands call the `pkg/client` façades only, never a generated
-`*APIService`; they use `managementv1` for model types.
+`*APIService`; they use `managementv1` for model types. A `forbidigo` rule
+in `.golangci.yml` enforces this for `cmd/` (`make lint`).
 See [CLI.md](CLI.md) for the full command reference.

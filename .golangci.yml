@@ -19,6 +19,7 @@ linters:
   enable:
     - errorlint
     - exptostd
+    - forbidigo
     - gocritic
     - gomodguard
     - govet
@@ -42,9 +43,26 @@ linters:
       - legacy
       - std-error-handling
 
+    rules:
+      # lkctl calls the pkg/client façades only; the generated services are
+      # the SDK's escape hatch, not the CLI's.
+      - path-except: ^cmd/
+        linters:
+          - forbidigo
+
     warn-unused: true
 
   settings:
+    forbidigo:
+      analyze-types: true
+      forbid:
+        - pattern: ^client\.Client\.(APIClient|[A-Za-z]+API)$
+          pkg: ^github\.com/lakekeeper/go-lakekeeper/pkg/client$
+          msg: call the pkg/client façade instead of the generated service
+        - pattern: ^managementv1\.(NewAPIClient|APIClient|[A-Za-z]+APIService)(\..*)?$
+          pkg: ^github\.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1$
+          msg: call the pkg/client façade instead of the generated service
+
     gocritic:
       enable-all: true
       disabled-checks:
