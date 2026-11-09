@@ -119,7 +119,10 @@ func WithBackoff(backoff retryablehttp.Backoff) Option {
 	}
 }
 
-// WithErrorHandler overrides retryablehttp's ErrorHandler.
+// WithErrorHandler overrides the ErrorHandler retryablehttp calls once
+// retries are exhausted. The default is retryablehttp.PassthroughErrorHandler,
+// which returns the last response so the façades report its status as an
+// *APIError. A handler that drops the response loses that.
 func WithErrorHandler(handler retryablehttp.ErrorHandler) Option {
 	return func(s *settings) error {
 		s.errorHandler = handler

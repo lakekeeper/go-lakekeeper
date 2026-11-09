@@ -250,6 +250,10 @@ func newHTTPClient(as core.AuthSource, s settings) *http.Client {
 	if s.backoff != nil {
 		retry.Backoff = s.backoff
 	}
+	// Hand the last response back once retries run out. retryablehttp's
+	// default closes it and returns a bare "giving up after N attempt(s)"
+	// error, so a 429 or 5xx would never reach WrapAPIError as an APIError.
+	retry.ErrorHandler = retryablehttp.PassthroughErrorHandler
 	if s.errorHandler != nil {
 		retry.ErrorHandler = s.errorHandler
 	}

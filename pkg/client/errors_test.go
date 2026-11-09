@@ -6,7 +6,9 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"sync/atomic"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -121,6 +123,30 @@ func TestFacadeError_NoBody(t *testing.T) {
 	require.Nil(t, apiErr.Model)
 	var genErr *managementv1.GenericOpenAPIError
 	require.ErrorAs(t, err, &genErr, "errors.As must reach the generated error")
+}
+
+func TestFacadeError_RetriesExhaustedStillAPIError(t *testing.T) {
+	t.Parallel()
+	var attempts atomic.Int32
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		attempts.Add(1)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusServiceUnavailable)
+		_, _ = w.Write([]byte(`{"error":{"code":503,"message":"try later","type":"Unavailable","stack":[]}}`))
+	}))
+	t.Cleanup(srv.Close)
+
+	c, err := client.New(t.Context(), srv.URL, "tok",
+		client.WithRetryMax(1), client.WithRetryWait(time.Millisecond, time.Millisecond))
+	require.NoError(t, err)
+
+	_, err = c.Roles.Get(t.Context(), "1234", client.WithProject("p"))
+
+	require.Equal(t, int32(2), attempts.Load(), "the request must have been retried")
+	var apiErr *client.APIError
+	require.ErrorAs(t, err, &apiErr, "want *client.APIError, got %T: %v", err, err)
+	require.Equal(t, http.StatusServiceUnavailable, apiErr.StatusCode)
+	require.Contains(t, string(apiErr.Body), "try later")
 }
 
 func TestFacadeError_CancelledContextKeepsChain(t *testing.T) {
