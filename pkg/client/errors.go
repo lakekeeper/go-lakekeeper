@@ -74,14 +74,21 @@ func (e *APIError) Unwrap() error { return e.err }
 // op names the operation and prefixes the message. resp may be nil; the
 // status is then unknown (StatusCode 0). WrapAPIError returns nil for a nil
 // err, an *APIError when err carries a generated
-// *managementv1.GenericOpenAPIError, and otherwise err wrapped with %w
-// (transport failure, context cancellation), so the chain stays intact.
+// *managementv1.GenericOpenAPIError for an error status, and otherwise err
+// wrapped with %w (transport failure, context cancellation, or a 2xx body
+// that failed to decode), so the chain stays intact.
 func WrapAPIError(op string, err error, resp *http.Response) error {
 	if err == nil {
 		return nil
 	}
 	var genErr *managementv1.GenericOpenAPIError
 	if errors.As(err, &genErr) {
+		if resp != nil && resp.StatusCode < http.StatusMultipleChoices {
+			// The server answered with success; it is the response body
+			// that failed to decode. That is not an error status, so it is
+			// not an APIError, and the decode message is the cause to show.
+			return fmt.Errorf("%s: decode %s response: %w", op, resp.Status, err)
+		}
 		apiErr := &APIError{op: op, err: err, Body: genErr.Body(), status: genErr.Error()}
 		var decoded managementv1.IcebergErrorResponse
 		if json.Unmarshal(apiErr.Body, &decoded) == nil {
@@ -90,6 +97,12 @@ func WrapAPIError(op string, err error, resp *http.Response) error {
 		if resp != nil {
 			apiErr.StatusCode = resp.StatusCode
 			apiErr.status = resp.Status
+			// The generated message starts with the status line, unless
+			// decoding the error body failed (a 4xx with an HTML page, for
+			// example). Keep that decode error instead of dropping it.
+			if msg := genErr.Error(); !strings.HasPrefix(msg, resp.Status) {
+				apiErr.status += " (" + msg + ")"
+			}
 		}
 		return apiErr
 	}

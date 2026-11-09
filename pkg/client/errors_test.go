@@ -125,6 +125,45 @@ func TestFacadeError_NoBody(t *testing.T) {
 	require.ErrorAs(t, err, &genErr, "errors.As must reach the generated error")
 }
 
+func TestFacadeError_NonJSONClientErrorKeepsDecodeCause(t *testing.T) {
+	t.Parallel()
+	mux, c := testutil.ServerMux(t)
+	mux.HandleFunc("GET /management/v1/role/{id}", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusUnauthorized)
+		_, _ = w.Write([]byte("<html>proxy login</html>"))
+	})
+
+	_, err := c.Roles.Get(t.Context(), "1234", client.WithProject("p"))
+
+	var apiErr *client.APIError
+	require.ErrorAs(t, err, &apiErr)
+	require.Equal(t, http.StatusUnauthorized, apiErr.StatusCode)
+	require.ErrorContains(t, err, "get role: 401 Unauthorized (")
+	require.ErrorContains(t, err, "invalid character '<'", "the decode error must stay in the text")
+	require.ErrorContains(t, err, "<html>proxy login</html>")
+}
+
+func TestFacadeError_UndecodableSuccessIsNotAPIError(t *testing.T) {
+	t.Parallel()
+	mux, c := testutil.ServerMux(t)
+	mux.HandleFunc("GET /management/v1/role/{id}", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`{"id":42}`))
+	})
+
+	_, err := c.Roles.Get(t.Context(), "1234", client.WithProject("p"))
+
+	require.Error(t, err)
+	var apiErr *client.APIError
+	require.NotErrorAs(t, err, &apiErr, "a 2xx is not an error status")
+	require.ErrorContains(t, err, "get role: decode 200 OK response: ")
+	var genErr *managementv1.GenericOpenAPIError
+	require.ErrorAs(t, err, &genErr, "the generated error stays in the chain")
+	require.JSONEq(t, `{"id":42}`, string(genErr.Body()))
+}
+
 func TestFacadeError_RetriesExhaustedStillAPIError(t *testing.T) {
 	t.Parallel()
 	var attempts atomic.Int32
