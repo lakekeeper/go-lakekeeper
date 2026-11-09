@@ -164,7 +164,9 @@ mutually exclusive on the singular `access` command.
 ### `lkctl warehouse`
 
 Warehouses are project-scoped. Use `--project` / `-p` to specify the
-project UUID.
+project UUID. When omitted, no project is sent and the server's default
+project is used (the nil UUID unless the operator configured another; an
+error if the operator disabled it).
 
 ```sh
 # List warehouses in a project (filter with --status active|inactive, repeatable)

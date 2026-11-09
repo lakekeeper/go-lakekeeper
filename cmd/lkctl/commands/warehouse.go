@@ -9,7 +9,6 @@ import (
 	"text/tabwriter"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
@@ -28,7 +27,7 @@ func newWarehouseCmd(opts *clientOptions) *cobra.Command {
 		},
 	}
 
-	cmd.PersistentFlags().StringVarP(&project, "project", "p", uuid.Nil.String(), "Select a project")
+	addProjectFlag(cmd, &project)
 
 	cmd.AddCommand(newWarehouseListCmd(opts, &project))
 	cmd.AddCommand(newWarehouseGetCmd(opts))
@@ -65,17 +64,13 @@ func newWarehouseListCmd(opts *clientOptions, project *string) *cobra.Command {
 				return err
 			}
 
-			req := c.WarehouseAPI.ListWarehouses(ctx).ProjectId(*project)
-			if len(status) > 0 {
-				vals := make([]managementv1.WarehouseStatus, 0, len(status))
-				for _, s := range status {
-					vals = append(vals, managementv1.WarehouseStatus(s))
-				}
-				req = req.WarehouseStatus(vals)
+			listOpts := &client.ListWarehousesOptions{}
+			for _, s := range status {
+				listOpts.Status = append(listOpts.Status, managementv1.WarehouseStatus(s))
 			}
-			resp, _, err := req.Execute()
+			resp, err := c.Warehouses.List(ctx, listOpts, client.WithProject(*project))
 			if err != nil {
-				return client.WrapAPIError("list warehouses", err, nil)
+				return err
 			}
 
 			switch output {
@@ -167,10 +162,14 @@ func newWarehouseCreateCmd(opts *clientOptions, project *string) *cobra.Command 
 			if err != nil {
 				return err
 			}
-			if req.ProjectId.Get() == nil {
-				req.SetProjectId(*project)
-			} else if *req.ProjectId.Get() != *project {
-				return errors.New("project id in config does not match --project")
+			// Without --project the config decides; if it names no project
+			// either, the server applies its default project.
+			if *project != "" {
+				if req.ProjectId.Get() == nil {
+					req.SetProjectId(*project)
+				} else if req.GetProjectId() != *project {
+					return errors.New("project id in config does not match --project")
+				}
 			}
 			wh, _, err := c.WarehouseAPI.CreateWarehouse(ctx).CreateWarehouseRequest(req).Execute()
 			if err != nil {

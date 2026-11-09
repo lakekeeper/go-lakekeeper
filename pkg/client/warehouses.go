@@ -37,9 +37,22 @@ func (w *Warehouses) Delete(ctx context.Context, id string) error {
 	return WrapAPIError("delete warehouse", err, resp)
 }
 
-// List returns warehouses scoped to the given project.
-func (w *Warehouses) List(ctx context.Context, projectID string) (*managementv1.ListWarehousesResponse, error) {
-	out, resp, err := w.api.ListWarehouses(ctx).ProjectId(projectID).Execute()
+// ListWarehousesOptions holds the query parameters of Warehouses.List. A nil
+// pointer or a zero field sends nothing for that parameter.
+type ListWarehousesOptions struct {
+	// Status keeps only warehouses in one of these states. Empty: the
+	// server's default filter applies.
+	Status []managementv1.WarehouseStatus
+}
+
+// List returns the warehouses of a project. Name the project with
+// WithProject; without it the server applies its default project.
+func (w *Warehouses) List(ctx context.Context, opts *ListWarehousesOptions, callOpts ...CallOption) (*managementv1.ListWarehousesResponse, error) {
+	req := withProject(w.api.ListWarehouses(ctx), callOpts)
+	if opts != nil && len(opts.Status) > 0 {
+		req = req.WarehouseStatus(opts.Status)
+	}
+	out, resp, err := req.Execute()
 	return out, WrapAPIError("list warehouses", err, resp)
 }
 

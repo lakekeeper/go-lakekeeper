@@ -23,6 +23,15 @@ type assignmentsOpts struct {
 	relations []string
 }
 
+// addProjectFlag registers the persistent -p/--project flag of a resource
+// command. It has no default: when omitted, no project is sent and the server
+// applies its default project. Pass the value to a façade as
+// client.WithProject(project); an empty value sends nothing.
+func addProjectFlag(cmd *cobra.Command, project *string) {
+	cmd.PersistentFlags().StringVarP(project, "project", "p", "",
+		"Project ID; when omitted, the server's default project is used")
+}
+
 func addListFlags(cmd *cobra.Command, opts *listOpts) {
 	cmd.Flags().Int64Var(&opts.limit, "limit", 100, "Upper bound on the number of results returned to the client")
 	cmd.Flags().StringVar(&opts.token, "token", "", "Pagination token")

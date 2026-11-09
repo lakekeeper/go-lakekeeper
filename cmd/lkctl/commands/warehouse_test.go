@@ -2,6 +2,10 @@ package commands
 
 import (
 	"bytes"
+	"encoding/json"
+	"net/http"
+	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 	"testing"
@@ -11,7 +15,68 @@ import (
 	"github.com/stretchr/testify/require"
 
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
+	"github.com/lakekeeper/go-lakekeeper/pkg/testutil"
 )
+
+func TestWarehouseProjectFlag_DefaultsToServerDefaultProject(t *testing.T) {
+	t.Parallel()
+
+	flag := newWarehouseCmd(&clientOptions{}).PersistentFlags().Lookup("project")
+
+	require.NotNil(t, flag)
+	assert.Equal(t, "p", flag.Shorthand)
+	assert.Empty(t, flag.DefValue, "-p must not default to a client-side project")
+	assert.Contains(t, flag.Usage, "server's default project")
+}
+
+func TestWarehouseCreate_WithoutProjectFlagSendsNoProject(t *testing.T) {
+	t.Parallel()
+	mux, baseURL := testutil.NewServer(t)
+	reqs := testutil.Respond(t, mux, "POST /management/v1/warehouse", http.StatusCreated, `{
+	  "id": "9d6651da-5f19-11f1-ad69-1b7104fe3cf7", "warehouse-id": "9d6651da-5f19-11f1-ad69-1b7104fe3cf7",
+	  "name": "wh", "project-id": "00000000-0000-0000-0000-000000000000",
+	  "storage-profile": {"type": "s3", "bucket": "b", "region": "r", "flavor": "aws", "sts-enabled": false},
+	  "delete-profile": {"type": "hard"}, "status": "active", "protected": false,
+	  "allowed-format-versions": [1, 2, 3]}`)
+	config := filepath.Join(t.TempDir(), "wh.json")
+	require.NoError(t, os.WriteFile(config, []byte(`{"warehouse-name":"wh","storage-profile":{"type":"s3","bucket":"b","region":"r","sts-enabled":false}}`), 0o600))
+
+	out, err := runLkctl(t, baseURL, "warehouse", "create", "wh", "-f", config)
+
+	require.NoError(t, err)
+	assert.Equal(t, "Warehouse wh created with id 9d6651da-5f19-11f1-ad69-1b7104fe3cf7\n", out)
+	got := reqs.Last(t)
+	assert.NotContains(t, got.Header, "X-Project-Id")
+	var body map[string]any
+	require.NoError(t, json.Unmarshal(got.Body, &body))
+	assert.NotContains(t, body, "project-id", "without -p no project must be sent")
+}
+
+func TestWarehouseList_WithoutProjectFlagSendsNoProject(t *testing.T) {
+	t.Parallel()
+	mux, baseURL := testutil.NewServer(t)
+	reqs := testutil.Respond(t, mux, "GET /management/v1/warehouse", http.StatusOK, map[string]any{"warehouses": []any{}})
+
+	_, err := runLkctl(t, baseURL, "warehouse", "list")
+
+	require.NoError(t, err)
+	got := reqs.Last(t)
+	assert.NotContains(t, got.Header, "X-Project-Id", "without -p no project header must be sent")
+	assert.False(t, got.Query.Has("projectId"), "the deprecated projectId query parameter must not be sent")
+}
+
+func TestWarehouseList_ProjectFlagSendsHeader(t *testing.T) {
+	t.Parallel()
+	mux, baseURL := testutil.NewServer(t)
+	reqs := testutil.Respond(t, mux, "GET /management/v1/warehouse", http.StatusOK, map[string]any{"warehouses": []any{}})
+
+	_, err := runLkctl(t, baseURL, "warehouse", "list", "-p", "11111111-1111-1111-1111-111111111111")
+
+	require.NoError(t, err)
+	got := reqs.Last(t)
+	assert.Equal(t, "11111111-1111-1111-1111-111111111111", got.Header.Get("x-project-id"))
+	assert.False(t, got.Query.Has("projectId"), "the deprecated projectId query parameter must not be sent")
+}
 
 func TestNewWarehouseCmdSubcommands(t *testing.T) {
 	t.Parallel()

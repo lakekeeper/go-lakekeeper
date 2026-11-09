@@ -180,9 +180,30 @@ wh, _, err := c.WarehouseAPI.CreateWarehouse(ctx). // generator — full control
     CreateWarehouseRequest(*req).Execute()
 ```
 
-The façades cover roughly 90% of `lkctl`'s call sites. For endpoints with
-extra query params, custom request options, or where you need the raw
-`*http.Response`, reach for the embedded generated service handles below.
+For endpoints without a façade, custom request options, or where you need
+the raw `*http.Response`, reach for the embedded generated service handles
+below.
+
+### Façade conventions
+
+- **Entities and request bodies** are the generated `managementv1` models.
+  Read fields through their `GetX()` accessors.
+- **Query parameters** are the only façade-owned types: one
+  `<Operation>Options` struct per list or query operation (for example
+  `client.ListWarehousesOptions`), passed as a pointer. `nil` or a zero
+  field sends nothing for that parameter.
+- **List results** are the generated list response; page with its
+  `GetNextPageToken()` accessor.
+- **Project scoping** is a trailing `...client.CallOption`;
+  `client.WithProject(id)` sends `x-project-id`, and omitting it lets the
+  server apply its default project. See
+  [ARCHITECTURE.md](ARCHITECTURE.md#project-scoping).
+
+```go
+resp, err := c.Warehouses.List(ctx,
+    &client.ListWarehousesOptions{Status: []managementv1.WarehouseStatus{managementv1.WAREHOUSESTATUS_ACTIVE}},
+    client.WithProject(projectID))
+```
 
 ### Errors
 
@@ -615,8 +636,18 @@ Build-time version info injected via `ldflags` by goreleaser and
 
 **Import path:** `github.com/lakekeeper/go-lakekeeper/pkg/testutil`
 
-Test helpers shared across unit and integration tests. Not intended for
-use outside tests.
+The `httptest` harness for façade and `lkctl` command tests. Not intended
+for use outside tests.
+
+| Helper | Purpose |
+|---|---|
+| `NewServer(t)` | Starts a test server; returns its `*http.ServeMux` and base URL |
+| `ServerMux(t)` | `NewServer` plus a `*client.Client` pointed at it (static token, no retries) |
+| `Respond(t, mux, pattern, status, body)` | Registers a canned response and returns a `*RequestLog` |
+| `RequestLog.Last(t)` / `Len()` | The recorded requests as `CapturedRequest` (method, path, query, header, body) |
+
+Façade tests live in `package client_test` (an internal test importing
+`testutil` would be an import cycle).
 
 ---
 

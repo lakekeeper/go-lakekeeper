@@ -150,10 +150,29 @@ use), the option is a no-op — the constructor never calls
 
 ## Project Scoping
 
-Resources that belong to a project (warehouses, roles) are accessed
-through the generated services with the project ID supplied per call.
-The wire convention is the `x-project-id` header; the generated service
-methods accept it as a setter on the fluent request builder
+Resources that belong to a project (warehouses, roles) take the project
+per call. A project-scoped façade method accepts a trailing, optional
+`...client.CallOption`; `client.WithProject(id)` names the project:
+
+```go
+c.Warehouses.List(ctx, nil, client.WithProject(projectID)) // x-project-id: <projectID>
+c.Warehouses.List(ctx, nil)                                // no project sent
+```
+
+- With `WithProject`, the façade sends the `x-project-id` header.
+- Without it (or with an empty id), the façade sends no project. The
+  server then applies its **default project**: the nil UUID unless the
+  operator set `LAKEKEEPER__DEFAULT_PROJECT_ID`. If the operator disabled
+  the default project, the server answers 400 `ProjectIdMissing`.
+- The façades never send the deprecated `projectId` query parameter or
+  `project-id` body field. When both are sent, Lakekeeper lets the
+  deprecated one win over the header.
+
+The one place that decides how a project is sent is the unexported
+`withProject` helper in `pkg/client/call_options.go`. `lkctl`'s
+`-p/--project` flag has no default and maps straight to `WithProject`.
+
+Callers of the generated services set the header themselves
 (`c.RoleAPI.ListRoles(ctx).XProjectId(projectID).Execute()`). Project-
 independent resources (`ServerAPI`, `UserAPI`, `ProjectAPI`) do not need
 the header.

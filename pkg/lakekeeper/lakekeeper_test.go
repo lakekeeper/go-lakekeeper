@@ -1,6 +1,7 @@
 package lakekeeper_test
 
 import (
+	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -8,6 +9,7 @@ import (
 
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
 	"github.com/lakekeeper/go-lakekeeper/pkg/lakekeeper"
+	"github.com/lakekeeper/go-lakekeeper/pkg/testutil"
 )
 
 // TestUmbrellaTypeIdentity confirms the umbrella's type aliases resolve to
@@ -61,4 +63,21 @@ func TestUmbrellaPermissionConsts(t *testing.T) {
 	assert.Equal(t, "user", row.PrincipalType)
 	assert.Equal(t, "alice", row.PrincipalID)
 	assert.Equal(t, "admin", row.Relation)
+}
+
+// TestUmbrellaFacadeCallOptions confirms the umbrella exposes the façade call
+// option and list options, so umbrella-only callers can scope a warehouse
+// list to a project.
+func TestUmbrellaFacadeCallOptions(t *testing.T) {
+	t.Parallel()
+
+	mux, c := testutil.ServerMux(t)
+	reqs := testutil.Respond(t, mux, "GET /management/v1/warehouse", http.StatusOK, map[string]any{"warehouses": []any{}})
+
+	var opts []lakekeeper.CallOption
+	opts = append(opts, lakekeeper.WithProject("11111111-1111-1111-1111-111111111111"))
+	_, err := c.Warehouses.List(t.Context(), &lakekeeper.ListWarehousesOptions{}, opts...)
+
+	require.NoError(t, err)
+	assert.Equal(t, "11111111-1111-1111-1111-111111111111", reqs.Last(t).Header.Get("x-project-id"))
 }

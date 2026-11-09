@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
+	"github.com/lakekeeper/go-lakekeeper/pkg/client"
 	"github.com/lakekeeper/go-lakekeeper/pkg/storage/credential"
 	"github.com/lakekeeper/go-lakekeeper/pkg/storage/profile"
 )
@@ -57,6 +58,48 @@ func TestWarehouse_Create_Default(t *testing.T) {
 	require.NotNil(t, got.StorageProfile.StorageProfileS3)
 	assert.Equal(t, "testacc", got.StorageProfile.StorageProfileS3.Bucket)
 	assert.Equal(t, "eu-local-1", got.StorageProfile.StorageProfileS3.Region)
+}
+
+func warehouseIDs(resp *managementv1.ListWarehousesResponse) []string {
+	ids := make([]string, 0, len(resp.GetWarehouses()))
+	for _, wh := range resp.GetWarehouses() {
+		ids = append(ids, wh.GetWarehouseId())
+	}
+	return ids
+}
+
+func TestWarehouse_List_ProjectScoping(t *testing.T) {
+	t.Parallel()
+	c := sharedClient
+	project := MustCreateProject(t, c)
+	whID, _ := MustCreateWarehouse(t, c, project)
+
+	scoped, err := c.Warehouses.List(t.Context(), nil, client.WithProject(project))
+	require.NoError(t, err)
+	assert.Contains(t, warehouseIDs(scoped), whID, "a list scoped to the project must include its warehouse")
+
+	unscoped, err := c.Warehouses.List(t.Context(), nil)
+	require.NoError(t, err)
+	assert.NotContains(t, warehouseIDs(unscoped), whID, "a list without a project must use the default project")
+}
+
+func TestWarehouse_List_StatusFilter(t *testing.T) {
+	t.Parallel()
+	c := sharedClient
+	project := MustCreateProject(t, c)
+	whID, _ := MustCreateWarehouse(t, c, project)
+
+	active, err := c.Warehouses.List(t.Context(), &client.ListWarehousesOptions{
+		Status: []managementv1.WarehouseStatus{managementv1.WAREHOUSESTATUS_ACTIVE},
+	}, client.WithProject(project))
+	require.NoError(t, err)
+	assert.Contains(t, warehouseIDs(active), whID)
+
+	inactive, err := c.Warehouses.List(t.Context(), &client.ListWarehousesOptions{
+		Status: []managementv1.WarehouseStatus{managementv1.WAREHOUSESTATUS_INACTIVE},
+	}, client.WithProject(project))
+	require.NoError(t, err)
+	assert.NotContains(t, warehouseIDs(inactive), whID, "an active warehouse must not match the inactive filter")
 }
 
 func TestWarehouse_Create_NewProject(t *testing.T) {

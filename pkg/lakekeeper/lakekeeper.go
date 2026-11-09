@@ -82,6 +82,12 @@ type (
 
 	// APIError is the error a façade returns for a server error response.
 	APIError = client.APIError
+
+	// CallOption configures one façade call (see WithProject).
+	CallOption = client.CallOption
+
+	// ListWarehousesOptions holds the query parameters of Warehouses.List.
+	ListWarehousesOptions = client.ListWarehousesOptions
 )
 
 var (
@@ -97,6 +103,8 @@ var (
 	WithInitialBootstrap = client.WithInitialBootstrap
 
 	WrapAPIError = client.WrapAPIError
+
+	WithProject = client.WithProject
 )
 
 // Storage profile builders + option types.
