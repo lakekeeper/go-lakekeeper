@@ -149,7 +149,8 @@ func TestNew_InitialBootstrap_BootstrapErrorFailsConstruction(t *testing.T) {
 	_, err := client.New(t.Context(), baseURL, "test-token", client.WithoutRetries(),
 		client.WithInitialBootstrap(true, true, nil))
 
-	require.ErrorContains(t, err, "bootstrap: bootstrap: 403 Forbidden")
+	require.ErrorContains(t, err, "bootstrap: 403 Forbidden")
+	require.NotContains(t, err.Error(), "bootstrap: bootstrap:")
 	var apiErr *client.APIError
 	require.ErrorAs(t, err, &apiErr)
 	assert.Equal(t, http.StatusForbidden, apiErr.StatusCode)

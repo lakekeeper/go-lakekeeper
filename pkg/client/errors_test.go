@@ -2,6 +2,7 @@ package client_test
 
 import (
 	"context"
+	"encoding/json"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -284,4 +285,32 @@ func TestInitialBootstrapError_IsAPIError(t *testing.T) {
 	require.ErrorAs(t, err, &apiErr)
 	require.Equal(t, http.StatusUnauthorized, apiErr.StatusCode)
 	require.ErrorContains(t, err, "bad token")
+	require.True(t, strings.HasPrefix(err.Error(), "bootstrap: get server info: 401 Unauthorized"), "got %q", err)
+}
+
+func TestInitialBootstrapError_SinglePrefix(t *testing.T) {
+	t.Parallel()
+	mux := http.NewServeMux()
+	mux.HandleFunc("GET /management/v1/info", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		// Marshal through the SDK so the body has every required field.
+		_ = json.NewEncoder(w).Encode(managementv1.ServerInfo{
+			ServerId: "srv", Version: "0.15.0", LakekeeperVersion: "0.15.0",
+			AuthzBackend: "openfga", ManagedRoleProviders: []string{}, Queues: []string{},
+		})
+	})
+	mux.HandleFunc("POST /management/v1/bootstrap", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusConflict)
+		_, _ = w.Write([]byte(`{"error":{"code":409,"message":"already bootstrapped","type":"Conflict"}}`))
+	})
+	srv := httptest.NewServer(mux)
+	t.Cleanup(srv.Close)
+
+	_, err := client.New(t.Context(), srv.URL, "tok", client.WithoutRetries(),
+		client.WithInitialBootstrap(true, true, nil))
+
+	require.Error(t, err)
+	require.True(t, strings.HasPrefix(err.Error(), "bootstrap: 409 Conflict"), "got %q", err)
+	require.NotContains(t, err.Error(), "bootstrap: bootstrap:")
 }

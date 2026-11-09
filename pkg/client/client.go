@@ -128,8 +128,9 @@ func NewWithAuthSource(ctx context.Context, baseURL string, as core.AuthSource, 
 	}
 
 	if settings.bootstrap {
+		// runBootstrap's errors already start with "bootstrap: ".
 		if err := c.runBootstrap(ctx, settings); err != nil {
-			return nil, fmt.Errorf("bootstrap: %w", err)
+			return nil, err
 		}
 	}
 
@@ -199,7 +200,7 @@ func (c *Client) catalogTransportFactory(tlsConfig *tls.Config) (http.RoundTripp
 func (c *Client) runBootstrap(ctx context.Context, s settings) error {
 	info, err := c.Server.Info(ctx)
 	if err != nil {
-		return err
+		return fmt.Errorf("bootstrap: %w", err)
 	}
 	if info.GetBootstrapped() {
 		return nil
