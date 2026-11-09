@@ -219,6 +219,7 @@ type (
 	UserType          = managementv1.UserType
 	CreateUserRequest = managementv1.CreateUserRequest
 	UpdateUserRequest = managementv1.UpdateUserRequest
+	WhoamiResponse    = managementv1.WhoamiResponse
 
 	// Server types.
 	ServerInfo       = managementv1.ServerInfo
