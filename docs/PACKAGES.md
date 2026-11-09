@@ -184,6 +184,39 @@ The façades cover roughly 90% of `lkctl`'s call sites. For endpoints with
 extra query params, custom request options, or where you need the raw
 `*http.Response`, reach for the embedded generated service handles below.
 
+### Errors
+
+When the server answers with an error status, every façade returns a
+`*client.APIError`:
+
+| Field | Meaning |
+|---|---|
+| `StatusCode` | HTTP status code; `0` when unknown (no response was available) |
+| `Body` | Full raw response body; `Error()` includes it truncated to 1 KiB |
+| `Model` | Decoded `*managementv1.ErrorModel` (code, message, type); `nil` when the body does not parse |
+
+`APIError` unwraps to the generated `*managementv1.GenericOpenAPIError`,
+so `errors.As` reaches either type. Compare `StatusCode` to tell
+not-found from forbidden from conflict; there are no `IsNotFound`-style
+helpers. Transport failures and context cancellation are not `APIError`s;
+they come back wrapped with `%w`, so `errors.Is(err, context.Canceled)`
+works.
+
+`client.WrapAPIError(op, err, resp)` is the one constructor. Callers of
+the embedded generated services use it to get the same error the façades
+return:
+
+```go
+out, resp, err := c.TasksAPI.ListTasks(ctx, warehouseID).Execute()
+if err != nil {
+    return client.WrapAPIError("list tasks", err, resp)
+}
+```
+
+`resp` may be `nil`; the status is then unknown. `lkctl` commands that
+still call generated services directly pass `nil` until they move to a
+façade.
+
 ### Embedded service handles (generator-shaped fluent surface)
 
 Every generated service is exposed as a field on `*Client`:
@@ -388,7 +421,6 @@ without exchanging it through an IdP.
 |---|---|
 | `AuthRoundTripper` | `http.RoundTripper` that injects the `AuthSource`'s header on every outbound request. Used by `pkg/client` to wire auth into the generated client's underlying `*http.Client` |
 | `RequestOptionFunc`, `WithHeader`, `WithHeaders`, `WithContext`, `WithQueryParams` | Per-request modifiers |
-| `APIError`, `APIErrorFromResponse`, `APIErrorFromError`, `APIErrorFromMessage` | Structured error type plus factories |
 | `Ptr[T any](v T) *T` | Convenience helper for taking the address of a literal — useful when calling generated setters that expect `*T` |
 
 ---

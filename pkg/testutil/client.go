@@ -26,7 +26,7 @@ func ServerMux(t *testing.T) (*http.ServeMux, *client.Client) {
 	server := httptest.NewServer(mux)
 	t.Cleanup(server.Close)
 
-	c, err := client.New(t.Context(), server.URL, "", client.WithoutRetries())
+	c, err := client.New(t.Context(), server.URL, "test-token", client.WithoutRetries())
 	if err != nil {
 		t.Fatal(err)
 	}

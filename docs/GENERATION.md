@@ -37,8 +37,8 @@ adds or removes files produces an obvious diff.
 
 | Package | Purpose |
 |---|---|
-| [`pkg/client/`](../pkg/client/) | Facade over the generated `managementv1.APIClient`: auth wiring, retry layering, optional bootstrap, `CatalogV1` helper |
-| [`pkg/core/`](../pkg/core/) | `AuthSource` interface + three implementations, `AuthRoundTripper`, `RequestOption` helpers, `APIError` |
+| [`pkg/client/`](../pkg/client/) | Facade over the generated `managementv1.APIClient`: auth wiring, retry layering, optional bootstrap, `CatalogV1` helper, `APIError` |
+| [`pkg/core/`](../pkg/core/) | `AuthSource` interface + three implementations, `AuthRoundTripper`, `RequestOption` helpers |
 | [`pkg/permissions/`](../pkg/permissions/) | Generic `BuildAssignment[T]` / `DescribeAssignment` helpers for the generated `*Assignment` union types |
 | [`pkg/storage/profile/`](../pkg/storage/profile/) | Ergonomic builders for `StorageProfile{S3,Gcs,Adls}` |
 | [`pkg/storage/credential/`](../pkg/storage/credential/) | Ergonomic builders for `StorageCredential` variants |

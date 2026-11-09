@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
+	"github.com/lakekeeper/go-lakekeeper/pkg/client"
 )
 
 // newWhoamiCmd returns `lkctl whoami`, which prints the user identified by
@@ -28,7 +29,7 @@ func newWhoamiCmd(opts *clientOptions) *cobra.Command {
 			}
 			user, _, err := c.UserAPI.Whoami(ctx).Execute()
 			if err != nil {
-				return wrapAPIError("whoami", err)
+				return client.WrapAPIError("whoami", err, nil)
 			}
 
 			if output == "json" {

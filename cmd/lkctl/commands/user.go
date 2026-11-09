@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/cobra"
 
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
+	"github.com/lakekeeper/go-lakekeeper/pkg/client"
 )
 
 // newUserCmd returns `lkctl user`, the parent for user-management subcommands.
@@ -55,7 +56,7 @@ func newUserListCmd(opts *clientOptions) *cobra.Command {
 
 			resp, _, err := req.Execute()
 			if err != nil {
-				return wrapAPIError("list users", err)
+				return client.WrapAPIError("list users", err, nil)
 			}
 
 			switch output {
@@ -96,7 +97,7 @@ func newUserGetCmd(opts *clientOptions) *cobra.Command {
 
 			user, _, err := c.UserAPI.GetUser(ctx, args[0]).Execute()
 			if err != nil {
-				return wrapAPIError("get user", err)
+				return client.WrapAPIError("get user", err, nil)
 			}
 
 			switch output {
@@ -130,7 +131,7 @@ func newUserDeleteCmd(opts *clientOptions) *cobra.Command {
 			}
 
 			if _, err := c.UserAPI.DeleteUser(ctx, args[0]).Execute(); err != nil {
-				return wrapAPIError("delete user", err)
+				return client.WrapAPIError("delete user", err, nil)
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "User %s deleted\n", args[0])
 			return nil
@@ -179,7 +180,7 @@ func newUserCreateCmd(opts *clientOptions) *cobra.Command {
 
 			user, _, err := c.UserAPI.CreateUser(ctx).CreateUserRequest(*req).Execute()
 			if err != nil {
-				return wrapAPIError("create user", err)
+				return client.WrapAPIError("create user", err, nil)
 			}
 
 			switch output {

@@ -143,9 +143,9 @@ func (c *Client) CatalogV1(ctx context.Context, projectID, warehouse string, opt
 }
 
 func (c *Client) runBootstrap(ctx context.Context, s settings) error {
-	info, _, err := c.ServerAPI.GetServerInfo(ctx).Execute()
+	info, err := c.Server.Info(ctx)
 	if err != nil {
-		return fmt.Errorf("server info: %w", err)
+		return err
 	}
 	if info != nil && info.Bootstrapped {
 		return nil
@@ -158,10 +158,7 @@ func (c *Client) runBootstrap(ctx context.Context, s settings) error {
 		req.SetUserType(*s.bootstrapUserType)
 	}
 
-	if _, err := c.ServerAPI.Bootstrap(ctx).BootstrapRequest(*req).Execute(); err != nil {
-		return err
-	}
-	return nil
+	return c.Server.Bootstrap(ctx, req)
 }
 
 func newHTTPClient(as core.AuthSource, s settings) *http.Client {
