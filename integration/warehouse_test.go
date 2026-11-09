@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -29,35 +30,54 @@ func TestWarehouse_Create_Default(t *testing.T) {
 
 	name := randomName("test-wh-default")
 	req := managementv1.NewCreateWarehouseRequest(sp, name)
-	req.SetProjectId(defaultProjectID)
 	req.SetStorageCredential(sc)
 
-	wh, r, err := c.WarehouseAPI.CreateWarehouse(t.Context()).CreateWarehouseRequest(*req).Execute()
+	wh, err := c.Warehouses.Create(t.Context(), req, client.WithProject(defaultProjectID))
 	require.NoError(t, err)
-	assert.Equal(t, http.StatusCreated, r.StatusCode)
 	require.NotNil(t, wh)
 
 	t.Cleanup(func() {
-		r, err := c.WarehouseAPI.DeleteWarehouse(context.Background(), wh.WarehouseId).Execute()
-		if err != nil {
+		if err := c.Warehouses.Delete(context.Background(), wh.GetWarehouseId()); err != nil {
 			t.Errorf("delete warehouse: %v", err)
-			return
 		}
-		assert.Equal(t, http.StatusNoContent, r.StatusCode)
 	})
 
-	got, _, err := c.WarehouseAPI.GetWarehouse(t.Context(), wh.WarehouseId).Execute()
+	got, err := c.Warehouses.Get(t.Context(), wh.GetWarehouseId())
 	require.NoError(t, err)
 	require.NotNil(t, got)
 
-	assert.Equal(t, wh.WarehouseId, got.WarehouseId)
-	assert.Equal(t, name, got.Name)
-	assert.Equal(t, defaultProjectID, got.ProjectId)
-	assert.Equal(t, managementv1.WAREHOUSESTATUS_ACTIVE, got.Status)
-	assert.False(t, got.Protected)
-	require.NotNil(t, got.StorageProfile.StorageProfileS3)
-	assert.Equal(t, "testacc", got.StorageProfile.StorageProfileS3.Bucket)
-	assert.Equal(t, "eu-local-1", got.StorageProfile.StorageProfileS3.Region)
+	assert.Equal(t, wh.GetWarehouseId(), got.GetWarehouseId())
+	assert.Equal(t, name, got.GetName())
+	assert.Equal(t, defaultProjectID, got.GetProjectId())
+	assert.Equal(t, managementv1.WAREHOUSESTATUS_ACTIVE, got.GetStatus())
+	assert.False(t, got.GetProtected())
+	s3, ok := profile.AsS3(got.GetStorageProfile())
+	require.True(t, ok, "the storage profile must be S3")
+	assert.Equal(t, "testacc", s3.GetBucket())
+	assert.Equal(t, "eu-local-1", s3.GetRegion())
+}
+
+// Not parallel: TestWarehouse_Create_Default also creates a warehouse on the
+// same bucket and prefix in the default project, and the server rejects
+// overlapping storage profiles within a project.
+func TestWarehouse_Create_WithoutProjectUsesDefaultProject(t *testing.T) {
+	c := sharedClient
+	whID, _ := MustCreateWarehouse(t, c, "")
+
+	got, err := c.Warehouses.Get(t.Context(), whID)
+	require.NoError(t, err)
+	assert.Equal(t, defaultProjectID, got.GetProjectId(), "a create without a project must land in the default project")
+}
+
+func TestWarehouse_Get_NotFoundIsAPIError(t *testing.T) {
+	t.Parallel()
+	c := sharedClient
+
+	_, err := c.Warehouses.Get(t.Context(), uuid.NewString())
+
+	var apiErr *client.APIError
+	require.ErrorAs(t, err, &apiErr)
+	assert.Equal(t, http.StatusNotFound, apiErr.StatusCode)
 }
 
 func warehouseIDs(resp *managementv1.ListWarehousesResponse) []string {
@@ -118,20 +138,16 @@ func TestWarehouse_Create_NewProject(t *testing.T) {
 	sc := credential.NewS3AccessKey("minio-root-user", "minio-root-password")
 
 	req := managementv1.NewCreateWarehouseRequest(sp, "test")
-	req.SetProjectId(p.ProjectId)
 	req.SetStorageCredential(sc)
 
-	wh, r, err := c.WarehouseAPI.CreateWarehouse(t.Context()).CreateWarehouseRequest(*req).Execute()
+	wh, err := c.Warehouses.Create(t.Context(), req, client.WithProject(p.GetProjectId()))
 	require.NoError(t, err)
-	assert.Equal(t, http.StatusCreated, r.StatusCode)
 	require.NotNil(t, wh)
+	assert.Equal(t, p.GetProjectId(), wh.GetProjectId())
 
 	t.Cleanup(func() {
-		r, err := c.WarehouseAPI.DeleteWarehouse(context.Background(), wh.WarehouseId).Execute()
-		if err != nil {
+		if err := c.Warehouses.Delete(context.Background(), wh.GetWarehouseId()); err != nil {
 			t.Errorf("delete warehouse: %v", err)
-		} else {
-			assert.Equal(t, http.StatusNoContent, r.StatusCode)
 		}
 
 		if err := c.Projects.Delete(context.Background(), client.WithProject(p.GetProjectId())); err != nil {
@@ -147,14 +163,14 @@ func TestWarehouse_Statistics(t *testing.T) {
 	project := MustCreateProject(t, c)
 	whID, _ := MustCreateWarehouse(t, c, project)
 
-	resp, r, err := c.WarehouseAPI.GetWarehouseStatistics(t.Context(), whID).Execute()
+	resp, err := c.Warehouses.Statistics(t.Context(), whID, &client.GetWarehouseStatisticsOptions{PageSize: 10})
 	require.NoError(t, err)
-	assert.Equal(t, http.StatusOK, r.StatusCode)
 
 	// Computed timestamps and counts are non-deterministic; assert presence
 	// and identity-of-warehouse only.
-	assert.NotEmpty(t, resp.Stats)
-	assert.Equal(t, whID, resp.WarehouseIdent)
+	assert.NotEmpty(t, resp.GetStats())
+	assert.LessOrEqual(t, len(resp.GetStats()), 10)
+	assert.Equal(t, whID, resp.GetWarehouseIdent())
 }
 
 func TestWarehouse_Rename(t *testing.T) {
@@ -165,15 +181,13 @@ func TestWarehouse_Rename(t *testing.T) {
 	whID, _ := MustCreateWarehouse(t, c, project)
 
 	newName := randomName("renamed-wh")
-	req := managementv1.NewRenameWarehouseRequest(newName)
-	resp, r, err := c.WarehouseAPI.RenameWarehouse(t.Context(), whID).RenameWarehouseRequest(*req).Execute()
+	resp, err := c.Warehouses.Rename(t.Context(), whID, managementv1.NewRenameWarehouseRequest(newName))
 	require.NoError(t, err)
-	assert.Equal(t, http.StatusOK, r.StatusCode)
-	assert.Equal(t, newName, resp.Name)
+	assert.Equal(t, newName, resp.GetName())
 
-	got, _, err := c.WarehouseAPI.GetWarehouse(t.Context(), whID).Execute()
+	got, err := c.Warehouses.Get(t.Context(), whID)
 	require.NoError(t, err)
-	assert.Equal(t, newName, got.Name)
+	assert.Equal(t, newName, got.GetName())
 }
 
 func TestWarehouse_DeactivateActivate(t *testing.T) {
@@ -183,21 +197,17 @@ func TestWarehouse_DeactivateActivate(t *testing.T) {
 	project := MustCreateProject(t, c)
 	whID, _ := MustCreateWarehouse(t, c, project)
 
-	r, err := c.WarehouseAPI.DeactivateWarehouse(t.Context(), whID).Execute()
-	require.NoError(t, err)
-	assert.Equal(t, http.StatusOK, r.StatusCode)
+	require.NoError(t, c.Warehouses.Deactivate(t.Context(), whID))
 
-	got, _, err := c.WarehouseAPI.GetWarehouse(t.Context(), whID).Execute()
+	got, err := c.Warehouses.Get(t.Context(), whID)
 	require.NoError(t, err)
-	assert.Equal(t, managementv1.WAREHOUSESTATUS_INACTIVE, got.Status)
+	assert.Equal(t, managementv1.WAREHOUSESTATUS_INACTIVE, got.GetStatus())
 
-	r, err = c.WarehouseAPI.ActivateWarehouse(t.Context(), whID).Execute()
-	require.NoError(t, err)
-	assert.Equal(t, http.StatusOK, r.StatusCode)
+	require.NoError(t, c.Warehouses.Activate(t.Context(), whID))
 
-	got, _, err = c.WarehouseAPI.GetWarehouse(t.Context(), whID).Execute()
+	got, err = c.Warehouses.Get(t.Context(), whID)
 	require.NoError(t, err)
-	assert.Equal(t, managementv1.WAREHOUSESTATUS_ACTIVE, got.Status)
+	assert.Equal(t, managementv1.WAREHOUSESTATUS_ACTIVE, got.GetStatus())
 }
 
 func TestWarehouse_SetProtection(t *testing.T) {
@@ -207,20 +217,22 @@ func TestWarehouse_SetProtection(t *testing.T) {
 	project := MustCreateProject(t, c)
 	whID, _ := MustCreateWarehouse(t, c, project)
 
-	req := managementv1.NewSetProtectionRequest(true)
-	resp, r, err := c.WarehouseAPI.SetWarehouseProtection(t.Context(), whID).SetProtectionRequest(*req).Execute()
+	resp, err := c.Warehouses.SetProtection(t.Context(), whID, managementv1.NewSetProtectionRequest(true))
 	require.NoError(t, err)
-	assert.Equal(t, http.StatusOK, r.StatusCode)
-	assert.True(t, resp.Protected)
-	assert.NotNil(t, resp.UpdatedAt.Get())
+	assert.True(t, resp.GetProtected())
+	assert.False(t, resp.GetUpdatedAt().IsZero())
 
 	// Unprotect before MustCreateWarehouse's delete cleanup runs (cleanups
 	// are LIFO, so this one fires first). Without it, deletion 409s on the
 	// protected warehouse and the project cleanup also fails.
 	t.Cleanup(func() {
-		unprotect := managementv1.NewSetProtectionRequest(false)
-		if _, _, err := c.WarehouseAPI.SetWarehouseProtection(context.Background(), whID).SetProtectionRequest(*unprotect).Execute(); err != nil {
+		if _, err := c.Warehouses.SetProtection(context.Background(), whID, managementv1.NewSetProtectionRequest(false)); err != nil {
 			t.Errorf("unprotect warehouse: %v", err)
 		}
 	})
+
+	err = c.Warehouses.Delete(t.Context(), whID)
+	var apiErr *client.APIError
+	require.ErrorAs(t, err, &apiErr, "deleting a protected warehouse must fail")
+	assert.Equal(t, http.StatusConflict, apiErr.StatusCode)
 }

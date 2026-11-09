@@ -152,8 +152,12 @@ use), the option is a no-op — the constructor never calls
 
 Resources that belong to a project (warehouses, roles) take the project
 per call, and so do `Projects.Get`, `Rename`, and `Delete`, which act on the
-project they name (the server's default project when they name none). A project-scoped façade method accepts a trailing, optional
-`...client.CallOption`; `client.WithProject(id)` names the project:
+project they name (the server's default project when they name none). A
+project-scoped façade method accepts a trailing, optional
+`...client.CallOption`; `client.WithProject(id)` names the project.
+A method takes the option only when its endpoint accepts `x-project-id`:
+for warehouses that is Create and List, while the calls that address a
+warehouse by id (`Get`, `Rename`, `Statistics`, …) take none:
 
 ```go
 c.Warehouses.List(ctx, nil, client.WithProject(projectID)) // x-project-id: <projectID>

@@ -10,9 +10,8 @@
 //	)
 //	sc := lakekeeper.NewS3AccessKey("ak", "sk")
 //	req := lakekeeper.NewCreateWarehouseRequest(sp, "main")
-//	req.SetProjectId(projectID)
 //	req.SetStorageCredential(sc)
-//	wh, err := c.Warehouses.Create(ctx, req)
+//	wh, err := c.Warehouses.Create(ctx, req, lakekeeper.WithProject(projectID))
 //
 // What it re-exports:
 //
@@ -88,6 +87,10 @@ type (
 
 	// ListWarehousesOptions holds the query parameters of Warehouses.List.
 	ListWarehousesOptions = client.ListWarehousesOptions
+
+	// GetWarehouseStatisticsOptions holds the query parameters of
+	// Warehouses.Statistics.
+	GetWarehouseStatisticsOptions = client.GetWarehouseStatisticsOptions
 
 	// GetWarehouseAccessByIDOptions holds the query parameters of
 	// Permissions.Warehouses.Access.

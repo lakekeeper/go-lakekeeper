@@ -13,6 +13,7 @@ import (
 
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
 	"github.com/lakekeeper/go-lakekeeper/pkg/client"
+	"github.com/lakekeeper/go-lakekeeper/pkg/storage/profile"
 )
 
 func newWarehouseCmd(opts *clientOptions) *cobra.Command {
@@ -77,7 +78,7 @@ func newWarehouseListCmd(opts *clientOptions, project *string) *cobra.Command {
 			case "json":
 				return printJSON(cmd.OutOrStdout(), resp)
 			case "text":
-				return printWarehouses(cmd.OutOrStdout(), output, resp.Warehouses...)
+				return printWarehouses(cmd.OutOrStdout(), output, resp.GetWarehouses()...)
 			default:
 				return fmt.Errorf("unknown output format: %s", output)
 			}
@@ -102,9 +103,9 @@ func newWarehouseGetCmd(opts *clientOptions) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			wh, _, err := c.WarehouseAPI.GetWarehouse(ctx, args[0]).Execute()
+			wh, err := c.Warehouses.Get(ctx, args[0])
 			if err != nil {
-				return client.WrapAPIError("get warehouse", err, nil)
+				return err
 			}
 			if wh == nil {
 				return errors.New("get warehouse: empty response")
@@ -153,29 +154,30 @@ func newWarehouseCreateCmd(opts *clientOptions, project *string) *cobra.Command 
 			if err := json.NewDecoder(reader).Decode(&req); err != nil {
 				return fmt.Errorf("decode config: %w", err)
 			}
-			if req.WarehouseName != args[0] {
+			if req.GetWarehouseName() != args[0] {
 				return errors.New("warehouse name in config does not match the name argument")
 			}
+			// A project-id in the config is sent the same way as --project:
+			// as the x-project-id header, never as the deprecated body field.
+			projectID := *project
+			if cfgProject := req.GetProjectId(); cfgProject != "" {
+				if projectID != "" && projectID != cfgProject {
+					return errors.New("project id in config does not match --project")
+				}
+				projectID = cfgProject
+			}
+			req.UnsetProjectId()
 
 			ctx := cmd.Context()
 			c, err := newClient(ctx, opts)
 			if err != nil {
 				return err
 			}
-			// Without --project the config decides; if it names no project
-			// either, the server applies its default project.
-			if *project != "" {
-				if req.ProjectId.Get() == nil {
-					req.SetProjectId(*project)
-				} else if req.GetProjectId() != *project {
-					return errors.New("project id in config does not match --project")
-				}
-			}
-			wh, _, err := c.WarehouseAPI.CreateWarehouse(ctx).CreateWarehouseRequest(req).Execute()
+			wh, err := c.Warehouses.Create(ctx, &req, client.WithProject(projectID))
 			if err != nil {
-				return client.WrapAPIError("create warehouse", err, nil)
+				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "Warehouse %s created with id %s\n", wh.Name, wh.WarehouseId)
+			fmt.Fprintf(cmd.OutOrStdout(), "Warehouse %s created with id %s\n", wh.GetName(), wh.GetWarehouseId())
 			return nil
 		},
 	}
@@ -199,9 +201,8 @@ func newWarehouseRenameCmd(opts *clientOptions) *cobra.Command {
 				return err
 			}
 
-			req := managementv1.NewRenameWarehouseRequest(args[1])
-			if _, _, err := c.WarehouseAPI.RenameWarehouse(ctx, args[0]).RenameWarehouseRequest(*req).Execute(); err != nil {
-				return client.WrapAPIError("rename warehouse", err, nil)
+			if _, err := c.Warehouses.Rename(ctx, args[0], managementv1.NewRenameWarehouseRequest(args[1])); err != nil {
+				return err
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "Warehouse %s renamed to %s\n", args[0], args[1])
 			return nil
@@ -221,8 +222,8 @@ func newWarehouseActivateCmd(opts *clientOptions) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			if _, err := c.WarehouseAPI.ActivateWarehouse(ctx, args[0]).Execute(); err != nil {
-				return client.WrapAPIError("activate warehouse", err, nil)
+			if err := c.Warehouses.Activate(ctx, args[0]); err != nil {
+				return err
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "Warehouse %s activated\n", args[0])
 			return nil
@@ -242,8 +243,8 @@ func newWarehouseDeactivateCmd(opts *clientOptions) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			if _, err := c.WarehouseAPI.DeactivateWarehouse(ctx, args[0]).Execute(); err != nil {
-				return client.WrapAPIError("deactivate warehouse", err, nil)
+			if err := c.Warehouses.Deactivate(ctx, args[0]); err != nil {
+				return err
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "Warehouse %s deactivated\n", args[0])
 			return nil
@@ -275,17 +276,16 @@ func newWarehouseSetProtectionCmd(opts *clientOptions) *cobra.Command {
 				return err
 			}
 
-			req := managementv1.NewSetProtectionRequest(protected)
-			resp, _, err := c.WarehouseAPI.SetWarehouseProtection(ctx, args[0]).SetProtectionRequest(*req).Execute()
+			resp, err := c.Warehouses.SetProtection(ctx, args[0], managementv1.NewSetProtectionRequest(protected))
 			if err != nil {
-				return client.WrapAPIError("set warehouse protection", err, nil)
+				return err
 			}
 
 			switch output {
 			case "json":
 				return printJSON(cmd.OutOrStdout(), resp)
 			case "text":
-				fmt.Fprintf(cmd.OutOrStdout(), "Warehouse %s protection set to %t\n", args[0], resp.Protected)
+				fmt.Fprintf(cmd.OutOrStdout(), "Warehouse %s protection set to %t\n", args[0], resp.GetProtected())
 				return nil
 			default:
 				return fmt.Errorf("unknown output format: %s", output)
@@ -320,24 +320,23 @@ func newWarehouseStatisticsCmd(opts *clientOptions) *cobra.Command {
 				return err
 			}
 
-			req := c.WarehouseAPI.GetWarehouseStatistics(ctx, args[0]).PageSize(pageSize)
-			if pageToken != "" {
-				req = req.PageToken(pageToken)
-			}
-			resp, _, err := req.Execute()
+			resp, err := c.Warehouses.Statistics(ctx, args[0], &client.GetWarehouseStatisticsOptions{
+				PageSize:  pageSize,
+				PageToken: pageToken,
+			})
 			if err != nil {
-				return client.WrapAPIError("get warehouse statistics", err, nil)
+				return err
 			}
 
 			switch output {
 			case "json":
 				return printJSON(cmd.OutOrStdout(), resp)
 			case "text":
-				if err := printWarehouseStatistics(cmd.OutOrStdout(), resp.Stats...); err != nil {
+				if err := printWarehouseStatistics(cmd.OutOrStdout(), resp.GetStats()...); err != nil {
 					return err
 				}
-				if resp.NextPageToken.Get() != nil {
-					fmt.Fprintf(cmd.OutOrStdout(), "\nNext page token: %s\n", *resp.NextPageToken.Get())
+				if next := resp.GetNextPageToken(); next != "" {
+					fmt.Fprintf(cmd.OutOrStdout(), "\nNext page token: %s\n", next)
 				}
 				return nil
 			default:
@@ -364,8 +363,8 @@ func newWarehouseDeleteCmd(opts *clientOptions) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			if _, err := c.WarehouseAPI.DeleteWarehouse(ctx, args[0]).Execute(); err != nil {
-				return client.WrapAPIError("delete warehouse", err, nil)
+			if err := c.Warehouses.Delete(ctx, args[0]); err != nil {
+				return err
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "Warehouse %s deleted\n", args[0])
 			return nil
@@ -563,7 +562,7 @@ func printWarehouses(w io.Writer, output string, warehouses ...managementv1.GetW
 		for i := range warehouses {
 			wh := &warehouses[i]
 			fmt.Fprintf(tw, "%s\t%s\t%s\t%s\t%s\n",
-				wh.WarehouseId, wh.Name, storageFamily(wh.StorageProfile), wh.Status, wh.ProjectId)
+				wh.GetWarehouseId(), wh.GetName(), storageFamily(wh.GetStorageProfile()), wh.GetStatus(), wh.GetProjectId())
 		}
 		return tw.Flush()
 	default:
@@ -581,7 +580,7 @@ func printWarehouseStatistics(w io.Writer, stats ...managementv1.WarehouseStatis
 	fmt.Fprintln(tw, "TIMESTAMP\tTABLES\tVIEWS\tUPDATED AT")
 	for _, s := range stats {
 		fmt.Fprintf(tw, "%s\t%d\t%d\t%s\n",
-			s.Timestamp.Format(time.RFC3339), s.NumberOfTables, s.NumberOfViews, s.UpdatedAt.Format(time.RFC3339))
+			s.GetTimestamp().Format(time.RFC3339), s.GetNumberOfTables(), s.GetNumberOfViews(), s.GetUpdatedAt().Format(time.RFC3339))
 	}
 	return tw.Flush()
 }
@@ -589,14 +588,14 @@ func printWarehouseStatistics(w io.Writer, stats ...managementv1.WarehouseStatis
 // storageFamily returns "s3", "gcs", or "adls" depending on which variant of
 // the StorageProfile union is populated. Falls back to "unknown".
 func storageFamily(sp managementv1.StorageProfile) string {
-	switch {
-	case sp.StorageProfileS3 != nil:
+	if _, ok := profile.AsS3(sp); ok {
 		return "s3"
-	case sp.StorageProfileGcs != nil:
-		return "gcs"
-	case sp.StorageProfileAdls != nil:
-		return "adls"
-	default:
-		return "unknown"
 	}
+	if _, ok := profile.AsGCS(sp); ok {
+		return "gcs"
+	}
+	if _, ok := profile.AsADLS(sp); ok {
+		return "adls"
+	}
+	return "unknown"
 }

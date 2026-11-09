@@ -193,20 +193,19 @@ func MustCreateWarehouse(t *testing.T, c *client.Client, projectID string) (stri
 	sc := credential.NewS3AccessKey("minio-root-user", "minio-root-password")
 
 	req := managementv1.NewCreateWarehouseRequest(sp, name)
-	req.SetProjectId(projectID)
 	req.SetStorageCredential(sc)
 
-	wh, err := c.Warehouses.Create(t.Context(), req)
+	wh, err := c.Warehouses.Create(t.Context(), req, client.WithProject(projectID))
 	if err != nil {
 		t.Fatalf("create warehouse: %v", err)
 	}
 
 	t.Cleanup(func() {
-		if err := c.Warehouses.Delete(context.Background(), wh.WarehouseId); err != nil {
+		if err := c.Warehouses.Delete(context.Background(), wh.GetWarehouseId()); err != nil {
 			t.Errorf("delete warehouse: %v", err)
 		}
 	})
-	return wh.WarehouseId, name
+	return wh.GetWarehouseId(), name
 }
 
 // *_GetAccess tests assert allowed actions via assertAllowedActionsSubset,

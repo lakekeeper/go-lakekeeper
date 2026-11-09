@@ -163,17 +163,18 @@ mutually exclusive on the singular `access` command.
 
 ### `lkctl warehouse`
 
-Warehouses are project-scoped. Use `--project` / `-p` to specify the
-project UUID. When omitted, no project is sent and the server's default
-project is used (the nil UUID unless the operator configured another; an
-error if the operator disabled it).
+Warehouses belong to a project. `list` and `create` take the project
+UUID from `--project` / `-p`. When omitted, no project is sent and the
+server's default project is used (the nil UUID unless the operator
+configured another; an error if the operator disabled it). The other
+subcommands address a warehouse by its id and ignore `-p`.
 
 ```sh
 # List warehouses in a project (filter with --status active|inactive, repeatable)
 lkctl warehouse list --project <PROJECT-ID>
 
 # Get a specific warehouse
-lkctl warehouse get <WAREHOUSE-ID> --project <PROJECT-ID>
+lkctl warehouse get <WAREHOUSE-ID>
 
 # Create a warehouse from a JSON config file
 lkctl warehouse create "my-warehouse" -f warehouse-config.json --project <PROJECT-ID>
@@ -182,16 +183,16 @@ lkctl warehouse create "my-warehouse" -f warehouse-config.json --project <PROJEC
 cat warehouse-config.json | lkctl warehouse create "my-warehouse" -f - --project <PROJECT-ID>
 
 # Lifecycle
-lkctl warehouse rename     <WAREHOUSE-ID> "new-name" --project <PROJECT-ID>
-lkctl warehouse activate   <WAREHOUSE-ID>            --project <PROJECT-ID>
-lkctl warehouse deactivate <WAREHOUSE-ID>            --project <PROJECT-ID>
-lkctl warehouse delete     <WAREHOUSE-ID>            --project <PROJECT-ID>
+lkctl warehouse rename     <WAREHOUSE-ID> "new-name"
+lkctl warehouse activate   <WAREHOUSE-ID>
+lkctl warehouse deactivate <WAREHOUSE-ID>
+lkctl warehouse delete     <WAREHOUSE-ID>
 
 # Protection (boolean, blocks delete while true)
-lkctl warehouse set-protection <WAREHOUSE-ID> --protected=true  --project <PROJECT-ID>
+lkctl warehouse set-protection <WAREHOUSE-ID> --protected=true
 
-# Statistics (paginated; --page-size, --page-token)
-lkctl warehouse statistics <WAREHOUSE-ID> --project <PROJECT-ID>
+# Statistics (paginated; --page-size, default 100, and --page-token)
+lkctl warehouse statistics <WAREHOUSE-ID>
 
 # Permissions
 lkctl warehouse access      <WAREHOUSE-ID>
@@ -201,10 +202,13 @@ lkctl warehouse revoke      <WAREHOUSE-ID> --roles <R> --assignments describe
 ```
 
 The `-f` flag for `create` accepts a JSON file that maps to
-`managementv1.CreateWarehouseRequest`. Example config:
+`managementv1.CreateWarehouseRequest`; its `warehouse-name` must match the
+name argument. A `project-id` in the config is sent like `-p`, as the
+`x-project-id` header; when both are given they must match. Example config:
 
 ```json
 {
+  "warehouse-name": "my-warehouse",
   "storage-profile": { ... },
   "storage-credential": { ... },
   "delete-profile": { "type": "hard" }

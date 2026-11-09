@@ -57,7 +57,6 @@ positionally, plus `Set<Field>(value)` mutators for everything else:
 
 ```go
 req := managementv1.NewCreateWarehouseRequest(sp, "main")  // required: profile, name
-req.SetProjectId(projectID)                                // optional
 req.SetStorageCredential(sc)                               // optional
 ```
 
@@ -105,10 +104,9 @@ sp := lakekeeper.NewS3Profile("bucket", "us-east-1",
 sc := lakekeeper.NewS3AccessKey("ak", "sk")
 
 req := lakekeeper.NewCreateWarehouseRequest(sp, "main")
-req.SetProjectId(projectID)
 req.SetStorageCredential(sc)
 
-wh, err := c.Warehouses.Create(ctx, req)
+wh, err := c.Warehouses.Create(ctx, req, lakekeeper.WithProject(projectID))
 ```
 
 What it re-exports:
@@ -168,7 +166,7 @@ generator's `(value, *http.Response, error)` triple.
 
 | Field | Purpose |
 |---|---|
-| `c.Warehouses` | Create / Get / Delete / List / Rename / Activate / Deactivate / SetProtection / Statistics |
+| `c.Warehouses` | Create and List (project-scoped); Get / Rename / Activate / Deactivate / SetProtection / Statistics / Delete (by warehouse id) |
 | `c.Projects` | Create / Get / Delete / List / Rename (Get, Delete, Rename act on the `WithProject` project, else the server's default project) |
 | `c.Roles` | Create / Get / Delete / List / Update (project-scoped) |
 | `c.Users` | Create / Get / Delete / List / Update / Whoami |
@@ -176,9 +174,9 @@ generator's `(value, *http.Response, error)` triple.
 | `c.Permissions` | Access / Assignments / Grant / Revoke, per resource kind: `.Warehouses`, `.Roles` |
 
 ```go
-wh, err := c.Warehouses.Create(ctx, req)         // façade — one call
-wh, _, err := c.WarehouseAPI.CreateWarehouse(ctx). // generator — full control
-    CreateWarehouseRequest(*req).Execute()
+wh, err := c.Warehouses.Get(ctx, id)                // façade — one call
+wh, _, err := c.WarehouseAPI.GetWarehouse(ctx, id). // generator — full control
+    Execute()
 ```
 
 For endpoints without a façade, custom request options, or where you need
@@ -191,8 +189,9 @@ below.
   Read fields through their `GetX()` accessors.
 - **Query parameters** are the only façade-owned types: one
   `<Operation>Options` struct per list or query operation (for example
-  `client.ListWarehousesOptions`), passed as a pointer. `nil` or a zero
-  field sends nothing for that parameter.
+  `client.ListWarehousesOptions`, `client.GetWarehouseStatisticsOptions`),
+  passed as a pointer. `nil` or a zero field sends nothing for that
+  parameter.
 - **List results** are the generated list response; page with its
   `GetNextPageToken()` accessor.
 - **Project scoping** is a trailing `...client.CallOption`;
@@ -204,6 +203,10 @@ below.
 resp, err := c.Warehouses.List(ctx,
     &client.ListWarehousesOptions{Status: []managementv1.WarehouseStatus{managementv1.WAREHOUSESTATUS_ACTIVE}},
     client.WithProject(projectID))
+
+stats, err := c.Warehouses.Statistics(ctx, warehouseID,
+    &client.GetWarehouseStatisticsOptions{PageSize: 50, PageToken: token})
+next := stats.GetNextPageToken() // "" on the last page
 ```
 
 ### Permissions façade
@@ -586,8 +589,8 @@ builders:
 ```go
 wh, err := c.Warehouses.Get(ctx, id)
 
-if s3, ok := profile.AsS3(wh.StorageProfile); ok {
-    fmt.Println(s3.Bucket, s3.Region)
+if s3, ok := profile.AsS3(wh.GetStorageProfile()); ok {
+    fmt.Println(s3.GetBucket(), s3.GetRegion())
 }
 ```
 
