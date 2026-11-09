@@ -137,11 +137,11 @@ lkctl server revoke  --users <USER-ID> --assignments admin
 # List all projects
 lkctl project list
 
-# Get a project by ID
+# Get a project by ID (sent as the x-project-id header)
 lkctl project get <PROJECT-ID>
 
 # Create a project
-PROJECT_ID=$(lkctl project create my-project | jq -r .)
+PROJECT_ID=$(lkctl project create my-project -o json | jq -r '."project-id"')
 
 # Rename a project
 lkctl project rename <PROJECT-ID> new-name
@@ -263,13 +263,16 @@ lkctl whoami        # the authenticated principal, including whether it is an in
 
 ## Pagination
 
-`list` subcommands accept `--limit` (default 100), `--token` (page token),
-and `--name` (server-side name filter):
+`role list` and `user list` accept `--limit` (default 100), `--token`
+(page token), and `--name` (name filter):
 
 ```sh
-lkctl project list --limit 10
-lkctl project list --limit 10 --token <next-page-token>
+lkctl user list --limit 10
+lkctl user list --limit 10 --token <next-page-token>
 ```
+
+`project list` is not paginated: the server returns every project visible
+to the caller in one response.
 
 `warehouse statistics` is paginated separately with `--page-size` and
 `--page-token`.

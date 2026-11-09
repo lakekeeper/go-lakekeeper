@@ -11,90 +11,78 @@ import (
 	"github.com/stretchr/testify/require"
 
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
+	"github.com/lakekeeper/go-lakekeeper/pkg/client"
 )
 
 func TestProject_Create(t *testing.T) {
 	c := sharedClient
 
-	req := managementv1.NewCreateProjectRequest(randomName("test-project"))
-	resp, r, err := c.ProjectAPI.CreateProject(t.Context()).CreateProjectRequest(*req).Execute()
+	name := randomName("test-project")
+	created, err := c.Projects.Create(t.Context(), managementv1.NewCreateProjectRequest(name))
 	require.NoError(t, err)
-	assert.Equal(t, http.StatusCreated, r.StatusCode)
-	assert.NotEmpty(t, resp.ProjectId)
+	require.NotEmpty(t, created.GetProjectId())
 
 	t.Cleanup(func() {
-		r, err := c.ProjectAPI.DeleteProject(context.Background()).XProjectId(resp.ProjectId).Execute()
-		if err != nil {
+		if err := c.Projects.Delete(context.Background(), client.WithProject(created.GetProjectId())); err != nil {
 			t.Errorf("delete project: %v", err)
-			return
 		}
-		assert.Equal(t, http.StatusNoContent, r.StatusCode)
 	})
+
+	got, err := c.Projects.Get(t.Context(), client.WithProject(created.GetProjectId()))
+	require.NoError(t, err)
+	assert.Equal(t, created.GetProjectId(), got.GetProjectId())
+	assert.Equal(t, name, got.GetProjectName())
 }
 
 func TestProject_Rename(t *testing.T) {
 	c := sharedClient
-
-	req := managementv1.NewCreateProjectRequest(randomName("test-project"))
-	created, r, err := c.ProjectAPI.CreateProject(t.Context()).CreateProjectRequest(*req).Execute()
-	require.NoError(t, err)
-	assert.Equal(t, http.StatusCreated, r.StatusCode)
-	assert.NotEmpty(t, created.ProjectId)
-
-	t.Cleanup(func() {
-		r, err := c.ProjectAPI.DeleteProject(context.Background()).XProjectId(created.ProjectId).Execute()
-		if err != nil {
-			t.Errorf("delete project: %v", err)
-			return
-		}
-		assert.Equal(t, http.StatusNoContent, r.StatusCode)
-	})
+	project := MustCreateProject(t, c)
 
 	renamed := randomName("test-project-renamed")
-	rename := managementv1.NewRenameProjectRequest(renamed)
-	r, err = c.ProjectAPI.RenameProject(t.Context()).XProjectId(created.ProjectId).RenameProjectRequest(*rename).Execute()
+	err := c.Projects.Rename(t.Context(), managementv1.NewRenameProjectRequest(renamed), client.WithProject(project))
 	require.NoError(t, err)
-	assert.Equal(t, http.StatusOK, r.StatusCode)
 
-	got, r, err := c.ProjectAPI.GetProject(t.Context()).XProjectId(created.ProjectId).Execute()
+	got, err := c.Projects.Get(t.Context(), client.WithProject(project))
 	require.NoError(t, err)
-	assert.Equal(t, http.StatusOK, r.StatusCode)
-	assert.Equal(t, renamed, got.ProjectName)
+	assert.Equal(t, renamed, got.GetProjectName())
 }
 
 func TestProject_Delete(t *testing.T) {
 	c := sharedClient
 
-	req := managementv1.NewCreateProjectRequest(randomName("test-project"))
-	created, r, err := c.ProjectAPI.CreateProject(t.Context()).CreateProjectRequest(*req).Execute()
+	created, err := c.Projects.Create(t.Context(), managementv1.NewCreateProjectRequest(randomName("test-project")))
 	require.NoError(t, err)
-	assert.Equal(t, http.StatusCreated, r.StatusCode)
-	assert.NotEmpty(t, created.ProjectId)
 
-	r, err = c.ProjectAPI.DeleteProject(t.Context()).XProjectId(created.ProjectId).Execute()
+	err = c.Projects.Delete(t.Context(), client.WithProject(created.GetProjectId()))
 	require.NoError(t, err)
-	assert.Equal(t, http.StatusNoContent, r.StatusCode)
 
-	got, r, err := c.ProjectAPI.GetProject(t.Context()).XProjectId(created.ProjectId).Execute()
+	got, err := c.Projects.Get(t.Context(), client.WithProject(created.GetProjectId()))
 	// Lakekeeper currently returns 403 for reads of a deleted/non-existent
 	// project; accept 404 too so a future server-side fix doesn't break us.
-	require.Error(t, err)
-	require.NotNil(t, r)
-	assert.Contains(t, []int{http.StatusForbidden, http.StatusNotFound}, r.StatusCode)
+	var apiErr *client.APIError
+	require.ErrorAs(t, err, &apiErr)
+	assert.Contains(t, []int{http.StatusForbidden, http.StatusNotFound}, apiErr.StatusCode)
 	assert.Nil(t, got)
+}
+
+func TestProject_Get_WithoutProjectReturnsDefaultProject(t *testing.T) {
+	c := sharedClient
+
+	got, err := c.Projects.Get(t.Context())
+	require.NoError(t, err)
+	assert.Equal(t, defaultProjectID, got.GetProjectId())
 }
 
 func TestProject_List(t *testing.T) {
 	c := sharedClient
 
-	resp, r, err := c.ProjectAPI.ListProjects(t.Context()).Execute()
+	resp, err := c.Projects.List(t.Context())
 	require.NoError(t, err)
-	assert.Equal(t, http.StatusOK, r.StatusCode)
 
 	// Other tests run concurrently and may have a project of their own visible
 	// at this moment; only assert the default project is present, not that
 	// it's the only one.
-	assert.Contains(t, resp.Projects, managementv1.GetProjectResponse{
+	assert.Contains(t, resp.GetProjects(), managementv1.GetProjectResponse{
 		ProjectId:   defaultProjectID,
 		ProjectName: "Default Project",
 	})

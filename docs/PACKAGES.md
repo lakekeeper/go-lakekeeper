@@ -169,7 +169,7 @@ generator's `(value, *http.Response, error)` triple.
 | Field | Purpose |
 |---|---|
 | `c.Warehouses` | Create / Get / Delete / List / Rename / Activate / Deactivate / SetProtection / Statistics |
-| `c.Projects` | Create / Get / Delete / List / Rename |
+| `c.Projects` | Create / Get / Delete / List / Rename (Get, Delete, Rename act on the `WithProject` project, else the server's default project) |
 | `c.Roles` | Create / Get / Delete / List / Update (project-scoped) |
 | `c.Users` | Create / Get / Delete / List / Update / Whoami |
 | `c.Server` | Info / Bootstrap |

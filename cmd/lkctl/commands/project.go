@@ -50,20 +50,20 @@ func newProjectListCmd(opts *clientOptions) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			resp, _, err := c.ProjectAPI.ListProjects(ctx).Execute()
+			resp, err := c.Projects.List(ctx)
 			if err != nil {
-				return client.WrapAPIError("list projects", err, nil)
+				return err
 			}
 
 			switch output {
 			case "json":
-				return printJSON(cmd.OutOrStdout(), resp.Projects)
+				return printJSON(cmd.OutOrStdout(), resp.GetProjects())
 			case "text":
-				if len(resp.Projects) == 0 {
+				if len(resp.GetProjects()) == 0 {
 					fmt.Fprintln(cmd.OutOrStdout(), "No projects available")
 					return nil
 				}
-				return printProjects(cmd.OutOrStdout(), resp.Projects...)
+				return printProjects(cmd.OutOrStdout(), resp.GetProjects()...)
 			default:
 				return fmt.Errorf("unknown output format: %s", output)
 			}
@@ -87,9 +87,9 @@ func newProjectGetCmd(opts *clientOptions) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			resp, _, err := c.ProjectAPI.GetProject(ctx).XProjectId(args[0]).Execute()
+			resp, err := c.Projects.Get(ctx, client.WithProject(args[0]))
 			if err != nil {
-				return client.WrapAPIError("get project", err, nil)
+				return err
 			}
 
 			switch output {
@@ -123,20 +123,19 @@ func newProjectCreateCmd(opts *clientOptions) *cobra.Command {
 				return err
 			}
 
-			req := managementv1.NewCreateProjectRequest(args[0])
-			created, _, err := c.ProjectAPI.CreateProject(ctx).CreateProjectRequest(*req).Execute()
+			created, err := c.Projects.Create(ctx, managementv1.NewCreateProjectRequest(args[0]))
 			if err != nil {
-				return client.WrapAPIError("create project", err, nil)
+				return err
 			}
 
 			switch output {
 			case "text":
-				fmt.Fprintf(cmd.OutOrStdout(), "Project %s created with id %s\n", args[0], created.ProjectId)
+				fmt.Fprintf(cmd.OutOrStdout(), "Project %s created with id %s\n", args[0], created.GetProjectId())
 				return nil
 			case "json":
-				project, _, err := c.ProjectAPI.GetProject(ctx).XProjectId(created.ProjectId).Execute()
+				project, err := c.Projects.Get(ctx, client.WithProject(created.GetProjectId()))
 				if err != nil {
-					return client.WrapAPIError("get project", err, nil)
+					return err
 				}
 				return printJSON(cmd.OutOrStdout(), project)
 			default:
@@ -161,9 +160,8 @@ func newProjectRenameCmd(opts *clientOptions) *cobra.Command {
 				return err
 			}
 
-			req := managementv1.NewRenameProjectRequest(args[1])
-			if _, err := c.ProjectAPI.RenameProject(ctx).XProjectId(args[0]).RenameProjectRequest(*req).Execute(); err != nil {
-				return client.WrapAPIError("rename project", err, nil)
+			if err := c.Projects.Rename(ctx, managementv1.NewRenameProjectRequest(args[1]), client.WithProject(args[0])); err != nil {
+				return err
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "Project %s renamed to %s\n", args[0], args[1])
 			return nil
@@ -184,8 +182,8 @@ func newProjectDeleteCmd(opts *clientOptions) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			if _, err := c.ProjectAPI.DeleteProject(ctx).XProjectId(args[0]).Execute(); err != nil {
-				return client.WrapAPIError("delete project", err, nil)
+			if err := c.Projects.Delete(ctx, client.WithProject(args[0])); err != nil {
+				return err
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "Project %s deleted\n", args[0])
 			return nil
@@ -401,7 +399,7 @@ func printProjects(w io.Writer, projects ...managementv1.GetProjectResponse) err
 	tw := tabwriter.NewWriter(w, 0, 0, 2, ' ', 0)
 	fmt.Fprintln(tw, "ID\tNAME")
 	for _, p := range projects {
-		fmt.Fprintf(tw, "%s\t%s\n", p.ProjectId, p.ProjectName)
+		fmt.Fprintf(tw, "%s\t%s\n", p.GetProjectId(), p.GetProjectName())
 	}
 	return tw.Flush()
 }

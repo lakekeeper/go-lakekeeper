@@ -106,8 +106,7 @@ func TestWarehouse_Create_NewProject(t *testing.T) {
 	t.Parallel()
 	c := sharedClient
 
-	pReq := managementv1.NewCreateProjectRequest("test-project-warehouse-create")
-	p, _, err := c.ProjectAPI.CreateProject(t.Context()).CreateProjectRequest(*pReq).Execute()
+	p, err := c.Projects.Create(t.Context(), managementv1.NewCreateProjectRequest("test-project-warehouse-create"))
 	require.NoError(t, err)
 	require.NotNil(t, p)
 
@@ -135,12 +134,9 @@ func TestWarehouse_Create_NewProject(t *testing.T) {
 			assert.Equal(t, http.StatusNoContent, r.StatusCode)
 		}
 
-		r, err = c.ProjectAPI.DeleteProject(context.Background()).XProjectId(p.ProjectId).Execute()
-		if err != nil {
+		if err := c.Projects.Delete(context.Background(), client.WithProject(p.GetProjectId())); err != nil {
 			t.Errorf("delete project: %v", err)
-			return
 		}
-		assert.Equal(t, http.StatusNoContent, r.StatusCode)
 	})
 }
 

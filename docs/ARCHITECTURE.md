@@ -151,7 +151,8 @@ use), the option is a no-op — the constructor never calls
 ## Project Scoping
 
 Resources that belong to a project (warehouses, roles) take the project
-per call. A project-scoped façade method accepts a trailing, optional
+per call, and so do `Projects.Get`, `Rename`, and `Delete`, which act on the
+project they name (the server's default project when they name none). A project-scoped façade method accepts a trailing, optional
 `...client.CallOption`; `client.WithProject(id)` names the project:
 
 ```go
@@ -174,5 +175,5 @@ The one place that decides how a project is sent is the unexported
 
 Callers of the generated services set the header themselves
 (`c.RoleAPI.ListRoles(ctx).XProjectId(projectID).Execute()`). Project-
-independent resources (`ServerAPI`, `UserAPI`, `ProjectAPI`) do not need
-the header.
+independent operations (server, users, project create and list) do not
+need the header.

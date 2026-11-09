@@ -307,7 +307,7 @@ and the role granted `select` on a warehouse.
 | Step | `lkctl` | Go SDK |
 |---|---|---|
 | 1. Bootstrap | `lkctl server bootstrap --accept-terms-of-use --as-operator` | `client.NewWithAuthSource(ctx, baseURL, as, client.WithInitialBootstrap(true, true, core.Ptr(managementv1.USERTYPE_APPLICATION)))` |
-| 2. Create project | `PROJECT_ID=$(lkctl project create my-project -o json \| jq -r '."project-id"')` | `created, _, err := c.ProjectAPI.CreateProject(ctx).CreateProjectRequest(*managementv1.NewCreateProjectRequest("my-project")).Execute()` |
+| 2. Create project | `PROJECT_ID=$(lkctl project create my-project -o json \| jq -r '."project-id"')` | `created, err := c.Projects.Create(ctx, managementv1.NewCreateProjectRequest("my-project"))` |
 | 3. Create role | `ROLE_ID=$(lkctl role create "data-readers" --project $PROJECT_ID -o json \| jq -r .id)` | `role, _, err := c.RoleAPI.CreateRole(ctx).XProjectId(projectID).CreateRoleRequest(*managementv1.NewCreateRoleRequest("data-readers")).Execute()` |
 | 4. Add user to role | `lkctl role grant $ROLE_ID --users $USER_ID --assignments assignee` | Build a `RoleAssignment` with wire shape `{"type": "assignee", "user": "<id>"}` via `permissions.BuildAssignment`, post via `UpdateRoleAssignmentsById` |
 | 5. Grant role on warehouse | `lkctl warehouse grant $WH_ID --roles $ROLE_ID --assignments select --project $PROJECT_ID` | Build a `WarehouseAssignment` with wire shape `{"type": "select", "role": "<id>"}`, post via `UpdateWarehouseAssignmentsById` |
@@ -318,7 +318,7 @@ picks up after step 1 (the caller passes in a constructed `*client.Client`)
 and assumes the user already exists — provision one via
 `c.UserAPI.CreateUser(...)` if not. It also uses the default project
 (`uuid.Nil`); replace `projectID` to target a named one and prepend the
-matching `c.ProjectAPI.CreateProject(...)` call.
+matching `c.Projects.Create(...)` call.
 
 ```go
 import (

@@ -7,9 +7,10 @@ import (
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
 )
 
-// Projects is a one-call façade over ProjectAPIService. Most methods take
-// the project id via header (X-Project-Id); pass it as the projectID
-// argument here. For per-call request options, reach for c.ProjectAPI.
+// Projects is a one-call façade over ProjectAPIService. Get, Rename and
+// Delete act on the project named by WithProject (sent as x-project-id) and,
+// without it, on the server's default project. Create and List are not
+// project-scoped. For endpoints without a façade, reach for c.ProjectAPI.
 type Projects struct {
 	api *managementv1.ProjectAPIService
 }
@@ -23,15 +24,17 @@ func (p *Projects) Create(ctx context.Context, req *managementv1.CreateProjectRe
 	return out, WrapAPIError("create project", err, resp)
 }
 
-// Get fetches a project by id.
-func (p *Projects) Get(ctx context.Context, projectID string) (*managementv1.GetProjectResponse, error) {
-	out, resp, err := p.api.GetProject(ctx).XProjectId(projectID).Execute()
+// Get fetches the project named by WithProject, or the server's default
+// project when none is named.
+func (p *Projects) Get(ctx context.Context, callOpts ...CallOption) (*managementv1.GetProjectResponse, error) {
+	out, resp, err := withProject(p.api.GetProject(ctx), callOpts).Execute()
 	return out, WrapAPIError("get project", err, resp)
 }
 
-// Delete removes a project by id.
-func (p *Projects) Delete(ctx context.Context, projectID string) error {
-	resp, err := p.api.DeleteProject(ctx).XProjectId(projectID).Execute()
+// Delete removes the project named by WithProject. Without it, the server
+// deletes its default project, so name the project unless that is intended.
+func (p *Projects) Delete(ctx context.Context, callOpts ...CallOption) error {
+	resp, err := withProject(p.api.DeleteProject(ctx), callOpts).Execute()
 	return WrapAPIError("delete project", err, resp)
 }
 
@@ -41,11 +44,12 @@ func (p *Projects) List(ctx context.Context) (*managementv1.ListProjectsResponse
 	return out, WrapAPIError("list projects", err, resp)
 }
 
-// Rename updates a project's display name.
-func (p *Projects) Rename(ctx context.Context, projectID string, req *managementv1.RenameProjectRequest) error {
+// Rename changes the display name of the project named by WithProject, or of
+// the server's default project when none is named.
+func (p *Projects) Rename(ctx context.Context, req *managementv1.RenameProjectRequest, callOpts ...CallOption) error {
 	if req == nil {
 		return errors.New("rename project: request must not be nil")
 	}
-	resp, err := p.api.RenameProject(ctx).XProjectId(projectID).RenameProjectRequest(*req).Execute()
+	resp, err := withProject(p.api.RenameProject(ctx), callOpts).RenameProjectRequest(*req).Execute()
 	return WrapAPIError("rename project", err, resp)
 }

@@ -69,7 +69,7 @@ export LAKEKEEPER_CLIENT_SECRET=<your-client-secret>
 export LAKEKEEPER_SCOPE=lakekeeper
 
 lkctl server bootstrap --accept-terms-of-use --as-operator
-PROJECT_ID=$(lkctl project create new-project | jq -r .)
+PROJECT_ID=$(lkctl project create new-project -o json | jq -r '."project-id"')
 lkctl role create "new-role" --project $PROJECT_ID --description "A new role"
 ```
 

@@ -162,18 +162,17 @@ func MustCreateRole(t *testing.T, c *client.Client, projectID string) *managemen
 func MustCreateProject(t *testing.T, c *client.Client) string {
 	t.Helper()
 
-	req := managementv1.NewCreateProjectRequest(randomName("test-project"))
-	created, _, err := c.ProjectAPI.CreateProject(t.Context()).CreateProjectRequest(*req).Execute()
+	created, err := c.Projects.Create(t.Context(), managementv1.NewCreateProjectRequest(randomName("test-project")))
 	if err != nil {
 		t.Fatalf("create project: %v", err)
 	}
 
 	t.Cleanup(func() {
-		if _, err := c.ProjectAPI.DeleteProject(context.Background()).XProjectId(created.ProjectId).Execute(); err != nil {
+		if err := c.Projects.Delete(context.Background(), client.WithProject(created.GetProjectId())); err != nil {
 			t.Errorf("delete project: %v", err)
 		}
 	})
-	return created.ProjectId
+	return created.GetProjectId()
 }
 
 // MustCreateWarehouse creates a warehouse against the in-stack MinIO under the

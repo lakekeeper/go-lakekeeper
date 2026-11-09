@@ -2,6 +2,7 @@ package commands
 
 import (
 	"bytes"
+	"net/http"
 	"sort"
 	"testing"
 
@@ -9,7 +10,38 @@ import (
 	"github.com/stretchr/testify/require"
 
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
+	"github.com/lakekeeper/go-lakekeeper/pkg/client"
+	"github.com/lakekeeper/go-lakekeeper/pkg/testutil"
 )
+
+const projectTestID = "11111111-1111-1111-1111-111111111111"
+
+func TestProjectGet_ArgumentSendsHeader(t *testing.T) {
+	t.Parallel()
+	mux, baseURL := testutil.NewServer(t)
+	reqs := testutil.Respond(t, mux, "GET /management/v1/project", http.StatusOK,
+		`{"project-id":"11111111-1111-1111-1111-111111111111","project-name":"Alpha"}`)
+
+	out, err := runLkctl(t, baseURL, "project", "get", projectTestID)
+
+	require.NoError(t, err)
+	assert.Equal(t, projectTestID, reqs.Last(t).Header.Get("x-project-id"))
+	assert.Contains(t, out, "Alpha")
+}
+
+func TestProjectDelete_ServerErrorKeepsStatus(t *testing.T) {
+	t.Parallel()
+	mux, baseURL := testutil.NewServer(t)
+	reqs := testutil.Respond(t, mux, "DELETE /management/v1/project", http.StatusForbidden,
+		`{"error":{"code":403,"message":"Forbidden","type":"NotAuthorized","stack":[]}}`)
+
+	_, err := runLkctl(t, baseURL, "project", "delete", projectTestID)
+
+	var apiErr *client.APIError
+	require.ErrorAs(t, err, &apiErr)
+	assert.Equal(t, http.StatusForbidden, apiErr.StatusCode)
+	assert.Equal(t, projectTestID, reqs.Last(t).Header.Get("x-project-id"))
+}
 
 func TestNewProjectCmdSubcommands(t *testing.T) {
 	t.Parallel()
