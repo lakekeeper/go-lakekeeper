@@ -218,8 +218,8 @@ func MustCreateWarehouse(t *testing.T, c *client.Client, projectID string) (stri
 //     in our enum but missing from `want`) FAILS — surfaced as news that should
 //     be reviewed and reflected in `want`. This tripwire is meaningful on the
 //     pinned/floor Lakekeeper (ci.yml v0.15.0), where every action is known.
-//   - UNKNOWN actions (a server newer than our spec, e.g. latest-main's
-//     `set_format_version_policy`) are LOGGED, not failed. We can't add them to
+//   - UNKNOWN actions (from a server newer than our spec, as
+//     `set_format_version_policy` once was) are LOGGED, not failed. We can't add them to
 //     `want` without the enum constant, which only ships with a release; failing
 //     on them would make the latest-main canary permanently, unactionably red.
 //   - server-side removals PASS — deprecations don't break the suite. For strict

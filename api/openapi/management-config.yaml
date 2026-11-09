@@ -23,8 +23,9 @@ enumClassPrefix: true
 # Its one undesirable side effect —
 # strict decoding via decoder.DisallowUnknownFields(), which rejects responses
 # carrying a field the SDK's spec doesn't know about — is the wrong posture for a
-# client library (Lakekeeper adds fields between releases, e.g. latest-main's
-# `allowed-format-versions` on the warehouse object after v0.12.3). The
+# client library (Lakekeeper adds fields between releases; servers after v0.12.3
+# returned `allowed-format-versions` on the warehouse object long before the
+# spec we generated from declared it). The
 # `api/openapi/postprocess` step in `make generate` strips those
 # DisallowUnknownFields() calls after generation, so additive server fields are
 # tolerated while the required-property check and discriminator dispatch remain.

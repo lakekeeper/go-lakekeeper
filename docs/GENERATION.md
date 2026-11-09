@@ -99,15 +99,16 @@ older spec keeps working against a newer Lakekeeper (additive server changes
 must not break decoding):
 
 - **Strip `decoder.DisallowUnknownFields()`** from model `UnmarshalJSON`s, so
-  responses carrying a field the SDK's spec predates (e.g. latest-main's
-  `allowed-format-versions` on the warehouse object) decode instead of erroring.
+  responses carrying a field the SDK's spec predates (as
+  `allowed-format-versions` on the warehouse object once was) decode instead of
+  erroring.
   The required-property presence check (a separate phase) and the oneOf
   discriminator dispatch are untouched; `newStrictDecoder` in `utils.go` (used
   only for the discriminator-lookup map) is preserved.
 - **Relax enum validation** — rewrite each enum `UnmarshalJSON`'s
   `return fmt.Errorf("%+v is not a valid X", value)` to store the value and
-  return nil. A newer server's enum value (e.g. the `set_format_version_policy`
-  `WarehouseAction`) is preserved as the raw string rather than failing the whole
+  return nil. A newer server's enum value (as the `set_format_version_policy`
+  `WarehouseAction` once was) is preserved as the raw string rather than failing the whole
   response; callers compare against the generated `AllowedXEnumValues`.
 
 Relaxing strict decoding is safe for unions: they decode by discriminator, or
