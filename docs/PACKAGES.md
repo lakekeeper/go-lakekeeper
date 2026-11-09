@@ -63,11 +63,22 @@ req.SetStorageCredential(sc)                               // optional
 
 This is mildly more verbose than the AWS SDK's struct-literal idiom
 (`&ec2.RunInstancesInput{...}`). The trade-off is that the `Set*` mutators
-absorb the `*string`/`*bool` ceremony for optional scalars — `req.SetDescription("x")`
-takes a value, the mutator stores `&v` internally. If you'd rather use
-struct literals, you can; you just have to wrap optional scalars yourself
-(`Description: managementv1.PtrString("x")` or with a `s := "x"; ... &s`
-temp). The setters are the recommended idiom for that reason.
+take plain values and hide the wrapper each optional field needs:
+
+- Optional fields are pointers (`*string`, `*bool`, …); `req.SetX(v)` stores
+  `&v`.
+- Optional fields the spec marks nullable (e.g. `Description` on
+  `CreateRoleRequest`) are `NullableX` wrappers with three states:
+  - `req.SetDescription("x")` sends the value;
+  - `req.SetDescriptionNil()` sends an explicit `null`;
+  - leaving it unset (or `req.UnsetDescription()`) omits the field.
+
+  Read them back with `.Get()`, which returns `nil` for both null and unset.
+
+Struct literals work too, but you wrap each field yourself:
+`managementv1.PtrString("x")` for a pointer field,
+`*managementv1.NewNullableString(managementv1.PtrString("x"))` for a nullable
+one. The setters are the recommended idiom for that reason.
 
 For request types whose only required input is the body itself
 (`SetProtectionRequest`, `RenameWarehouseRequest`, …), the umbrella's
