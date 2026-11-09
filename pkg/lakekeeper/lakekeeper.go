@@ -92,6 +92,9 @@ type (
 	// Warehouses.Statistics.
 	GetWarehouseStatisticsOptions = client.GetWarehouseStatisticsOptions
 
+	// ListUserOptions holds the query parameters of Users.List.
+	ListUserOptions = client.ListUserOptions
+
 	// GetWarehouseAccessByIDOptions holds the query parameters of
 	// Permissions.Warehouses.Access.
 	GetWarehouseAccessByIDOptions = client.GetWarehouseAccessByIDOptions

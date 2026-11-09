@@ -38,7 +38,7 @@ graph TD
 ```
 
 **Principals.** Two kinds: **users** (human or application identities,
-provisioned via `lkctl user create` / `c.UserAPI`) and **roles**
+provisioned via `lkctl user create` / `c.Users.Create`) and **roles**
 (first-class objects scoped to a project). Users can be assigned to
 roles, and roles can themselves be granted permissions on resources —
 so a single grant on a role propagates to every member.
@@ -318,7 +318,7 @@ and the role granted `select` on a warehouse.
 The SDK side, end-to-end, in one block. To keep the snippet focused, it
 picks up after step 1 (the caller passes in a constructed `*client.Client`)
 and assumes the user already exists — provision one via
-`c.UserAPI.CreateUser(...)` if not. It also uses the default project
+`c.Users.Create(...)` if not. It also uses the default project
 (`uuid.Nil`); replace `projectID` to target a named one and prepend the
 matching `c.Projects.Create(...)` call.
 

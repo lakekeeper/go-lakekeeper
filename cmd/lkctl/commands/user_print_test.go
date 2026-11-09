@@ -25,7 +25,7 @@ func TestPrintUsersText(t *testing.T) {
 	}
 
 	var buf bytes.Buffer
-	require.NoError(t, printUsers(&buf, "text", nil, &user))
+	require.NoError(t, printUsers(&buf, "text", "", user))
 
 	got := buf.String()
 	assert.Contains(t, got, "ID")
@@ -49,7 +49,7 @@ func TestPrintUsersWide(t *testing.T) {
 	}
 
 	var buf bytes.Buffer
-	require.NoError(t, printUsers(&buf, "wide", nil, &user))
+	require.NoError(t, printUsers(&buf, "wide", "", user))
 	assert.Contains(t, buf.String(), "CREATED AT")
 	assert.Contains(t, buf.String(), "LAST UPDATED WITH")
 }
@@ -58,15 +58,14 @@ func TestPrintUsersWithNextPageToken(t *testing.T) {
 	t.Parallel()
 
 	var buf bytes.Buffer
-	tok := "next-token"
-	require.NoError(t, printUsers(&buf, "text", &tok))
+	require.NoError(t, printUsers(&buf, "text", "next-token"))
 	assert.Contains(t, buf.String(), "next-token")
 }
 
 func TestPrintUsersUnknownFormat(t *testing.T) {
 	t.Parallel()
 
-	err := printUsers(&bytes.Buffer{}, "yaml", nil)
+	err := printUsers(&bytes.Buffer{}, "yaml", "")
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "unknown output format")
 }

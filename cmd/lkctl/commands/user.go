@@ -46,28 +46,20 @@ func newUserListCmd(opts *clientOptions) *cobra.Command {
 				return err
 			}
 
-			req := c.UserAPI.ListUser(ctx).PageSize(listOpts.limit)
-			if listOpts.token != "" {
-				req = req.PageToken(listOpts.token)
-			}
-			if listOpts.name != "" {
-				req = req.Name(listOpts.name)
-			}
-
-			resp, _, err := req.Execute()
+			resp, err := c.Users.List(ctx, &client.ListUserOptions{
+				Name:      listOpts.name,
+				PageSize:  listOpts.limit,
+				PageToken: listOpts.token,
+			})
 			if err != nil {
-				return client.WrapAPIError("list users", err, nil)
+				return err
 			}
 
 			switch output {
 			case "json":
 				return printJSON(cmd.OutOrStdout(), resp)
 			case "text", "wide":
-				users := make([]*managementv1.User, len(resp.Users))
-				for i := range resp.Users {
-					users[i] = &resp.Users[i]
-				}
-				return printUsers(cmd.OutOrStdout(), output, resp.NextPageToken.Get(), users...)
+				return printUsers(cmd.OutOrStdout(), output, resp.GetNextPageToken(), resp.GetUsers()...)
 			default:
 				return fmt.Errorf("unknown output format: %s", output)
 			}
@@ -95,16 +87,16 @@ func newUserGetCmd(opts *clientOptions) *cobra.Command {
 				return err
 			}
 
-			user, _, err := c.UserAPI.GetUser(ctx, args[0]).Execute()
+			user, err := c.Users.Get(ctx, args[0])
 			if err != nil {
-				return client.WrapAPIError("get user", err, nil)
+				return err
 			}
 
 			switch output {
 			case "json":
 				return printJSON(cmd.OutOrStdout(), user)
 			case "text", "wide":
-				return printUsers(cmd.OutOrStdout(), output, nil, user)
+				return printUsers(cmd.OutOrStdout(), output, "", *user)
 			default:
 				return fmt.Errorf("unknown output format: %s", output)
 			}
@@ -130,8 +122,8 @@ func newUserDeleteCmd(opts *clientOptions) *cobra.Command {
 				return err
 			}
 
-			if _, err := c.UserAPI.DeleteUser(ctx, args[0]).Execute(); err != nil {
-				return client.WrapAPIError("delete user", err, nil)
+			if err := c.Users.Delete(ctx, args[0]); err != nil {
+				return err
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "User %s deleted\n", args[0])
 			return nil
@@ -178,14 +170,14 @@ func newUserCreateCmd(opts *clientOptions) *cobra.Command {
 				req.SetUpdateIfExists(true)
 			}
 
-			user, _, err := c.UserAPI.CreateUser(ctx).CreateUserRequest(*req).Execute()
+			user, err := c.Users.Create(ctx, req)
 			if err != nil {
-				return client.WrapAPIError("create user", err, nil)
+				return err
 			}
 
 			switch output {
 			case "text":
-				fmt.Fprintf(cmd.OutOrStdout(), "User %s registered with id %s\n", args[1], user.Id)
+				fmt.Fprintf(cmd.OutOrStdout(), "User %s registered with id %s\n", args[1], user.GetId())
 				return nil
 			case "json":
 				return printJSON(cmd.OutOrStdout(), user)

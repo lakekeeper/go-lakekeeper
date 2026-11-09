@@ -239,8 +239,9 @@ lkctl role revoke      <ROLE-ID> --roles <R> --assignments ownership  # alias: r
 ### `lkctl user`
 
 ```sh
-# List users
+# List users; --name filters on the server, across all pages
 lkctl user list
+lkctl user list --name peter
 
 # Get a user
 lkctl user get <USER-ID>

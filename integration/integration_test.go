@@ -125,13 +125,13 @@ func MustProvisionUser(t *testing.T, c *client.Client) *managementv1.User {
 	req.SetUserType(managementv1.USERTYPE_HUMAN)
 	req.SetUpdateIfExists(false)
 
-	user, _, err := c.UserAPI.CreateUser(t.Context()).CreateUserRequest(*req).Execute()
+	user, err := c.Users.Create(t.Context(), req)
 	if err != nil {
 		t.Fatalf("create user: %v", err)
 	}
 
 	t.Cleanup(func() {
-		if _, err := c.UserAPI.DeleteUser(context.Background(), user.Id).Execute(); err != nil {
+		if err := c.Users.Delete(context.Background(), user.GetId()); err != nil {
 			t.Errorf("delete user: %v", err)
 		}
 	})

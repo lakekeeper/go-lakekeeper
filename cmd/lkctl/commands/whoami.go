@@ -9,7 +9,6 @@ import (
 	"github.com/spf13/cobra"
 
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
-	"github.com/lakekeeper/go-lakekeeper/pkg/client"
 )
 
 // newWhoamiCmd returns `lkctl whoami`, which prints the user identified by
@@ -27,9 +26,9 @@ func newWhoamiCmd(opts *clientOptions) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			user, _, err := c.UserAPI.Whoami(ctx).Execute()
+			user, err := c.Users.Whoami(ctx)
 			if err != nil {
-				return client.WrapAPIError("whoami", err, nil)
+				return err
 			}
 
 			if output == "json" {
@@ -50,16 +49,17 @@ func newWhoamiCmd(opts *clientOptions) *cobra.Command {
 //   - "wide": adds CREATED AT, UPDATED AT, LAST UPDATED WITH
 func printWhoami(w io.Writer, output string, u *managementv1.WhoamiResponse) error {
 	tw := tabwriter.NewWriter(w, 0, 0, 2, ' ', 0)
+	updatedAt, _ := u.GetUpdatedAtOk()
 	switch output {
 	case "text":
 		fmt.Fprintln(tw, "ID\tNAME\tEMAIL\tUSER TYPE\tINSTANCE ADMIN")
 		fmt.Fprintf(tw, "%s\t%s\t%s\t%s\t%t\n",
-			u.Id, u.Name, formatStringPtr(u.Email.Get()), u.UserType, u.IsInstanceAdmin)
+			u.GetId(), u.GetName(), u.GetEmail(), u.GetUserType(), u.GetIsInstanceAdmin())
 	case "wide":
 		fmt.Fprintln(tw, "ID\tNAME\tEMAIL\tUSER TYPE\tINSTANCE ADMIN\tCREATED AT\tUPDATED AT\tLAST UPDATED WITH")
 		fmt.Fprintf(tw, "%s\t%s\t%s\t%s\t%t\t%s\t%s\t%s\n",
-			u.Id, u.Name, formatStringPtr(u.Email.Get()), u.UserType, u.IsInstanceAdmin,
-			u.CreatedAt.Format(time.RFC3339), formatTimePtr(u.UpdatedAt.Get()), u.LastUpdatedWith)
+			u.GetId(), u.GetName(), u.GetEmail(), u.GetUserType(), u.GetIsInstanceAdmin(),
+			u.GetCreatedAt().Format(time.RFC3339), formatTimePtr(updatedAt), u.GetLastUpdatedWith())
 	default:
 		return fmt.Errorf("unknown output format: %s", output)
 	}

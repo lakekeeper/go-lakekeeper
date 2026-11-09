@@ -33,10 +33,33 @@ func (u *Users) Delete(ctx context.Context, userID string) error {
 	return WrapAPIError("delete user", err, resp)
 }
 
-// List returns users with optional paging. Use c.UserAPI.ListUser directly
-// for filter parameters not exposed here.
-func (u *Users) List(ctx context.Context) (*managementv1.ListUsersResponse, error) {
-	out, resp, err := u.api.ListUser(ctx).Execute()
+// ListUserOptions holds the query parameters of Users.List. A zero field
+// sends nothing, so the server's default applies.
+type ListUserOptions struct {
+	// Name filters users by name on the server (across all pages).
+	Name string
+	// PageSize caps the number of users in one response.
+	PageSize int64
+	// PageToken continues a previous listing; take it from
+	// ListUsersResponse.GetNextPageToken().
+	PageToken string
+}
+
+// List returns one page of users. opts may be nil.
+func (u *Users) List(ctx context.Context, opts *ListUserOptions) (*managementv1.ListUsersResponse, error) {
+	req := u.api.ListUser(ctx)
+	if opts != nil {
+		if opts.Name != "" {
+			req = req.Name(opts.Name)
+		}
+		if opts.PageSize != 0 {
+			req = req.PageSize(opts.PageSize)
+		}
+		if opts.PageToken != "" {
+			req = req.PageToken(opts.PageToken)
+		}
+	}
+	out, resp, err := req.Execute()
 	return out, WrapAPIError("list users", err, resp)
 }
 

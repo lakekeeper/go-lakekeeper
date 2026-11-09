@@ -13,34 +13,31 @@ import (
 //   - "text": ID, NAME, EMAIL, USER TYPE
 //   - "wide": adds CREATED AT, UPDATED AT, LAST UPDATED WITH
 //
-// If nextPageToken is non-nil, it is printed after the table.
-func printUsers(w io.Writer, output string, nextPageToken *string, users ...*managementv1.User) error {
+// If nextPageToken is non-empty, it is printed after the table.
+func printUsers(w io.Writer, output, nextPageToken string, users ...managementv1.User) error {
+	tw := tabwriter.NewWriter(w, 0, 0, 2, ' ', 0)
 	switch output {
 	case "text":
-		tw := tabwriter.NewWriter(w, 0, 0, 2, ' ', 0)
 		fmt.Fprintln(tw, "ID\tNAME\tEMAIL\tUSER TYPE")
 		for _, u := range users {
-			fmt.Fprintf(tw, "%s\t%s\t%s\t%s\n", u.Id, u.Name, formatStringPtr(u.Email.Get()), u.UserType)
-		}
-		if err := tw.Flush(); err != nil {
-			return err
+			fmt.Fprintf(tw, "%s\t%s\t%s\t%s\n", u.GetId(), u.GetName(), u.GetEmail(), u.GetUserType())
 		}
 	case "wide":
-		tw := tabwriter.NewWriter(w, 0, 0, 2, ' ', 0)
 		fmt.Fprintln(tw, "ID\tNAME\tEMAIL\tUSER TYPE\tCREATED AT\tUPDATED AT\tLAST UPDATED WITH")
 		for _, u := range users {
+			updatedAt, _ := u.GetUpdatedAtOk()
 			fmt.Fprintf(tw, "%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
-				u.Id, u.Name, formatStringPtr(u.Email.Get()), u.UserType,
-				u.CreatedAt.Format(time.RFC3339), formatTimePtr(u.UpdatedAt.Get()), u.LastUpdatedWith)
-		}
-		if err := tw.Flush(); err != nil {
-			return err
+				u.GetId(), u.GetName(), u.GetEmail(), u.GetUserType(),
+				u.GetCreatedAt().Format(time.RFC3339), formatTimePtr(updatedAt), u.GetLastUpdatedWith())
 		}
 	default:
 		return fmt.Errorf("unknown output format: %s", output)
 	}
-	if nextPageToken != nil {
-		fmt.Fprintf(w, "\nNext page token: %s\n", *nextPageToken)
+	if err := tw.Flush(); err != nil {
+		return err
+	}
+	if nextPageToken != "" {
+		fmt.Fprintf(w, "\nNext page token: %s\n", nextPageToken)
 	}
 	return nil
 }
