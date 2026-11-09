@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"unicode/utf8"
 
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
 )
@@ -52,7 +53,12 @@ func (e *APIError) Error() string {
 	msg := e.op + ": " + e.status
 	if s := strings.TrimSpace(string(e.Body)); s != "" {
 		if len(s) > apiErrorBodyLimit {
-			s = s[:apiErrorBodyLimit] + "...(truncated)"
+			// Cut on a rune boundary so the text stays valid UTF-8.
+			n := apiErrorBodyLimit
+			for n > 0 && !utf8.RuneStart(s[n]) {
+				n--
+			}
+			s = s[:n] + "...(truncated)"
 		}
 		msg += ": " + s
 	}

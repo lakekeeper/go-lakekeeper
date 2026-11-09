@@ -10,6 +10,7 @@ import (
 	"sync/atomic"
 	"testing"
 	"time"
+	"unicode/utf8"
 
 	"github.com/stretchr/testify/require"
 
@@ -105,6 +106,23 @@ func TestFacadeError_LongBodyTruncatedInTextButKeptWhole(t *testing.T) {
 	require.Equal(t, http.StatusBadGateway, apiErr.StatusCode)
 	require.Len(t, apiErr.Body, len(long), "Body keeps the full response")
 	require.Nil(t, apiErr.Model, "a non-JSON body has no error model")
+}
+
+func TestFacadeError_TruncationKeepsValidUTF8(t *testing.T) {
+	t.Parallel()
+	// Two ASCII bytes, then 3-byte runes: byte 1024 falls inside a rune.
+	long := "xx" + strings.Repeat("€", 1000)
+	mux, c := testutil.ServerMux(t)
+	mux.HandleFunc("GET /management/v1/role/{id}", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "text/plain")
+		w.WriteHeader(http.StatusBadGateway)
+		_, _ = w.Write([]byte(long))
+	})
+
+	_, err := c.Roles.Get(t.Context(), "1234", client.WithProject("p"))
+
+	require.ErrorContains(t, err, "...(truncated)")
+	require.True(t, utf8.ValidString(err.Error()), "error text must stay valid UTF-8")
 }
 
 func TestFacadeError_NoBody(t *testing.T) {
