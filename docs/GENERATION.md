@@ -13,7 +13,7 @@ to regenerate it**, and **why a postprocessor is involved**.
 Everything under [`pkg/apis/management/v1/`](../pkg/apis/management/v1/) is
 regenerated wholesale on every `make generate` run. The Makefile `rm -rf`s
 the directory before invoking the generator (see
-[Makefile:](../Makefile#L)), so any hand-edits there are silently
+[Makefile:138](../Makefile#L138)), so any hand-edits there are silently
 discarded the next time someone regenerates.
 
 Files carrying this header are generator output and **must not be
