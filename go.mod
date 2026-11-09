@@ -14,7 +14,6 @@ require (
 	github.com/spf13/cobra v1.10.2
 	github.com/stretchr/testify v1.12.1
 	golang.org/x/oauth2 v0.37.0
-	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
@@ -278,6 +277,7 @@ require (
 	go.opentelemetry.io/otel/metric v1.46.0 // indirect
 	go.opentelemetry.io/otel/trace v1.46.0 // indirect
 	golang.org/x/telemetry v0.0.0-20261009151841-97e8ea77aa2a // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
 tool (

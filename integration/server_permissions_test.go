@@ -53,6 +53,30 @@ func TestPermissions_Server_GetAssignments(t *testing.T) {
 	assert.ElementsMatch(t, want, describeAssignments(t, resp.Assignments))
 }
 
+func TestPermissions_Server_GetAssignments_RelationsFilter(t *testing.T) {
+	c := sharedClient
+
+	// The only server assignment is the admin's `operator`, so filtering on
+	// `admin` must return nothing. A server that ignores the parameter's
+	// encoding returns the unfiltered set instead of an error, which only a
+	// negative case like this one catches.
+	resp, r, err := c.PermissionsOpenfgaAPI.GetServerAssignments(t.Context()).
+		Relations([]managementv1.ServerRelation{managementv1.SERVERRELATION_ADMIN}).
+		Execute()
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusOK, r.StatusCode)
+	assert.Empty(t, describeAssignments(t, resp.Assignments))
+
+	resp, _, err = c.PermissionsOpenfgaAPI.GetServerAssignments(t.Context()).
+		Relations([]managementv1.ServerRelation{managementv1.SERVERRELATION_ADMIN, managementv1.SERVERRELATION_OPERATOR}).
+		Execute()
+	require.NoError(t, err)
+	assert.ElementsMatch(t,
+		[]permissions.AssignmentRow{{PrincipalType: "user", PrincipalID: adminID, Relation: "operator"}},
+		describeAssignments(t, resp.Assignments),
+	)
+}
+
 func TestPermissions_Server_Update(t *testing.T) {
 	c := sharedClient
 

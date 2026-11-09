@@ -6,14 +6,14 @@ upstream Lakekeeper OpenAPI spec. Everything else in the repo — including the
 packages — is hand-written.
 
 This document is the single source of truth for **what is generated**, **how
-to regenerate it**, and **why a pre- and postprocessor are involved**.
+to regenerate it**, and **why a postprocessor is involved**.
 
 ## What is generated
 
 Everything under [`pkg/apis/management/v1/`](../pkg/apis/management/v1/) is
 regenerated wholesale on every `make generate` run. The Makefile `rm -rf`s
 the directory before invoking the generator (see
-[Makefile:159](../Makefile#L159)), so any hand-edits there are silently
+[Makefile:](../Makefile#L)), so any hand-edits there are silently
 discarded the next time someone regenerates.
 
 Files carrying this header are generator output and **must not be
@@ -51,25 +51,21 @@ adds or removes files produces an obvious diff.
 make generate
 ```
 
-The pipeline (see [Makefile:151-174](../Makefile#L151-L174)):
+The pipeline (see [Makefile:135-155](../Makefile#L135-L155)):
 
-1. `go run ./api/openapi/preprocess` rewrites
-   `api/openapi/management-open-api.yaml` →
-   `api/openapi/management-open-api.processed.yaml`. See
-   [The preprocessor](#the-preprocessor) below.
-2. `rm -rf pkg/apis/management/v1` and recreate the directory.
-3. Copy the top-level [`.openapi-generator-ignore`](../api/openapi/.openapi-generator-ignore)
+1. `rm -rf pkg/apis/management/v1` and recreate the directory.
+2. Copy the top-level [`.openapi-generator-ignore`](../api/openapi/.openapi-generator-ignore)
    into the output directory.
-4. Run `openapitools/openapi-generator-cli:v7.10.0 generate` in a container.
-   Input spec (`-i`): the preprocessed
-   `api/openapi/management-open-api.processed.yaml` from step 1.
-   Generator config (`-c`):
+3. Run `openapitools/openapi-generator-cli:v7.10.0 generate` in a container.
+   Input spec (`-i`): the committed
+   [`api/openapi/management-open-api.yaml`](../api/openapi/management-open-api.yaml),
+   unmodified. Generator config (`-c`):
    [`api/openapi/management-config.yaml`](../api/openapi/management-config.yaml).
-5. Delete the processed YAML.
-6. `goimports -w` + `go mod tidy` + `make fmt`.
+4. `go run ./api/openapi/postprocess`. See [The postprocessor](#the-postprocessor) below.
+5. `goimports -w` + `go mod tidy` + `make fmt`.
 
 The container engine resolves to `docker` or `podman` depending on what's on
-PATH (see [Makefile:69](../Makefile#L69)), so `make generate` works on either.
+PATH (see [Makefile:45](../Makefile#L45)), so `make generate` works on either.
 
 The generator config is intentionally minimal —
 [`management-config.yaml`](../api/openapi/management-config.yaml) lists only
@@ -86,20 +82,13 @@ targets, then run `make generate` and commit the spec and the regenerated tree i
 **same commit** so the diff stays reviewable. Name the Lakekeeper tag or
 commit in the commit message.
 
-## The preprocessor
-
-Located at [`api/openapi/preprocess/`](../api/openapi/preprocess/). The spec
-is the source of truth; the preprocessor only patches what the spec gets
-wrong for the generated client. Today that is a single rewrite:
-
-- **Bracket notation on `relations`.** It forces `style: deepObject,
-  explode: false` on every `relations` array query parameter. The Lakekeeper
-  backend parses the parameter with `serde_urlencoded`, which only accepts
-  `?relations[0]=a&relations[1]=b`; the spec leaves the style unset, so the
-  generator would otherwise emit the rejected `?relations=a&relations=b`.
-
-Unions, enum names and nullable fields come straight from the spec and the
-generator config, with no rewriting.
+The spec goes into the generator unmodified: unions, enum names, nullable
+fields and query-parameter encoding all come straight from the spec and the
+generator config. Array query parameters such as `relations` use the OpenAPI
+default (`form`, exploded), so the client sends `?relations=a&relations=b`,
+which is the form Lakekeeper (v0.15.0 and later) parses. It silently ignores
+bracket notation (`relations[0]=a`), so a filter sent that way returns
+unfiltered results instead of failing.
 
 ## The postprocessor
 
