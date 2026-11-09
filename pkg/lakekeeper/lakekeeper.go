@@ -15,7 +15,10 @@
 //
 // What it re-exports:
 //
-//   - Client + constructors, APIError and WrapAPIError from pkg/client
+//   - Client + constructors and client Options, APIError and WrapAPIError
+//     from pkg/client
+//   - CallOption and WithProject, and every façade …Options type (e.g.
+//     ListWarehousesOptions, ListRolesOptions, GetServerAccessOptions)
 //   - Storage profile/credential builders from pkg/storage/{profile,credential}
 //   - Permission builders from pkg/permissions
 //   - The most common Management API request/response types

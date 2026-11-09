@@ -107,11 +107,13 @@ type GetWarehouseStatisticsOptions struct {
 // response's GetNextPageToken.
 func (w *Warehouses) Statistics(ctx context.Context, id string, opts *GetWarehouseStatisticsOptions) (*managementv1.WarehouseStatisticsResponse, error) {
 	req := w.api.GetWarehouseStatistics(ctx, id)
-	if opts != nil && opts.PageSize != 0 {
-		req = req.PageSize(opts.PageSize)
-	}
-	if opts != nil && opts.PageToken != "" {
-		req = req.PageToken(opts.PageToken)
+	if opts != nil {
+		if opts.PageSize != 0 {
+			req = req.PageSize(opts.PageSize)
+		}
+		if opts.PageToken != "" {
+			req = req.PageToken(opts.PageToken)
+		}
 	}
 	out, resp, err := req.Execute()
 	return out, WrapAPIError("get warehouse statistics", err, resp)

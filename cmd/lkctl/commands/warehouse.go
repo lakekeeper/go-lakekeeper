@@ -65,11 +65,9 @@ func newWarehouseListCmd(opts *clientOptions, project *string) *cobra.Command {
 				return err
 			}
 
-			listOpts := &client.ListWarehousesOptions{}
-			for _, s := range status {
-				listOpts.Status = append(listOpts.Status, managementv1.WarehouseStatus(s))
-			}
-			resp, err := c.Warehouses.List(ctx, listOpts, client.WithProject(*project))
+			resp, err := c.Warehouses.List(ctx,
+				&client.ListWarehousesOptions{Status: toEnums[managementv1.WarehouseStatus](status)},
+				client.WithProject(*project))
 			if err != nil {
 				return err
 			}
@@ -407,7 +405,7 @@ func newWarehouseAccessCmd(opts *clientOptions) *cobra.Command {
 			case "json":
 				return printJSON(cmd.OutOrStdout(), resp)
 			case "text":
-				return printAllowedActions(cmd.OutOrStdout(), resp.AllowedActions)
+				return printAllowedActions(cmd.OutOrStdout(), resp.GetAllowedActions())
 			default:
 				return fmt.Errorf("unknown output format: %s", output)
 			}
@@ -437,7 +435,7 @@ func newWarehouseAssignmentsCmd(opts *clientOptions) *cobra.Command {
 			}
 
 			resp, err := c.Permissions.Warehouses.Assignments(ctx, args[0], &client.GetWarehouseAssignmentsByIDOptions{
-				Relations: toRelations[managementv1.WarehouseRelation](assignments.relations),
+				Relations: toEnums[managementv1.WarehouseRelation](assignments.relations),
 			})
 			if err != nil {
 				return err
@@ -447,7 +445,7 @@ func newWarehouseAssignmentsCmd(opts *clientOptions) *cobra.Command {
 			case "json":
 				return printJSON(cmd.OutOrStdout(), resp)
 			case "text":
-				return printAssignments(cmd.OutOrStdout(), resp.Assignments...)
+				return printAssignments(cmd.OutOrStdout(), resp.GetAssignments()...)
 			default:
 				return fmt.Errorf("unknown output format: %s", output)
 			}

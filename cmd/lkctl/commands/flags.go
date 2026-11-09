@@ -46,3 +46,17 @@ func addAccessFlags(cmd *cobra.Command, opts *accessOpts) {
 func addAssignmentsFlags(cmd *cobra.Command, opts *assignmentsOpts) {
 	cmd.Flags().StringSliceVar(&opts.relations, "relations", nil, "Filter by relations (repeat for multiple, also accepts comma-separated values)")
 }
+
+// toEnums converts string flag values (e.g. --relations, --status) into a
+// generated string enum type. Empty input gives nil, so a façade option
+// built from it sends nothing.
+func toEnums[E ~string](values []string) []E {
+	if len(values) == 0 {
+		return nil
+	}
+	out := make([]E, 0, len(values))
+	for _, v := range values {
+		out = append(out, E(v))
+	}
+	return out
+}

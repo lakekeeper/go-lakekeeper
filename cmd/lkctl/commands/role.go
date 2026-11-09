@@ -74,7 +74,7 @@ func newRoleListCmd(opts *clientOptions, project *string) *cobra.Command {
 				if err != nil {
 					return err
 				}
-				roles, nextToken = resp.Roles, resp.GetNextPageToken()
+				roles, nextToken = resp.GetRoles(), resp.GetNextPageToken()
 			}
 
 			switch output {
@@ -105,8 +105,9 @@ func newRoleListCmd(opts *clientOptions, project *string) *cobra.Command {
 	return cmd
 }
 
-// findRolesByName returns the roles in the Project named exactly name. It
-// runs the server's role search and keeps the exact matches. The search
+// findRolesByName returns the role named exactly name, or none. Lakekeeper
+// keeps role names unique per project (ignoring case), so there is at most
+// one. It runs the server's role search and keeps the exact match. The search
 // returns only the 10 nearest roles and truncates the search string to 64
 // characters, so it can miss an exact match (for example among 10 or more
 // names that differ only in punctuation). On a miss it therefore pages
@@ -116,7 +117,7 @@ func findRolesByName(ctx context.Context, c *client.Client, name string, pageSiz
 	if err != nil {
 		return nil, err
 	}
-	if matches := exactRoleNameMatches(found.Roles, name); len(matches) > 0 {
+	if matches := exactRoleNameMatches(found.GetRoles(), name); len(matches) > 0 {
 		return matches, nil
 	}
 
@@ -127,7 +128,7 @@ func findRolesByName(ctx context.Context, c *client.Client, name string, pageSiz
 		if err != nil {
 			return nil, err
 		}
-		matches = append(matches, exactRoleNameMatches(page.Roles, name)...)
+		matches = append(matches, exactRoleNameMatches(page.GetRoles(), name)...)
 		opts.PageToken = page.GetNextPageToken()
 		if opts.PageToken == "" {
 			return matches, nil
@@ -138,7 +139,7 @@ func findRolesByName(ctx context.Context, c *client.Client, name string, pageSiz
 func exactRoleNameMatches(roles []managementv1.Role, name string) []managementv1.Role {
 	matches := make([]managementv1.Role, 0, 1)
 	for i := range roles {
-		if roles[i].Name == name {
+		if roles[i].GetName() == name {
 			matches = append(matches, roles[i])
 		}
 	}
@@ -213,7 +214,7 @@ func newRoleCreateCmd(opts *clientOptions, project *string) *cobra.Command {
 
 			switch output {
 			case "text":
-				fmt.Fprintf(cmd.OutOrStdout(), "Role %s created with id %s\n", args[0], role.Id)
+				fmt.Fprintf(cmd.OutOrStdout(), "Role %s created with id %s\n", args[0], role.GetId())
 				return nil
 			case "json":
 				return printJSON(cmd.OutOrStdout(), role)
@@ -326,7 +327,7 @@ func newRoleAccessCmd(opts *clientOptions) *cobra.Command {
 			case "json":
 				return printJSON(cmd.OutOrStdout(), resp)
 			case "text":
-				return printAllowedActions(cmd.OutOrStdout(), resp.AllowedActions)
+				return printAllowedActions(cmd.OutOrStdout(), resp.GetAllowedActions())
 			default:
 				return fmt.Errorf("unknown output format: %s", output)
 			}
@@ -356,7 +357,7 @@ func newRoleAssignmentsCmd(opts *clientOptions) *cobra.Command {
 			}
 
 			resp, err := c.Permissions.Roles.Assignments(ctx, args[0], &client.GetRoleAssignmentsByIDOptions{
-				Relations: toRelations[managementv1.RoleRelation](assignments.relations),
+				Relations: toEnums[managementv1.RoleRelation](assignments.relations),
 			})
 			if err != nil {
 				return err
@@ -366,7 +367,7 @@ func newRoleAssignmentsCmd(opts *clientOptions) *cobra.Command {
 			case "json":
 				return printJSON(cmd.OutOrStdout(), resp)
 			case "text":
-				return printAssignments(cmd.OutOrStdout(), resp.Assignments...)
+				return printAssignments(cmd.OutOrStdout(), resp.GetAssignments()...)
 			default:
 				return fmt.Errorf("unknown output format: %s", output)
 			}
@@ -469,20 +470,23 @@ func printRoles(w io.Writer, output string, roles ...managementv1.Role) error {
 		fmt.Fprintln(tw, "ID\tNAME\tPROJECT ID\tCREATED AT\tUPDATED AT\tDESCRIPTION")
 		for i := range roles {
 			r := &roles[i]
+			updatedAt, _ := r.GetUpdatedAtOk()
+			description, _ := r.GetDescriptionOk()
 			fmt.Fprintf(tw, "%s\t%s\t%s\t%s\t%s\t%s\n",
-				r.Id, r.Name, r.ProjectId,
-				r.CreatedAt.Format(time.RFC3339),
-				formatTimePtr(r.UpdatedAt.Get()),
-				formatStringPtr(r.Description.Get()))
+				r.GetId(), r.GetName(), r.GetProjectId(),
+				r.GetCreatedAt().Format(time.RFC3339),
+				formatTimePtr(updatedAt),
+				formatStringPtr(description))
 		}
 	} else {
 		fmt.Fprintln(tw, "ID\tNAME\tPROJECT ID\tCREATED AT\tUPDATED AT")
 		for i := range roles {
 			r := &roles[i]
+			updatedAt, _ := r.GetUpdatedAtOk()
 			fmt.Fprintf(tw, "%s\t%s\t%s\t%s\t%s\n",
-				r.Id, r.Name, r.ProjectId,
-				r.CreatedAt.Format(time.RFC3339),
-				formatTimePtr(r.UpdatedAt.Get()))
+				r.GetId(), r.GetName(), r.GetProjectId(),
+				r.GetCreatedAt().Format(time.RFC3339),
+				formatTimePtr(updatedAt))
 		}
 	}
 	return tw.Flush()

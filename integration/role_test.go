@@ -98,6 +98,22 @@ func TestRole_Search_FindsByName(t *testing.T) {
 	assert.Contains(t, roleIDs(found.GetRoles()), role.GetId())
 }
 
+// `role list --name` (findRolesByName) relies on role names being unique per
+// project, ignoring case.
+func TestRole_Create_NameIsUniqueInProjectIgnoringCase(t *testing.T) {
+	t.Parallel()
+	c := sharedClient
+	project := MustCreateProject(t, c)
+	role := MustCreateRole(t, c, project)
+
+	_, err := c.Roles.Create(t.Context(),
+		managementv1.NewCreateRoleRequest(strings.ToUpper(role.GetName())), client.WithProject(project))
+
+	var apiErr *client.APIError
+	require.ErrorAs(t, err, &apiErr, "a second role with the same name must be rejected")
+	assert.Equal(t, http.StatusConflict, apiErr.StatusCode)
+}
+
 // Lakekeeper's role search returns the 10 roles nearest by trigram distance.
 // Names that differ only in punctuation share every trigram, so they tie at
 // distance 0 and the search can leave out the one asked for. `role list

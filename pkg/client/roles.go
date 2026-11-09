@@ -9,8 +9,8 @@ import (
 
 // Roles is a one-call façade over RoleAPIService. Every operation is
 // project-scoped: name the Project with WithProject, or omit it and the server
-// applies its default project. Role membership and permissions are not here;
-// reach for c.RoleAPI and c.PermissionsOpenfgaAPI.
+// applies its default project. Role permissions live on c.Permissions.Roles.
+// Role membership has no façade; reach for the embedded c.RoleAPI.
 type Roles struct {
 	api *managementv1.RoleAPIService
 }
@@ -36,8 +36,8 @@ func (r *Roles) Delete(ctx context.Context, roleID string, callOpts ...CallOptio
 	return WrapAPIError("delete role", err, resp)
 }
 
-// ListRolesOptions are the query parameters of Roles.List. Zero fields are
-// not sent.
+// ListRolesOptions holds the query parameters of Roles.List. A nil pointer
+// or a zero field sends nothing.
 type ListRolesOptions struct {
 	// PageSize caps the number of roles in one page; zero uses the server's
 	// default page size.

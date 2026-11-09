@@ -50,7 +50,7 @@ func TestPermissions_Server_GetAccess(t *testing.T) {
 	resp, err := c.Permissions.Server.Access(t.Context(), nil)
 	require.NoError(t, err)
 
-	assertAllowedActionsSubset(t, serverAdminActions, resp.AllowedActions, managementv1.AllowedServerActionEnumValues)
+	assertAllowedActionsSubset(t, serverAdminActions, resp.GetAllowedActions(), managementv1.AllowedServerActionEnumValues)
 }
 
 func TestPermissions_Server_GetAssignments(t *testing.T) {
@@ -64,7 +64,7 @@ func TestPermissions_Server_GetAssignments(t *testing.T) {
 		PrincipalID:   adminID,
 		Relation:      "operator",
 	}}
-	assert.ElementsMatch(t, want, describeAssignments(t, resp.Assignments))
+	assert.ElementsMatch(t, want, describeAssignments(t, resp.GetAssignments()))
 }
 
 func TestPermissions_Server_GetAssignments_RelationsFilter(t *testing.T) {
@@ -78,7 +78,7 @@ func TestPermissions_Server_GetAssignments_RelationsFilter(t *testing.T) {
 		Relations: []managementv1.ServerRelation{managementv1.SERVERRELATION_ADMIN},
 	})
 	require.NoError(t, err)
-	assert.Empty(t, describeAssignments(t, resp.Assignments))
+	assert.Empty(t, describeAssignments(t, resp.GetAssignments()))
 
 	resp, err = c.Permissions.Server.Assignments(t.Context(), &client.GetServerAssignmentsOptions{
 		Relations: []managementv1.ServerRelation{managementv1.SERVERRELATION_ADMIN, managementv1.SERVERRELATION_OPERATOR},
@@ -86,7 +86,7 @@ func TestPermissions_Server_GetAssignments_RelationsFilter(t *testing.T) {
 	require.NoError(t, err)
 	assert.ElementsMatch(t,
 		[]permissions.AssignmentRow{{PrincipalType: "user", PrincipalID: adminID, Relation: "operator"}},
-		describeAssignments(t, resp.Assignments),
+		describeAssignments(t, resp.GetAssignments()),
 	)
 }
 
@@ -99,11 +99,11 @@ func TestPermissions_Server_Update(t *testing.T) {
 	require.NoError(t, err)
 	assert.ElementsMatch(t,
 		[]permissions.AssignmentRow{{PrincipalType: "user", PrincipalID: adminID, Relation: "operator"}},
-		describeAssignments(t, resp.Assignments),
+		describeAssignments(t, resp.GetAssignments()),
 	)
 
 	// add admin assignment for the new user
-	admin := []managementv1.ServerAssignment{userAssignment[managementv1.ServerAssignment](t, "admin", user.Id)}
+	admin := []managementv1.ServerAssignment{userAssignment[managementv1.ServerAssignment](t, "admin", user.GetId())}
 	require.NoError(t, c.Permissions.Server.Grant(t.Context(), admin))
 	// If the test stops before its own revoke below, remove the tuple anyway.
 	removed := false
@@ -121,9 +121,9 @@ func TestPermissions_Server_Update(t *testing.T) {
 	assert.ElementsMatch(t,
 		[]permissions.AssignmentRow{
 			{PrincipalType: "user", PrincipalID: adminID, Relation: "operator"},
-			{PrincipalType: "user", PrincipalID: user.Id, Relation: "admin"},
+			{PrincipalType: "user", PrincipalID: user.GetId(), Relation: "admin"},
 		},
-		describeAssignments(t, resp.Assignments),
+		describeAssignments(t, resp.GetAssignments()),
 	)
 
 	// remove the admin assignment
@@ -134,7 +134,7 @@ func TestPermissions_Server_Update(t *testing.T) {
 	require.NoError(t, err)
 	assert.ElementsMatch(t,
 		[]permissions.AssignmentRow{{PrincipalType: "user", PrincipalID: adminID, Relation: "operator"}},
-		describeAssignments(t, resp.Assignments),
+		describeAssignments(t, resp.GetAssignments()),
 	)
 }
 
@@ -143,7 +143,7 @@ func TestPermissions_Server_SameAdd(t *testing.T) {
 
 	user := MustProvisionUser(t, c)
 
-	operator := []managementv1.ServerAssignment{userAssignment[managementv1.ServerAssignment](t, "operator", user.Id)}
+	operator := []managementv1.ServerAssignment{userAssignment[managementv1.ServerAssignment](t, "operator", user.GetId())}
 	require.NoError(t, c.Permissions.Server.Grant(t.Context(), operator))
 	revokeOnCleanup(t, c, operator)
 
@@ -159,40 +159,40 @@ func TestPermissions_Server_GetAccess_UserFilter(t *testing.T) {
 	c := sharedClient
 
 	user := MustProvisionUser(t, c)
-	byUser := &client.GetServerAccessOptions{PrincipalUser: user.Id}
+	byUser := &client.GetServerAccessOptions{PrincipalUser: user.GetId()}
 
 	// fresh user has no allowed actions on the server
 	resp, err := c.Permissions.Server.Access(t.Context(), byUser)
 	require.NoError(t, err)
-	assert.Empty(t, resp.AllowedActions)
+	assert.Empty(t, resp.GetAllowedActions())
 
 	// granting admin should expand the allowed-actions set
-	admin := []managementv1.ServerAssignment{userAssignment[managementv1.ServerAssignment](t, "admin", user.Id)}
+	admin := []managementv1.ServerAssignment{userAssignment[managementv1.ServerAssignment](t, "admin", user.GetId())}
 	require.NoError(t, c.Permissions.Server.Grant(t.Context(), admin))
 	revokeOnCleanup(t, c, admin)
 
 	resp, err = c.Permissions.Server.Access(t.Context(), byUser)
 	require.NoError(t, err)
-	assertAllowedActionsSubset(t, serverAdminActions, resp.AllowedActions, managementv1.AllowedServerActionEnumValues)
+	assertAllowedActionsSubset(t, serverAdminActions, resp.GetAllowedActions(), managementv1.AllowedServerActionEnumValues)
 }
 
 func TestPermissions_Server_GetAccess_RoleFilter(t *testing.T) {
 	c := sharedClient
 
 	role := MustCreateRole(t, c, defaultProjectID)
-	byRole := &client.GetServerAccessOptions{PrincipalRole: role.Id}
+	byRole := &client.GetServerAccessOptions{PrincipalRole: role.GetId()}
 
 	// fresh role has no allowed actions on the server
 	resp, err := c.Permissions.Server.Access(t.Context(), byRole)
 	require.NoError(t, err)
-	assert.Empty(t, resp.AllowedActions)
+	assert.Empty(t, resp.GetAllowedActions())
 
 	// granting admin should expand the allowed-actions set
-	admin := []managementv1.ServerAssignment{roleAssignment[managementv1.ServerAssignment](t, "admin", role.Id)}
+	admin := []managementv1.ServerAssignment{roleAssignment[managementv1.ServerAssignment](t, "admin", role.GetId())}
 	require.NoError(t, c.Permissions.Server.Grant(t.Context(), admin))
 	revokeOnCleanup(t, c, admin)
 
 	resp, err = c.Permissions.Server.Access(t.Context(), byRole)
 	require.NoError(t, err)
-	assertAllowedActionsSubset(t, serverAdminActions, resp.AllowedActions, managementv1.AllowedServerActionEnumValues)
+	assertAllowedActionsSubset(t, serverAdminActions, resp.GetAllowedActions(), managementv1.AllowedServerActionEnumValues)
 }

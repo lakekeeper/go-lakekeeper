@@ -22,19 +22,6 @@ func buildAssignmentSet[T any](relations, users, roles []string) ([]T, error) {
 	})
 }
 
-// toRelations converts the --relations flag values into a resource's
-// generated relation type. Empty input gives nil (no filter).
-func toRelations[R ~string](relations []string) []R {
-	if len(relations) == 0 {
-		return nil
-	}
-	out := make([]R, 0, len(relations))
-	for _, r := range relations {
-		out = append(out, R(r))
-	}
-	return out
-}
-
 // printAssignments writes a tabular listing of permission assignments to w.
 // Empty input writes "No assignments". The function is generic over the
 // resource-specific assignment type (ServerAssignment, ProjectAssignment, …);

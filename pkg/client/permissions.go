@@ -32,6 +32,56 @@ func errNoAssignments(op string) error {
 	return fmt.Errorf("%s: no assignments", op)
 }
 
+// principalFiltered is any generated Access request builder: it can read
+// another principal's access instead of the caller's.
+type principalFiltered[R any] interface {
+	PrincipalUser(principalUser string) R
+	PrincipalRole(principalRole string) R
+}
+
+// principalOptions is the shape every Access options type shares (e.g.
+// GetServerAccessOptions), so withPrincipal accepts any of them.
+type principalOptions = struct{ PrincipalUser, PrincipalRole string }
+
+// withPrincipal applies an Access method's options to its request builder.
+// A nil opts or an empty field sends nothing.
+func withPrincipal[R principalFiltered[R], O ~principalOptions](req R, opts *O) R {
+	if opts == nil {
+		return req
+	}
+	o := principalOptions(*opts)
+	if o.PrincipalUser != "" {
+		req = req.PrincipalUser(o.PrincipalUser)
+	}
+	if o.PrincipalRole != "" {
+		req = req.PrincipalRole(o.PrincipalRole)
+	}
+	return req
+}
+
+// relationFiltered is any generated Assignments request builder: it can
+// keep only assignments of some relations.
+type relationFiltered[R, E any] interface {
+	Relations(relations []E) R
+}
+
+// relationOptions is the shape every Assignments options type shares (e.g.
+// GetServerAssignmentsOptions, with E = ServerRelation), so withRelations
+// accepts any of them.
+type relationOptions[E any] = struct{ Relations []E }
+
+// withRelations applies an Assignments method's options to its request
+// builder. A nil opts or empty Relations sends nothing.
+func withRelations[R relationFiltered[R, E], O ~relationOptions[E], E any](req R, opts *O) R {
+	if opts == nil {
+		return req
+	}
+	if relations := relationOptions[E](*opts).Relations; len(relations) > 0 {
+		req = req.Relations(relations)
+	}
+	return req
+}
+
 // WarehousePermissions manages the permissions of a warehouse. The
 // warehouse id selects the project, so these calls take no project option.
 type WarehousePermissions struct {
@@ -49,16 +99,7 @@ type GetWarehouseAccessByIDOptions struct {
 
 // Access returns the allowed actions on a warehouse.
 func (p *WarehousePermissions) Access(ctx context.Context, warehouseID string, opts *GetWarehouseAccessByIDOptions) (*managementv1.GetWarehouseAccessResponse, error) {
-	req := p.api.GetWarehouseAccessById(ctx, warehouseID)
-	if opts != nil {
-		if opts.PrincipalUser != "" {
-			req = req.PrincipalUser(opts.PrincipalUser)
-		}
-		if opts.PrincipalRole != "" {
-			req = req.PrincipalRole(opts.PrincipalRole)
-		}
-	}
-	out, resp, err := req.Execute()
+	out, resp, err := withPrincipal(p.api.GetWarehouseAccessById(ctx, warehouseID), opts).Execute()
 	return out, WrapAPIError("get warehouse access", err, resp)
 }
 
@@ -72,11 +113,7 @@ type GetWarehouseAssignmentsByIDOptions struct {
 
 // Assignments lists the assignments on a warehouse.
 func (p *WarehousePermissions) Assignments(ctx context.Context, warehouseID string, opts *GetWarehouseAssignmentsByIDOptions) (*managementv1.GetWarehouseAssignmentsResponse, error) {
-	req := p.api.GetWarehouseAssignmentsById(ctx, warehouseID)
-	if opts != nil && len(opts.Relations) > 0 {
-		req = req.Relations(opts.Relations)
-	}
-	out, resp, err := req.Execute()
+	out, resp, err := withRelations(p.api.GetWarehouseAssignmentsById(ctx, warehouseID), opts).Execute()
 	return out, WrapAPIError("get warehouse assignments", err, resp)
 }
 
@@ -91,7 +128,7 @@ func (p *WarehousePermissions) Revoke(ctx context.Context, warehouseID string, a
 }
 
 func (p *WarehousePermissions) update(ctx context.Context, op, warehouseID string, req managementv1.UpdateWarehouseAssignmentsRequest) error {
-	if len(req.Writes) == 0 && len(req.Deletes) == 0 {
+	if len(req.GetWrites()) == 0 && len(req.GetDeletes()) == 0 {
 		return errNoAssignments(op)
 	}
 	resp, err := p.api.UpdateWarehouseAssignmentsById(ctx, warehouseID).UpdateWarehouseAssignmentsRequest(req).Execute()
@@ -115,16 +152,7 @@ type GetAuthorizerRoleActionsOptions struct {
 
 // Access returns the allowed authorizer actions on a role.
 func (p *RolePermissions) Access(ctx context.Context, roleID string, opts *GetAuthorizerRoleActionsOptions) (*managementv1.GetOpenFGARoleActionsResponse, error) {
-	req := p.api.GetAuthorizerRoleActions(ctx, roleID)
-	if opts != nil {
-		if opts.PrincipalUser != "" {
-			req = req.PrincipalUser(opts.PrincipalUser)
-		}
-		if opts.PrincipalRole != "" {
-			req = req.PrincipalRole(opts.PrincipalRole)
-		}
-	}
-	out, resp, err := req.Execute()
+	out, resp, err := withPrincipal(p.api.GetAuthorizerRoleActions(ctx, roleID), opts).Execute()
 	return out, WrapAPIError("get role access", err, resp)
 }
 
@@ -137,11 +165,7 @@ type GetRoleAssignmentsByIDOptions struct {
 
 // Assignments lists the assignments on a role.
 func (p *RolePermissions) Assignments(ctx context.Context, roleID string, opts *GetRoleAssignmentsByIDOptions) (*managementv1.GetRoleAssignmentsResponse, error) {
-	req := p.api.GetRoleAssignmentsById(ctx, roleID)
-	if opts != nil && len(opts.Relations) > 0 {
-		req = req.Relations(opts.Relations)
-	}
-	out, resp, err := req.Execute()
+	out, resp, err := withRelations(p.api.GetRoleAssignmentsById(ctx, roleID), opts).Execute()
 	return out, WrapAPIError("get role assignments", err, resp)
 }
 
@@ -156,7 +180,7 @@ func (p *RolePermissions) Revoke(ctx context.Context, roleID string, assignments
 }
 
 func (p *RolePermissions) update(ctx context.Context, op, roleID string, req managementv1.UpdateRoleAssignmentsRequest) error {
-	if len(req.Writes) == 0 && len(req.Deletes) == 0 {
+	if len(req.GetWrites()) == 0 && len(req.GetDeletes()) == 0 {
 		return errNoAssignments(op)
 	}
 	resp, err := p.api.UpdateRoleAssignmentsById(ctx, roleID).UpdateRoleAssignmentsRequest(req).Execute()
@@ -181,15 +205,7 @@ type GetProjectAccessOptions struct {
 // Access returns the allowed actions on a project.
 func (p *ProjectPermissions) Access(ctx context.Context, opts *GetProjectAccessOptions, callOpts ...CallOption) (*managementv1.GetProjectAccessResponse, error) {
 	req := withProject(p.api.GetProjectAccess(ctx), callOpts)
-	if opts != nil {
-		if opts.PrincipalUser != "" {
-			req = req.PrincipalUser(opts.PrincipalUser)
-		}
-		if opts.PrincipalRole != "" {
-			req = req.PrincipalRole(opts.PrincipalRole)
-		}
-	}
-	out, resp, err := req.Execute()
+	out, resp, err := withPrincipal(req, opts).Execute()
 	return out, WrapAPIError("get project access", err, resp)
 }
 
@@ -204,10 +220,7 @@ type GetProjectAssignmentsOptions struct {
 // Assignments lists the assignments on a project.
 func (p *ProjectPermissions) Assignments(ctx context.Context, opts *GetProjectAssignmentsOptions, callOpts ...CallOption) (*managementv1.GetProjectAssignmentsResponse, error) {
 	req := withProject(p.api.GetProjectAssignments(ctx), callOpts)
-	if opts != nil && len(opts.Relations) > 0 {
-		req = req.Relations(opts.Relations)
-	}
-	out, resp, err := req.Execute()
+	out, resp, err := withRelations(req, opts).Execute()
 	return out, WrapAPIError("get project assignments", err, resp)
 }
 
@@ -222,7 +235,7 @@ func (p *ProjectPermissions) Revoke(ctx context.Context, assignments []managemen
 }
 
 func (p *ProjectPermissions) update(ctx context.Context, op string, req managementv1.UpdateProjectAssignmentsRequest, callOpts []CallOption) error {
-	if len(req.Writes) == 0 && len(req.Deletes) == 0 {
+	if len(req.GetWrites()) == 0 && len(req.GetDeletes()) == 0 {
 		return errNoAssignments(op)
 	}
 	resp, err := withProject(p.api.UpdateProjectAssignments(ctx), callOpts).UpdateProjectAssignmentsRequest(req).Execute()
@@ -247,16 +260,7 @@ type GetServerAccessOptions struct {
 
 // Access returns the allowed actions on the server.
 func (p *ServerPermissions) Access(ctx context.Context, opts *GetServerAccessOptions) (*managementv1.GetServerAccessResponse, error) {
-	req := p.api.GetServerAccess(ctx)
-	if opts != nil {
-		if opts.PrincipalUser != "" {
-			req = req.PrincipalUser(opts.PrincipalUser)
-		}
-		if opts.PrincipalRole != "" {
-			req = req.PrincipalRole(opts.PrincipalRole)
-		}
-	}
-	out, resp, err := req.Execute()
+	out, resp, err := withPrincipal(p.api.GetServerAccess(ctx), opts).Execute()
 	return out, WrapAPIError("get server access", err, resp)
 }
 
@@ -270,11 +274,7 @@ type GetServerAssignmentsOptions struct {
 
 // Assignments lists the assignments on the server.
 func (p *ServerPermissions) Assignments(ctx context.Context, opts *GetServerAssignmentsOptions) (*managementv1.GetServerAssignmentsResponse, error) {
-	req := p.api.GetServerAssignments(ctx)
-	if opts != nil && len(opts.Relations) > 0 {
-		req = req.Relations(opts.Relations)
-	}
-	out, resp, err := req.Execute()
+	out, resp, err := withRelations(p.api.GetServerAssignments(ctx), opts).Execute()
 	return out, WrapAPIError("get server assignments", err, resp)
 }
 
@@ -289,7 +289,7 @@ func (p *ServerPermissions) Revoke(ctx context.Context, assignments []management
 }
 
 func (p *ServerPermissions) update(ctx context.Context, op string, req managementv1.UpdateServerAssignmentsRequest) error {
-	if len(req.Writes) == 0 && len(req.Deletes) == 0 {
+	if len(req.GetWrites()) == 0 && len(req.GetDeletes()) == 0 {
 		return errNoAssignments(op)
 	}
 	resp, err := p.api.UpdateServerAssignments(ctx).UpdateServerAssignmentsRequest(req).Execute()

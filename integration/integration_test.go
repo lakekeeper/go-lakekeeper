@@ -150,7 +150,7 @@ func MustCreateRole(t *testing.T, c *client.Client, projectID string) *managemen
 	}
 
 	t.Cleanup(func() {
-		if err := c.Roles.Delete(context.Background(), role.Id, client.WithProject(projectID)); err != nil {
+		if err := c.Roles.Delete(context.Background(), role.GetId(), client.WithProject(projectID)); err != nil {
 			t.Errorf("delete role: %v", err)
 		}
 	})

@@ -53,7 +53,7 @@ func TestPermissions_Project_GetAccess(t *testing.T) {
 		managementv1.PROJECTACTION_GRANT_TAG_CREATOR,
 		managementv1.PROJECTACTION_GRANT_WRITE,
 	}
-	assertAllowedActionsSubset(t, want, resp.AllowedActions, managementv1.AllowedProjectActionEnumValues)
+	assertAllowedActionsSubset(t, want, resp.GetAllowedActions(), managementv1.AllowedProjectActionEnumValues)
 }
 
 func TestPermissions_Project_GetAssignments(t *testing.T) {
@@ -65,7 +65,7 @@ func TestPermissions_Project_GetAssignments(t *testing.T) {
 	assert.Equal(t, defaultProjectID, resp.GetProjectId())
 	assert.ElementsMatch(t,
 		[]permissions.AssignmentRow{projectAdminRow()},
-		describeAssignments(t, resp.Assignments),
+		describeAssignments(t, resp.GetAssignments()),
 	)
 }
 
@@ -90,10 +90,10 @@ func TestPermissions_Project_Update(t *testing.T) {
 	require.NoError(t, err)
 	assert.ElementsMatch(t,
 		[]permissions.AssignmentRow{projectAdminRow()},
-		describeAssignments(t, resp.Assignments),
+		describeAssignments(t, resp.GetAssignments()),
 	)
 
-	sel := []managementv1.ProjectAssignment{userAssignment[managementv1.ProjectAssignment](t, "select", user.Id)}
+	sel := []managementv1.ProjectAssignment{userAssignment[managementv1.ProjectAssignment](t, "select", user.GetId())}
 	require.NoError(t, c.Permissions.Projects.Grant(t.Context(), sel, client.WithProject(defaultProjectID)))
 
 	resp, err = c.Permissions.Projects.Assignments(t.Context(), nil, client.WithProject(defaultProjectID))
@@ -101,9 +101,9 @@ func TestPermissions_Project_Update(t *testing.T) {
 	assert.ElementsMatch(t,
 		[]permissions.AssignmentRow{
 			projectAdminRow(),
-			{PrincipalType: "user", PrincipalID: user.Id, Relation: "select"},
+			{PrincipalType: "user", PrincipalID: user.GetId(), Relation: "select"},
 		},
-		describeAssignments(t, resp.Assignments),
+		describeAssignments(t, resp.GetAssignments()),
 	)
 
 	require.NoError(t, c.Permissions.Projects.Revoke(t.Context(), sel, client.WithProject(defaultProjectID)))
@@ -112,7 +112,7 @@ func TestPermissions_Project_Update(t *testing.T) {
 	require.NoError(t, err)
 	assert.ElementsMatch(t,
 		[]permissions.AssignmentRow{projectAdminRow()},
-		describeAssignments(t, resp.Assignments),
+		describeAssignments(t, resp.GetAssignments()),
 	)
 }
 
@@ -121,7 +121,7 @@ func TestPermissions_Project_SameAdd(t *testing.T) {
 
 	user := MustProvisionUser(t, c)
 
-	modify := []managementv1.ProjectAssignment{userAssignment[managementv1.ProjectAssignment](t, "modify", user.Id)}
+	modify := []managementv1.ProjectAssignment{userAssignment[managementv1.ProjectAssignment](t, "modify", user.GetId())}
 	require.NoError(t, c.Permissions.Projects.Grant(t.Context(), modify, client.WithProject(defaultProjectID)))
 	// defaultProjectID is a shared resource; undo the write so other tests
 	// asserting exact assignment sets don't see a leftover tuple. Cleanups
@@ -150,10 +150,10 @@ func TestPermissions_Project_Add_NewProject(t *testing.T) {
 	assert.Equal(t, projectID, resp.GetProjectId())
 	assert.ElementsMatch(t,
 		[]permissions.AssignmentRow{{PrincipalType: "user", PrincipalID: adminID, Relation: "project_admin"}},
-		describeAssignments(t, resp.Assignments),
+		describeAssignments(t, resp.GetAssignments()),
 	)
 
-	modify := []managementv1.ProjectAssignment{userAssignment[managementv1.ProjectAssignment](t, "modify", user.Id)}
+	modify := []managementv1.ProjectAssignment{userAssignment[managementv1.ProjectAssignment](t, "modify", user.GetId())}
 	require.NoError(t, c.Permissions.Projects.Grant(t.Context(), modify, client.WithProject(projectID)))
 
 	resp, err = c.Permissions.Projects.Assignments(t.Context(), nil, client.WithProject(projectID))
@@ -161,9 +161,9 @@ func TestPermissions_Project_Add_NewProject(t *testing.T) {
 	assert.ElementsMatch(t,
 		[]permissions.AssignmentRow{
 			{PrincipalType: "user", PrincipalID: adminID, Relation: "project_admin"},
-			{PrincipalType: "user", PrincipalID: user.Id, Relation: "modify"},
+			{PrincipalType: "user", PrincipalID: user.GetId(), Relation: "modify"},
 		},
-		describeAssignments(t, resp.Assignments),
+		describeAssignments(t, resp.GetAssignments()),
 	)
 }
 
@@ -173,7 +173,7 @@ func TestPermissions_Project_Add_Role(t *testing.T) {
 	projectID := MustCreateProject(t, c)
 	role := MustCreateRole(t, c, projectID)
 
-	describe := []managementv1.ProjectAssignment{roleAssignment[managementv1.ProjectAssignment](t, "describe", role.Id)}
+	describe := []managementv1.ProjectAssignment{roleAssignment[managementv1.ProjectAssignment](t, "describe", role.GetId())}
 	require.NoError(t, c.Permissions.Projects.Grant(t.Context(), describe, client.WithProject(projectID)))
 
 	resp, err := c.Permissions.Projects.Assignments(t.Context(), nil, client.WithProject(projectID))
@@ -181,8 +181,8 @@ func TestPermissions_Project_Add_Role(t *testing.T) {
 	assert.ElementsMatch(t,
 		[]permissions.AssignmentRow{
 			{PrincipalType: "user", PrincipalID: adminID, Relation: "project_admin"},
-			{PrincipalType: "role", PrincipalID: role.Id, Relation: "describe"},
+			{PrincipalType: "role", PrincipalID: role.GetId(), Relation: "describe"},
 		},
-		describeAssignments(t, resp.Assignments),
+		describeAssignments(t, resp.GetAssignments()),
 	)
 }

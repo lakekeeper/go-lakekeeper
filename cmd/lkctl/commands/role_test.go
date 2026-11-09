@@ -151,7 +151,7 @@ func TestRoleListName_SearchHitKeepsOnlyExactMatch(t *testing.T) {
 	var roles []managementv1.Role
 	require.NoError(t, json.Unmarshal([]byte(out), &roles), out)
 	require.Len(t, roles, 1)
-	assert.Equal(t, roleTestID, roles[0].Id)
+	assert.Equal(t, roleTestID, roles[0].GetId())
 	sent := searches.Last(t)
 	assert.Equal(t, roleTestProjectID, sent.Header.Get("x-project-id"))
 	assert.JSONEq(t, `{"search":"data-eng"}`, string(sent.Body))
@@ -190,7 +190,7 @@ func TestRoleListName_SearchMissFindsRoleOnLaterListPage(t *testing.T) {
 	var roles []managementv1.Role
 	require.NoError(t, json.Unmarshal([]byte(out), &roles), out)
 	require.Len(t, roles, 1)
-	assert.Equal(t, roleTestID, roles[0].Id)
+	assert.Equal(t, roleTestID, roles[0].GetId())
 	mu.Lock()
 	defer mu.Unlock()
 	assert.Equal(t, []string{"", "page-2"}, pageTokens, "the listing must be paged to the end")

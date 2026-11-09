@@ -28,7 +28,7 @@ func TestPermissions_Warehouse_GetAuthzProps(t *testing.T) {
 	resp, r, err := c.PermissionsOpenfgaAPI.GetWarehouseById(t.Context(), wh).Execute()
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusOK, r.StatusCode)
-	assert.False(t, resp.ManagedAccess)
+	assert.False(t, resp.GetManagedAccess())
 }
 
 func TestPermissions_Warehouse_SetManagedAccess(t *testing.T) {
@@ -40,7 +40,7 @@ func TestPermissions_Warehouse_SetManagedAccess(t *testing.T) {
 	resp, r, err := c.PermissionsOpenfgaAPI.GetWarehouseById(t.Context(), wh).Execute()
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusOK, r.StatusCode)
-	assert.False(t, resp.ManagedAccess)
+	assert.False(t, resp.GetManagedAccess())
 
 	setReq := managementv1.NewSetManagedAccessRequest(true)
 	r, err = c.PermissionsOpenfgaAPI.SetWarehouseManagedAccess(t.Context(), wh).SetManagedAccessRequest(*setReq).Execute()
@@ -49,7 +49,7 @@ func TestPermissions_Warehouse_SetManagedAccess(t *testing.T) {
 
 	resp, _, err = c.PermissionsOpenfgaAPI.GetWarehouseById(t.Context(), wh).Execute()
 	require.NoError(t, err)
-	assert.True(t, resp.ManagedAccess)
+	assert.True(t, resp.GetManagedAccess())
 }
 
 func TestPermissions_Warehouse_GetAccess(t *testing.T) {
@@ -91,7 +91,7 @@ func TestPermissions_Warehouse_GetAccess(t *testing.T) {
 		managementv1.WAREHOUSEACTION_SET_FORMAT_VERSION_POLICY,
 		managementv1.WAREHOUSEACTION_GRANT_WRITE,
 	}
-	assertAllowedActionsSubset(t, want, resp.AllowedActions, managementv1.AllowedWarehouseActionEnumValues)
+	assertAllowedActionsSubset(t, want, resp.GetAllowedActions(), managementv1.AllowedWarehouseActionEnumValues)
 }
 
 func TestPermissions_Warehouse_GetAssignments(t *testing.T) {
@@ -105,7 +105,7 @@ func TestPermissions_Warehouse_GetAssignments(t *testing.T) {
 
 	assert.ElementsMatch(t,
 		[]permissions.AssignmentRow{{PrincipalType: "user", PrincipalID: adminID, Relation: "ownership"}},
-		describeAssignments(t, resp.Assignments),
+		describeAssignments(t, resp.GetAssignments()),
 	)
 }
 
@@ -120,10 +120,10 @@ func TestPermissions_Warehouse_Update(t *testing.T) {
 	require.NoError(t, err)
 	assert.ElementsMatch(t,
 		[]permissions.AssignmentRow{{PrincipalType: "user", PrincipalID: adminID, Relation: "ownership"}},
-		describeAssignments(t, resp.Assignments),
+		describeAssignments(t, resp.GetAssignments()),
 	)
 
-	describe := []managementv1.WarehouseAssignment{userAssignment[managementv1.WarehouseAssignment](t, "describe", user.Id)}
+	describe := []managementv1.WarehouseAssignment{userAssignment[managementv1.WarehouseAssignment](t, "describe", user.GetId())}
 	require.NoError(t, c.Permissions.Warehouses.Grant(t.Context(), wh, describe))
 
 	resp, err = c.Permissions.Warehouses.Assignments(t.Context(), wh, nil)
@@ -131,9 +131,9 @@ func TestPermissions_Warehouse_Update(t *testing.T) {
 	assert.ElementsMatch(t,
 		[]permissions.AssignmentRow{
 			{PrincipalType: "user", PrincipalID: adminID, Relation: "ownership"},
-			{PrincipalType: "user", PrincipalID: user.Id, Relation: "describe"},
+			{PrincipalType: "user", PrincipalID: user.GetId(), Relation: "describe"},
 		},
-		describeAssignments(t, resp.Assignments),
+		describeAssignments(t, resp.GetAssignments()),
 	)
 
 	require.NoError(t, c.Permissions.Warehouses.Revoke(t.Context(), wh, describe))
@@ -142,7 +142,7 @@ func TestPermissions_Warehouse_Update(t *testing.T) {
 	require.NoError(t, err)
 	assert.ElementsMatch(t,
 		[]permissions.AssignmentRow{{PrincipalType: "user", PrincipalID: adminID, Relation: "ownership"}},
-		describeAssignments(t, resp.Assignments),
+		describeAssignments(t, resp.GetAssignments()),
 	)
 }
 
@@ -153,7 +153,7 @@ func TestPermissions_Warehouse_SameAdd(t *testing.T) {
 	project := MustCreateProject(t, c)
 	wh, _ := MustCreateWarehouse(t, c, project)
 
-	modify := []managementv1.WarehouseAssignment{userAssignment[managementv1.WarehouseAssignment](t, "modify", user.Id)}
+	modify := []managementv1.WarehouseAssignment{userAssignment[managementv1.WarehouseAssignment](t, "modify", user.GetId())}
 	require.NoError(t, c.Permissions.Warehouses.Grant(t.Context(), wh, modify))
 
 	err := c.Permissions.Warehouses.Grant(t.Context(), wh, modify)
@@ -171,15 +171,15 @@ func TestPermissions_Warehouse_Add_Role(t *testing.T) {
 	role := MustCreateRole(t, c, project)
 
 	require.NoError(t, c.Permissions.Warehouses.Grant(t.Context(), wh,
-		[]managementv1.WarehouseAssignment{roleAssignment[managementv1.WarehouseAssignment](t, "describe", role.Id)}))
+		[]managementv1.WarehouseAssignment{roleAssignment[managementv1.WarehouseAssignment](t, "describe", role.GetId())}))
 
 	resp, err := c.Permissions.Warehouses.Assignments(t.Context(), wh, nil)
 	require.NoError(t, err)
 	assert.ElementsMatch(t,
 		[]permissions.AssignmentRow{
 			{PrincipalType: "user", PrincipalID: adminID, Relation: "ownership"},
-			{PrincipalType: "role", PrincipalID: role.Id, Relation: "describe"},
+			{PrincipalType: "role", PrincipalID: role.GetId(), Relation: "describe"},
 		},
-		describeAssignments(t, resp.Assignments),
+		describeAssignments(t, resp.GetAssignments()),
 	)
 }

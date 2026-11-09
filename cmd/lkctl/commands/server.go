@@ -148,7 +148,7 @@ func newServerAccessCmd(opts *clientOptions) *cobra.Command {
 			case "json":
 				return printJSON(cmd.OutOrStdout(), resp)
 			case "text":
-				return printAllowedActions(cmd.OutOrStdout(), resp.AllowedActions)
+				return printAllowedActions(cmd.OutOrStdout(), resp.GetAllowedActions())
 			default:
 				return fmt.Errorf("unknown output format: %s", output)
 			}
@@ -178,7 +178,7 @@ func newServerAssignmentsCmd(opts *clientOptions) *cobra.Command {
 			}
 
 			resp, err := c.Permissions.Server.Assignments(ctx, &client.GetServerAssignmentsOptions{
-				Relations: toRelations[managementv1.ServerRelation](assignments.relations),
+				Relations: toEnums[managementv1.ServerRelation](assignments.relations),
 			})
 			if err != nil {
 				return err
@@ -188,7 +188,7 @@ func newServerAssignmentsCmd(opts *clientOptions) *cobra.Command {
 			case "json":
 				return printJSON(cmd.OutOrStdout(), resp)
 			case "text":
-				return printAssignments(cmd.OutOrStdout(), resp.Assignments...)
+				return printAssignments(cmd.OutOrStdout(), resp.GetAssignments()...)
 			default:
 				return fmt.Errorf("unknown output format: %s", output)
 			}

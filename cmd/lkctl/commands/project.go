@@ -238,7 +238,7 @@ func newProjectAccessCmd(opts *clientOptions) *cobra.Command {
 			case "json":
 				return printJSON(cmd.OutOrStdout(), resp)
 			case "text":
-				return printAllowedActions(cmd.OutOrStdout(), resp.AllowedActions)
+				return printAllowedActions(cmd.OutOrStdout(), resp.GetAllowedActions())
 			default:
 				return fmt.Errorf("unknown output format: %s", output)
 			}
@@ -269,7 +269,7 @@ func newProjectAssignmentsCmd(opts *clientOptions) *cobra.Command {
 			}
 
 			resp, err := c.Permissions.Projects.Assignments(ctx, &client.GetProjectAssignmentsOptions{
-				Relations: toRelations[managementv1.ProjectRelation](assignments.relations),
+				Relations: toEnums[managementv1.ProjectRelation](assignments.relations),
 			}, optionalProject(args))
 			if err != nil {
 				return err
@@ -279,7 +279,7 @@ func newProjectAssignmentsCmd(opts *clientOptions) *cobra.Command {
 			case "json":
 				return printJSON(cmd.OutOrStdout(), resp)
 			case "text":
-				return printAssignments(cmd.OutOrStdout(), resp.Assignments...)
+				return printAssignments(cmd.OutOrStdout(), resp.GetAssignments()...)
 			default:
 				return fmt.Errorf("unknown output format: %s", output)
 			}

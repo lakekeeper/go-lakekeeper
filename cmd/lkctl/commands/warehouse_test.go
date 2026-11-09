@@ -165,6 +165,28 @@ func TestWarehouseList_ProjectFlagSendsHeader(t *testing.T) {
 	assert.False(t, got.Query.Has("projectId"), "the deprecated projectId query parameter must not be sent")
 }
 
+func TestWarehouseList_StatusFlagSendsEachStatus(t *testing.T) {
+	t.Parallel()
+	mux, baseURL := testutil.NewServer(t)
+	reqs := testutil.Respond(t, mux, "GET /management/v1/warehouse", http.StatusOK, map[string]any{"warehouses": []any{}})
+
+	_, err := runLkctl(t, baseURL, "warehouse", "list", "--status", "active,inactive")
+
+	require.NoError(t, err)
+	assert.Equal(t, []string{"active", "inactive"}, reqs.Last(t).Query["warehouseStatus"])
+}
+
+func TestWarehouseList_WithoutStatusFlagSendsNoStatusFilter(t *testing.T) {
+	t.Parallel()
+	mux, baseURL := testutil.NewServer(t)
+	reqs := testutil.Respond(t, mux, "GET /management/v1/warehouse", http.StatusOK, map[string]any{"warehouses": []any{}})
+
+	_, err := runLkctl(t, baseURL, "warehouse", "list")
+
+	require.NoError(t, err)
+	assert.False(t, reqs.Last(t).Query.Has("warehouseStatus"))
+}
+
 func TestNewWarehouseCmdSubcommands(t *testing.T) {
 	t.Parallel()
 

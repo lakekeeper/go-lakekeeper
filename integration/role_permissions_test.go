@@ -26,7 +26,7 @@ func TestPermissions_Role_GetAccess(t *testing.T) {
 	// Permissions.Roles.Access reads GetAuthorizerRoleActions, not the
 	// deprecated GetRoleAccessById, because the access surface is the only
 	// one the new endpoint covers cleanly.
-	resp, err := c.Permissions.Roles.Access(t.Context(), role.Id, nil)
+	resp, err := c.Permissions.Roles.Access(t.Context(), role.GetId(), nil)
 	require.NoError(t, err)
 
 	// GetAuthorizerRoleActions reports the OpenFGA-level action set, which is
@@ -40,7 +40,7 @@ func TestPermissions_Role_GetAccess(t *testing.T) {
 		managementv1.OPENFGAROLEACTION_CAN_CHANGE_OWNERSHIP,
 		managementv1.OPENFGAROLEACTION_READ_ASSIGNMENTS,
 	}
-	assertAllowedActionsSubset(t, want, resp.AllowedActions, managementv1.AllowedOpenFGARoleActionEnumValues)
+	assertAllowedActionsSubset(t, want, resp.GetAllowedActions(), managementv1.AllowedOpenFGARoleActionEnumValues)
 }
 
 func TestPermissions_Role_GetAssignments(t *testing.T) {
@@ -48,12 +48,12 @@ func TestPermissions_Role_GetAssignments(t *testing.T) {
 
 	role := MustCreateRole(t, c, defaultProjectID)
 
-	resp, err := c.Permissions.Roles.Assignments(t.Context(), role.Id, nil)
+	resp, err := c.Permissions.Roles.Assignments(t.Context(), role.GetId(), nil)
 	require.NoError(t, err)
 
 	assert.ElementsMatch(t,
 		[]permissions.AssignmentRow{{PrincipalType: "user", PrincipalID: adminID, Relation: "ownership"}},
-		describeAssignments(t, resp.Assignments),
+		describeAssignments(t, resp.GetAssignments()),
 	)
 }
 
@@ -64,33 +64,33 @@ func TestPermissions_Role_Update(t *testing.T) {
 	role := MustCreateRole(t, c, projectID)
 	user := MustProvisionUser(t, c)
 
-	resp, err := c.Permissions.Roles.Assignments(t.Context(), role.Id, nil)
+	resp, err := c.Permissions.Roles.Assignments(t.Context(), role.GetId(), nil)
 	require.NoError(t, err)
 	assert.ElementsMatch(t,
 		[]permissions.AssignmentRow{{PrincipalType: "user", PrincipalID: adminID, Relation: "ownership"}},
-		describeAssignments(t, resp.Assignments),
+		describeAssignments(t, resp.GetAssignments()),
 	)
 
-	assignee := []managementv1.RoleAssignment{userAssignment[managementv1.RoleAssignment](t, "assignee", user.Id)}
-	require.NoError(t, c.Permissions.Roles.Grant(t.Context(), role.Id, assignee))
+	assignee := []managementv1.RoleAssignment{userAssignment[managementv1.RoleAssignment](t, "assignee", user.GetId())}
+	require.NoError(t, c.Permissions.Roles.Grant(t.Context(), role.GetId(), assignee))
 
-	resp, err = c.Permissions.Roles.Assignments(t.Context(), role.Id, nil)
+	resp, err = c.Permissions.Roles.Assignments(t.Context(), role.GetId(), nil)
 	require.NoError(t, err)
 	assert.ElementsMatch(t,
 		[]permissions.AssignmentRow{
 			{PrincipalType: "user", PrincipalID: adminID, Relation: "ownership"},
-			{PrincipalType: "user", PrincipalID: user.Id, Relation: "assignee"},
+			{PrincipalType: "user", PrincipalID: user.GetId(), Relation: "assignee"},
 		},
-		describeAssignments(t, resp.Assignments),
+		describeAssignments(t, resp.GetAssignments()),
 	)
 
-	require.NoError(t, c.Permissions.Roles.Revoke(t.Context(), role.Id, assignee))
+	require.NoError(t, c.Permissions.Roles.Revoke(t.Context(), role.GetId(), assignee))
 
-	resp, err = c.Permissions.Roles.Assignments(t.Context(), role.Id, nil)
+	resp, err = c.Permissions.Roles.Assignments(t.Context(), role.GetId(), nil)
 	require.NoError(t, err)
 	assert.ElementsMatch(t,
 		[]permissions.AssignmentRow{{PrincipalType: "user", PrincipalID: adminID, Relation: "ownership"}},
-		describeAssignments(t, resp.Assignments),
+		describeAssignments(t, resp.GetAssignments()),
 	)
 }
 
@@ -100,10 +100,10 @@ func TestPermissions_Role_SameAdd(t *testing.T) {
 	user := MustProvisionUser(t, c)
 	role := MustCreateRole(t, c, defaultProjectID)
 
-	assignee := []managementv1.RoleAssignment{userAssignment[managementv1.RoleAssignment](t, "assignee", user.Id)}
-	require.NoError(t, c.Permissions.Roles.Grant(t.Context(), role.Id, assignee))
+	assignee := []managementv1.RoleAssignment{userAssignment[managementv1.RoleAssignment](t, "assignee", user.GetId())}
+	require.NoError(t, c.Permissions.Roles.Grant(t.Context(), role.GetId(), assignee))
 
-	err := c.Permissions.Roles.Grant(t.Context(), role.Id, assignee)
+	err := c.Permissions.Roles.Grant(t.Context(), role.GetId(), assignee)
 	var apiErr *client.APIError
 	require.ErrorAs(t, err, &apiErr)
 	assert.Equal(t, http.StatusConflict, apiErr.StatusCode)
