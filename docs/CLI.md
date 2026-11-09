@@ -217,11 +217,18 @@ name argument. A `project-id` in the config is sent like `-p`, as the
 
 ### `lkctl role`
 
-Roles are project-scoped. Use `--project` / `-p`.
+Roles are project-scoped. Use `--project` / `-p` to specify the project
+UUID. When omitted, no project is sent and the server's default project is
+used, as for `lkctl warehouse`. The permission subcommands (`access`,
+`assignments`, `grant`, `revoke`) ignore `-p`: their endpoints address the
+role by id alone.
 
 ```sh
-# List roles
+# List roles (one page; --limit, --token)
 lkctl role list --project <PROJECT-ID>
+
+# Find the role named exactly "data-readers" anywhere in the project
+lkctl role list --name data-readers --project <PROJECT-ID>
 
 # Get / create / update / delete
 lkctl role get    <ROLE-ID>
@@ -235,6 +242,12 @@ lkctl role assignments <ROLE-ID>
 lkctl role grant       <ROLE-ID> --users <U> --assignments assignee   # alias: role assign
 lkctl role revoke      <ROLE-ID> --roles <R> --assignments ownership  # alias: role unassign
 ```
+
+`role list --name` returns the role whose name matches exactly, from the
+whole project rather than the current page; it cannot be combined with
+`--token`. It asks the server's role search first. That search returns only
+the 10 closest names (and only looks at the first 64 characters), so when it
+finds no exact match, `lkctl` pages through every role before printing none.
 
 ### `lkctl user`
 
@@ -269,7 +282,8 @@ lkctl whoami        # the authenticated principal, including whether it is an in
 ## Pagination
 
 `role list` and `user list` accept `--limit` (default 100), `--token`
-(page token), and `--name` (name filter):
+(page token), and `--name` (name filter; for `role list` an exact match
+across the whole project, see [`lkctl role`](#lkctl-role)):
 
 ```sh
 lkctl user list --limit 10

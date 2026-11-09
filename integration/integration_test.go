@@ -144,13 +144,13 @@ func MustCreateRole(t *testing.T, c *client.Client, projectID string) *managemen
 	t.Helper()
 
 	req := managementv1.NewCreateRoleRequest(randomName("test-role"))
-	role, _, err := c.RoleAPI.CreateRole(t.Context()).XProjectId(projectID).CreateRoleRequest(*req).Execute()
+	role, err := c.Roles.Create(t.Context(), req, client.WithProject(projectID))
 	if err != nil {
 		t.Fatalf("create role: %v", err)
 	}
 
 	t.Cleanup(func() {
-		if _, err := c.RoleAPI.DeleteRole(context.Background(), role.Id).XProjectId(projectID).Execute(); err != nil {
+		if err := c.Roles.Delete(context.Background(), role.Id, client.WithProject(projectID)); err != nil {
 			t.Errorf("delete role: %v", err)
 		}
 	})

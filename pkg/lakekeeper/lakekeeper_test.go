@@ -81,3 +81,16 @@ func TestUmbrellaFacadeCallOptions(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "11111111-1111-1111-1111-111111111111", reqs.Last(t).Header.Get("x-project-id"))
 }
+
+// TestUmbrellaListRolesOptions confirms umbrella-only callers can page roles.
+func TestUmbrellaListRolesOptions(t *testing.T) {
+	t.Parallel()
+
+	mux, c := testutil.ServerMux(t)
+	reqs := testutil.Respond(t, mux, "GET /management/v1/role", http.StatusOK, map[string]any{"roles": []any{}})
+
+	_, err := c.Roles.List(t.Context(), &lakekeeper.ListRolesOptions{PageSize: 5})
+
+	require.NoError(t, err)
+	assert.Equal(t, "5", reqs.Last(t).Query.Get("pageSize"))
+}

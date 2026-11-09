@@ -310,7 +310,7 @@ and the role granted `select` on a warehouse.
 |---|---|---|
 | 1. Bootstrap | `lkctl server bootstrap --accept-terms-of-use --as-operator` | `client.NewWithAuthSource(ctx, baseURL, as, client.WithInitialBootstrap(true, true, core.Ptr(managementv1.USERTYPE_APPLICATION)))` |
 | 2. Create project | `PROJECT_ID=$(lkctl project create my-project -o json \| jq -r '."project-id"')` | `created, err := c.Projects.Create(ctx, managementv1.NewCreateProjectRequest("my-project"))` |
-| 3. Create role | `ROLE_ID=$(lkctl role create "data-readers" --project $PROJECT_ID -o json \| jq -r .id)` | `role, _, err := c.RoleAPI.CreateRole(ctx).XProjectId(projectID).CreateRoleRequest(*managementv1.NewCreateRoleRequest("data-readers")).Execute()` |
+| 3. Create role | `ROLE_ID=$(lkctl role create "data-readers" --project $PROJECT_ID -o json \| jq -r .id)` | `role, err := c.Roles.Create(ctx, managementv1.NewCreateRoleRequest("data-readers"), client.WithProject(projectID))` |
 | 4. Add user to role | `lkctl role grant $ROLE_ID --users $USER_ID --assignments assignee` | Build a `RoleAssignment` with wire shape `{"type": "assignee", "user": "<id>"}` via `permissions.BuildAssignment`, pass it to `c.Permissions.Roles.Grant` |
 | 5. Grant role on warehouse | `lkctl warehouse grant $WH_ID --roles $ROLE_ID --assignments select --project $PROJECT_ID` | Build a `WarehouseAssignment` with wire shape `{"type": "select", "role": "<id>"}`, pass it to `c.Permissions.Warehouses.Grant` |
 | 6. Verify | `lkctl warehouse access $WH_ID --user $USER_ID` | `c.Permissions.Warehouses.Access(ctx, WH_ID, &client.GetWarehouseAccessByIDOptions{PrincipalUser: USER_ID})` |
@@ -340,12 +340,10 @@ func provision(ctx context.Context, c *client.Client, userID, warehouseID string
     projectID := uuid.Nil.String()
 
     // 3. Role
-    role, _, err := c.RoleAPI.CreateRole(ctx).
-        XProjectId(projectID).
-        CreateRoleRequest(*managementv1.NewCreateRoleRequest("data-readers")).
-        Execute()
+    role, err := c.Roles.Create(ctx, managementv1.NewCreateRoleRequest("data-readers"),
+        client.WithProject(projectID))
     if err != nil {
-        return fmt.Errorf("create role: %w", err)
+        return err // already "create role: <status>: <body>"
     }
 
     // 4. Add user as assignee of the role.

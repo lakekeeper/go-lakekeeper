@@ -168,7 +168,7 @@ generator's `(value, *http.Response, error)` triple.
 |---|---|
 | `c.Warehouses` | Create and List (project-scoped); Get / Rename / Activate / Deactivate / SetProtection / Statistics / Delete (by warehouse id) |
 | `c.Projects` | Create / Get / Delete / List / Rename (Get, Delete, Rename act on the `WithProject` project, else the server's default project) |
-| `c.Roles` | Create / Get / Delete / List / Update (project-scoped) |
+| `c.Roles` | Create / Get / Delete / List / Update / Search (project-scoped; `List` takes `client.ListRolesOptions` for paging) |
 | `c.Users` | Create / Get / Delete / List (paged, server-side name filter) / Update / Whoami; not project-scoped |
 | `c.Server` | Info / Bootstrap |
 | `c.Permissions` | Access / Assignments / Grant / Revoke, per resource kind: `.Warehouses`, `.Roles` |

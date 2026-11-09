@@ -107,6 +107,9 @@ type (
 	// GetRoleAssignmentsByIDOptions holds the query parameters of
 	// Permissions.Roles.Assignments.
 	GetRoleAssignmentsByIDOptions = client.GetRoleAssignmentsByIDOptions
+
+	// ListRolesOptions holds the query parameters of Roles.List.
+	ListRolesOptions = client.ListRolesOptions
 )
 
 var (

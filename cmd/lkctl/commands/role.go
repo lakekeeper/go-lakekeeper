@@ -1,13 +1,13 @@
 package commands
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
 	"text/tabwriter"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
@@ -25,7 +25,7 @@ func newRoleCmd(opts *clientOptions) *cobra.Command {
 		},
 	}
 
-	cmd.PersistentFlags().StringVarP(&project, "project", "p", uuid.Nil.String(), "Select a project")
+	addProjectFlag(cmd, &project)
 
 	cmd.AddCommand(newRoleListCmd(opts, &project))
 	cmd.AddCommand(newRoleGetCmd(opts, &project))
@@ -58,25 +58,23 @@ func newRoleListCmd(opts *clientOptions, project *string) *cobra.Command {
 				return err
 			}
 
-			req := c.RoleAPI.ListRoles(ctx).XProjectId(*project).PageSize(listOpts.limit)
-			if listOpts.token != "" {
-				req = req.PageToken(listOpts.token)
-			}
-
-			resp, _, err := req.Execute()
-			if err != nil {
-				return client.WrapAPIError("list roles", err, nil)
-			}
-
-			roles := resp.Roles
+			var (
+				roles     []managementv1.Role
+				nextToken string
+			)
 			if listOpts.name != "" {
-				filtered := make([]managementv1.Role, 0, len(roles))
-				for i := range roles {
-					if roles[i].Name == listOpts.name {
-						filtered = append(filtered, roles[i])
-					}
+				roles, err = findRolesByName(ctx, c, listOpts.name, listOpts.limit, client.WithProject(*project))
+				if err != nil {
+					return err
 				}
-				roles = filtered
+			} else {
+				resp, err := c.Roles.List(ctx,
+					&client.ListRolesOptions{PageSize: listOpts.limit, PageToken: listOpts.token},
+					client.WithProject(*project))
+				if err != nil {
+					return err
+				}
+				roles, nextToken = resp.Roles, resp.GetNextPageToken()
 			}
 
 			switch output {
@@ -90,8 +88,8 @@ func newRoleListCmd(opts *clientOptions, project *string) *cobra.Command {
 				if err := printRoles(cmd.OutOrStdout(), output, roles...); err != nil {
 					return err
 				}
-				if resp.NextPageToken.Get() != nil {
-					fmt.Fprintf(cmd.OutOrStdout(), "\nNext page token: %s\n", *resp.NextPageToken.Get())
+				if nextToken != "" {
+					fmt.Fprintf(cmd.OutOrStdout(), "\nNext page token: %s\n", nextToken)
 				}
 				return nil
 			default:
@@ -101,8 +99,50 @@ func newRoleListCmd(opts *clientOptions, project *string) *cobra.Command {
 	}
 
 	addListFlags(cmd, &listOpts)
+	cmd.Flags().Lookup("name").Usage = "Show only the role named exactly this, searched across the whole project (not just the current page)"
+	cmd.MarkFlagsMutuallyExclusive("name", "token")
 	cmd.Flags().StringVarP(&output, "output", "o", "text", "Output format. One of: json|text|wide")
 	return cmd
+}
+
+// findRolesByName returns the roles in the Project named exactly name. It
+// runs the server's role search and keeps the exact matches. The search
+// returns only the 10 nearest roles and truncates the search string to 64
+// characters, so it can miss an exact match (for example among 10 or more
+// names that differ only in punctuation). On a miss it therefore pages
+// through the whole listing, pageSize roles at a time, before reporting none.
+func findRolesByName(ctx context.Context, c *client.Client, name string, pageSize int64, callOpts ...client.CallOption) ([]managementv1.Role, error) {
+	found, err := c.Roles.Search(ctx, managementv1.NewSearchRoleRequest(name), callOpts...)
+	if err != nil {
+		return nil, err
+	}
+	if matches := exactRoleNameMatches(found.Roles, name); len(matches) > 0 {
+		return matches, nil
+	}
+
+	matches := []managementv1.Role{}
+	opts := &client.ListRolesOptions{PageSize: pageSize}
+	for {
+		page, err := c.Roles.List(ctx, opts, callOpts...)
+		if err != nil {
+			return nil, err
+		}
+		matches = append(matches, exactRoleNameMatches(page.Roles, name)...)
+		opts.PageToken = page.GetNextPageToken()
+		if opts.PageToken == "" {
+			return matches, nil
+		}
+	}
+}
+
+func exactRoleNameMatches(roles []managementv1.Role, name string) []managementv1.Role {
+	matches := make([]managementv1.Role, 0, 1)
+	for i := range roles {
+		if roles[i].Name == name {
+			matches = append(matches, roles[i])
+		}
+	}
+	return matches
 }
 
 func newRoleGetCmd(opts *clientOptions, project *string) *cobra.Command {
@@ -119,9 +159,9 @@ func newRoleGetCmd(opts *clientOptions, project *string) *cobra.Command {
 				return err
 			}
 
-			role, _, err := c.RoleAPI.GetRole(ctx, args[0]).XProjectId(*project).Execute()
+			role, err := c.Roles.Get(ctx, args[0], client.WithProject(*project))
 			if err != nil {
-				return client.WrapAPIError("get role", err, nil)
+				return err
 			}
 
 			switch output {
@@ -166,9 +206,9 @@ func newRoleCreateCmd(opts *clientOptions, project *string) *cobra.Command {
 			if description != "" {
 				req.SetDescription(description)
 			}
-			role, _, err := c.RoleAPI.CreateRole(ctx).XProjectId(*project).CreateRoleRequest(*req).Execute()
+			role, err := c.Roles.Create(ctx, req, client.WithProject(*project))
 			if err != nil {
-				return client.WrapAPIError("create role", err, nil)
+				return err
 			}
 
 			switch output {
@@ -209,9 +249,9 @@ func newRoleUpdateCmd(opts *clientOptions, project *string) *cobra.Command {
 			if description != "" {
 				req.SetDescription(description)
 			}
-			role, _, err := c.RoleAPI.UpdateRole(ctx, args[0]).XProjectId(*project).UpdateRoleRequest(*req).Execute()
+			role, err := c.Roles.Update(ctx, args[0], req, client.WithProject(*project))
 			if err != nil {
-				return client.WrapAPIError("update role", err, nil)
+				return err
 			}
 
 			switch output {
@@ -243,8 +283,8 @@ func newRoleDeleteCmd(opts *clientOptions, project *string) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			if _, err := c.RoleAPI.DeleteRole(ctx, args[0]).XProjectId(*project).Execute(); err != nil {
-				return client.WrapAPIError("delete role", err, nil)
+			if err := c.Roles.Delete(ctx, args[0], client.WithProject(*project)); err != nil {
+				return err
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "Role %s deleted\n", args[0])
 			return nil
