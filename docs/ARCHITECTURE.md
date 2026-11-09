@@ -18,7 +18,7 @@ graph TD
 
     subgraph "Hand-written"
         CLIENT["pkg/client.Client<br/>(facade)"]
-        CORE["pkg/core<br/>AuthSource · AuthRoundTripper<br/>APIError"]
+        CORE["pkg/core<br/>AuthSource · AuthRoundTripper"]
         PERM["pkg/permissions<br/>BuildAssignment · DescribeAssignment"]
         PROFILE["pkg/storage/profile<br/>pkg/storage/credential"]
     end
@@ -127,9 +127,13 @@ Key points:
   (defaults: 100 ms–400 ms, max 5 retries). Disable with `WithoutRetries()`
   or tune with `WithRetryMax`, `WithRetryWait`, `WithCheckRetry`,
   `WithBackoff`, and `WithErrorHandler`.
-- **Errors come from the generator.** Non-2xx responses surface as
-  `*managementv1.GenericOpenAPIError`, which carries the raw body and
-  any decoded error model.
+- **One error model.** The generated client turns non-2xx responses into
+  `*managementv1.GenericOpenAPIError`. Façades pass it and the
+  `*http.Response` to `client.WrapAPIError`, which returns a
+  `*client.APIError` carrying the status code, the raw body, and the
+  decoded error model, and unwrapping to the generated error. Transport
+  and context errors stay wrapped with `%w`. See
+  [PACKAGES.md](PACKAGES.md#errors).
 
 ## Bootstrap Flow
 

@@ -14,8 +14,8 @@ type Server struct {
 
 // Info returns the server's bootstrap state and version metadata.
 func (s *Server) Info(ctx context.Context) (*managementv1.ServerInfo, error) {
-	out, _, err := s.api.GetServerInfo(ctx).Execute()
-	return out, wrapAPIError("server info", err)
+	out, resp, err := s.api.GetServerInfo(ctx).Execute()
+	return out, WrapAPIError("server info", err, resp)
 }
 
 // Bootstrap performs initial server setup. Idempotent against an
@@ -25,6 +25,6 @@ func (s *Server) Bootstrap(ctx context.Context, req *managementv1.BootstrapReque
 	if req == nil {
 		return errors.New("bootstrap: request must not be nil")
 	}
-	_, err := s.api.Bootstrap(ctx).BootstrapRequest(*req).Execute()
-	return wrapAPIError("bootstrap", err)
+	resp, err := s.api.Bootstrap(ctx).BootstrapRequest(*req).Execute()
+	return WrapAPIError("bootstrap", err, resp)
 }

@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
+	"github.com/lakekeeper/go-lakekeeper/pkg/client"
 )
 
 func newServerCmd(opts *clientOptions) *cobra.Command {
@@ -45,7 +46,7 @@ func newServerInfoCmd(opts *clientOptions) *cobra.Command {
 			}
 			info, _, err := c.ServerAPI.GetServerInfo(ctx).Execute()
 			if err != nil {
-				return wrapAPIError("get server info", err)
+				return client.WrapAPIError("get server info", err, nil)
 			}
 
 			switch output {
@@ -89,14 +90,14 @@ func newServerBootstrapCmd(opts *clientOptions) *cobra.Command {
 			req.IsOperator = &asOperator
 
 			if _, err := c.ServerAPI.Bootstrap(ctx).BootstrapRequest(*req).Execute(); err != nil {
-				return wrapAPIError("bootstrap", err)
+				return client.WrapAPIError("bootstrap", err, nil)
 			}
 
 			switch output {
 			case "json":
 				info, _, err := c.ServerAPI.GetServerInfo(ctx).Execute()
 				if err != nil {
-					return wrapAPIError("get server info", err)
+					return client.WrapAPIError("get server info", err, nil)
 				}
 				return printJSON(cmd.OutOrStdout(), info)
 			case "text":
@@ -144,7 +145,7 @@ func newServerAccessCmd(opts *clientOptions) *cobra.Command {
 			}
 			resp, _, err := req.Execute()
 			if err != nil {
-				return wrapAPIError("get server access", err)
+				return client.WrapAPIError("get server access", err, nil)
 			}
 
 			switch output {
@@ -190,7 +191,7 @@ func newServerAssignmentsCmd(opts *clientOptions) *cobra.Command {
 			}
 			resp, _, err := req.Execute()
 			if err != nil {
-				return wrapAPIError("get server assignments", err)
+				return client.WrapAPIError("get server assignments", err, nil)
 			}
 
 			switch output {
@@ -240,7 +241,7 @@ func newServerGrantCmd(opts *clientOptions) *cobra.Command {
 				return err
 			}
 			if _, err := c.PermissionsOpenfgaAPI.UpdateServerAssignments(ctx).UpdateServerAssignmentsRequest(*req).Execute(); err != nil {
-				return wrapAPIError("update server assignments", err)
+				return client.WrapAPIError("update server assignments", err, nil)
 			}
 			fmt.Fprintln(cmd.OutOrStdout(), "Server permissions updated")
 			return nil
@@ -287,7 +288,7 @@ func newServerRevokeCmd(opts *clientOptions) *cobra.Command {
 				return err
 			}
 			if _, err := c.PermissionsOpenfgaAPI.UpdateServerAssignments(ctx).UpdateServerAssignmentsRequest(*req).Execute(); err != nil {
-				return wrapAPIError("update server assignments", err)
+				return client.WrapAPIError("update server assignments", err, nil)
 			}
 			fmt.Fprintln(cmd.OutOrStdout(), "Server permissions updated")
 			return nil

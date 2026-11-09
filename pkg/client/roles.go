@@ -19,26 +19,26 @@ func (r *Roles) Create(ctx context.Context, projectID string, req *managementv1.
 	if req == nil {
 		return nil, errors.New("create role: request must not be nil")
 	}
-	out, _, err := r.api.CreateRole(ctx).XProjectId(projectID).CreateRoleRequest(*req).Execute()
-	return out, wrapAPIError("create role", err)
+	out, resp, err := r.api.CreateRole(ctx).XProjectId(projectID).CreateRoleRequest(*req).Execute()
+	return out, WrapAPIError("create role", err, resp)
 }
 
 // Get retrieves a role by id, scoped to the given project.
 func (r *Roles) Get(ctx context.Context, projectID, roleID string) (*managementv1.Role, error) {
-	out, _, err := r.api.GetRole(ctx, roleID).XProjectId(projectID).Execute()
-	return out, wrapAPIError("get role", err)
+	out, resp, err := r.api.GetRole(ctx, roleID).XProjectId(projectID).Execute()
+	return out, WrapAPIError("get role", err, resp)
 }
 
 // Delete removes a role.
 func (r *Roles) Delete(ctx context.Context, projectID, roleID string) error {
-	_, err := r.api.DeleteRole(ctx, roleID).XProjectId(projectID).Execute()
-	return wrapAPIError("delete role", err)
+	resp, err := r.api.DeleteRole(ctx, roleID).XProjectId(projectID).Execute()
+	return WrapAPIError("delete role", err, resp)
 }
 
 // List returns roles in the given project.
 func (r *Roles) List(ctx context.Context, projectID string) (*managementv1.ListRolesResponse, error) {
-	out, _, err := r.api.ListRoles(ctx).XProjectId(projectID).Execute()
-	return out, wrapAPIError("list roles", err)
+	out, resp, err := r.api.ListRoles(ctx).XProjectId(projectID).Execute()
+	return out, WrapAPIError("list roles", err, resp)
 }
 
 // Update mutates a role's name/description.
@@ -46,6 +46,6 @@ func (r *Roles) Update(ctx context.Context, projectID, roleID string, req *manag
 	if req == nil {
 		return nil, errors.New("update role: request must not be nil")
 	}
-	out, _, err := r.api.UpdateRole(ctx, roleID).XProjectId(projectID).UpdateRoleRequest(*req).Execute()
-	return out, wrapAPIError("update role", err)
+	out, resp, err := r.api.UpdateRole(ctx, roleID).XProjectId(projectID).UpdateRoleRequest(*req).Execute()
+	return out, WrapAPIError("update role", err, resp)
 }

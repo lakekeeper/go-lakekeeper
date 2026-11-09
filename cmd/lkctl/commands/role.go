@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/cobra"
 
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
+	"github.com/lakekeeper/go-lakekeeper/pkg/client"
 )
 
 func newRoleCmd(opts *clientOptions) *cobra.Command {
@@ -64,7 +65,7 @@ func newRoleListCmd(opts *clientOptions, project *string) *cobra.Command {
 
 			resp, _, err := req.Execute()
 			if err != nil {
-				return wrapAPIError("list roles", err)
+				return client.WrapAPIError("list roles", err, nil)
 			}
 
 			roles := resp.Roles
@@ -120,7 +121,7 @@ func newRoleGetCmd(opts *clientOptions, project *string) *cobra.Command {
 
 			role, _, err := c.RoleAPI.GetRole(ctx, args[0]).XProjectId(*project).Execute()
 			if err != nil {
-				return wrapAPIError("get role", err)
+				return client.WrapAPIError("get role", err, nil)
 			}
 
 			switch output {
@@ -167,7 +168,7 @@ func newRoleCreateCmd(opts *clientOptions, project *string) *cobra.Command {
 			}
 			role, _, err := c.RoleAPI.CreateRole(ctx).XProjectId(*project).CreateRoleRequest(*req).Execute()
 			if err != nil {
-				return wrapAPIError("create role", err)
+				return client.WrapAPIError("create role", err, nil)
 			}
 
 			switch output {
@@ -210,7 +211,7 @@ func newRoleUpdateCmd(opts *clientOptions, project *string) *cobra.Command {
 			}
 			role, _, err := c.RoleAPI.UpdateRole(ctx, args[0]).XProjectId(*project).UpdateRoleRequest(*req).Execute()
 			if err != nil {
-				return wrapAPIError("update role", err)
+				return client.WrapAPIError("update role", err, nil)
 			}
 
 			switch output {
@@ -243,7 +244,7 @@ func newRoleDeleteCmd(opts *clientOptions, project *string) *cobra.Command {
 				return err
 			}
 			if _, err := c.RoleAPI.DeleteRole(ctx, args[0]).XProjectId(*project).Execute(); err != nil {
-				return wrapAPIError("delete role", err)
+				return client.WrapAPIError("delete role", err, nil)
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "Role %s deleted\n", args[0])
 			return nil
@@ -282,7 +283,7 @@ func newRoleAccessCmd(opts *clientOptions) *cobra.Command {
 			}
 			resp, _, err := req.Execute()
 			if err != nil {
-				return wrapAPIError("get role access", err)
+				return client.WrapAPIError("get role access", err, nil)
 			}
 
 			switch output {
@@ -329,7 +330,7 @@ func newRoleAssignmentsCmd(opts *clientOptions) *cobra.Command {
 
 			resp, _, err := req.Execute()
 			if err != nil {
-				return wrapAPIError("get role assignments", err)
+				return client.WrapAPIError("get role assignments", err, nil)
 			}
 
 			switch output {
@@ -374,7 +375,7 @@ func newRoleGrantCmd(opts *clientOptions) *cobra.Command {
 				return err
 			}
 			if _, err := c.PermissionsOpenfgaAPI.UpdateRoleAssignmentsById(ctx, args[0]).UpdateRoleAssignmentsRequest(*req).Execute(); err != nil {
-				return wrapAPIError("update role assignments", err)
+				return client.WrapAPIError("update role assignments", err, nil)
 			}
 			fmt.Fprintln(cmd.OutOrStdout(), "Role permissions updated")
 			return nil
@@ -421,7 +422,7 @@ func newRoleRevokeCmd(opts *clientOptions) *cobra.Command {
 				return err
 			}
 			if _, err := c.PermissionsOpenfgaAPI.UpdateRoleAssignmentsById(ctx, args[0]).UpdateRoleAssignmentsRequest(*req).Execute(); err != nil {
-				return wrapAPIError("update role assignments", err)
+				return client.WrapAPIError("update role assignments", err, nil)
 			}
 			fmt.Fprintln(cmd.OutOrStdout(), "Role permissions updated")
 			return nil

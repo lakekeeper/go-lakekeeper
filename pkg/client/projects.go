@@ -19,26 +19,26 @@ func (p *Projects) Create(ctx context.Context, req *managementv1.CreateProjectRe
 	if req == nil {
 		return nil, errors.New("create project: request must not be nil")
 	}
-	out, _, err := p.api.CreateProject(ctx).CreateProjectRequest(*req).Execute()
-	return out, wrapAPIError("create project", err)
+	out, resp, err := p.api.CreateProject(ctx).CreateProjectRequest(*req).Execute()
+	return out, WrapAPIError("create project", err, resp)
 }
 
 // Get fetches a project by id.
 func (p *Projects) Get(ctx context.Context, projectID string) (*managementv1.GetProjectResponse, error) {
-	out, _, err := p.api.GetProject(ctx).XProjectId(projectID).Execute()
-	return out, wrapAPIError("get project", err)
+	out, resp, err := p.api.GetProject(ctx).XProjectId(projectID).Execute()
+	return out, WrapAPIError("get project", err, resp)
 }
 
 // Delete removes a project by id.
 func (p *Projects) Delete(ctx context.Context, projectID string) error {
-	_, err := p.api.DeleteProject(ctx).XProjectId(projectID).Execute()
-	return wrapAPIError("delete project", err)
+	resp, err := p.api.DeleteProject(ctx).XProjectId(projectID).Execute()
+	return WrapAPIError("delete project", err, resp)
 }
 
 // List returns all projects visible to the caller.
 func (p *Projects) List(ctx context.Context) (*managementv1.ListProjectsResponse, error) {
-	out, _, err := p.api.ListProjects(ctx).Execute()
-	return out, wrapAPIError("list projects", err)
+	out, resp, err := p.api.ListProjects(ctx).Execute()
+	return out, WrapAPIError("list projects", err, resp)
 }
 
 // Rename updates a project's display name.
@@ -46,6 +46,6 @@ func (p *Projects) Rename(ctx context.Context, projectID string, req *management
 	if req == nil {
 		return errors.New("rename project: request must not be nil")
 	}
-	_, err := p.api.RenameProject(ctx).XProjectId(projectID).RenameProjectRequest(*req).Execute()
-	return wrapAPIError("rename project", err)
+	resp, err := p.api.RenameProject(ctx).XProjectId(projectID).RenameProjectRequest(*req).Execute()
+	return WrapAPIError("rename project", err, resp)
 }

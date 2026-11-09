@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/cobra"
 
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
+	"github.com/lakekeeper/go-lakekeeper/pkg/client"
 )
 
 func newProjectCmd(opts *clientOptions) *cobra.Command {
@@ -51,7 +52,7 @@ func newProjectListCmd(opts *clientOptions) *cobra.Command {
 			}
 			resp, _, err := c.ProjectAPI.ListProjects(ctx).Execute()
 			if err != nil {
-				return wrapAPIError("list projects", err)
+				return client.WrapAPIError("list projects", err, nil)
 			}
 
 			switch output {
@@ -88,7 +89,7 @@ func newProjectGetCmd(opts *clientOptions) *cobra.Command {
 			}
 			resp, _, err := c.ProjectAPI.GetProject(ctx).XProjectId(args[0]).Execute()
 			if err != nil {
-				return wrapAPIError("get project", err)
+				return client.WrapAPIError("get project", err, nil)
 			}
 
 			switch output {
@@ -125,7 +126,7 @@ func newProjectCreateCmd(opts *clientOptions) *cobra.Command {
 			req := managementv1.NewCreateProjectRequest(args[0])
 			created, _, err := c.ProjectAPI.CreateProject(ctx).CreateProjectRequest(*req).Execute()
 			if err != nil {
-				return wrapAPIError("create project", err)
+				return client.WrapAPIError("create project", err, nil)
 			}
 
 			switch output {
@@ -135,7 +136,7 @@ func newProjectCreateCmd(opts *clientOptions) *cobra.Command {
 			case "json":
 				project, _, err := c.ProjectAPI.GetProject(ctx).XProjectId(created.ProjectId).Execute()
 				if err != nil {
-					return wrapAPIError("get project", err)
+					return client.WrapAPIError("get project", err, nil)
 				}
 				return printJSON(cmd.OutOrStdout(), project)
 			default:
@@ -162,7 +163,7 @@ func newProjectRenameCmd(opts *clientOptions) *cobra.Command {
 
 			req := managementv1.NewRenameProjectRequest(args[1])
 			if _, err := c.ProjectAPI.RenameProject(ctx).XProjectId(args[0]).RenameProjectRequest(*req).Execute(); err != nil {
-				return wrapAPIError("rename project", err)
+				return client.WrapAPIError("rename project", err, nil)
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "Project %s renamed to %s\n", args[0], args[1])
 			return nil
@@ -184,7 +185,7 @@ func newProjectDeleteCmd(opts *clientOptions) *cobra.Command {
 				return err
 			}
 			if _, err := c.ProjectAPI.DeleteProject(ctx).XProjectId(args[0]).Execute(); err != nil {
-				return wrapAPIError("delete project", err)
+				return client.WrapAPIError("delete project", err, nil)
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "Project %s deleted\n", args[0])
 			return nil
@@ -228,7 +229,7 @@ func newProjectAccessCmd(opts *clientOptions) *cobra.Command {
 			}
 			resp, _, err := req.Execute()
 			if err != nil {
-				return wrapAPIError("get project access", err)
+				return client.WrapAPIError("get project access", err, nil)
 			}
 
 			switch output {
@@ -278,7 +279,7 @@ func newProjectAssignmentsCmd(opts *clientOptions) *cobra.Command {
 			}
 			resp, _, err := req.Execute()
 			if err != nil {
-				return wrapAPIError("get project assignments", err)
+				return client.WrapAPIError("get project assignments", err, nil)
 			}
 
 			switch output {
@@ -328,7 +329,7 @@ func newProjectGrantCmd(opts *clientOptions) *cobra.Command {
 				return err
 			}
 			if _, err := c.PermissionsOpenfgaAPI.UpdateProjectAssignmentsById(ctx, project).UpdateProjectAssignmentsRequest(*req).Execute(); err != nil {
-				return wrapAPIError("update project assignments", err)
+				return client.WrapAPIError("update project assignments", err, nil)
 			}
 			fmt.Fprintln(cmd.OutOrStdout(), "Project permissions updated")
 			return nil
@@ -380,7 +381,7 @@ func newProjectRevokeCmd(opts *clientOptions) *cobra.Command {
 				return err
 			}
 			if _, err := c.PermissionsOpenfgaAPI.UpdateProjectAssignmentsById(ctx, project).UpdateProjectAssignmentsRequest(*req).Execute(); err != nil {
-				return wrapAPIError("update project assignments", err)
+				return client.WrapAPIError("update project assignments", err, nil)
 			}
 			fmt.Fprintln(cmd.OutOrStdout(), "Project permissions updated")
 			return nil

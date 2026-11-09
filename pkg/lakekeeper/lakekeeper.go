@@ -16,7 +16,7 @@
 //
 // What it re-exports:
 //
-//   - Client + constructors from pkg/client
+//   - Client + constructors, APIError and WrapAPIError from pkg/client
 //   - Storage profile/credential builders from pkg/storage/{profile,credential}
 //   - Permission builders from pkg/permissions
 //   - The most common Management API request/response types
@@ -79,6 +79,9 @@ func NewK8sServiceAccount(ctx context.Context, baseURL, tokenPath string, option
 type (
 	Client = client.Client
 	Option = client.Option
+
+	// APIError is the error a façade returns for a server error response.
+	APIError = client.APIError
 )
 
 var (
@@ -92,6 +95,8 @@ var (
 	WithBackoff          = client.WithBackoff
 	WithErrorHandler     = client.WithErrorHandler
 	WithInitialBootstrap = client.WithInitialBootstrap
+
+	WrapAPIError = client.WrapAPIError
 )
 
 // Storage profile builders + option types.

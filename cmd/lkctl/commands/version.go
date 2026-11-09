@@ -6,6 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/lakekeeper/go-lakekeeper/pkg/client"
 	"github.com/lakekeeper/go-lakekeeper/pkg/version"
 )
 
@@ -88,7 +89,7 @@ func getServerVersion(ctx context.Context, opts *clientOptions) (string, error) 
 	}
 	info, _, err := c.ServerAPI.GetServerInfo(ctx).Execute()
 	if err != nil {
-		return "", wrapAPIError("server info", err)
+		return "", client.WrapAPIError("server info", err, nil)
 	}
 	return info.Version, nil
 }
