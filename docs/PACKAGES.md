@@ -171,7 +171,7 @@ generator's `(value, *http.Response, error)` triple.
 | `c.Roles` | Create / Get / Delete / List / Update / Search (project-scoped; `List` takes `client.ListRolesOptions` for paging) |
 | `c.Users` | Create / Get / Delete / List (paged, server-side name filter) / Update / Whoami; not project-scoped |
 | `c.Server` | Info / Bootstrap |
-| `c.Permissions` | Access / Assignments / Grant / Revoke, per resource kind: `.Warehouses`, `.Roles` |
+| `c.Permissions` | Access / Assignments / Grant / Revoke, per resource kind: `.Warehouses`, `.Roles`, `.Projects` (project-scoped), `.Server` |
 
 ```go
 wh, err := c.Warehouses.Get(ctx, id)                // façade — one call
@@ -215,8 +215,8 @@ users, err := c.Users.List(ctx,
 ### Permissions façade
 
 `c.Permissions` holds one sub-façade per resource kind (`Warehouses`,
-`Roles`). Each has the same four methods, taking the resource id and the
-resource's generated types:
+`Roles`, `Projects`, `Server`). Each has the same four methods, taking the
+resource id and the resource's generated types:
 
 | Method | Request | Returns |
 |---|---|---|
@@ -230,6 +230,17 @@ slice before any request is sent. Pass what
 [`permissions.BuildAssignmentSet`](#pkgpermissions) builds. Warehouse and
 role ids select their project, so these methods take no
 `client.CallOption`.
+
+`Projects` and `Server` have no `id` argument. `Projects` methods name
+the project with a trailing `client.WithProject(id)`; without it the
+server's default project applies. The server is a single resource and is
+not project-scoped.
+
+```go
+err := c.Permissions.Projects.Grant(ctx, projectSet, client.WithProject(projectID))
+resp, err := c.Permissions.Server.Assignments(ctx,
+    &client.GetServerAssignmentsOptions{Relations: []managementv1.ServerRelation{managementv1.SERVERRELATION_ADMIN}})
+```
 
 ```go
 set, err := permissions.BuildAssignmentSet[managementv1.WarehouseAssignment](
@@ -245,9 +256,12 @@ access, err := c.Permissions.Warehouses.Access(ctx, warehouseID,
 ```
 
 `Roles.Access` reads the role's authorizer actions
-(`GetAuthorizerRoleActions`); `Warehouses.Access` reads the warehouse's
-access (`GetWarehouseAccessById`, deprecated upstream; these are the
-endpoints `lkctl` already used, so its output is unchanged).
+(`GetAuthorizerRoleActions`); `Warehouses.Access`, `Projects.Access`, and
+`Server.Access` read the deprecated-upstream `/access` endpoints
+(`GetWarehouseAccessById`, `GetProjectAccess`, `GetServerAccess`). They
+return the action sets `lkctl` already printed, so its output is
+unchanged. `Projects` uses the header variants of the project endpoints,
+not the `…ById` path variants.
 
 ### Errors
 

@@ -22,6 +22,8 @@ import (
 type Permissions struct {
 	Warehouses *WarehousePermissions
 	Roles      *RolePermissions
+	Projects   *ProjectPermissions
+	Server     *ServerPermissions
 }
 
 // errNoAssignments rejects a Grant or Revoke without assignments before it
@@ -158,5 +160,138 @@ func (p *RolePermissions) update(ctx context.Context, op, roleID string, req man
 		return errNoAssignments(op)
 	}
 	resp, err := p.api.UpdateRoleAssignmentsById(ctx, roleID).UpdateRoleAssignmentsRequest(req).Execute()
+	return WrapAPIError(op, err, resp)
+}
+
+// ProjectPermissions manages the permissions of a project. The project is
+// the WithProject option; without it the server applies its default project.
+type ProjectPermissions struct {
+	api *managementv1.PermissionsOpenfgaAPIService
+}
+
+// GetProjectAccessOptions holds the query parameters of
+// ProjectPermissions.Access. A nil pointer or a zero field sends nothing.
+type GetProjectAccessOptions struct {
+	// PrincipalUser reads this user's access instead of the caller's.
+	PrincipalUser string
+	// PrincipalRole reads this role's access instead of the caller's.
+	PrincipalRole string
+}
+
+// Access returns the allowed actions on a project.
+func (p *ProjectPermissions) Access(ctx context.Context, opts *GetProjectAccessOptions, callOpts ...CallOption) (*managementv1.GetProjectAccessResponse, error) {
+	req := withProject(p.api.GetProjectAccess(ctx), callOpts)
+	if opts != nil {
+		if opts.PrincipalUser != "" {
+			req = req.PrincipalUser(opts.PrincipalUser)
+		}
+		if opts.PrincipalRole != "" {
+			req = req.PrincipalRole(opts.PrincipalRole)
+		}
+	}
+	out, resp, err := req.Execute()
+	return out, WrapAPIError("get project access", err, resp)
+}
+
+// GetProjectAssignmentsOptions holds the query parameters of
+// ProjectPermissions.Assignments. A nil pointer or a zero field sends
+// nothing.
+type GetProjectAssignmentsOptions struct {
+	// Relations keeps only assignments of these relations. Empty: all.
+	Relations []managementv1.ProjectRelation
+}
+
+// Assignments lists the assignments on a project.
+func (p *ProjectPermissions) Assignments(ctx context.Context, opts *GetProjectAssignmentsOptions, callOpts ...CallOption) (*managementv1.GetProjectAssignmentsResponse, error) {
+	req := withProject(p.api.GetProjectAssignments(ctx), callOpts)
+	if opts != nil && len(opts.Relations) > 0 {
+		req = req.Relations(opts.Relations)
+	}
+	out, resp, err := req.Execute()
+	return out, WrapAPIError("get project assignments", err, resp)
+}
+
+// Grant writes assignments on a project.
+func (p *ProjectPermissions) Grant(ctx context.Context, assignments []managementv1.ProjectAssignment, callOpts ...CallOption) error {
+	return p.update(ctx, "grant project assignments", managementv1.UpdateProjectAssignmentsRequest{Writes: assignments}, callOpts)
+}
+
+// Revoke deletes assignments on a project.
+func (p *ProjectPermissions) Revoke(ctx context.Context, assignments []managementv1.ProjectAssignment, callOpts ...CallOption) error {
+	return p.update(ctx, "revoke project assignments", managementv1.UpdateProjectAssignmentsRequest{Deletes: assignments}, callOpts)
+}
+
+func (p *ProjectPermissions) update(ctx context.Context, op string, req managementv1.UpdateProjectAssignmentsRequest, callOpts []CallOption) error {
+	if len(req.Writes) == 0 && len(req.Deletes) == 0 {
+		return errNoAssignments(op)
+	}
+	resp, err := withProject(p.api.UpdateProjectAssignments(ctx), callOpts).UpdateProjectAssignmentsRequest(req).Execute()
+	return WrapAPIError(op, err, resp)
+}
+
+// ServerPermissions manages the permissions of the server. The server is
+// a single resource, so these calls take neither an id nor a project
+// option.
+type ServerPermissions struct {
+	api *managementv1.PermissionsOpenfgaAPIService
+}
+
+// GetServerAccessOptions holds the query parameters of
+// ServerPermissions.Access. A nil pointer or a zero field sends nothing.
+type GetServerAccessOptions struct {
+	// PrincipalUser reads this user's access instead of the caller's.
+	PrincipalUser string
+	// PrincipalRole reads this role's access instead of the caller's.
+	PrincipalRole string
+}
+
+// Access returns the allowed actions on the server.
+func (p *ServerPermissions) Access(ctx context.Context, opts *GetServerAccessOptions) (*managementv1.GetServerAccessResponse, error) {
+	req := p.api.GetServerAccess(ctx)
+	if opts != nil {
+		if opts.PrincipalUser != "" {
+			req = req.PrincipalUser(opts.PrincipalUser)
+		}
+		if opts.PrincipalRole != "" {
+			req = req.PrincipalRole(opts.PrincipalRole)
+		}
+	}
+	out, resp, err := req.Execute()
+	return out, WrapAPIError("get server access", err, resp)
+}
+
+// GetServerAssignmentsOptions holds the query parameters of
+// ServerPermissions.Assignments. A nil pointer or a zero field sends
+// nothing.
+type GetServerAssignmentsOptions struct {
+	// Relations keeps only assignments of these relations. Empty: all.
+	Relations []managementv1.ServerRelation
+}
+
+// Assignments lists the assignments on the server.
+func (p *ServerPermissions) Assignments(ctx context.Context, opts *GetServerAssignmentsOptions) (*managementv1.GetServerAssignmentsResponse, error) {
+	req := p.api.GetServerAssignments(ctx)
+	if opts != nil && len(opts.Relations) > 0 {
+		req = req.Relations(opts.Relations)
+	}
+	out, resp, err := req.Execute()
+	return out, WrapAPIError("get server assignments", err, resp)
+}
+
+// Grant writes assignments on the server.
+func (p *ServerPermissions) Grant(ctx context.Context, assignments []managementv1.ServerAssignment) error {
+	return p.update(ctx, "grant server assignments", managementv1.UpdateServerAssignmentsRequest{Writes: assignments})
+}
+
+// Revoke deletes assignments on the server.
+func (p *ServerPermissions) Revoke(ctx context.Context, assignments []managementv1.ServerAssignment) error {
+	return p.update(ctx, "revoke server assignments", managementv1.UpdateServerAssignmentsRequest{Deletes: assignments})
+}
+
+func (p *ServerPermissions) update(ctx context.Context, op string, req managementv1.UpdateServerAssignmentsRequest) error {
+	if len(req.Writes) == 0 && len(req.Deletes) == 0 {
+		return errNoAssignments(op)
+	}
+	resp, err := p.api.UpdateServerAssignments(ctx).UpdateServerAssignmentsRequest(req).Execute()
 	return WrapAPIError(op, err, resp)
 }

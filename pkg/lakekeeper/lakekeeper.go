@@ -107,6 +107,18 @@ type (
 	// GetRoleAssignmentsByIDOptions holds the query parameters of
 	// Permissions.Roles.Assignments.
 	GetRoleAssignmentsByIDOptions = client.GetRoleAssignmentsByIDOptions
+	// GetProjectAccessOptions holds the query parameters of
+	// Permissions.Projects.Access.
+	GetProjectAccessOptions = client.GetProjectAccessOptions
+	// GetProjectAssignmentsOptions holds the query parameters of
+	// Permissions.Projects.Assignments.
+	GetProjectAssignmentsOptions = client.GetProjectAssignmentsOptions
+	// GetServerAccessOptions holds the query parameters of
+	// Permissions.Server.Access.
+	GetServerAccessOptions = client.GetServerAccessOptions
+	// GetServerAssignmentsOptions holds the query parameters of
+	// Permissions.Server.Assignments.
+	GetServerAssignmentsOptions = client.GetServerAssignmentsOptions
 
 	// ListRolesOptions holds the query parameters of Roles.List.
 	ListRolesOptions = client.ListRolesOptions

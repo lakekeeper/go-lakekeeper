@@ -149,13 +149,16 @@ lkctl project rename <PROJECT-ID> new-name
 # Delete a project
 lkctl project delete <PROJECT-ID>
 
-# Permissions — PROJECT-ID is optional and defaults to the bootstrap project
+# Permissions — PROJECT-ID is optional (sent as the x-project-id header)
 lkctl project access      [PROJECT-ID]                 # show allowed actions for the current user
 lkctl project access      [PROJECT-ID] --user <ID>     # or for a specific user
 lkctl project assignments [PROJECT-ID]                 # list assignments
 lkctl project grant       [PROJECT-ID] --users <U> --assignments project_admin
 lkctl project revoke      [PROJECT-ID] --roles <R> --assignments select
 ```
+
+When `[PROJECT-ID]` is omitted, no project is sent and the server's
+default project is used, the same as omitting `-p` on other commands.
 
 `grant` and `revoke` accept `--users`, `--roles`, and `--assignments` as
 repeatable / comma-separated string slices. `--user` / `--role` are

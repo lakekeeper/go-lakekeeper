@@ -151,10 +151,11 @@ use), the option is a no-op — the constructor never calls
 ## Project Scoping
 
 Resources that belong to a project (warehouses, roles) take the project
-per call, and so do `Projects.Get`, `Rename`, and `Delete`, which act on the
-project they name (the server's default project when they name none). A
-project-scoped façade method accepts a trailing, optional
-`...client.CallOption`; `client.WithProject(id)` names the project.
+per call, and so do `Projects.Get`, `Rename`, `Delete`, and
+`Permissions.Projects`, which act on the project they name (the server's
+default project when they name none). A project-scoped façade method
+accepts a trailing, optional `...client.CallOption`;
+`client.WithProject(id)` names the project.
 A method takes the option only when its endpoint accepts `x-project-id`:
 for warehouses that is Create and List, while the calls that address a
 warehouse by id (`Get`, `Rename`, `Statistics`, …) take none:
@@ -175,7 +176,9 @@ c.Warehouses.List(ctx, nil)                                // no project sent
 
 The one place that decides how a project is sent is the unexported
 `withProject` helper in `pkg/client/call_options.go`. `lkctl`'s
-`-p/--project` flag has no default and maps straight to `WithProject`.
+`-p/--project` flag and the optional `[PROJECT-ID]` argument of the
+`project` permission commands have no default and map straight to
+`WithProject`.
 
 Callers of the generated services set the header themselves
 (`c.RoleAPI.ListRoles(ctx).XProjectId(projectID).Execute()`). Project-

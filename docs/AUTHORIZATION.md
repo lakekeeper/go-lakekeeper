@@ -169,57 +169,49 @@ a, err := permissions.BuildAssignment[managementv1.WarehouseAssignment](
 examples below all follow the same skeleton:
 
 1. Build one or more `*Assignment` values for the relation(s) you want.
-2. Grant or revoke them. For warehouses and roles, pass them to the
-   permissions façade: `c.Permissions.<Resource>.Grant` or `.Revoke`.
-   For the server and projects, append them to `req.Writes` (grant) or
-   `req.Deletes` (revoke) and call the right
-   `c.PermissionsOpenfgaAPI.Update<Resource>Assignments…` method.
-3. Verify with `c.Permissions.<Resource>.Assignments` (warehouses,
-   roles) or the matching `Get<Resource>Assignments…`.
+2. Grant or revoke them with the permissions façade:
+   `c.Permissions.<Resource>.Grant` or `.Revoke`.
+3. Verify with `c.Permissions.<Resource>.Assignments`.
 
-The `PermissionsOpenfgaAPI` field name is a historical artifact of the
-OpenAPI tag — it is just Lakekeeper's permissions service, regardless of
-which Authorizer backend the server runs.
+`<Resource>` is `Server`, `Projects`, `Warehouses`, or `Roles`.
 
 ### Server
 
+The server is a single resource, so its calls take no id:
+
 ```go
-req := managementv1.NewUpdateServerAssignmentsRequest()
 a, err := permissions.BuildAssignment[managementv1.ServerAssignment](
     "admin", permissions.PrincipalUser, userID,
 )
 if err != nil {
     return err
 }
-req.Writes = append(req.Writes, a)
 
-if _, err := c.PermissionsOpenfgaAPI.UpdateServerAssignments(ctx).
-    UpdateServerAssignmentsRequest(*req).Execute(); err != nil {
-    return fmt.Errorf("update server assignments: %w", err)
+if err := c.Permissions.Server.Grant(ctx,
+    []managementv1.ServerAssignment{a}); err != nil {
+    return err // *client.APIError on a server error
 }
 
 // Verify
-resp, _, err := c.PermissionsOpenfgaAPI.GetServerAssignments(ctx).Execute()
+resp, err := c.Permissions.Server.Assignments(ctx, nil)
 ```
 
 ### Project
 
-`UpdateProjectAssignmentsById` accepts the project UUID; pass
-`uuid.Nil.String()` for the default project.
+Name the project with `client.WithProject`. Without it, no project is
+sent and the server applies its default project.
 
 ```go
-req := managementv1.NewUpdateProjectAssignmentsRequest()
 a, err := permissions.BuildAssignment[managementv1.ProjectAssignment](
     "project_admin", permissions.PrincipalRole, roleID,
 )
 if err != nil {
     return err
 }
-req.Writes = append(req.Writes, a)
 
-if _, err := c.PermissionsOpenfgaAPI.UpdateProjectAssignmentsById(ctx, projectID).
-    UpdateProjectAssignmentsRequest(*req).Execute(); err != nil {
-    return fmt.Errorf("update project assignments: %w", err)
+if err := c.Permissions.Projects.Grant(ctx,
+    []managementv1.ProjectAssignment{a}, client.WithProject(projectID)); err != nil {
+    return err
 }
 ```
 
@@ -261,9 +253,7 @@ if err := c.Permissions.Roles.Grant(ctx, roleID,
 }
 ```
 
-To revoke instead, call `Revoke` with the same assignments (for the
-server and projects: `req.Deletes = append(req.Deletes, a)` — same
-shape, opposite slice).
+To revoke instead, call `Revoke` with the same assignments.
 
 ## Reading effective access
 
@@ -278,11 +268,9 @@ lkctl warehouse access      <WAREHOUSE-ID> --user <USER-ID>
 lkctl warehouse assignments <WAREHOUSE-ID>
 ```
 
-**SDK.** For warehouses and roles, `c.Permissions.<Resource>.Access`
-returns the allowed actions. For the server and projects, the
-`Get<Resource>Access*` methods live on the permissions service field
-`c.PermissionsOpenfgaAPI`. `c.AuthorizationAPI.BatchCheckActions` covers
-batch checks across resource types.
+**SDK.** `c.Permissions.<Resource>.Access` returns the allowed actions.
+`c.AuthorizationAPI.BatchCheckActions` covers batch checks across
+resource types.
 
 ```go
 // Effective actions for the current principal on a warehouse.
@@ -293,8 +281,9 @@ resp, err = c.Permissions.Warehouses.Access(ctx, warehouseID,
     &client.GetWarehouseAccessByIDOptions{PrincipalUser: userID})
 ```
 
-`GetProjectAccessById` and `GetServerAccess` are flagged **Deprecated**
-by the generator — replacement endpoints exist for the parameter-less
+The project, server, and warehouse access endpoints behind
+`Permissions.<Resource>.Access` (`/permissions/<resource>/access`) are
+flagged **Deprecated** by the generator — replacement endpoints exist for the parameter-less
 case. They remain the path the SDK and `lkctl` use today because the
 `--user` / `--role` filter parity has not been migrated upstream yet.
 Document and use them now; plan to migrate once the replacement covers

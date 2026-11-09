@@ -104,6 +104,8 @@ func NewWithAuthSource(ctx context.Context, baseURL string, as core.AuthSource, 
 		Permissions: &Permissions{
 			Warehouses: &WarehousePermissions{api: api.PermissionsOpenfgaAPI},
 			Roles:      &RolePermissions{api: api.PermissionsOpenfgaAPI},
+			Projects:   &ProjectPermissions{api: api.PermissionsOpenfgaAPI},
+			Server:     &ServerPermissions{api: api.PermissionsOpenfgaAPI},
 		},
 		baseURL:    parsed,
 		authSource: as,

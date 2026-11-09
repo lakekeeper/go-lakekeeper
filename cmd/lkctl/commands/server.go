@@ -136,16 +136,12 @@ func newServerAccessCmd(opts *clientOptions) *cobra.Command {
 				return err
 			}
 
-			req := c.PermissionsOpenfgaAPI.GetServerAccess(ctx)
-			if access.user != "" {
-				req = req.PrincipalUser(access.user)
-			}
-			if access.role != "" {
-				req = req.PrincipalRole(access.role)
-			}
-			resp, _, err := req.Execute()
+			resp, err := c.Permissions.Server.Access(ctx, &client.GetServerAccessOptions{
+				PrincipalUser: access.user,
+				PrincipalRole: access.role,
+			})
 			if err != nil {
-				return client.WrapAPIError("get server access", err, nil)
+				return err
 			}
 
 			switch output {
@@ -181,17 +177,11 @@ func newServerAssignmentsCmd(opts *clientOptions) *cobra.Command {
 				return err
 			}
 
-			req := c.PermissionsOpenfgaAPI.GetServerAssignments(ctx)
-			if len(assignments.relations) > 0 {
-				rels := make([]managementv1.ServerRelation, 0, len(assignments.relations))
-				for _, r := range assignments.relations {
-					rels = append(rels, managementv1.ServerRelation(r))
-				}
-				req = req.Relations(rels)
-			}
-			resp, _, err := req.Execute()
+			resp, err := c.Permissions.Server.Assignments(ctx, &client.GetServerAssignmentsOptions{
+				Relations: toRelations[managementv1.ServerRelation](assignments.relations),
+			})
 			if err != nil {
-				return client.WrapAPIError("get server assignments", err, nil)
+				return err
 			}
 
 			switch output {
@@ -232,16 +222,14 @@ func newServerGrantCmd(opts *clientOptions) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			req := managementv1.NewUpdateServerAssignmentsRequest()
-			req.Writes = set
 
 			ctx := cmd.Context()
 			c, err := newClient(ctx, opts)
 			if err != nil {
 				return err
 			}
-			if _, err := c.PermissionsOpenfgaAPI.UpdateServerAssignments(ctx).UpdateServerAssignmentsRequest(*req).Execute(); err != nil {
-				return client.WrapAPIError("update server assignments", err, nil)
+			if err := c.Permissions.Server.Grant(ctx, set); err != nil {
+				return err
 			}
 			fmt.Fprintln(cmd.OutOrStdout(), "Server permissions updated")
 			return nil
@@ -279,16 +267,14 @@ func newServerRevokeCmd(opts *clientOptions) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			req := managementv1.NewUpdateServerAssignmentsRequest()
-			req.Deletes = set
 
 			ctx := cmd.Context()
 			c, err := newClient(ctx, opts)
 			if err != nil {
 				return err
 			}
-			if _, err := c.PermissionsOpenfgaAPI.UpdateServerAssignments(ctx).UpdateServerAssignmentsRequest(*req).Execute(); err != nil {
-				return client.WrapAPIError("update server assignments", err, nil)
+			if err := c.Permissions.Server.Revoke(ctx, set); err != nil {
+				return err
 			}
 			fmt.Fprintln(cmd.OutOrStdout(), "Server permissions updated")
 			return nil

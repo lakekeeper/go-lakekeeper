@@ -6,7 +6,6 @@ import (
 	"io"
 	"text/tabwriter"
 
-	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
@@ -192,6 +191,19 @@ func newProjectDeleteCmd(opts *clientOptions) *cobra.Command {
 	return cmd
 }
 
+// projectArgHelp documents the optional [PROJECT-ID] argument of the
+// project permission commands.
+const projectArgHelp = "PROJECT-ID is optional; when omitted, the server's default project is used."
+
+// optionalProject maps the optional [PROJECT-ID] argument to the project
+// option: no argument sends no project, like an omitted -p.
+func optionalProject(args []string) client.CallOption {
+	if len(args) == 0 {
+		return client.WithProject("")
+	}
+	return client.WithProject(args[0])
+}
+
 func newProjectAccessCmd(opts *clientOptions) *cobra.Command {
 	var (
 		access accessOpts
@@ -201,15 +213,11 @@ func newProjectAccessCmd(opts *clientOptions) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "access [PROJECT-ID]",
 		Short: "Get project access",
-		Long:  "Get project access. By default, the current user's access on the default project is returned.",
+		Long:  "Get project access. By default, the current user's access is returned.\n\n" + projectArgHelp,
 		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if access.user != "" && access.role != "" {
 				return errors.New("--user and --role are mutually exclusive")
-			}
-			project := uuid.Nil.String()
-			if len(args) == 1 {
-				project = args[0]
 			}
 
 			ctx := cmd.Context()
@@ -218,16 +226,12 @@ func newProjectAccessCmd(opts *clientOptions) *cobra.Command {
 				return err
 			}
 
-			req := c.PermissionsOpenfgaAPI.GetProjectAccessById(ctx, project)
-			if access.user != "" {
-				req = req.PrincipalUser(access.user)
-			}
-			if access.role != "" {
-				req = req.PrincipalRole(access.role)
-			}
-			resp, _, err := req.Execute()
+			resp, err := c.Permissions.Projects.Access(ctx, &client.GetProjectAccessOptions{
+				PrincipalUser: access.user,
+				PrincipalRole: access.role,
+			}, optionalProject(args))
 			if err != nil {
-				return client.WrapAPIError("get project access", err, nil)
+				return err
 			}
 
 			switch output {
@@ -255,29 +259,20 @@ func newProjectAssignmentsCmd(opts *clientOptions) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "assignments [PROJECT-ID]",
 		Short: "Get project assignments",
+		Long:  "Get project assignments.\n\n" + projectArgHelp,
 		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			project := uuid.Nil.String()
-			if len(args) == 1 {
-				project = args[0]
-			}
 			ctx := cmd.Context()
 			c, err := newClient(ctx, opts)
 			if err != nil {
 				return err
 			}
 
-			req := c.PermissionsOpenfgaAPI.GetProjectAssignmentsById(ctx, project)
-			if len(assignments.relations) > 0 {
-				rels := make([]managementv1.ProjectRelation, 0, len(assignments.relations))
-				for _, r := range assignments.relations {
-					rels = append(rels, managementv1.ProjectRelation(r))
-				}
-				req = req.Relations(rels)
-			}
-			resp, _, err := req.Execute()
+			resp, err := c.Permissions.Projects.Assignments(ctx, &client.GetProjectAssignmentsOptions{
+				Relations: toRelations[managementv1.ProjectRelation](assignments.relations),
+			}, optionalProject(args))
 			if err != nil {
-				return client.WrapAPIError("get project assignments", err, nil)
+				return err
 			}
 
 			switch output {
@@ -307,27 +302,21 @@ func newProjectGrantCmd(opts *clientOptions) *cobra.Command {
 		Use:     "grant [PROJECT-ID]",
 		Aliases: []string{"assign"},
 		Short:   "Add project assignments",
+		Long:    "Add project assignments.\n\n" + projectArgHelp,
 		Args:    cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			project := uuid.Nil.String()
-			if len(args) == 1 {
-				project = args[0]
-			}
-
 			set, err := buildAssignmentSet[managementv1.ProjectAssignment](assignments, users, roles)
 			if err != nil {
 				return err
 			}
-			req := managementv1.NewUpdateProjectAssignmentsRequest()
-			req.Writes = set
 
 			ctx := cmd.Context()
 			c, err := newClient(ctx, opts)
 			if err != nil {
 				return err
 			}
-			if _, err := c.PermissionsOpenfgaAPI.UpdateProjectAssignmentsById(ctx, project).UpdateProjectAssignmentsRequest(*req).Execute(); err != nil {
-				return client.WrapAPIError("update project assignments", err, nil)
+			if err := c.Permissions.Projects.Grant(ctx, set, optionalProject(args)); err != nil {
+				return err
 			}
 			fmt.Fprintln(cmd.OutOrStdout(), "Project permissions updated")
 			return nil
@@ -354,32 +343,26 @@ func newProjectRevokeCmd(opts *clientOptions) *cobra.Command {
 		Use:     "revoke [PROJECT-ID]",
 		Aliases: []string{"unassign"},
 		Short:   "Remove project assignments",
-		Example: `  # Revoke project_admin from a user on the default project
+		Long:    "Remove project assignments.\n\n" + projectArgHelp,
+		Example: `  # Revoke project_admin from a user on the server's default project
   lkctl project revoke --users 0198618c-5be8-7a82-a0b9-1076c9dd12f0 --assignments project_admin
 
   # Revoke select from a role on a specific project
   lkctl project revoke 0198618c-5be8-7a82-a0b9-1076c9dd12f0 --roles 11111111-2222-3333-4444-555555555555 --assignments select`,
 		Args: cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			project := uuid.Nil.String()
-			if len(args) == 1 {
-				project = args[0]
-			}
-
 			set, err := buildAssignmentSet[managementv1.ProjectAssignment](assignments, users, roles)
 			if err != nil {
 				return err
 			}
-			req := managementv1.NewUpdateProjectAssignmentsRequest()
-			req.Deletes = set
 
 			ctx := cmd.Context()
 			c, err := newClient(ctx, opts)
 			if err != nil {
 				return err
 			}
-			if _, err := c.PermissionsOpenfgaAPI.UpdateProjectAssignmentsById(ctx, project).UpdateProjectAssignmentsRequest(*req).Execute(); err != nil {
-				return client.WrapAPIError("update project assignments", err, nil)
+			if err := c.Permissions.Projects.Revoke(ctx, set, optionalProject(args)); err != nil {
+				return err
 			}
 			fmt.Fprintln(cmd.OutOrStdout(), "Project permissions updated")
 			return nil
