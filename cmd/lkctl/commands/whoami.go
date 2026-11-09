@@ -2,6 +2,9 @@ package commands
 
 import (
 	"fmt"
+	"io"
+	"text/tabwriter"
+	"time"
 
 	"github.com/spf13/cobra"
 
@@ -28,14 +31,10 @@ func newWhoamiCmd(opts *clientOptions) *cobra.Command {
 				return wrapAPIError("whoami", err)
 			}
 
-			switch output {
-			case "json":
+			if output == "json" {
 				return printJSON(cmd.OutOrStdout(), user)
-			case "text", "wide":
-				return printUsers(cmd.OutOrStdout(), output, nil, whoamiUser(user))
-			default:
-				return fmt.Errorf("unknown output format: %s", output)
 			}
+			return printWhoami(cmd.OutOrStdout(), output, user)
 		},
 	}
 
@@ -43,10 +42,25 @@ func newWhoamiCmd(opts *clientOptions) *cobra.Command {
 	return cmd
 }
 
-// whoamiUser projects a whoami response onto the User fields printUsers shows.
-func whoamiUser(w *managementv1.WhoamiResponse) *managementv1.User {
-	u := managementv1.NewUser(w.CreatedAt, w.Id, w.LastUpdatedWith, w.Name, w.UserType)
-	u.Email.Set(w.Email)
-	u.UpdatedAt.Set(w.UpdatedAt)
-	return u
+// printWhoami writes a tabular representation of the current user to w.
+// Supported formats mirror printUsers, plus the instance-admin flag that only
+// the whoami response carries:
+//   - "text": ID, NAME, EMAIL, USER TYPE, INSTANCE ADMIN
+//   - "wide": adds CREATED AT, UPDATED AT, LAST UPDATED WITH
+func printWhoami(w io.Writer, output string, u *managementv1.WhoamiResponse) error {
+	tw := tabwriter.NewWriter(w, 0, 0, 2, ' ', 0)
+	switch output {
+	case "text":
+		fmt.Fprintln(tw, "ID\tNAME\tEMAIL\tUSER TYPE\tINSTANCE ADMIN")
+		fmt.Fprintf(tw, "%s\t%s\t%s\t%s\t%t\n",
+			u.Id, u.Name, formatStringPtr(u.Email), u.UserType, u.IsInstanceAdmin)
+	case "wide":
+		fmt.Fprintln(tw, "ID\tNAME\tEMAIL\tUSER TYPE\tINSTANCE ADMIN\tCREATED AT\tUPDATED AT\tLAST UPDATED WITH")
+		fmt.Fprintf(tw, "%s\t%s\t%s\t%s\t%t\t%s\t%s\t%s\n",
+			u.Id, u.Name, formatStringPtr(u.Email), u.UserType, u.IsInstanceAdmin,
+			u.CreatedAt.Format(time.RFC3339), formatTimePtr(u.UpdatedAt), u.LastUpdatedWith)
+	default:
+		return fmt.Errorf("unknown output format: %s", output)
+	}
+	return tw.Flush()
 }
