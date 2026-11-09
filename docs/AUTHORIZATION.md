@@ -307,27 +307,22 @@ and the role granted `select` on a warehouse.
 The SDK side, end-to-end, in one block. To keep the snippet focused, it
 picks up after step 1 (the caller passes in a constructed `*client.Client`)
 and assumes the user already exists — provision one via
-`c.Users.Create(...)` if not. It also uses the default project
-(`uuid.Nil`); replace `projectID` to target a named one and prepend the
-matching `c.Projects.Create(...)` call.
+`c.Users.Create(...)` if not. An empty `projectID` sends no project, so
+the server applies its default project; pass the id from
+`c.Projects.Create(...)` to target a named one.
 
 ```go
 import (
     "context"
     "fmt"
 
-    "github.com/google/uuid"
-
     managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
     "github.com/lakekeeper/go-lakekeeper/pkg/client"
-    "github.com/lakekeeper/go-lakekeeper/pkg/core"
     "github.com/lakekeeper/go-lakekeeper/pkg/permissions"
 )
 
-func provision(ctx context.Context, c *client.Client, userID, warehouseID string) error {
-    // 2. Project (default project shown via uuid.Nil; replace for a named one)
-    projectID := uuid.Nil.String()
-
+// projectID "" means the server's default project.
+func provision(ctx context.Context, c *client.Client, projectID, userID, warehouseID string) error {
     // 3. Role
     role, err := c.Roles.Create(ctx, managementv1.NewCreateRoleRequest("data-readers"),
         client.WithProject(projectID))

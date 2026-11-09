@@ -19,20 +19,20 @@ import (
 
 var defaultUserAgent = "go-lakekeeper/" + version.GetVersion().Version
 
-// Client is a thin facade over the generated managementv1.APIClient.
+// Client is the SDK entry point for the Lakekeeper Management API.
 //
-// The generated APIClient is embedded, so each generated service handle
-// (ProjectAPI, WarehouseAPI, ServerAPI, …) is reachable as a public field
-// directly on Client. The facade adds: auth wiring (via core.AuthSource and a
-// custom http.RoundTripper), optional retry behaviour, optional bootstrap on
-// construction, and a CatalogV1 helper that delegates to apache/iceberg-go.
+// Use the resource façades (Warehouses, Projects, Roles, Users, Server,
+// Permissions): one method call per operation, with project scoping via
+// WithProject and errors as *APIError. Client also adds auth wiring (via
+// core.AuthSource and a custom http.RoundTripper), optional retry
+// behaviour, optional bootstrap on construction, and a CatalogV1 helper
+// that delegates to apache/iceberg-go.
 //
-// For the common cases — single-body request, single-response result —
-// reach for the resource façades (Warehouses, Projects, Roles, Users,
-// Server). They compress the generator's three-call fluent pattern into
-// one method call. The full fluent surface remains available via the
-// embedded APIClient when you need extra request options or the raw
-// *http.Response.
+// The generated APIClient is embedded as the escape hatch: each generated
+// service handle (ProjectAPI, WarehouseAPI, TagAPI, …) is reachable as a
+// public field directly on Client, for operations without a façade or when
+// you need extra request options or the raw *http.Response. Wrap its
+// errors with WrapAPIError to get the façades' error type.
 type Client struct {
 	*managementv1.APIClient
 

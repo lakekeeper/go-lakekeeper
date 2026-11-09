@@ -136,12 +136,14 @@ provides no behaviour of its own — every symbol resolves through
 
 **Import path:** `github.com/lakekeeper/go-lakekeeper/pkg/client`
 
-The top-level facade. `Client` embeds the generated
-`*managementv1.APIClient`, so each generated service handle is reachable as
-a public field directly on `Client`. The facade adds auth wiring (via
-`core.AuthSource` and a custom `http.RoundTripper`), optional retry
-behaviour, optional bootstrap on construction, and a `CatalogV1` helper
-that delegates to `apache/iceberg-go`.
+The top-level facade and the public SDK interface. `Client` carries the
+resource façades (`Warehouses`, `Projects`, `Roles`, `Users`, `Server`,
+`Permissions`), auth wiring (via `core.AuthSource` and a custom
+`http.RoundTripper`), optional retry behaviour, optional bootstrap on
+construction, and a `CatalogV1` helper that delegates to
+`apache/iceberg-go`. It also embeds the generated
+`*managementv1.APIClient` as the escape hatch, so each generated service
+handle is reachable as a public field directly on `Client`.
 
 ### Constructors
 
@@ -179,9 +181,16 @@ wh, _, err := c.WarehouseAPI.GetWarehouse(ctx, id). // generator — full contro
     Execute()
 ```
 
-For endpoints without a façade, custom request options, or where you need
-the raw `*http.Response`, reach for the embedded generated service handles
-below.
+**Coverage.** The façades cover every operation `lkctl` uses on
+warehouses, projects, roles, users, and the server, plus access,
+assignments, grant, and revoke for warehouse, role, project, and server
+permissions. `lkctl` commands call only the façades. Not covered, and
+reachable only through the [embedded generated
+services](#escape-hatch-embedded-generated-services): tags, tasks, grants,
+authorization checks, namespace and tabular protections, warehouse managed
+access, and the less common warehouse operations (storage credential and
+profile updates, delete profile, undrop, tabular search, …). For those, custom request
+options, or the raw `*http.Response`, use the escape hatch.
 
 ### Façade conventions
 
@@ -292,13 +301,13 @@ if err != nil {
 }
 ```
 
-`resp` may be `nil`; the status is then unknown. `lkctl` commands that
-still call generated services directly pass `nil` until they move to a
-façade.
+`resp` may be `nil`; the status is then unknown.
 
-### Embedded service handles (generator-shaped fluent surface)
+### Escape hatch: embedded generated services
 
-Every generated service is exposed as a field on `*Client`:
+`Client` embeds the generated `*managementv1.APIClient`, so every generated
+service is exposed as a field on `*Client`, with the generator's fluent
+builders and its `(value, *http.Response, error)` result:
 
 | Field | Purpose |
 |---|---|
@@ -308,12 +317,16 @@ Every generated service is exposed as a field on `*Client`:
 | `c.RoleAPI` | Roles |
 | `c.WarehouseAPI` | Warehouses, namespaces, tabular protections |
 | `c.PermissionsOpenfgaAPI` | Assignments and access checks |
-| `c.AuthorizationAPI` | Authorization metadata |
+| `c.AuthorizationAPI` | Authorization metadata and action checks |
+| `c.GrantAPI` | Grants |
+| `c.TagAPI` | Tags |
 | `c.TasksAPI` | Background task introspection |
 
-Project-scoping (where the API needs `x-project-id`) is handled by passing
-the project ID into the relevant generated method — see the godoc on each
-service for specifics.
+On a project-scoped endpoint, name the project with the builder's
+`XProjectId(id)` (the `x-project-id` header) and leave the deprecated
+`ProjectId(id)` query builder and `project-id` body field unset; see
+[ARCHITECTURE.md](ARCHITECTURE.md#project-scoping). Wrap errors with
+[`client.WrapAPIError`](#errors) to get the façades' error type.
 
 ### Catalog helper
 
@@ -515,14 +528,16 @@ without exchanging it through an IdP.
 It contains the generated `*APIClient`, per-resource `*APIService` types
 (`ProjectAPIService`, `WarehouseAPIService`, `RoleAPIService`,
 `UserAPIService`, `ServerAPIService`, `PermissionsOpenfgaAPIService`,
-`AuthorizationAPIService`, `TasksAPIService`), and a few hundred model
-types (one file per model, prefix `model_`).
+`AuthorizationAPIService`, `GrantAPIService`, `TagAPIService`,
+`TasksAPIService`), and a few hundred model types (one file per model,
+prefix `model_`).
 
 The generated client is normally accessed through
 [`pkg/client`](#pkgclient) rather than instantiated directly. Use the
-embedded service fields on `*client.Client` for routine operations, and
-reach for the raw `managementv1` types when constructing requests
-(e.g. `managementv1.NewBootstrapRequest(true)`).
+resource façades on `*client.Client` for routine operations and the
+embedded service fields only for operations without a façade. The
+`managementv1` model types stay the entities and request bodies the
+façades take and return (e.g. `managementv1.NewBootstrapRequest(true)`).
 
 ---
 
@@ -713,4 +728,6 @@ Façade tests live in `package client_test` (an internal test importing
 
 The CLI binary entry point. Delegates immediately to
 `cmd/lkctl/commands.NewCommand()`, which builds the Cobra command tree.
+Commands call the `pkg/client` façades only, never a generated
+`*APIService`; they use `managementv1` for model types.
 See [CLI.md](CLI.md) for the full command reference.
