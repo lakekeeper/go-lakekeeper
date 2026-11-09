@@ -186,6 +186,8 @@ func TestFacadeError_RetriesExhaustedStillAPIError(t *testing.T) {
 	require.ErrorAs(t, err, &apiErr, "want *client.APIError, got %T: %v", err, err)
 	require.Equal(t, http.StatusServiceUnavailable, apiErr.StatusCode)
 	require.Contains(t, string(apiErr.Body), "try later")
+	require.NotNil(t, apiErr.Model, "a 5xx JSON body is decoded too")
+	require.Equal(t, "Unavailable", apiErr.Model.Type)
 }
 
 func TestFacadeError_CancelledContextKeepsChain(t *testing.T) {
