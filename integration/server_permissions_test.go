@@ -96,6 +96,21 @@ func TestPermissions_Server_Update(t *testing.T) {
 	r, err := c.PermissionsOpenfgaAPI.UpdateServerAssignments(t.Context()).UpdateServerAssignmentsRequest(*addReq).Execute()
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusNoContent, r.StatusCode)
+	// Server is shared; if the test stops before its own delete below, remove
+	// the tuple so later tests asserting exact assignment sets don't see it.
+	// Cleanups run LIFO, so this fires before MustProvisionUser's user-delete
+	// cleanup.
+	removed := false
+	t.Cleanup(func() {
+		if removed {
+			return
+		}
+		delReq := managementv1.NewUpdateServerAssignmentsRequest()
+		delReq.Deletes = append(delReq.Deletes, userAssignment[managementv1.ServerAssignment](t, "admin", user.Id))
+		if _, err := c.PermissionsOpenfgaAPI.UpdateServerAssignments(context.Background()).UpdateServerAssignmentsRequest(*delReq).Execute(); err != nil {
+			t.Errorf("undo server admin assignment: %v", err)
+		}
+	})
 
 	resp, _, err = c.PermissionsOpenfgaAPI.GetServerAssignments(t.Context()).Execute()
 	require.NoError(t, err)
@@ -113,6 +128,7 @@ func TestPermissions_Server_Update(t *testing.T) {
 
 	r, err = c.PermissionsOpenfgaAPI.UpdateServerAssignments(t.Context()).UpdateServerAssignmentsRequest(*delReq).Execute()
 	require.NoError(t, err)
+	removed = true
 	assert.Equal(t, http.StatusNoContent, r.StatusCode)
 
 	resp, _, err = c.PermissionsOpenfgaAPI.GetServerAssignments(t.Context()).Execute()
