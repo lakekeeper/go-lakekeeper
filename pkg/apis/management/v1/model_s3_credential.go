@@ -109,54 +109,6 @@ func (dst *S3Credential) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	// check if the discriminator value is 'S3CredentialAccessKey'
-	if jsonDict["credential-type"] == "S3CredentialAccessKey" {
-		// try to unmarshal JSON data into S3CredentialAccessKey
-		err = json.Unmarshal(data, &dst.S3CredentialAccessKey)
-		if err == nil {
-			return nil // data stored in dst.S3CredentialAccessKey, return on the first match
-		} else {
-			dst.S3CredentialAccessKey = nil
-			return fmt.Errorf("failed to unmarshal S3Credential as S3CredentialAccessKey: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'S3CredentialAliyunOss'
-	if jsonDict["credential-type"] == "S3CredentialAliyunOss" {
-		// try to unmarshal JSON data into S3CredentialAliyunOss
-		err = json.Unmarshal(data, &dst.S3CredentialAliyunOss)
-		if err == nil {
-			return nil // data stored in dst.S3CredentialAliyunOss, return on the first match
-		} else {
-			dst.S3CredentialAliyunOss = nil
-			return fmt.Errorf("failed to unmarshal S3Credential as S3CredentialAliyunOss: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'S3CredentialAwsSystemIdentity'
-	if jsonDict["credential-type"] == "S3CredentialAwsSystemIdentity" {
-		// try to unmarshal JSON data into S3CredentialAwsSystemIdentity
-		err = json.Unmarshal(data, &dst.S3CredentialAwsSystemIdentity)
-		if err == nil {
-			return nil // data stored in dst.S3CredentialAwsSystemIdentity, return on the first match
-		} else {
-			dst.S3CredentialAwsSystemIdentity = nil
-			return fmt.Errorf("failed to unmarshal S3Credential as S3CredentialAwsSystemIdentity: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'S3CredentialCloudflareR2'
-	if jsonDict["credential-type"] == "S3CredentialCloudflareR2" {
-		// try to unmarshal JSON data into S3CredentialCloudflareR2
-		err = json.Unmarshal(data, &dst.S3CredentialCloudflareR2)
-		if err == nil {
-			return nil // data stored in dst.S3CredentialCloudflareR2, return on the first match
-		} else {
-			dst.S3CredentialCloudflareR2 = nil
-			return fmt.Errorf("failed to unmarshal S3Credential as S3CredentialCloudflareR2: %s", err.Error())
-		}
-	}
-
 	return nil
 }
 
@@ -200,6 +152,28 @@ func (obj *S3Credential) GetActualInstance() interface{} {
 
 	if obj.S3CredentialCloudflareR2 != nil {
 		return obj.S3CredentialCloudflareR2
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj S3Credential) GetActualInstanceValue() interface{} {
+	if obj.S3CredentialAccessKey != nil {
+		return *obj.S3CredentialAccessKey
+	}
+
+	if obj.S3CredentialAliyunOss != nil {
+		return *obj.S3CredentialAliyunOss
+	}
+
+	if obj.S3CredentialAwsSystemIdentity != nil {
+		return *obj.S3CredentialAwsSystemIdentity
+	}
+
+	if obj.S3CredentialCloudflareR2 != nil {
+		return *obj.S3CredentialCloudflareR2
 	}
 
 	// all schemas are nil

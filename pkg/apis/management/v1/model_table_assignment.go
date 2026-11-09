@@ -189,102 +189,6 @@ func (dst *TableAssignment) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	// check if the discriminator value is 'TableAssignmentDescribe'
-	if jsonDict["type"] == "TableAssignmentDescribe" {
-		// try to unmarshal JSON data into TableAssignmentDescribe
-		err = json.Unmarshal(data, &dst.TableAssignmentDescribe)
-		if err == nil {
-			return nil // data stored in dst.TableAssignmentDescribe, return on the first match
-		} else {
-			dst.TableAssignmentDescribe = nil
-			return fmt.Errorf("failed to unmarshal TableAssignment as TableAssignmentDescribe: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'TableAssignmentManageGrants'
-	if jsonDict["type"] == "TableAssignmentManageGrants" {
-		// try to unmarshal JSON data into TableAssignmentManageGrants
-		err = json.Unmarshal(data, &dst.TableAssignmentManageGrants)
-		if err == nil {
-			return nil // data stored in dst.TableAssignmentManageGrants, return on the first match
-		} else {
-			dst.TableAssignmentManageGrants = nil
-			return fmt.Errorf("failed to unmarshal TableAssignment as TableAssignmentManageGrants: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'TableAssignmentManageTags'
-	if jsonDict["type"] == "TableAssignmentManageTags" {
-		// try to unmarshal JSON data into TableAssignmentManageTags
-		err = json.Unmarshal(data, &dst.TableAssignmentManageTags)
-		if err == nil {
-			return nil // data stored in dst.TableAssignmentManageTags, return on the first match
-		} else {
-			dst.TableAssignmentManageTags = nil
-			return fmt.Errorf("failed to unmarshal TableAssignment as TableAssignmentManageTags: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'TableAssignmentModify'
-	if jsonDict["type"] == "TableAssignmentModify" {
-		// try to unmarshal JSON data into TableAssignmentModify
-		err = json.Unmarshal(data, &dst.TableAssignmentModify)
-		if err == nil {
-			return nil // data stored in dst.TableAssignmentModify, return on the first match
-		} else {
-			dst.TableAssignmentModify = nil
-			return fmt.Errorf("failed to unmarshal TableAssignment as TableAssignmentModify: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'TableAssignmentOwnership'
-	if jsonDict["type"] == "TableAssignmentOwnership" {
-		// try to unmarshal JSON data into TableAssignmentOwnership
-		err = json.Unmarshal(data, &dst.TableAssignmentOwnership)
-		if err == nil {
-			return nil // data stored in dst.TableAssignmentOwnership, return on the first match
-		} else {
-			dst.TableAssignmentOwnership = nil
-			return fmt.Errorf("failed to unmarshal TableAssignment as TableAssignmentOwnership: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'TableAssignmentPassGrants'
-	if jsonDict["type"] == "TableAssignmentPassGrants" {
-		// try to unmarshal JSON data into TableAssignmentPassGrants
-		err = json.Unmarshal(data, &dst.TableAssignmentPassGrants)
-		if err == nil {
-			return nil // data stored in dst.TableAssignmentPassGrants, return on the first match
-		} else {
-			dst.TableAssignmentPassGrants = nil
-			return fmt.Errorf("failed to unmarshal TableAssignment as TableAssignmentPassGrants: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'TableAssignmentSelect'
-	if jsonDict["type"] == "TableAssignmentSelect" {
-		// try to unmarshal JSON data into TableAssignmentSelect
-		err = json.Unmarshal(data, &dst.TableAssignmentSelect)
-		if err == nil {
-			return nil // data stored in dst.TableAssignmentSelect, return on the first match
-		} else {
-			dst.TableAssignmentSelect = nil
-			return fmt.Errorf("failed to unmarshal TableAssignment as TableAssignmentSelect: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'TableAssignmentWrite'
-	if jsonDict["type"] == "TableAssignmentWrite" {
-		// try to unmarshal JSON data into TableAssignmentWrite
-		err = json.Unmarshal(data, &dst.TableAssignmentWrite)
-		if err == nil {
-			return nil // data stored in dst.TableAssignmentWrite, return on the first match
-		} else {
-			dst.TableAssignmentWrite = nil
-			return fmt.Errorf("failed to unmarshal TableAssignment as TableAssignmentWrite: %s", err.Error())
-		}
-	}
-
 	return nil
 }
 
@@ -360,6 +264,44 @@ func (obj *TableAssignment) GetActualInstance() interface{} {
 
 	if obj.TableAssignmentWrite != nil {
 		return obj.TableAssignmentWrite
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj TableAssignment) GetActualInstanceValue() interface{} {
+	if obj.TableAssignmentDescribe != nil {
+		return *obj.TableAssignmentDescribe
+	}
+
+	if obj.TableAssignmentManageGrants != nil {
+		return *obj.TableAssignmentManageGrants
+	}
+
+	if obj.TableAssignmentManageTags != nil {
+		return *obj.TableAssignmentManageTags
+	}
+
+	if obj.TableAssignmentModify != nil {
+		return *obj.TableAssignmentModify
+	}
+
+	if obj.TableAssignmentOwnership != nil {
+		return *obj.TableAssignmentOwnership
+	}
+
+	if obj.TableAssignmentPassGrants != nil {
+		return *obj.TableAssignmentPassGrants
+	}
+
+	if obj.TableAssignmentSelect != nil {
+		return *obj.TableAssignmentSelect
+	}
+
+	if obj.TableAssignmentWrite != nil {
+		return *obj.TableAssignmentWrite
 	}
 
 	// all schemas are nil

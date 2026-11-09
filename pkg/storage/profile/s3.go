@@ -30,11 +30,11 @@ func NewS3Profile(bucket, region string, opts ...S3Option) managementv1.StorageP
 }
 
 func WithS3Endpoint(endpoint string) S3Option {
-	return func(p *managementv1.StorageProfileS3) { p.Endpoint = &endpoint }
+	return func(p *managementv1.StorageProfileS3) { p.SetEndpoint(endpoint) }
 }
 
 func WithS3KeyPrefix(prefix string) S3Option {
-	return func(p *managementv1.StorageProfileS3) { p.KeyPrefix = &prefix }
+	return func(p *managementv1.StorageProfileS3) { p.SetKeyPrefix(prefix) }
 }
 
 func WithS3Flavor(flavor S3Flavor) S3Option {
@@ -42,19 +42,19 @@ func WithS3Flavor(flavor S3Flavor) S3Option {
 }
 
 func WithS3PathStyleAccess() S3Option {
-	return func(p *managementv1.StorageProfileS3) { p.PathStyleAccess = ptrTo(true) }
+	return func(p *managementv1.StorageProfileS3) { p.SetPathStyleAccess(true) }
 }
 
 func WithS3AlternativeProtocols() S3Option {
-	return func(p *managementv1.StorageProfileS3) { p.AllowAlternativeProtocols = ptrTo(true) }
+	return func(p *managementv1.StorageProfileS3) { p.SetAllowAlternativeProtocols(true) }
 }
 
 func WithS3AssumeRoleARN(arn string) S3Option {
-	return func(p *managementv1.StorageProfileS3) { p.AssumeRoleArn = &arn }
+	return func(p *managementv1.StorageProfileS3) { p.SetAssumeRoleArn(arn) }
 }
 
 func WithS3AWSKMSKeyARN(arn string) S3Option {
-	return func(p *managementv1.StorageProfileS3) { p.AwsKmsKeyArn = &arn }
+	return func(p *managementv1.StorageProfileS3) { p.SetAwsKmsKeyArn(arn) }
 }
 
 // WithS3STSEnabled enables STS-vended credentials. STSRoleARN or AssumeRoleARN
@@ -64,11 +64,11 @@ func WithS3STSEnabled() S3Option {
 }
 
 func WithS3STSRoleARN(arn string) S3Option {
-	return func(p *managementv1.StorageProfileS3) { p.StsRoleArn = &arn }
+	return func(p *managementv1.StorageProfileS3) { p.SetStsRoleArn(arn) }
 }
 
 func WithS3STSEndpoint(endpoint string) S3Option {
-	return func(p *managementv1.StorageProfileS3) { p.StsEndpoint = &endpoint }
+	return func(p *managementv1.StorageProfileS3) { p.SetStsEndpoint(endpoint) }
 }
 
 func WithS3STSTokenValidity(d time.Duration) S3Option {
@@ -83,7 +83,7 @@ func WithS3RemoteSigningURLStyle(style S3UrlStyleDetectionMode) S3Option {
 }
 
 func WithS3StorageLayout(layout StorageLayout) S3Option {
-	return func(p *managementv1.StorageProfileS3) { p.StorageLayout = &layout }
+	return func(p *managementv1.StorageProfileS3) { p.SetStorageLayout(layout) }
 }
 
 // WithS3PushS3DeleteDisabled controls whether the `s3.delete-enabled=false`
@@ -94,7 +94,7 @@ func WithS3PushS3DeleteDisabled(disabled bool) S3Option {
 }
 
 func WithS3LegacyMd5Behavior(enabled bool) S3Option {
-	return func(p *managementv1.StorageProfileS3) { p.LegacyMd5Behavior = &enabled }
+	return func(p *managementv1.StorageProfileS3) { p.SetLegacyMd5Behavior(enabled) }
 }
 
 // WithS3RemoteSigningEnabled toggles remote signing for S3 requests. Spec
@@ -104,5 +104,5 @@ func WithS3RemoteSigningEnabled(enabled bool) S3Option {
 }
 
 func WithS3StsSessionTags(tags map[string]string) S3Option {
-	return func(p *managementv1.StorageProfileS3) { p.StsSessionTags = tags }
+	return func(p *managementv1.StorageProfileS3) { p.SetStsSessionTags(tags) }
 }

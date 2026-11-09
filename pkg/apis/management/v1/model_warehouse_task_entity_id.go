@@ -89,42 +89,6 @@ func (dst *WarehouseTaskEntityId) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	// check if the discriminator value is 'WarehouseTaskEntityIdGenericTable'
-	if jsonDict["type"] == "WarehouseTaskEntityIdGenericTable" {
-		// try to unmarshal JSON data into WarehouseTaskEntityIdGenericTable
-		err = json.Unmarshal(data, &dst.WarehouseTaskEntityIdGenericTable)
-		if err == nil {
-			return nil // data stored in dst.WarehouseTaskEntityIdGenericTable, return on the first match
-		} else {
-			dst.WarehouseTaskEntityIdGenericTable = nil
-			return fmt.Errorf("failed to unmarshal WarehouseTaskEntityId as WarehouseTaskEntityIdGenericTable: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'WarehouseTaskEntityIdTable'
-	if jsonDict["type"] == "WarehouseTaskEntityIdTable" {
-		// try to unmarshal JSON data into WarehouseTaskEntityIdTable
-		err = json.Unmarshal(data, &dst.WarehouseTaskEntityIdTable)
-		if err == nil {
-			return nil // data stored in dst.WarehouseTaskEntityIdTable, return on the first match
-		} else {
-			dst.WarehouseTaskEntityIdTable = nil
-			return fmt.Errorf("failed to unmarshal WarehouseTaskEntityId as WarehouseTaskEntityIdTable: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'WarehouseTaskEntityIdView'
-	if jsonDict["type"] == "WarehouseTaskEntityIdView" {
-		// try to unmarshal JSON data into WarehouseTaskEntityIdView
-		err = json.Unmarshal(data, &dst.WarehouseTaskEntityIdView)
-		if err == nil {
-			return nil // data stored in dst.WarehouseTaskEntityIdView, return on the first match
-		} else {
-			dst.WarehouseTaskEntityIdView = nil
-			return fmt.Errorf("failed to unmarshal WarehouseTaskEntityId as WarehouseTaskEntityIdView: %s", err.Error())
-		}
-	}
-
 	return nil
 }
 
@@ -160,6 +124,24 @@ func (obj *WarehouseTaskEntityId) GetActualInstance() interface{} {
 
 	if obj.WarehouseTaskEntityIdView != nil {
 		return obj.WarehouseTaskEntityIdView
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj WarehouseTaskEntityId) GetActualInstanceValue() interface{} {
+	if obj.WarehouseTaskEntityIdGenericTable != nil {
+		return *obj.WarehouseTaskEntityIdGenericTable
+	}
+
+	if obj.WarehouseTaskEntityIdTable != nil {
+		return *obj.WarehouseTaskEntityIdTable
+	}
+
+	if obj.WarehouseTaskEntityIdView != nil {
+		return *obj.WarehouseTaskEntityIdView
 	}
 
 	// all schemas are nil

@@ -209,114 +209,6 @@ func (dst *WarehouseAssignment) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	// check if the discriminator value is 'WarehouseAssignmentCreate'
-	if jsonDict["type"] == "WarehouseAssignmentCreate" {
-		// try to unmarshal JSON data into WarehouseAssignmentCreate
-		err = json.Unmarshal(data, &dst.WarehouseAssignmentCreate)
-		if err == nil {
-			return nil // data stored in dst.WarehouseAssignmentCreate, return on the first match
-		} else {
-			dst.WarehouseAssignmentCreate = nil
-			return fmt.Errorf("failed to unmarshal WarehouseAssignment as WarehouseAssignmentCreate: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'WarehouseAssignmentDescribe'
-	if jsonDict["type"] == "WarehouseAssignmentDescribe" {
-		// try to unmarshal JSON data into WarehouseAssignmentDescribe
-		err = json.Unmarshal(data, &dst.WarehouseAssignmentDescribe)
-		if err == nil {
-			return nil // data stored in dst.WarehouseAssignmentDescribe, return on the first match
-		} else {
-			dst.WarehouseAssignmentDescribe = nil
-			return fmt.Errorf("failed to unmarshal WarehouseAssignment as WarehouseAssignmentDescribe: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'WarehouseAssignmentManageGrants'
-	if jsonDict["type"] == "WarehouseAssignmentManageGrants" {
-		// try to unmarshal JSON data into WarehouseAssignmentManageGrants
-		err = json.Unmarshal(data, &dst.WarehouseAssignmentManageGrants)
-		if err == nil {
-			return nil // data stored in dst.WarehouseAssignmentManageGrants, return on the first match
-		} else {
-			dst.WarehouseAssignmentManageGrants = nil
-			return fmt.Errorf("failed to unmarshal WarehouseAssignment as WarehouseAssignmentManageGrants: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'WarehouseAssignmentManageTags'
-	if jsonDict["type"] == "WarehouseAssignmentManageTags" {
-		// try to unmarshal JSON data into WarehouseAssignmentManageTags
-		err = json.Unmarshal(data, &dst.WarehouseAssignmentManageTags)
-		if err == nil {
-			return nil // data stored in dst.WarehouseAssignmentManageTags, return on the first match
-		} else {
-			dst.WarehouseAssignmentManageTags = nil
-			return fmt.Errorf("failed to unmarshal WarehouseAssignment as WarehouseAssignmentManageTags: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'WarehouseAssignmentModify'
-	if jsonDict["type"] == "WarehouseAssignmentModify" {
-		// try to unmarshal JSON data into WarehouseAssignmentModify
-		err = json.Unmarshal(data, &dst.WarehouseAssignmentModify)
-		if err == nil {
-			return nil // data stored in dst.WarehouseAssignmentModify, return on the first match
-		} else {
-			dst.WarehouseAssignmentModify = nil
-			return fmt.Errorf("failed to unmarshal WarehouseAssignment as WarehouseAssignmentModify: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'WarehouseAssignmentOwnership'
-	if jsonDict["type"] == "WarehouseAssignmentOwnership" {
-		// try to unmarshal JSON data into WarehouseAssignmentOwnership
-		err = json.Unmarshal(data, &dst.WarehouseAssignmentOwnership)
-		if err == nil {
-			return nil // data stored in dst.WarehouseAssignmentOwnership, return on the first match
-		} else {
-			dst.WarehouseAssignmentOwnership = nil
-			return fmt.Errorf("failed to unmarshal WarehouseAssignment as WarehouseAssignmentOwnership: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'WarehouseAssignmentPassGrants'
-	if jsonDict["type"] == "WarehouseAssignmentPassGrants" {
-		// try to unmarshal JSON data into WarehouseAssignmentPassGrants
-		err = json.Unmarshal(data, &dst.WarehouseAssignmentPassGrants)
-		if err == nil {
-			return nil // data stored in dst.WarehouseAssignmentPassGrants, return on the first match
-		} else {
-			dst.WarehouseAssignmentPassGrants = nil
-			return fmt.Errorf("failed to unmarshal WarehouseAssignment as WarehouseAssignmentPassGrants: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'WarehouseAssignmentSelect'
-	if jsonDict["type"] == "WarehouseAssignmentSelect" {
-		// try to unmarshal JSON data into WarehouseAssignmentSelect
-		err = json.Unmarshal(data, &dst.WarehouseAssignmentSelect)
-		if err == nil {
-			return nil // data stored in dst.WarehouseAssignmentSelect, return on the first match
-		} else {
-			dst.WarehouseAssignmentSelect = nil
-			return fmt.Errorf("failed to unmarshal WarehouseAssignment as WarehouseAssignmentSelect: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'WarehouseAssignmentWrite'
-	if jsonDict["type"] == "WarehouseAssignmentWrite" {
-		// try to unmarshal JSON data into WarehouseAssignmentWrite
-		err = json.Unmarshal(data, &dst.WarehouseAssignmentWrite)
-		if err == nil {
-			return nil // data stored in dst.WarehouseAssignmentWrite, return on the first match
-		} else {
-			dst.WarehouseAssignmentWrite = nil
-			return fmt.Errorf("failed to unmarshal WarehouseAssignment as WarehouseAssignmentWrite: %s", err.Error())
-		}
-	}
-
 	return nil
 }
 
@@ -400,6 +292,48 @@ func (obj *WarehouseAssignment) GetActualInstance() interface{} {
 
 	if obj.WarehouseAssignmentWrite != nil {
 		return obj.WarehouseAssignmentWrite
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj WarehouseAssignment) GetActualInstanceValue() interface{} {
+	if obj.WarehouseAssignmentCreate != nil {
+		return *obj.WarehouseAssignmentCreate
+	}
+
+	if obj.WarehouseAssignmentDescribe != nil {
+		return *obj.WarehouseAssignmentDescribe
+	}
+
+	if obj.WarehouseAssignmentManageGrants != nil {
+		return *obj.WarehouseAssignmentManageGrants
+	}
+
+	if obj.WarehouseAssignmentManageTags != nil {
+		return *obj.WarehouseAssignmentManageTags
+	}
+
+	if obj.WarehouseAssignmentModify != nil {
+		return *obj.WarehouseAssignmentModify
+	}
+
+	if obj.WarehouseAssignmentOwnership != nil {
+		return *obj.WarehouseAssignmentOwnership
+	}
+
+	if obj.WarehouseAssignmentPassGrants != nil {
+		return *obj.WarehouseAssignmentPassGrants
+	}
+
+	if obj.WarehouseAssignmentSelect != nil {
+		return *obj.WarehouseAssignmentSelect
+	}
+
+	if obj.WarehouseAssignmentWrite != nil {
+		return *obj.WarehouseAssignmentWrite
 	}
 
 	// all schemas are nil

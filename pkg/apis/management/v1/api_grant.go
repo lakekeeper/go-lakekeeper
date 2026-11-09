@@ -3177,6 +3177,7 @@ func (a *GrantAPIService) ListNamespaceSubtreeGrantsExecute(r ApiListNamespaceSu
 		parameterAddToHeaderOrQuery(localVarQueryParams, "includeSoftDeleted", r.includeSoftDeleted, "form", "")
 	} else {
 		var defaultValue bool = true
+		parameterAddToHeaderOrQuery(localVarQueryParams, "includeSoftDeleted", defaultValue, "form", "")
 		r.includeSoftDeleted = &defaultValue
 	}
 	if r.createdBefore != nil {
@@ -3186,6 +3187,7 @@ func (a *GrantAPIService) ListNamespaceSubtreeGrantsExecute(r ApiListNamespaceSu
 		parameterAddToHeaderOrQuery(localVarQueryParams, "includeRootLevel", r.includeRootLevel, "form", "")
 	} else {
 		var defaultValue bool = true
+		parameterAddToHeaderOrQuery(localVarQueryParams, "includeRootLevel", defaultValue, "form", "")
 		r.includeRootLevel = &defaultValue
 	}
 	if r.pageToken != nil {
@@ -4455,6 +4457,7 @@ func (a *GrantAPIService) ListWarehouseSubtreeGrantsExecute(r ApiListWarehouseSu
 		parameterAddToHeaderOrQuery(localVarQueryParams, "includeSoftDeleted", r.includeSoftDeleted, "form", "")
 	} else {
 		var defaultValue bool = true
+		parameterAddToHeaderOrQuery(localVarQueryParams, "includeSoftDeleted", defaultValue, "form", "")
 		r.includeSoftDeleted = &defaultValue
 	}
 	if r.createdBefore != nil {
@@ -4464,6 +4467,7 @@ func (a *GrantAPIService) ListWarehouseSubtreeGrantsExecute(r ApiListWarehouseSu
 		parameterAddToHeaderOrQuery(localVarQueryParams, "includeRootLevel", r.includeRootLevel, "form", "")
 	} else {
 		var defaultValue bool = true
+		parameterAddToHeaderOrQuery(localVarQueryParams, "includeRootLevel", defaultValue, "form", "")
 		r.includeRootLevel = &defaultValue
 	}
 	if r.pageToken != nil {

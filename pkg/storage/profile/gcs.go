@@ -23,7 +23,7 @@ func NewGCSProfile(bucket string, opts ...GCSOption) managementv1.StorageProfile
 }
 
 func WithGCSKeyPrefix(prefix string) GCSOption {
-	return func(p *managementv1.StorageProfileGcs) { p.KeyPrefix = &prefix }
+	return func(p *managementv1.StorageProfileGcs) { p.SetKeyPrefix(prefix) }
 }
 
 // WithGCSSTSEnabled lets the caller explicitly set STS-vended-credentials on
@@ -33,5 +33,5 @@ func WithGCSSTSEnabled(enabled bool) GCSOption {
 }
 
 func WithGCSStorageLayout(layout StorageLayout) GCSOption {
-	return func(p *managementv1.StorageProfileGcs) { p.StorageLayout = &layout }
+	return func(p *managementv1.StorageProfileGcs) { p.SetStorageLayout(layout) }
 }

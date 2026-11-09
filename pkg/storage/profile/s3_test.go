@@ -22,8 +22,8 @@ func TestNewS3Profile_Defaults(t *testing.T) {
 	assert.Equal(t, "us-east-1", p.Region)
 	assert.Equal(t, "s3", p.Type, "discriminator must be set so the StorageProfile oneOf marshaler picks the right variant")
 	assert.False(t, p.StsEnabled, "STS is opt-in")
-	assert.Nil(t, p.Endpoint)
-	assert.Nil(t, p.KeyPrefix)
+	assert.False(t, p.HasEndpoint())
+	assert.False(t, p.HasKeyPrefix())
 	assert.Nil(t, p.Flavor)
 }
 
@@ -56,22 +56,22 @@ func TestNewS3Profile_AllOptionsApplied(t *testing.T) {
 
 	require.NotNil(t, sp.StorageProfileS3)
 	p := sp.StorageProfileS3
-	require.Equal(t, "https://minio:9000", *p.Endpoint)
-	assert.Equal(t, "warehouses/foo", *p.KeyPrefix)
+	require.Equal(t, "https://minio:9000", p.GetEndpoint())
+	assert.Equal(t, "warehouses/foo", p.GetKeyPrefix())
 	assert.Equal(t, flavor, *p.Flavor)
-	assert.True(t, *p.PathStyleAccess)
-	assert.True(t, *p.AllowAlternativeProtocols)
-	assert.Equal(t, "arn:aws:iam::123:role/assume", *p.AssumeRoleArn)
-	assert.Equal(t, "arn:aws:kms::123:key/abc", *p.AwsKmsKeyArn)
+	assert.True(t, p.GetPathStyleAccess())
+	assert.True(t, p.GetAllowAlternativeProtocols())
+	assert.Equal(t, "arn:aws:iam::123:role/assume", p.GetAssumeRoleArn())
+	assert.Equal(t, "arn:aws:kms::123:key/abc", p.GetAwsKmsKeyArn())
 	assert.True(t, p.StsEnabled)
-	assert.Equal(t, "arn:aws:iam::123:role/sts", *p.StsRoleArn)
-	assert.Equal(t, "https://sts.example.com", *p.StsEndpoint)
+	assert.Equal(t, "arn:aws:iam::123:role/sts", p.GetStsRoleArn())
+	assert.Equal(t, "https://sts.example.com", p.GetStsEndpoint())
 	assert.Equal(t, int64((2 * time.Hour).Seconds()), *p.StsTokenValiditySeconds)
 	assert.Equal(t, style, *p.RemoteSigningUrlStyle)
 	assert.True(t, *p.PushS3DeleteDisabled)
-	assert.True(t, *p.LegacyMd5Behavior)
+	assert.True(t, p.GetLegacyMd5Behavior())
 	assert.False(t, *p.RemoteSigningEnabled)
-	assert.Equal(t, tags, p.StsSessionTags)
+	assert.Equal(t, tags, p.GetStsSessionTags())
 }
 
 func TestAsS3_OnS3Union(t *testing.T) {
@@ -106,5 +106,5 @@ func TestNewS3Profile_OptionsAreOverridable(t *testing.T) {
 		profile.WithS3Endpoint("second"),
 	)
 	require.NotNil(t, sp.StorageProfileS3)
-	assert.Equal(t, "second", *sp.StorageProfileS3.Endpoint, "later options must override earlier ones")
+	assert.Equal(t, "second", sp.StorageProfileS3.GetEndpoint(), "later options must override earlier ones")
 }

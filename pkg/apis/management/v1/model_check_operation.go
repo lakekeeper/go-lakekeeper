@@ -184,6 +184,10 @@ func (dst *CheckOperation) UnmarshalJSON(data []byte) error {
 	} else if match == 1 {
 		return nil // exactly one match
 	} else { // no match
+		if err != nil {
+			return fmt.Errorf("data failed to match schemas in oneOf(CheckOperation): %v", err)
+		}
+
 		return fmt.Errorf("data failed to match schemas in oneOf(CheckOperation)")
 	}
 }
@@ -252,6 +256,40 @@ func (obj *CheckOperation) GetActualInstance() interface{} {
 
 	if obj.CheckOperationWarehouse != nil {
 		return obj.CheckOperationWarehouse
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj CheckOperation) GetActualInstanceValue() interface{} {
+	if obj.CheckOperationGenericTable != nil {
+		return *obj.CheckOperationGenericTable
+	}
+
+	if obj.CheckOperationNamespace != nil {
+		return *obj.CheckOperationNamespace
+	}
+
+	if obj.CheckOperationProject != nil {
+		return *obj.CheckOperationProject
+	}
+
+	if obj.CheckOperationServer != nil {
+		return *obj.CheckOperationServer
+	}
+
+	if obj.CheckOperationTable != nil {
+		return *obj.CheckOperationTable
+	}
+
+	if obj.CheckOperationView != nil {
+		return *obj.CheckOperationView
+	}
+
+	if obj.CheckOperationWarehouse != nil {
+		return *obj.CheckOperationWarehouse
 	}
 
 	// all schemas are nil

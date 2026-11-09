@@ -74,6 +74,10 @@ func (dst *SubtreeGrantPrincipal) UnmarshalJSON(data []byte) error {
 	} else if match == 1 {
 		return nil // exactly one match
 	} else { // no match
+		if err != nil {
+			return fmt.Errorf("data failed to match schemas in oneOf(SubtreeGrantPrincipal): %v", err)
+		}
+
 		return fmt.Errorf("data failed to match schemas in oneOf(SubtreeGrantPrincipal)")
 	}
 }
@@ -102,6 +106,20 @@ func (obj *SubtreeGrantPrincipal) GetActualInstance() interface{} {
 
 	if obj.SubtreeGrantPrincipalOne != nil {
 		return obj.SubtreeGrantPrincipalOne
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj SubtreeGrantPrincipal) GetActualInstanceValue() interface{} {
+	if obj.SubtreeGrantPrincipalEvery != nil {
+		return *obj.SubtreeGrantPrincipalEvery
+	}
+
+	if obj.SubtreeGrantPrincipalOne != nil {
+		return *obj.SubtreeGrantPrincipalOne
 	}
 
 	// all schemas are nil

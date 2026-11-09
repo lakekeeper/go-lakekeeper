@@ -69,30 +69,6 @@ func (dst *RoleMember) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	// check if the discriminator value is 'RoleMemberRole'
-	if jsonDict["type"] == "RoleMemberRole" {
-		// try to unmarshal JSON data into RoleMemberRole
-		err = json.Unmarshal(data, &dst.RoleMemberRole)
-		if err == nil {
-			return nil // data stored in dst.RoleMemberRole, return on the first match
-		} else {
-			dst.RoleMemberRole = nil
-			return fmt.Errorf("failed to unmarshal RoleMember as RoleMemberRole: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'RoleMemberUser'
-	if jsonDict["type"] == "RoleMemberUser" {
-		// try to unmarshal JSON data into RoleMemberUser
-		err = json.Unmarshal(data, &dst.RoleMemberUser)
-		if err == nil {
-			return nil // data stored in dst.RoleMemberUser, return on the first match
-		} else {
-			dst.RoleMemberUser = nil
-			return fmt.Errorf("failed to unmarshal RoleMember as RoleMemberUser: %s", err.Error())
-		}
-	}
-
 	return nil
 }
 
@@ -120,6 +96,20 @@ func (obj *RoleMember) GetActualInstance() interface{} {
 
 	if obj.RoleMemberUser != nil {
 		return obj.RoleMemberUser
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj RoleMember) GetActualInstanceValue() interface{} {
+	if obj.RoleMemberRole != nil {
+		return *obj.RoleMemberRole
+	}
+
+	if obj.RoleMemberUser != nil {
+		return *obj.RoleMemberUser
 	}
 
 	// all schemas are nil

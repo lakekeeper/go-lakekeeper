@@ -74,6 +74,10 @@ func (dst *SubtreeGrantPrivileges) UnmarshalJSON(data []byte) error {
 	} else if match == 1 {
 		return nil // exactly one match
 	} else { // no match
+		if err != nil {
+			return fmt.Errorf("data failed to match schemas in oneOf(SubtreeGrantPrivileges): %v", err)
+		}
+
 		return fmt.Errorf("data failed to match schemas in oneOf(SubtreeGrantPrivileges)")
 	}
 }
@@ -102,6 +106,20 @@ func (obj *SubtreeGrantPrivileges) GetActualInstance() interface{} {
 
 	if obj.SubtreeGrantPrivilegesOnly != nil {
 		return obj.SubtreeGrantPrivilegesOnly
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj SubtreeGrantPrivileges) GetActualInstanceValue() interface{} {
+	if obj.SubtreeGrantPrivilegesEvery != nil {
+		return *obj.SubtreeGrantPrivilegesEvery
+	}
+
+	if obj.SubtreeGrantPrivilegesOnly != nil {
+		return *obj.SubtreeGrantPrivilegesOnly
 	}
 
 	// all schemas are nil

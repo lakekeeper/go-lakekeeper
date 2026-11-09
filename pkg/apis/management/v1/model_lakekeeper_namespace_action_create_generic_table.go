@@ -29,8 +29,8 @@ type LakekeeperNamespaceActionCreateGenericTable struct {
 	// Generic table ID, if externally provided.
 	GenericTableId NullableString `json:"generic_table_id,omitempty"`
 	// Name of the generic table to create.
-	Name       NullableString    `json:"name,omitempty"`
-	Properties map[string]string `json:"properties,omitempty"`
+	Name       NullableString     `json:"name,omitempty"`
+	Properties *map[string]string `json:"properties,omitempty"`
 }
 
 type _LakekeeperNamespaceActionCreateGenericTable LakekeeperNamespaceActionCreateGenericTable
@@ -255,14 +255,14 @@ func (o *LakekeeperNamespaceActionCreateGenericTable) GetProperties() map[string
 		var ret map[string]string
 		return ret
 	}
-	return o.Properties
+	return *o.Properties
 }
 
 // GetPropertiesOk returns a tuple with the Properties field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *LakekeeperNamespaceActionCreateGenericTable) GetPropertiesOk() (map[string]string, bool) {
+func (o *LakekeeperNamespaceActionCreateGenericTable) GetPropertiesOk() (*map[string]string, bool) {
 	if o == nil || IsNil(o.Properties) {
-		return map[string]string{}, false
+		return nil, false
 	}
 	return o.Properties, true
 }
@@ -278,7 +278,7 @@ func (o *LakekeeperNamespaceActionCreateGenericTable) HasProperties() bool {
 
 // SetProperties gets a reference to the given map[string]string and assigns it to the Properties field.
 func (o *LakekeeperNamespaceActionCreateGenericTable) SetProperties(v map[string]string) {
-	o.Properties = v
+	o.Properties = &v
 }
 
 func (o LakekeeperNamespaceActionCreateGenericTable) MarshalJSON() ([]byte, error) {

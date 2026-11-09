@@ -229,126 +229,6 @@ func (dst *ProjectAssignment) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	// check if the discriminator value is 'ProjectAssignmentCreate'
-	if jsonDict["type"] == "ProjectAssignmentCreate" {
-		// try to unmarshal JSON data into ProjectAssignmentCreate
-		err = json.Unmarshal(data, &dst.ProjectAssignmentCreate)
-		if err == nil {
-			return nil // data stored in dst.ProjectAssignmentCreate, return on the first match
-		} else {
-			dst.ProjectAssignmentCreate = nil
-			return fmt.Errorf("failed to unmarshal ProjectAssignment as ProjectAssignmentCreate: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'ProjectAssignmentDataAdmin'
-	if jsonDict["type"] == "ProjectAssignmentDataAdmin" {
-		// try to unmarshal JSON data into ProjectAssignmentDataAdmin
-		err = json.Unmarshal(data, &dst.ProjectAssignmentDataAdmin)
-		if err == nil {
-			return nil // data stored in dst.ProjectAssignmentDataAdmin, return on the first match
-		} else {
-			dst.ProjectAssignmentDataAdmin = nil
-			return fmt.Errorf("failed to unmarshal ProjectAssignment as ProjectAssignmentDataAdmin: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'ProjectAssignmentDescribe'
-	if jsonDict["type"] == "ProjectAssignmentDescribe" {
-		// try to unmarshal JSON data into ProjectAssignmentDescribe
-		err = json.Unmarshal(data, &dst.ProjectAssignmentDescribe)
-		if err == nil {
-			return nil // data stored in dst.ProjectAssignmentDescribe, return on the first match
-		} else {
-			dst.ProjectAssignmentDescribe = nil
-			return fmt.Errorf("failed to unmarshal ProjectAssignment as ProjectAssignmentDescribe: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'ProjectAssignmentModify'
-	if jsonDict["type"] == "ProjectAssignmentModify" {
-		// try to unmarshal JSON data into ProjectAssignmentModify
-		err = json.Unmarshal(data, &dst.ProjectAssignmentModify)
-		if err == nil {
-			return nil // data stored in dst.ProjectAssignmentModify, return on the first match
-		} else {
-			dst.ProjectAssignmentModify = nil
-			return fmt.Errorf("failed to unmarshal ProjectAssignment as ProjectAssignmentModify: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'ProjectAssignmentProjectAdmin'
-	if jsonDict["type"] == "ProjectAssignmentProjectAdmin" {
-		// try to unmarshal JSON data into ProjectAssignmentProjectAdmin
-		err = json.Unmarshal(data, &dst.ProjectAssignmentProjectAdmin)
-		if err == nil {
-			return nil // data stored in dst.ProjectAssignmentProjectAdmin, return on the first match
-		} else {
-			dst.ProjectAssignmentProjectAdmin = nil
-			return fmt.Errorf("failed to unmarshal ProjectAssignment as ProjectAssignmentProjectAdmin: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'ProjectAssignmentRoleCreator'
-	if jsonDict["type"] == "ProjectAssignmentRoleCreator" {
-		// try to unmarshal JSON data into ProjectAssignmentRoleCreator
-		err = json.Unmarshal(data, &dst.ProjectAssignmentRoleCreator)
-		if err == nil {
-			return nil // data stored in dst.ProjectAssignmentRoleCreator, return on the first match
-		} else {
-			dst.ProjectAssignmentRoleCreator = nil
-			return fmt.Errorf("failed to unmarshal ProjectAssignment as ProjectAssignmentRoleCreator: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'ProjectAssignmentSecurityAdmin'
-	if jsonDict["type"] == "ProjectAssignmentSecurityAdmin" {
-		// try to unmarshal JSON data into ProjectAssignmentSecurityAdmin
-		err = json.Unmarshal(data, &dst.ProjectAssignmentSecurityAdmin)
-		if err == nil {
-			return nil // data stored in dst.ProjectAssignmentSecurityAdmin, return on the first match
-		} else {
-			dst.ProjectAssignmentSecurityAdmin = nil
-			return fmt.Errorf("failed to unmarshal ProjectAssignment as ProjectAssignmentSecurityAdmin: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'ProjectAssignmentSelect'
-	if jsonDict["type"] == "ProjectAssignmentSelect" {
-		// try to unmarshal JSON data into ProjectAssignmentSelect
-		err = json.Unmarshal(data, &dst.ProjectAssignmentSelect)
-		if err == nil {
-			return nil // data stored in dst.ProjectAssignmentSelect, return on the first match
-		} else {
-			dst.ProjectAssignmentSelect = nil
-			return fmt.Errorf("failed to unmarshal ProjectAssignment as ProjectAssignmentSelect: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'ProjectAssignmentTagCreator'
-	if jsonDict["type"] == "ProjectAssignmentTagCreator" {
-		// try to unmarshal JSON data into ProjectAssignmentTagCreator
-		err = json.Unmarshal(data, &dst.ProjectAssignmentTagCreator)
-		if err == nil {
-			return nil // data stored in dst.ProjectAssignmentTagCreator, return on the first match
-		} else {
-			dst.ProjectAssignmentTagCreator = nil
-			return fmt.Errorf("failed to unmarshal ProjectAssignment as ProjectAssignmentTagCreator: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'ProjectAssignmentWrite'
-	if jsonDict["type"] == "ProjectAssignmentWrite" {
-		// try to unmarshal JSON data into ProjectAssignmentWrite
-		err = json.Unmarshal(data, &dst.ProjectAssignmentWrite)
-		if err == nil {
-			return nil // data stored in dst.ProjectAssignmentWrite, return on the first match
-		} else {
-			dst.ProjectAssignmentWrite = nil
-			return fmt.Errorf("failed to unmarshal ProjectAssignment as ProjectAssignmentWrite: %s", err.Error())
-		}
-	}
-
 	return nil
 }
 
@@ -440,6 +320,52 @@ func (obj *ProjectAssignment) GetActualInstance() interface{} {
 
 	if obj.ProjectAssignmentWrite != nil {
 		return obj.ProjectAssignmentWrite
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj ProjectAssignment) GetActualInstanceValue() interface{} {
+	if obj.ProjectAssignmentCreate != nil {
+		return *obj.ProjectAssignmentCreate
+	}
+
+	if obj.ProjectAssignmentDataAdmin != nil {
+		return *obj.ProjectAssignmentDataAdmin
+	}
+
+	if obj.ProjectAssignmentDescribe != nil {
+		return *obj.ProjectAssignmentDescribe
+	}
+
+	if obj.ProjectAssignmentModify != nil {
+		return *obj.ProjectAssignmentModify
+	}
+
+	if obj.ProjectAssignmentProjectAdmin != nil {
+		return *obj.ProjectAssignmentProjectAdmin
+	}
+
+	if obj.ProjectAssignmentRoleCreator != nil {
+		return *obj.ProjectAssignmentRoleCreator
+	}
+
+	if obj.ProjectAssignmentSecurityAdmin != nil {
+		return *obj.ProjectAssignmentSecurityAdmin
+	}
+
+	if obj.ProjectAssignmentSelect != nil {
+		return *obj.ProjectAssignmentSelect
+	}
+
+	if obj.ProjectAssignmentTagCreator != nil {
+		return *obj.ProjectAssignmentTagCreator
+	}
+
+	if obj.ProjectAssignmentWrite != nil {
+		return *obj.ProjectAssignmentWrite
 	}
 
 	// all schemas are nil

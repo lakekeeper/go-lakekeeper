@@ -69,30 +69,6 @@ func (dst *TabularDeleteProfile) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	// check if the discriminator value is 'TabularDeleteProfileHard'
-	if jsonDict["type"] == "TabularDeleteProfileHard" {
-		// try to unmarshal JSON data into TabularDeleteProfileHard
-		err = json.Unmarshal(data, &dst.TabularDeleteProfileHard)
-		if err == nil {
-			return nil // data stored in dst.TabularDeleteProfileHard, return on the first match
-		} else {
-			dst.TabularDeleteProfileHard = nil
-			return fmt.Errorf("failed to unmarshal TabularDeleteProfile as TabularDeleteProfileHard: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'TabularDeleteProfileSoft'
-	if jsonDict["type"] == "TabularDeleteProfileSoft" {
-		// try to unmarshal JSON data into TabularDeleteProfileSoft
-		err = json.Unmarshal(data, &dst.TabularDeleteProfileSoft)
-		if err == nil {
-			return nil // data stored in dst.TabularDeleteProfileSoft, return on the first match
-		} else {
-			dst.TabularDeleteProfileSoft = nil
-			return fmt.Errorf("failed to unmarshal TabularDeleteProfile as TabularDeleteProfileSoft: %s", err.Error())
-		}
-	}
-
 	return nil
 }
 
@@ -120,6 +96,20 @@ func (obj *TabularDeleteProfile) GetActualInstance() interface{} {
 
 	if obj.TabularDeleteProfileSoft != nil {
 		return obj.TabularDeleteProfileSoft
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj TabularDeleteProfile) GetActualInstanceValue() interface{} {
+	if obj.TabularDeleteProfileHard != nil {
+		return *obj.TabularDeleteProfileHard
+	}
+
+	if obj.TabularDeleteProfileSoft != nil {
+		return *obj.TabularDeleteProfileSoft
 	}
 
 	// all schemas are nil

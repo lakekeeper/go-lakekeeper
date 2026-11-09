@@ -24,11 +24,11 @@ type StorageProfileStackit struct {
 	// Name of the STACKIT bucket.  Must not contain `.`: STACKIT addresses buckets as a subdomain of the endpoint, and its wildcard certificate covers only a single label.
 	Bucket string `json:"bucket"`
 	// URN of the STACKIT credentials group to assume when vending credentials, e.g. `urn:sgws:identity::12345678901234567890:group/credentials-group-a1b2c3`.  Copy it verbatim from the credentials group; it is not derivable. Required when `sts-enabled` is true, optional otherwise — but validated whenever it is present.
-	CredentialsGroupUrn *string `json:"credentials-group-urn,omitempty"`
+	CredentialsGroupUrn NullableString `json:"credentials-group-urn,omitempty"`
 	// Endpoint override. Normally omitted — the endpoint is derived from `region` and `storage-service`. Takes precedence over `storage-service` when set.  Set this only for a STACKIT endpoint outside the public naming scheme, which STACKIT hands out per customer. Such an endpoint is a distinct storage tenant, not another route to the same bucket, so the resolved endpoint is immutable once the warehouse exists. An update may switch between `endpoint` and `storage-service` if both resolve to the same endpoint.
-	Endpoint *string `json:"endpoint,omitempty"`
+	Endpoint NullableString `json:"endpoint,omitempty"`
 	// Subpath within the bucket to use.
-	KeyPrefix *string `json:"key-prefix,omitempty"`
+	KeyPrefix NullableString `json:"key-prefix,omitempty"`
 	// Push `s3.delete-enabled=false` to clients, discouraging Spark from deleting files directly and bypassing soft-deletion. Defaults to true.
 	PushS3DeleteDisabled *bool `json:"push-s3-delete-disabled,omitempty"`
 	// STACKIT region, e.g. `eu01`.
@@ -36,7 +36,7 @@ type StorageProfileStackit struct {
 	// Allow clients to have Lakekeeper sign their S3 requests. Defaults to enabled, and is the only client path when `sts-enabled` is false.
 	RemoteSigningEnabled *bool `json:"remote-signing-enabled,omitempty"`
 	// Storage layout for namespace and tabular paths.
-	StorageLayout *StorageLayout `json:"storage-layout,omitempty"`
+	StorageLayout NullableStorageLayout `json:"storage-layout,omitempty"`
 	// STACKIT storage service that holds the bucket. Defaults to `object-storage`. Ignored when `endpoint` is set.  Each service is a distinct storage tenant, so the resolved endpoint is immutable once the warehouse exists. An update may switch between `storage-service` and `endpoint` if both resolve to the same endpoint.
 	StorageService *StackitStorageService `json:"storage-service,omitempty"`
 	// Vend temporary downscoped credentials via STS. Defaults to enabled.  Requires `credentials-group-urn`, and a trust policy on that group allowing `sts:AssumeRole`. Disable it to fall back to remote signing on STACKIT storage without STS.
@@ -92,100 +92,133 @@ func (o *StorageProfileStackit) SetBucket(v string) {
 	o.Bucket = v
 }
 
-// GetCredentialsGroupUrn returns the CredentialsGroupUrn field value if set, zero value otherwise.
+// GetCredentialsGroupUrn returns the CredentialsGroupUrn field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *StorageProfileStackit) GetCredentialsGroupUrn() string {
-	if o == nil || IsNil(o.CredentialsGroupUrn) {
+	if o == nil || IsNil(o.CredentialsGroupUrn.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.CredentialsGroupUrn
+	return *o.CredentialsGroupUrn.Get()
 }
 
 // GetCredentialsGroupUrnOk returns a tuple with the CredentialsGroupUrn field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *StorageProfileStackit) GetCredentialsGroupUrnOk() (*string, bool) {
-	if o == nil || IsNil(o.CredentialsGroupUrn) {
+	if o == nil {
 		return nil, false
 	}
-	return o.CredentialsGroupUrn, true
+	return o.CredentialsGroupUrn.Get(), o.CredentialsGroupUrn.IsSet()
 }
 
 // HasCredentialsGroupUrn returns a boolean if a field has been set.
 func (o *StorageProfileStackit) HasCredentialsGroupUrn() bool {
-	if o != nil && !IsNil(o.CredentialsGroupUrn) {
+	if o != nil && o.CredentialsGroupUrn.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetCredentialsGroupUrn gets a reference to the given string and assigns it to the CredentialsGroupUrn field.
+// SetCredentialsGroupUrn gets a reference to the given NullableString and assigns it to the CredentialsGroupUrn field.
 func (o *StorageProfileStackit) SetCredentialsGroupUrn(v string) {
-	o.CredentialsGroupUrn = &v
+	o.CredentialsGroupUrn.Set(&v)
 }
 
-// GetEndpoint returns the Endpoint field value if set, zero value otherwise.
+// SetCredentialsGroupUrnNil sets the value for CredentialsGroupUrn to be an explicit nil
+func (o *StorageProfileStackit) SetCredentialsGroupUrnNil() {
+	o.CredentialsGroupUrn.Set(nil)
+}
+
+// UnsetCredentialsGroupUrn ensures that no value is present for CredentialsGroupUrn, not even an explicit nil
+func (o *StorageProfileStackit) UnsetCredentialsGroupUrn() {
+	o.CredentialsGroupUrn.Unset()
+}
+
+// GetEndpoint returns the Endpoint field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *StorageProfileStackit) GetEndpoint() string {
-	if o == nil || IsNil(o.Endpoint) {
+	if o == nil || IsNil(o.Endpoint.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.Endpoint
+	return *o.Endpoint.Get()
 }
 
 // GetEndpointOk returns a tuple with the Endpoint field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *StorageProfileStackit) GetEndpointOk() (*string, bool) {
-	if o == nil || IsNil(o.Endpoint) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Endpoint, true
+	return o.Endpoint.Get(), o.Endpoint.IsSet()
 }
 
 // HasEndpoint returns a boolean if a field has been set.
 func (o *StorageProfileStackit) HasEndpoint() bool {
-	if o != nil && !IsNil(o.Endpoint) {
+	if o != nil && o.Endpoint.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetEndpoint gets a reference to the given string and assigns it to the Endpoint field.
+// SetEndpoint gets a reference to the given NullableString and assigns it to the Endpoint field.
 func (o *StorageProfileStackit) SetEndpoint(v string) {
-	o.Endpoint = &v
+	o.Endpoint.Set(&v)
 }
 
-// GetKeyPrefix returns the KeyPrefix field value if set, zero value otherwise.
+// SetEndpointNil sets the value for Endpoint to be an explicit nil
+func (o *StorageProfileStackit) SetEndpointNil() {
+	o.Endpoint.Set(nil)
+}
+
+// UnsetEndpoint ensures that no value is present for Endpoint, not even an explicit nil
+func (o *StorageProfileStackit) UnsetEndpoint() {
+	o.Endpoint.Unset()
+}
+
+// GetKeyPrefix returns the KeyPrefix field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *StorageProfileStackit) GetKeyPrefix() string {
-	if o == nil || IsNil(o.KeyPrefix) {
+	if o == nil || IsNil(o.KeyPrefix.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.KeyPrefix
+	return *o.KeyPrefix.Get()
 }
 
 // GetKeyPrefixOk returns a tuple with the KeyPrefix field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *StorageProfileStackit) GetKeyPrefixOk() (*string, bool) {
-	if o == nil || IsNil(o.KeyPrefix) {
+	if o == nil {
 		return nil, false
 	}
-	return o.KeyPrefix, true
+	return o.KeyPrefix.Get(), o.KeyPrefix.IsSet()
 }
 
 // HasKeyPrefix returns a boolean if a field has been set.
 func (o *StorageProfileStackit) HasKeyPrefix() bool {
-	if o != nil && !IsNil(o.KeyPrefix) {
+	if o != nil && o.KeyPrefix.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetKeyPrefix gets a reference to the given string and assigns it to the KeyPrefix field.
+// SetKeyPrefix gets a reference to the given NullableString and assigns it to the KeyPrefix field.
 func (o *StorageProfileStackit) SetKeyPrefix(v string) {
-	o.KeyPrefix = &v
+	o.KeyPrefix.Set(&v)
+}
+
+// SetKeyPrefixNil sets the value for KeyPrefix to be an explicit nil
+func (o *StorageProfileStackit) SetKeyPrefixNil() {
+	o.KeyPrefix.Set(nil)
+}
+
+// UnsetKeyPrefix ensures that no value is present for KeyPrefix, not even an explicit nil
+func (o *StorageProfileStackit) UnsetKeyPrefix() {
+	o.KeyPrefix.Unset()
 }
 
 // GetPushS3DeleteDisabled returns the PushS3DeleteDisabled field value if set, zero value otherwise.
@@ -276,36 +309,47 @@ func (o *StorageProfileStackit) SetRemoteSigningEnabled(v bool) {
 	o.RemoteSigningEnabled = &v
 }
 
-// GetStorageLayout returns the StorageLayout field value if set, zero value otherwise.
+// GetStorageLayout returns the StorageLayout field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *StorageProfileStackit) GetStorageLayout() StorageLayout {
-	if o == nil || IsNil(o.StorageLayout) {
+	if o == nil || IsNil(o.StorageLayout.Get()) {
 		var ret StorageLayout
 		return ret
 	}
-	return *o.StorageLayout
+	return *o.StorageLayout.Get()
 }
 
 // GetStorageLayoutOk returns a tuple with the StorageLayout field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *StorageProfileStackit) GetStorageLayoutOk() (*StorageLayout, bool) {
-	if o == nil || IsNil(o.StorageLayout) {
+	if o == nil {
 		return nil, false
 	}
-	return o.StorageLayout, true
+	return o.StorageLayout.Get(), o.StorageLayout.IsSet()
 }
 
 // HasStorageLayout returns a boolean if a field has been set.
 func (o *StorageProfileStackit) HasStorageLayout() bool {
-	if o != nil && !IsNil(o.StorageLayout) {
+	if o != nil && o.StorageLayout.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetStorageLayout gets a reference to the given StorageLayout and assigns it to the StorageLayout field.
+// SetStorageLayout gets a reference to the given NullableStorageLayout and assigns it to the StorageLayout field.
 func (o *StorageProfileStackit) SetStorageLayout(v StorageLayout) {
-	o.StorageLayout = &v
+	o.StorageLayout.Set(&v)
+}
+
+// SetStorageLayoutNil sets the value for StorageLayout to be an explicit nil
+func (o *StorageProfileStackit) SetStorageLayoutNil() {
+	o.StorageLayout.Set(nil)
+}
+
+// UnsetStorageLayout ensures that no value is present for StorageLayout, not even an explicit nil
+func (o *StorageProfileStackit) UnsetStorageLayout() {
+	o.StorageLayout.Unset()
 }
 
 // GetStorageService returns the StorageService field value if set, zero value otherwise.
@@ -439,14 +483,14 @@ func (o StorageProfileStackit) MarshalJSON() ([]byte, error) {
 func (o StorageProfileStackit) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["bucket"] = o.Bucket
-	if !IsNil(o.CredentialsGroupUrn) {
-		toSerialize["credentials-group-urn"] = o.CredentialsGroupUrn
+	if o.CredentialsGroupUrn.IsSet() {
+		toSerialize["credentials-group-urn"] = o.CredentialsGroupUrn.Get()
 	}
-	if !IsNil(o.Endpoint) {
-		toSerialize["endpoint"] = o.Endpoint
+	if o.Endpoint.IsSet() {
+		toSerialize["endpoint"] = o.Endpoint.Get()
 	}
-	if !IsNil(o.KeyPrefix) {
-		toSerialize["key-prefix"] = o.KeyPrefix
+	if o.KeyPrefix.IsSet() {
+		toSerialize["key-prefix"] = o.KeyPrefix.Get()
 	}
 	if !IsNil(o.PushS3DeleteDisabled) {
 		toSerialize["push-s3-delete-disabled"] = o.PushS3DeleteDisabled
@@ -455,8 +499,8 @@ func (o StorageProfileStackit) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.RemoteSigningEnabled) {
 		toSerialize["remote-signing-enabled"] = o.RemoteSigningEnabled
 	}
-	if !IsNil(o.StorageLayout) {
-		toSerialize["storage-layout"] = o.StorageLayout
+	if o.StorageLayout.IsSet() {
+		toSerialize["storage-layout"] = o.StorageLayout.Get()
 	}
 	if !IsNil(o.StorageService) {
 		toSerialize["storage-service"] = o.StorageService

@@ -22,23 +22,23 @@ var _ MappedNullable = &StorageProfileS3{}
 // StorageProfileS3 S3 storage profile
 type StorageProfileS3 struct {
 	// Allow `s3a://` and `s3n://` in locations. This is disabled by default. We do not recommend to use this setting except for migration of old hadoop-based tables via the register endpoint. Tables with `s3a` paths are not accessible outside the Java ecosystem.
-	AllowAlternativeProtocols *bool `json:"allow-alternative-protocols,omitempty"`
+	AllowAlternativeProtocols NullableBool `json:"allow-alternative-protocols,omitempty"`
 	// Optional ARN to assume when accessing the bucket from Lakekeeper.
-	AssumeRoleArn *string `json:"assume-role-arn,omitempty"`
+	AssumeRoleArn NullableString `json:"assume-role-arn,omitempty"`
 	// ARN of the KMS key used to encrypt the S3 bucket, if any.
-	AwsKmsKeyArn *string `json:"aws-kms-key-arn,omitempty"`
+	AwsKmsKeyArn NullableString `json:"aws-kms-key-arn,omitempty"`
 	// Name of the S3 bucket
 	Bucket string `json:"bucket"`
 	// Optional endpoint to use for S3 requests, if not provided the region will be used to determine the endpoint. If both region and endpoint are provided, the endpoint will be used. Example: `http://s3-de.my-domain.com:9000`
-	Endpoint *string `json:"endpoint,omitempty"`
+	Endpoint NullableString `json:"endpoint,omitempty"`
 	// S3 flavor to use. Defaults to AWS
 	Flavor *S3Flavor `json:"flavor,omitempty"`
 	// Subpath in the bucket to use.
-	KeyPrefix *string `json:"key-prefix,omitempty"`
+	KeyPrefix NullableString `json:"key-prefix,omitempty"`
 	// Legacy MD5 behavior for S3 operations requiring checksums. When enabled, Lakekeeper will use the legacy MD5 checksum for operations like `DeleteObjects`.
-	LegacyMd5Behavior *bool `json:"legacy-md5-behavior,omitempty"`
+	LegacyMd5Behavior NullableBool `json:"legacy-md5-behavior,omitempty"`
 	// Path style access for S3 requests. If the underlying S3 supports both, we recommend to not set `path_style_access`.
-	PathStyleAccess *bool `json:"path-style-access,omitempty"`
+	PathStyleAccess NullableBool `json:"path-style-access,omitempty"`
 	// Controls whether the `s3.delete-enabled=false` flag is sent to clients.  In all Iceberg 1.x versions, when Spark executes `DROP TABLE xxx PURGE`, it directly deletes files from S3, bypassing the catalog's soft-deletion mechanism. Other query engines properly delegate this operation to the catalog. This Spark behavior is expected to change in Iceberg 2.0.  Setting this to `true` pushes the `s3.delete-enabled=false` flag to clients, which discourages Spark from directly deleting files during `DROP TABLE xxx PURGE` operations. Note that clients may override this setting, and it affects other Spark operations that require file deletion, such as removing snapshots.  For more details, refer to Lakekeeper's [Soft-Deletion documentation](https://docs.lakekeeper.io/docs/nightly/concepts/#soft-deletion). This flag has no effect if Soft-Deletion is disabled for the warehouse.
 	PushS3DeleteDisabled *bool `json:"push-s3-delete-disabled,omitempty"`
 	// Region to use for S3 requests.
@@ -48,16 +48,16 @@ type StorageProfileS3 struct {
 	// S3 URL style detection mode for remote signing. One of `auto`, `path-style`, `virtual-host`. Default: `auto`. When set to `auto`, Lakekeeper will first try to parse the URL as `virtual-host` and then attempt `path-style`. `path` assumes the bucket name is the first path segment in the URL. `virtual-host` assumes the bucket name is the first subdomain if it is preceding `.s3` or `.s3-`.  Examples  Virtual host:   - <https://bucket.s3.endpoint.com/bar/a/key>   - <https://bucket.s3-eu-central-1.amazonaws.com/file>  Path style:   - <https://s3.endpoint.com/bucket/bar/a/key>   - <https://s3.us-east-1.amazonaws.com/bucket/file>
 	RemoteSigningUrlStyle *S3UrlStyleDetectionMode `json:"remote-signing-url-style,omitempty"`
 	// Storage layout for namespace and tabular paths.
-	StorageLayout *StorageLayout `json:"storage-layout,omitempty"`
-	StsEnabled    bool           `json:"sts-enabled"`
+	StorageLayout NullableStorageLayout `json:"storage-layout,omitempty"`
+	StsEnabled    bool                  `json:"sts-enabled"`
 	// Optional endpoint to use for STS requests. Use this when the STS endpoint differs from the S3 endpoint, which is common with S3-compatible storage systems. If not provided, the S3 `endpoint` is used for STS requests as well.
-	StsEndpoint *string `json:"sts-endpoint,omitempty"`
+	StsEndpoint NullableString `json:"sts-endpoint,omitempty"`
 	// Optional role ARN to assume for sts vended-credentials. If not provided, `assume_role_arn` is used. Either `assume_role_arn` or `sts_role_arn` must be provided if `sts_enabled` is true.
-	StsRoleArn *string `json:"sts-role-arn,omitempty"`
+	StsRoleArn NullableString `json:"sts-role-arn,omitempty"`
 	// Add `\"Principal\": \"*\"` to every statement of the STS session policy. Some S3-compatible STS implementations, such as Yandex Object Storage, reject session policies without a principal, while AWS and MinIO reject policies that have one. Defaults to false.
-	StsSessionPolicyPrincipal *bool `json:"sts-session-policy-principal,omitempty"`
+	StsSessionPolicyPrincipal NullableBool `json:"sts-session-policy-principal,omitempty"`
 	// Optional session tags for STS assume role operations.
-	StsSessionTags map[string]string `json:"sts-session-tags,omitempty"`
+	StsSessionTags *map[string]string `json:"sts-session-tags,omitempty"`
 	// The validity of the sts tokens in seconds. Default is 3600
 	StsTokenValiditySeconds *int64 `json:"sts-token-validity-seconds,omitempty"`
 	Type                    string `json:"type"`
@@ -86,100 +86,133 @@ func NewStorageProfileS3WithDefaults() *StorageProfileS3 {
 	return &this
 }
 
-// GetAllowAlternativeProtocols returns the AllowAlternativeProtocols field value if set, zero value otherwise.
+// GetAllowAlternativeProtocols returns the AllowAlternativeProtocols field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *StorageProfileS3) GetAllowAlternativeProtocols() bool {
-	if o == nil || IsNil(o.AllowAlternativeProtocols) {
+	if o == nil || IsNil(o.AllowAlternativeProtocols.Get()) {
 		var ret bool
 		return ret
 	}
-	return *o.AllowAlternativeProtocols
+	return *o.AllowAlternativeProtocols.Get()
 }
 
 // GetAllowAlternativeProtocolsOk returns a tuple with the AllowAlternativeProtocols field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *StorageProfileS3) GetAllowAlternativeProtocolsOk() (*bool, bool) {
-	if o == nil || IsNil(o.AllowAlternativeProtocols) {
+	if o == nil {
 		return nil, false
 	}
-	return o.AllowAlternativeProtocols, true
+	return o.AllowAlternativeProtocols.Get(), o.AllowAlternativeProtocols.IsSet()
 }
 
 // HasAllowAlternativeProtocols returns a boolean if a field has been set.
 func (o *StorageProfileS3) HasAllowAlternativeProtocols() bool {
-	if o != nil && !IsNil(o.AllowAlternativeProtocols) {
+	if o != nil && o.AllowAlternativeProtocols.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetAllowAlternativeProtocols gets a reference to the given bool and assigns it to the AllowAlternativeProtocols field.
+// SetAllowAlternativeProtocols gets a reference to the given NullableBool and assigns it to the AllowAlternativeProtocols field.
 func (o *StorageProfileS3) SetAllowAlternativeProtocols(v bool) {
-	o.AllowAlternativeProtocols = &v
+	o.AllowAlternativeProtocols.Set(&v)
 }
 
-// GetAssumeRoleArn returns the AssumeRoleArn field value if set, zero value otherwise.
+// SetAllowAlternativeProtocolsNil sets the value for AllowAlternativeProtocols to be an explicit nil
+func (o *StorageProfileS3) SetAllowAlternativeProtocolsNil() {
+	o.AllowAlternativeProtocols.Set(nil)
+}
+
+// UnsetAllowAlternativeProtocols ensures that no value is present for AllowAlternativeProtocols, not even an explicit nil
+func (o *StorageProfileS3) UnsetAllowAlternativeProtocols() {
+	o.AllowAlternativeProtocols.Unset()
+}
+
+// GetAssumeRoleArn returns the AssumeRoleArn field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *StorageProfileS3) GetAssumeRoleArn() string {
-	if o == nil || IsNil(o.AssumeRoleArn) {
+	if o == nil || IsNil(o.AssumeRoleArn.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.AssumeRoleArn
+	return *o.AssumeRoleArn.Get()
 }
 
 // GetAssumeRoleArnOk returns a tuple with the AssumeRoleArn field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *StorageProfileS3) GetAssumeRoleArnOk() (*string, bool) {
-	if o == nil || IsNil(o.AssumeRoleArn) {
+	if o == nil {
 		return nil, false
 	}
-	return o.AssumeRoleArn, true
+	return o.AssumeRoleArn.Get(), o.AssumeRoleArn.IsSet()
 }
 
 // HasAssumeRoleArn returns a boolean if a field has been set.
 func (o *StorageProfileS3) HasAssumeRoleArn() bool {
-	if o != nil && !IsNil(o.AssumeRoleArn) {
+	if o != nil && o.AssumeRoleArn.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetAssumeRoleArn gets a reference to the given string and assigns it to the AssumeRoleArn field.
+// SetAssumeRoleArn gets a reference to the given NullableString and assigns it to the AssumeRoleArn field.
 func (o *StorageProfileS3) SetAssumeRoleArn(v string) {
-	o.AssumeRoleArn = &v
+	o.AssumeRoleArn.Set(&v)
 }
 
-// GetAwsKmsKeyArn returns the AwsKmsKeyArn field value if set, zero value otherwise.
+// SetAssumeRoleArnNil sets the value for AssumeRoleArn to be an explicit nil
+func (o *StorageProfileS3) SetAssumeRoleArnNil() {
+	o.AssumeRoleArn.Set(nil)
+}
+
+// UnsetAssumeRoleArn ensures that no value is present for AssumeRoleArn, not even an explicit nil
+func (o *StorageProfileS3) UnsetAssumeRoleArn() {
+	o.AssumeRoleArn.Unset()
+}
+
+// GetAwsKmsKeyArn returns the AwsKmsKeyArn field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *StorageProfileS3) GetAwsKmsKeyArn() string {
-	if o == nil || IsNil(o.AwsKmsKeyArn) {
+	if o == nil || IsNil(o.AwsKmsKeyArn.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.AwsKmsKeyArn
+	return *o.AwsKmsKeyArn.Get()
 }
 
 // GetAwsKmsKeyArnOk returns a tuple with the AwsKmsKeyArn field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *StorageProfileS3) GetAwsKmsKeyArnOk() (*string, bool) {
-	if o == nil || IsNil(o.AwsKmsKeyArn) {
+	if o == nil {
 		return nil, false
 	}
-	return o.AwsKmsKeyArn, true
+	return o.AwsKmsKeyArn.Get(), o.AwsKmsKeyArn.IsSet()
 }
 
 // HasAwsKmsKeyArn returns a boolean if a field has been set.
 func (o *StorageProfileS3) HasAwsKmsKeyArn() bool {
-	if o != nil && !IsNil(o.AwsKmsKeyArn) {
+	if o != nil && o.AwsKmsKeyArn.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetAwsKmsKeyArn gets a reference to the given string and assigns it to the AwsKmsKeyArn field.
+// SetAwsKmsKeyArn gets a reference to the given NullableString and assigns it to the AwsKmsKeyArn field.
 func (o *StorageProfileS3) SetAwsKmsKeyArn(v string) {
-	o.AwsKmsKeyArn = &v
+	o.AwsKmsKeyArn.Set(&v)
+}
+
+// SetAwsKmsKeyArnNil sets the value for AwsKmsKeyArn to be an explicit nil
+func (o *StorageProfileS3) SetAwsKmsKeyArnNil() {
+	o.AwsKmsKeyArn.Set(nil)
+}
+
+// UnsetAwsKmsKeyArn ensures that no value is present for AwsKmsKeyArn, not even an explicit nil
+func (o *StorageProfileS3) UnsetAwsKmsKeyArn() {
+	o.AwsKmsKeyArn.Unset()
 }
 
 // GetBucket returns the Bucket field value
@@ -206,36 +239,47 @@ func (o *StorageProfileS3) SetBucket(v string) {
 	o.Bucket = v
 }
 
-// GetEndpoint returns the Endpoint field value if set, zero value otherwise.
+// GetEndpoint returns the Endpoint field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *StorageProfileS3) GetEndpoint() string {
-	if o == nil || IsNil(o.Endpoint) {
+	if o == nil || IsNil(o.Endpoint.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.Endpoint
+	return *o.Endpoint.Get()
 }
 
 // GetEndpointOk returns a tuple with the Endpoint field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *StorageProfileS3) GetEndpointOk() (*string, bool) {
-	if o == nil || IsNil(o.Endpoint) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Endpoint, true
+	return o.Endpoint.Get(), o.Endpoint.IsSet()
 }
 
 // HasEndpoint returns a boolean if a field has been set.
 func (o *StorageProfileS3) HasEndpoint() bool {
-	if o != nil && !IsNil(o.Endpoint) {
+	if o != nil && o.Endpoint.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetEndpoint gets a reference to the given string and assigns it to the Endpoint field.
+// SetEndpoint gets a reference to the given NullableString and assigns it to the Endpoint field.
 func (o *StorageProfileS3) SetEndpoint(v string) {
-	o.Endpoint = &v
+	o.Endpoint.Set(&v)
+}
+
+// SetEndpointNil sets the value for Endpoint to be an explicit nil
+func (o *StorageProfileS3) SetEndpointNil() {
+	o.Endpoint.Set(nil)
+}
+
+// UnsetEndpoint ensures that no value is present for Endpoint, not even an explicit nil
+func (o *StorageProfileS3) UnsetEndpoint() {
+	o.Endpoint.Unset()
 }
 
 // GetFlavor returns the Flavor field value if set, zero value otherwise.
@@ -270,100 +314,133 @@ func (o *StorageProfileS3) SetFlavor(v S3Flavor) {
 	o.Flavor = &v
 }
 
-// GetKeyPrefix returns the KeyPrefix field value if set, zero value otherwise.
+// GetKeyPrefix returns the KeyPrefix field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *StorageProfileS3) GetKeyPrefix() string {
-	if o == nil || IsNil(o.KeyPrefix) {
+	if o == nil || IsNil(o.KeyPrefix.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.KeyPrefix
+	return *o.KeyPrefix.Get()
 }
 
 // GetKeyPrefixOk returns a tuple with the KeyPrefix field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *StorageProfileS3) GetKeyPrefixOk() (*string, bool) {
-	if o == nil || IsNil(o.KeyPrefix) {
+	if o == nil {
 		return nil, false
 	}
-	return o.KeyPrefix, true
+	return o.KeyPrefix.Get(), o.KeyPrefix.IsSet()
 }
 
 // HasKeyPrefix returns a boolean if a field has been set.
 func (o *StorageProfileS3) HasKeyPrefix() bool {
-	if o != nil && !IsNil(o.KeyPrefix) {
+	if o != nil && o.KeyPrefix.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetKeyPrefix gets a reference to the given string and assigns it to the KeyPrefix field.
+// SetKeyPrefix gets a reference to the given NullableString and assigns it to the KeyPrefix field.
 func (o *StorageProfileS3) SetKeyPrefix(v string) {
-	o.KeyPrefix = &v
+	o.KeyPrefix.Set(&v)
 }
 
-// GetLegacyMd5Behavior returns the LegacyMd5Behavior field value if set, zero value otherwise.
+// SetKeyPrefixNil sets the value for KeyPrefix to be an explicit nil
+func (o *StorageProfileS3) SetKeyPrefixNil() {
+	o.KeyPrefix.Set(nil)
+}
+
+// UnsetKeyPrefix ensures that no value is present for KeyPrefix, not even an explicit nil
+func (o *StorageProfileS3) UnsetKeyPrefix() {
+	o.KeyPrefix.Unset()
+}
+
+// GetLegacyMd5Behavior returns the LegacyMd5Behavior field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *StorageProfileS3) GetLegacyMd5Behavior() bool {
-	if o == nil || IsNil(o.LegacyMd5Behavior) {
+	if o == nil || IsNil(o.LegacyMd5Behavior.Get()) {
 		var ret bool
 		return ret
 	}
-	return *o.LegacyMd5Behavior
+	return *o.LegacyMd5Behavior.Get()
 }
 
 // GetLegacyMd5BehaviorOk returns a tuple with the LegacyMd5Behavior field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *StorageProfileS3) GetLegacyMd5BehaviorOk() (*bool, bool) {
-	if o == nil || IsNil(o.LegacyMd5Behavior) {
+	if o == nil {
 		return nil, false
 	}
-	return o.LegacyMd5Behavior, true
+	return o.LegacyMd5Behavior.Get(), o.LegacyMd5Behavior.IsSet()
 }
 
 // HasLegacyMd5Behavior returns a boolean if a field has been set.
 func (o *StorageProfileS3) HasLegacyMd5Behavior() bool {
-	if o != nil && !IsNil(o.LegacyMd5Behavior) {
+	if o != nil && o.LegacyMd5Behavior.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetLegacyMd5Behavior gets a reference to the given bool and assigns it to the LegacyMd5Behavior field.
+// SetLegacyMd5Behavior gets a reference to the given NullableBool and assigns it to the LegacyMd5Behavior field.
 func (o *StorageProfileS3) SetLegacyMd5Behavior(v bool) {
-	o.LegacyMd5Behavior = &v
+	o.LegacyMd5Behavior.Set(&v)
 }
 
-// GetPathStyleAccess returns the PathStyleAccess field value if set, zero value otherwise.
+// SetLegacyMd5BehaviorNil sets the value for LegacyMd5Behavior to be an explicit nil
+func (o *StorageProfileS3) SetLegacyMd5BehaviorNil() {
+	o.LegacyMd5Behavior.Set(nil)
+}
+
+// UnsetLegacyMd5Behavior ensures that no value is present for LegacyMd5Behavior, not even an explicit nil
+func (o *StorageProfileS3) UnsetLegacyMd5Behavior() {
+	o.LegacyMd5Behavior.Unset()
+}
+
+// GetPathStyleAccess returns the PathStyleAccess field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *StorageProfileS3) GetPathStyleAccess() bool {
-	if o == nil || IsNil(o.PathStyleAccess) {
+	if o == nil || IsNil(o.PathStyleAccess.Get()) {
 		var ret bool
 		return ret
 	}
-	return *o.PathStyleAccess
+	return *o.PathStyleAccess.Get()
 }
 
 // GetPathStyleAccessOk returns a tuple with the PathStyleAccess field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *StorageProfileS3) GetPathStyleAccessOk() (*bool, bool) {
-	if o == nil || IsNil(o.PathStyleAccess) {
+	if o == nil {
 		return nil, false
 	}
-	return o.PathStyleAccess, true
+	return o.PathStyleAccess.Get(), o.PathStyleAccess.IsSet()
 }
 
 // HasPathStyleAccess returns a boolean if a field has been set.
 func (o *StorageProfileS3) HasPathStyleAccess() bool {
-	if o != nil && !IsNil(o.PathStyleAccess) {
+	if o != nil && o.PathStyleAccess.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetPathStyleAccess gets a reference to the given bool and assigns it to the PathStyleAccess field.
+// SetPathStyleAccess gets a reference to the given NullableBool and assigns it to the PathStyleAccess field.
 func (o *StorageProfileS3) SetPathStyleAccess(v bool) {
-	o.PathStyleAccess = &v
+	o.PathStyleAccess.Set(&v)
+}
+
+// SetPathStyleAccessNil sets the value for PathStyleAccess to be an explicit nil
+func (o *StorageProfileS3) SetPathStyleAccessNil() {
+	o.PathStyleAccess.Set(nil)
+}
+
+// UnsetPathStyleAccess ensures that no value is present for PathStyleAccess, not even an explicit nil
+func (o *StorageProfileS3) UnsetPathStyleAccess() {
+	o.PathStyleAccess.Unset()
 }
 
 // GetPushS3DeleteDisabled returns the PushS3DeleteDisabled field value if set, zero value otherwise.
@@ -486,36 +563,47 @@ func (o *StorageProfileS3) SetRemoteSigningUrlStyle(v S3UrlStyleDetectionMode) {
 	o.RemoteSigningUrlStyle = &v
 }
 
-// GetStorageLayout returns the StorageLayout field value if set, zero value otherwise.
+// GetStorageLayout returns the StorageLayout field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *StorageProfileS3) GetStorageLayout() StorageLayout {
-	if o == nil || IsNil(o.StorageLayout) {
+	if o == nil || IsNil(o.StorageLayout.Get()) {
 		var ret StorageLayout
 		return ret
 	}
-	return *o.StorageLayout
+	return *o.StorageLayout.Get()
 }
 
 // GetStorageLayoutOk returns a tuple with the StorageLayout field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *StorageProfileS3) GetStorageLayoutOk() (*StorageLayout, bool) {
-	if o == nil || IsNil(o.StorageLayout) {
+	if o == nil {
 		return nil, false
 	}
-	return o.StorageLayout, true
+	return o.StorageLayout.Get(), o.StorageLayout.IsSet()
 }
 
 // HasStorageLayout returns a boolean if a field has been set.
 func (o *StorageProfileS3) HasStorageLayout() bool {
-	if o != nil && !IsNil(o.StorageLayout) {
+	if o != nil && o.StorageLayout.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetStorageLayout gets a reference to the given StorageLayout and assigns it to the StorageLayout field.
+// SetStorageLayout gets a reference to the given NullableStorageLayout and assigns it to the StorageLayout field.
 func (o *StorageProfileS3) SetStorageLayout(v StorageLayout) {
-	o.StorageLayout = &v
+	o.StorageLayout.Set(&v)
+}
+
+// SetStorageLayoutNil sets the value for StorageLayout to be an explicit nil
+func (o *StorageProfileS3) SetStorageLayoutNil() {
+	o.StorageLayout.Set(nil)
+}
+
+// UnsetStorageLayout ensures that no value is present for StorageLayout, not even an explicit nil
+func (o *StorageProfileS3) UnsetStorageLayout() {
+	o.StorageLayout.Unset()
 }
 
 // GetStsEnabled returns the StsEnabled field value
@@ -542,100 +630,133 @@ func (o *StorageProfileS3) SetStsEnabled(v bool) {
 	o.StsEnabled = v
 }
 
-// GetStsEndpoint returns the StsEndpoint field value if set, zero value otherwise.
+// GetStsEndpoint returns the StsEndpoint field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *StorageProfileS3) GetStsEndpoint() string {
-	if o == nil || IsNil(o.StsEndpoint) {
+	if o == nil || IsNil(o.StsEndpoint.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.StsEndpoint
+	return *o.StsEndpoint.Get()
 }
 
 // GetStsEndpointOk returns a tuple with the StsEndpoint field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *StorageProfileS3) GetStsEndpointOk() (*string, bool) {
-	if o == nil || IsNil(o.StsEndpoint) {
+	if o == nil {
 		return nil, false
 	}
-	return o.StsEndpoint, true
+	return o.StsEndpoint.Get(), o.StsEndpoint.IsSet()
 }
 
 // HasStsEndpoint returns a boolean if a field has been set.
 func (o *StorageProfileS3) HasStsEndpoint() bool {
-	if o != nil && !IsNil(o.StsEndpoint) {
+	if o != nil && o.StsEndpoint.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetStsEndpoint gets a reference to the given string and assigns it to the StsEndpoint field.
+// SetStsEndpoint gets a reference to the given NullableString and assigns it to the StsEndpoint field.
 func (o *StorageProfileS3) SetStsEndpoint(v string) {
-	o.StsEndpoint = &v
+	o.StsEndpoint.Set(&v)
 }
 
-// GetStsRoleArn returns the StsRoleArn field value if set, zero value otherwise.
+// SetStsEndpointNil sets the value for StsEndpoint to be an explicit nil
+func (o *StorageProfileS3) SetStsEndpointNil() {
+	o.StsEndpoint.Set(nil)
+}
+
+// UnsetStsEndpoint ensures that no value is present for StsEndpoint, not even an explicit nil
+func (o *StorageProfileS3) UnsetStsEndpoint() {
+	o.StsEndpoint.Unset()
+}
+
+// GetStsRoleArn returns the StsRoleArn field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *StorageProfileS3) GetStsRoleArn() string {
-	if o == nil || IsNil(o.StsRoleArn) {
+	if o == nil || IsNil(o.StsRoleArn.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.StsRoleArn
+	return *o.StsRoleArn.Get()
 }
 
 // GetStsRoleArnOk returns a tuple with the StsRoleArn field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *StorageProfileS3) GetStsRoleArnOk() (*string, bool) {
-	if o == nil || IsNil(o.StsRoleArn) {
+	if o == nil {
 		return nil, false
 	}
-	return o.StsRoleArn, true
+	return o.StsRoleArn.Get(), o.StsRoleArn.IsSet()
 }
 
 // HasStsRoleArn returns a boolean if a field has been set.
 func (o *StorageProfileS3) HasStsRoleArn() bool {
-	if o != nil && !IsNil(o.StsRoleArn) {
+	if o != nil && o.StsRoleArn.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetStsRoleArn gets a reference to the given string and assigns it to the StsRoleArn field.
+// SetStsRoleArn gets a reference to the given NullableString and assigns it to the StsRoleArn field.
 func (o *StorageProfileS3) SetStsRoleArn(v string) {
-	o.StsRoleArn = &v
+	o.StsRoleArn.Set(&v)
 }
 
-// GetStsSessionPolicyPrincipal returns the StsSessionPolicyPrincipal field value if set, zero value otherwise.
+// SetStsRoleArnNil sets the value for StsRoleArn to be an explicit nil
+func (o *StorageProfileS3) SetStsRoleArnNil() {
+	o.StsRoleArn.Set(nil)
+}
+
+// UnsetStsRoleArn ensures that no value is present for StsRoleArn, not even an explicit nil
+func (o *StorageProfileS3) UnsetStsRoleArn() {
+	o.StsRoleArn.Unset()
+}
+
+// GetStsSessionPolicyPrincipal returns the StsSessionPolicyPrincipal field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *StorageProfileS3) GetStsSessionPolicyPrincipal() bool {
-	if o == nil || IsNil(o.StsSessionPolicyPrincipal) {
+	if o == nil || IsNil(o.StsSessionPolicyPrincipal.Get()) {
 		var ret bool
 		return ret
 	}
-	return *o.StsSessionPolicyPrincipal
+	return *o.StsSessionPolicyPrincipal.Get()
 }
 
 // GetStsSessionPolicyPrincipalOk returns a tuple with the StsSessionPolicyPrincipal field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *StorageProfileS3) GetStsSessionPolicyPrincipalOk() (*bool, bool) {
-	if o == nil || IsNil(o.StsSessionPolicyPrincipal) {
+	if o == nil {
 		return nil, false
 	}
-	return o.StsSessionPolicyPrincipal, true
+	return o.StsSessionPolicyPrincipal.Get(), o.StsSessionPolicyPrincipal.IsSet()
 }
 
 // HasStsSessionPolicyPrincipal returns a boolean if a field has been set.
 func (o *StorageProfileS3) HasStsSessionPolicyPrincipal() bool {
-	if o != nil && !IsNil(o.StsSessionPolicyPrincipal) {
+	if o != nil && o.StsSessionPolicyPrincipal.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetStsSessionPolicyPrincipal gets a reference to the given bool and assigns it to the StsSessionPolicyPrincipal field.
+// SetStsSessionPolicyPrincipal gets a reference to the given NullableBool and assigns it to the StsSessionPolicyPrincipal field.
 func (o *StorageProfileS3) SetStsSessionPolicyPrincipal(v bool) {
-	o.StsSessionPolicyPrincipal = &v
+	o.StsSessionPolicyPrincipal.Set(&v)
+}
+
+// SetStsSessionPolicyPrincipalNil sets the value for StsSessionPolicyPrincipal to be an explicit nil
+func (o *StorageProfileS3) SetStsSessionPolicyPrincipalNil() {
+	o.StsSessionPolicyPrincipal.Set(nil)
+}
+
+// UnsetStsSessionPolicyPrincipal ensures that no value is present for StsSessionPolicyPrincipal, not even an explicit nil
+func (o *StorageProfileS3) UnsetStsSessionPolicyPrincipal() {
+	o.StsSessionPolicyPrincipal.Unset()
 }
 
 // GetStsSessionTags returns the StsSessionTags field value if set, zero value otherwise.
@@ -644,14 +765,14 @@ func (o *StorageProfileS3) GetStsSessionTags() map[string]string {
 		var ret map[string]string
 		return ret
 	}
-	return o.StsSessionTags
+	return *o.StsSessionTags
 }
 
 // GetStsSessionTagsOk returns a tuple with the StsSessionTags field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *StorageProfileS3) GetStsSessionTagsOk() (map[string]string, bool) {
+func (o *StorageProfileS3) GetStsSessionTagsOk() (*map[string]string, bool) {
 	if o == nil || IsNil(o.StsSessionTags) {
-		return map[string]string{}, false
+		return nil, false
 	}
 	return o.StsSessionTags, true
 }
@@ -667,7 +788,7 @@ func (o *StorageProfileS3) HasStsSessionTags() bool {
 
 // SetStsSessionTags gets a reference to the given map[string]string and assigns it to the StsSessionTags field.
 func (o *StorageProfileS3) SetStsSessionTags(v map[string]string) {
-	o.StsSessionTags = v
+	o.StsSessionTags = &v
 }
 
 // GetStsTokenValiditySeconds returns the StsTokenValiditySeconds field value if set, zero value otherwise.
@@ -736,30 +857,30 @@ func (o StorageProfileS3) MarshalJSON() ([]byte, error) {
 
 func (o StorageProfileS3) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.AllowAlternativeProtocols) {
-		toSerialize["allow-alternative-protocols"] = o.AllowAlternativeProtocols
+	if o.AllowAlternativeProtocols.IsSet() {
+		toSerialize["allow-alternative-protocols"] = o.AllowAlternativeProtocols.Get()
 	}
-	if !IsNil(o.AssumeRoleArn) {
-		toSerialize["assume-role-arn"] = o.AssumeRoleArn
+	if o.AssumeRoleArn.IsSet() {
+		toSerialize["assume-role-arn"] = o.AssumeRoleArn.Get()
 	}
-	if !IsNil(o.AwsKmsKeyArn) {
-		toSerialize["aws-kms-key-arn"] = o.AwsKmsKeyArn
+	if o.AwsKmsKeyArn.IsSet() {
+		toSerialize["aws-kms-key-arn"] = o.AwsKmsKeyArn.Get()
 	}
 	toSerialize["bucket"] = o.Bucket
-	if !IsNil(o.Endpoint) {
-		toSerialize["endpoint"] = o.Endpoint
+	if o.Endpoint.IsSet() {
+		toSerialize["endpoint"] = o.Endpoint.Get()
 	}
 	if !IsNil(o.Flavor) {
 		toSerialize["flavor"] = o.Flavor
 	}
-	if !IsNil(o.KeyPrefix) {
-		toSerialize["key-prefix"] = o.KeyPrefix
+	if o.KeyPrefix.IsSet() {
+		toSerialize["key-prefix"] = o.KeyPrefix.Get()
 	}
-	if !IsNil(o.LegacyMd5Behavior) {
-		toSerialize["legacy-md5-behavior"] = o.LegacyMd5Behavior
+	if o.LegacyMd5Behavior.IsSet() {
+		toSerialize["legacy-md5-behavior"] = o.LegacyMd5Behavior.Get()
 	}
-	if !IsNil(o.PathStyleAccess) {
-		toSerialize["path-style-access"] = o.PathStyleAccess
+	if o.PathStyleAccess.IsSet() {
+		toSerialize["path-style-access"] = o.PathStyleAccess.Get()
 	}
 	if !IsNil(o.PushS3DeleteDisabled) {
 		toSerialize["push-s3-delete-disabled"] = o.PushS3DeleteDisabled
@@ -771,18 +892,18 @@ func (o StorageProfileS3) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.RemoteSigningUrlStyle) {
 		toSerialize["remote-signing-url-style"] = o.RemoteSigningUrlStyle
 	}
-	if !IsNil(o.StorageLayout) {
-		toSerialize["storage-layout"] = o.StorageLayout
+	if o.StorageLayout.IsSet() {
+		toSerialize["storage-layout"] = o.StorageLayout.Get()
 	}
 	toSerialize["sts-enabled"] = o.StsEnabled
-	if !IsNil(o.StsEndpoint) {
-		toSerialize["sts-endpoint"] = o.StsEndpoint
+	if o.StsEndpoint.IsSet() {
+		toSerialize["sts-endpoint"] = o.StsEndpoint.Get()
 	}
-	if !IsNil(o.StsRoleArn) {
-		toSerialize["sts-role-arn"] = o.StsRoleArn
+	if o.StsRoleArn.IsSet() {
+		toSerialize["sts-role-arn"] = o.StsRoleArn.Get()
 	}
-	if !IsNil(o.StsSessionPolicyPrincipal) {
-		toSerialize["sts-session-policy-principal"] = o.StsSessionPolicyPrincipal
+	if o.StsSessionPolicyPrincipal.IsSet() {
+		toSerialize["sts-session-policy-principal"] = o.StsSessionPolicyPrincipal.Get()
 	}
 	if !IsNil(o.StsSessionTags) {
 		toSerialize["sts-session-tags"] = o.StsSessionTags

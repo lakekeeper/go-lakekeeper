@@ -28,15 +28,15 @@ func NewADLSProfile(accountName, filesystem string, opts ...ADLSOption) manageme
 }
 
 func WithADLSKeyPrefix(prefix string) ADLSOption {
-	return func(p *managementv1.StorageProfileAdls) { p.KeyPrefix = &prefix }
+	return func(p *managementv1.StorageProfileAdls) { p.SetKeyPrefix(prefix) }
 }
 
 func WithADLSAuthorityHost(host string) ADLSOption {
-	return func(p *managementv1.StorageProfileAdls) { p.AuthorityHost = &host }
+	return func(p *managementv1.StorageProfileAdls) { p.SetAuthorityHost(host) }
 }
 
 func WithADLSHost(host string) ADLSOption {
-	return func(p *managementv1.StorageProfileAdls) { p.Host = &host }
+	return func(p *managementv1.StorageProfileAdls) { p.SetHost(host) }
 }
 
 func WithADLSAlternativeProtocols() ADLSOption {
@@ -52,10 +52,10 @@ func WithADLSSASEnabled(enabled bool) ADLSOption {
 func WithADLSSASTokenValidity(d time.Duration) ADLSOption {
 	return func(p *managementv1.StorageProfileAdls) {
 		seconds := int64(d.Seconds())
-		p.SasTokenValiditySeconds = &seconds
+		p.SetSasTokenValiditySeconds(seconds)
 	}
 }
 
 func WithADLSStorageLayout(layout StorageLayout) ADLSOption {
-	return func(p *managementv1.StorageProfileAdls) { p.StorageLayout = &layout }
+	return func(p *managementv1.StorageProfileAdls) { p.SetStorageLayout(layout) }
 }

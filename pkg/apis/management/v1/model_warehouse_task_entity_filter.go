@@ -109,54 +109,6 @@ func (dst *WarehouseTaskEntityFilter) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	// check if the discriminator value is 'WarehouseTaskEntityFilterGenericTable'
-	if jsonDict["type"] == "WarehouseTaskEntityFilterGenericTable" {
-		// try to unmarshal JSON data into WarehouseTaskEntityFilterGenericTable
-		err = json.Unmarshal(data, &dst.WarehouseTaskEntityFilterGenericTable)
-		if err == nil {
-			return nil // data stored in dst.WarehouseTaskEntityFilterGenericTable, return on the first match
-		} else {
-			dst.WarehouseTaskEntityFilterGenericTable = nil
-			return fmt.Errorf("failed to unmarshal WarehouseTaskEntityFilter as WarehouseTaskEntityFilterGenericTable: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'WarehouseTaskEntityFilterTable'
-	if jsonDict["type"] == "WarehouseTaskEntityFilterTable" {
-		// try to unmarshal JSON data into WarehouseTaskEntityFilterTable
-		err = json.Unmarshal(data, &dst.WarehouseTaskEntityFilterTable)
-		if err == nil {
-			return nil // data stored in dst.WarehouseTaskEntityFilterTable, return on the first match
-		} else {
-			dst.WarehouseTaskEntityFilterTable = nil
-			return fmt.Errorf("failed to unmarshal WarehouseTaskEntityFilter as WarehouseTaskEntityFilterTable: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'WarehouseTaskEntityFilterView'
-	if jsonDict["type"] == "WarehouseTaskEntityFilterView" {
-		// try to unmarshal JSON data into WarehouseTaskEntityFilterView
-		err = json.Unmarshal(data, &dst.WarehouseTaskEntityFilterView)
-		if err == nil {
-			return nil // data stored in dst.WarehouseTaskEntityFilterView, return on the first match
-		} else {
-			dst.WarehouseTaskEntityFilterView = nil
-			return fmt.Errorf("failed to unmarshal WarehouseTaskEntityFilter as WarehouseTaskEntityFilterView: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'WarehouseTaskEntityFilterWarehouse'
-	if jsonDict["type"] == "WarehouseTaskEntityFilterWarehouse" {
-		// try to unmarshal JSON data into WarehouseTaskEntityFilterWarehouse
-		err = json.Unmarshal(data, &dst.WarehouseTaskEntityFilterWarehouse)
-		if err == nil {
-			return nil // data stored in dst.WarehouseTaskEntityFilterWarehouse, return on the first match
-		} else {
-			dst.WarehouseTaskEntityFilterWarehouse = nil
-			return fmt.Errorf("failed to unmarshal WarehouseTaskEntityFilter as WarehouseTaskEntityFilterWarehouse: %s", err.Error())
-		}
-	}
-
 	return nil
 }
 
@@ -200,6 +152,28 @@ func (obj *WarehouseTaskEntityFilter) GetActualInstance() interface{} {
 
 	if obj.WarehouseTaskEntityFilterWarehouse != nil {
 		return obj.WarehouseTaskEntityFilterWarehouse
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj WarehouseTaskEntityFilter) GetActualInstanceValue() interface{} {
+	if obj.WarehouseTaskEntityFilterGenericTable != nil {
+		return *obj.WarehouseTaskEntityFilterGenericTable
+	}
+
+	if obj.WarehouseTaskEntityFilterTable != nil {
+		return *obj.WarehouseTaskEntityFilterTable
+	}
+
+	if obj.WarehouseTaskEntityFilterView != nil {
+		return *obj.WarehouseTaskEntityFilterView
+	}
+
+	if obj.WarehouseTaskEntityFilterWarehouse != nil {
+		return *obj.WarehouseTaskEntityFilterWarehouse
 	}
 
 	// all schemas are nil

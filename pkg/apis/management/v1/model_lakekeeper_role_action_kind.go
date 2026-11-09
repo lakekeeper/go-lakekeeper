@@ -169,90 +169,6 @@ func (dst *LakekeeperRoleActionKind) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	// check if the discriminator value is 'LakekeeperRoleActionKindDelete'
-	if jsonDict["action"] == "LakekeeperRoleActionKindDelete" {
-		// try to unmarshal JSON data into LakekeeperRoleActionKindDelete
-		err = json.Unmarshal(data, &dst.LakekeeperRoleActionKindDelete)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperRoleActionKindDelete, return on the first match
-		} else {
-			dst.LakekeeperRoleActionKindDelete = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperRoleActionKind as LakekeeperRoleActionKindDelete: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperRoleActionKindManageRoleAssignments'
-	if jsonDict["action"] == "LakekeeperRoleActionKindManageRoleAssignments" {
-		// try to unmarshal JSON data into LakekeeperRoleActionKindManageRoleAssignments
-		err = json.Unmarshal(data, &dst.LakekeeperRoleActionKindManageRoleAssignments)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperRoleActionKindManageRoleAssignments, return on the first match
-		} else {
-			dst.LakekeeperRoleActionKindManageRoleAssignments = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperRoleActionKind as LakekeeperRoleActionKindManageRoleAssignments: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperRoleActionKindRead'
-	if jsonDict["action"] == "LakekeeperRoleActionKindRead" {
-		// try to unmarshal JSON data into LakekeeperRoleActionKindRead
-		err = json.Unmarshal(data, &dst.LakekeeperRoleActionKindRead)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperRoleActionKindRead, return on the first match
-		} else {
-			dst.LakekeeperRoleActionKindRead = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperRoleActionKind as LakekeeperRoleActionKindRead: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperRoleActionKindReadMetadata'
-	if jsonDict["action"] == "LakekeeperRoleActionKindReadMetadata" {
-		// try to unmarshal JSON data into LakekeeperRoleActionKindReadMetadata
-		err = json.Unmarshal(data, &dst.LakekeeperRoleActionKindReadMetadata)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperRoleActionKindReadMetadata, return on the first match
-		} else {
-			dst.LakekeeperRoleActionKindReadMetadata = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperRoleActionKind as LakekeeperRoleActionKindReadMetadata: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperRoleActionKindReadRoleAssignments'
-	if jsonDict["action"] == "LakekeeperRoleActionKindReadRoleAssignments" {
-		// try to unmarshal JSON data into LakekeeperRoleActionKindReadRoleAssignments
-		err = json.Unmarshal(data, &dst.LakekeeperRoleActionKindReadRoleAssignments)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperRoleActionKindReadRoleAssignments, return on the first match
-		} else {
-			dst.LakekeeperRoleActionKindReadRoleAssignments = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperRoleActionKind as LakekeeperRoleActionKindReadRoleAssignments: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperRoleActionKindUpdate'
-	if jsonDict["action"] == "LakekeeperRoleActionKindUpdate" {
-		// try to unmarshal JSON data into LakekeeperRoleActionKindUpdate
-		err = json.Unmarshal(data, &dst.LakekeeperRoleActionKindUpdate)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperRoleActionKindUpdate, return on the first match
-		} else {
-			dst.LakekeeperRoleActionKindUpdate = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperRoleActionKind as LakekeeperRoleActionKindUpdate: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperRoleActionKindUpdateSourceSystem'
-	if jsonDict["action"] == "LakekeeperRoleActionKindUpdateSourceSystem" {
-		// try to unmarshal JSON data into LakekeeperRoleActionKindUpdateSourceSystem
-		err = json.Unmarshal(data, &dst.LakekeeperRoleActionKindUpdateSourceSystem)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperRoleActionKindUpdateSourceSystem, return on the first match
-		} else {
-			dst.LakekeeperRoleActionKindUpdateSourceSystem = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperRoleActionKind as LakekeeperRoleActionKindUpdateSourceSystem: %s", err.Error())
-		}
-	}
-
 	return nil
 }
 
@@ -320,6 +236,40 @@ func (obj *LakekeeperRoleActionKind) GetActualInstance() interface{} {
 
 	if obj.LakekeeperRoleActionKindUpdateSourceSystem != nil {
 		return obj.LakekeeperRoleActionKindUpdateSourceSystem
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj LakekeeperRoleActionKind) GetActualInstanceValue() interface{} {
+	if obj.LakekeeperRoleActionKindDelete != nil {
+		return *obj.LakekeeperRoleActionKindDelete
+	}
+
+	if obj.LakekeeperRoleActionKindManageRoleAssignments != nil {
+		return *obj.LakekeeperRoleActionKindManageRoleAssignments
+	}
+
+	if obj.LakekeeperRoleActionKindRead != nil {
+		return *obj.LakekeeperRoleActionKindRead
+	}
+
+	if obj.LakekeeperRoleActionKindReadMetadata != nil {
+		return *obj.LakekeeperRoleActionKindReadMetadata
+	}
+
+	if obj.LakekeeperRoleActionKindReadRoleAssignments != nil {
+		return *obj.LakekeeperRoleActionKindReadRoleAssignments
+	}
+
+	if obj.LakekeeperRoleActionKindUpdate != nil {
+		return *obj.LakekeeperRoleActionKindUpdate
+	}
+
+	if obj.LakekeeperRoleActionKindUpdateSourceSystem != nil {
+		return *obj.LakekeeperRoleActionKindUpdateSourceSystem
 	}
 
 	// all schemas are nil

@@ -89,42 +89,6 @@ func (dst *EndpointMode) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	// check if the discriminator value is 'EndpointModeDefault'
-	if jsonDict["type"] == "EndpointModeDefault" {
-		// try to unmarshal JSON data into EndpointModeDefault
-		err = json.Unmarshal(data, &dst.EndpointModeDefault)
-		if err == nil {
-			return nil // data stored in dst.EndpointModeDefault, return on the first match
-		} else {
-			dst.EndpointModeDefault = nil
-			return fmt.Errorf("failed to unmarshal EndpointMode as EndpointModeDefault: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'EndpointModeRegional'
-	if jsonDict["type"] == "EndpointModeRegional" {
-		// try to unmarshal JSON data into EndpointModeRegional
-		err = json.Unmarshal(data, &dst.EndpointModeRegional)
-		if err == nil {
-			return nil // data stored in dst.EndpointModeRegional, return on the first match
-		} else {
-			dst.EndpointModeRegional = nil
-			return fmt.Errorf("failed to unmarshal EndpointMode as EndpointModeRegional: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'EndpointModeWorkspacePrivateLink'
-	if jsonDict["type"] == "EndpointModeWorkspacePrivateLink" {
-		// try to unmarshal JSON data into EndpointModeWorkspacePrivateLink
-		err = json.Unmarshal(data, &dst.EndpointModeWorkspacePrivateLink)
-		if err == nil {
-			return nil // data stored in dst.EndpointModeWorkspacePrivateLink, return on the first match
-		} else {
-			dst.EndpointModeWorkspacePrivateLink = nil
-			return fmt.Errorf("failed to unmarshal EndpointMode as EndpointModeWorkspacePrivateLink: %s", err.Error())
-		}
-	}
-
 	return nil
 }
 
@@ -160,6 +124,24 @@ func (obj *EndpointMode) GetActualInstance() interface{} {
 
 	if obj.EndpointModeWorkspacePrivateLink != nil {
 		return obj.EndpointModeWorkspacePrivateLink
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj EndpointMode) GetActualInstanceValue() interface{} {
+	if obj.EndpointModeDefault != nil {
+		return *obj.EndpointModeDefault
+	}
+
+	if obj.EndpointModeRegional != nil {
+		return *obj.EndpointModeRegional
+	}
+
+	if obj.EndpointModeWorkspacePrivateLink != nil {
+		return *obj.EndpointModeWorkspacePrivateLink
 	}
 
 	// all schemas are nil

@@ -109,54 +109,6 @@ func (dst *StorageCredentialType) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	// check if the discriminator value is 'StorageCredentialTypeAz'
-	if jsonDict["type"] == "StorageCredentialTypeAz" {
-		// try to unmarshal JSON data into StorageCredentialTypeAz
-		err = json.Unmarshal(data, &dst.StorageCredentialTypeAz)
-		if err == nil {
-			return nil // data stored in dst.StorageCredentialTypeAz, return on the first match
-		} else {
-			dst.StorageCredentialTypeAz = nil
-			return fmt.Errorf("failed to unmarshal StorageCredentialType as StorageCredentialTypeAz: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'StorageCredentialTypeGcs'
-	if jsonDict["type"] == "StorageCredentialTypeGcs" {
-		// try to unmarshal JSON data into StorageCredentialTypeGcs
-		err = json.Unmarshal(data, &dst.StorageCredentialTypeGcs)
-		if err == nil {
-			return nil // data stored in dst.StorageCredentialTypeGcs, return on the first match
-		} else {
-			dst.StorageCredentialTypeGcs = nil
-			return fmt.Errorf("failed to unmarshal StorageCredentialType as StorageCredentialTypeGcs: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'StorageCredentialTypeS3'
-	if jsonDict["type"] == "StorageCredentialTypeS3" {
-		// try to unmarshal JSON data into StorageCredentialTypeS3
-		err = json.Unmarshal(data, &dst.StorageCredentialTypeS3)
-		if err == nil {
-			return nil // data stored in dst.StorageCredentialTypeS3, return on the first match
-		} else {
-			dst.StorageCredentialTypeS3 = nil
-			return fmt.Errorf("failed to unmarshal StorageCredentialType as StorageCredentialTypeS3: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'StorageCredentialTypeStackit'
-	if jsonDict["type"] == "StorageCredentialTypeStackit" {
-		// try to unmarshal JSON data into StorageCredentialTypeStackit
-		err = json.Unmarshal(data, &dst.StorageCredentialTypeStackit)
-		if err == nil {
-			return nil // data stored in dst.StorageCredentialTypeStackit, return on the first match
-		} else {
-			dst.StorageCredentialTypeStackit = nil
-			return fmt.Errorf("failed to unmarshal StorageCredentialType as StorageCredentialTypeStackit: %s", err.Error())
-		}
-	}
-
 	return nil
 }
 
@@ -200,6 +152,28 @@ func (obj *StorageCredentialType) GetActualInstance() interface{} {
 
 	if obj.StorageCredentialTypeStackit != nil {
 		return obj.StorageCredentialTypeStackit
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj StorageCredentialType) GetActualInstanceValue() interface{} {
+	if obj.StorageCredentialTypeAz != nil {
+		return *obj.StorageCredentialTypeAz
+	}
+
+	if obj.StorageCredentialTypeGcs != nil {
+		return *obj.StorageCredentialTypeGcs
+	}
+
+	if obj.StorageCredentialTypeS3 != nil {
+		return *obj.StorageCredentialTypeS3
+	}
+
+	if obj.StorageCredentialTypeStackit != nil {
+		return *obj.StorageCredentialTypeStackit
 	}
 
 	// all schemas are nil

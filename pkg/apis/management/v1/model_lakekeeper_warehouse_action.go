@@ -589,342 +589,6 @@ func (dst *LakekeeperWarehouseAction) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	// check if the discriminator value is 'LakekeeperWarehouseActionAcceptMovedNamespace'
-	if jsonDict["action"] == "LakekeeperWarehouseActionAcceptMovedNamespace" {
-		// try to unmarshal JSON data into LakekeeperWarehouseActionAcceptMovedNamespace
-		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionAcceptMovedNamespace)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperWarehouseActionAcceptMovedNamespace, return on the first match
-		} else {
-			dst.LakekeeperWarehouseActionAcceptMovedNamespace = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionAcceptMovedNamespace: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperWarehouseActionActivate'
-	if jsonDict["action"] == "LakekeeperWarehouseActionActivate" {
-		// try to unmarshal JSON data into LakekeeperWarehouseActionActivate
-		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionActivate)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperWarehouseActionActivate, return on the first match
-		} else {
-			dst.LakekeeperWarehouseActionActivate = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionActivate: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperWarehouseActionControlAllTasks'
-	if jsonDict["action"] == "LakekeeperWarehouseActionControlAllTasks" {
-		// try to unmarshal JSON data into LakekeeperWarehouseActionControlAllTasks
-		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionControlAllTasks)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperWarehouseActionControlAllTasks, return on the first match
-		} else {
-			dst.LakekeeperWarehouseActionControlAllTasks = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionControlAllTasks: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperWarehouseActionCreateNamespace'
-	if jsonDict["action"] == "LakekeeperWarehouseActionCreateNamespace" {
-		// try to unmarshal JSON data into LakekeeperWarehouseActionCreateNamespace
-		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionCreateNamespace)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperWarehouseActionCreateNamespace, return on the first match
-		} else {
-			dst.LakekeeperWarehouseActionCreateNamespace = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionCreateNamespace: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperWarehouseActionDeactivate'
-	if jsonDict["action"] == "LakekeeperWarehouseActionDeactivate" {
-		// try to unmarshal JSON data into LakekeeperWarehouseActionDeactivate
-		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionDeactivate)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperWarehouseActionDeactivate, return on the first match
-		} else {
-			dst.LakekeeperWarehouseActionDeactivate = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionDeactivate: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperWarehouseActionDelete'
-	if jsonDict["action"] == "LakekeeperWarehouseActionDelete" {
-		// try to unmarshal JSON data into LakekeeperWarehouseActionDelete
-		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionDelete)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperWarehouseActionDelete, return on the first match
-		} else {
-			dst.LakekeeperWarehouseActionDelete = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionDelete: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperWarehouseActionGetAllTasks'
-	if jsonDict["action"] == "LakekeeperWarehouseActionGetAllTasks" {
-		// try to unmarshal JSON data into LakekeeperWarehouseActionGetAllTasks
-		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionGetAllTasks)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperWarehouseActionGetAllTasks, return on the first match
-		} else {
-			dst.LakekeeperWarehouseActionGetAllTasks = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionGetAllTasks: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperWarehouseActionGetConfig'
-	if jsonDict["action"] == "LakekeeperWarehouseActionGetConfig" {
-		// try to unmarshal JSON data into LakekeeperWarehouseActionGetConfig
-		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionGetConfig)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperWarehouseActionGetConfig, return on the first match
-		} else {
-			dst.LakekeeperWarehouseActionGetConfig = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionGetConfig: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperWarehouseActionGetEndpointStatistics'
-	if jsonDict["action"] == "LakekeeperWarehouseActionGetEndpointStatistics" {
-		// try to unmarshal JSON data into LakekeeperWarehouseActionGetEndpointStatistics
-		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionGetEndpointStatistics)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperWarehouseActionGetEndpointStatistics, return on the first match
-		} else {
-			dst.LakekeeperWarehouseActionGetEndpointStatistics = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionGetEndpointStatistics: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperWarehouseActionGetMetadata'
-	if jsonDict["action"] == "LakekeeperWarehouseActionGetMetadata" {
-		// try to unmarshal JSON data into LakekeeperWarehouseActionGetMetadata
-		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionGetMetadata)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperWarehouseActionGetMetadata, return on the first match
-		} else {
-			dst.LakekeeperWarehouseActionGetMetadata = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionGetMetadata: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperWarehouseActionGetTaskQueueConfig'
-	if jsonDict["action"] == "LakekeeperWarehouseActionGetTaskQueueConfig" {
-		// try to unmarshal JSON data into LakekeeperWarehouseActionGetTaskQueueConfig
-		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionGetTaskQueueConfig)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperWarehouseActionGetTaskQueueConfig, return on the first match
-		} else {
-			dst.LakekeeperWarehouseActionGetTaskQueueConfig = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionGetTaskQueueConfig: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperWarehouseActionIncludeInList'
-	if jsonDict["action"] == "LakekeeperWarehouseActionIncludeInList" {
-		// try to unmarshal JSON data into LakekeeperWarehouseActionIncludeInList
-		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionIncludeInList)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperWarehouseActionIncludeInList, return on the first match
-		} else {
-			dst.LakekeeperWarehouseActionIncludeInList = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionIncludeInList: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperWarehouseActionListDeletedTabulars'
-	if jsonDict["action"] == "LakekeeperWarehouseActionListDeletedTabulars" {
-		// try to unmarshal JSON data into LakekeeperWarehouseActionListDeletedTabulars
-		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionListDeletedTabulars)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperWarehouseActionListDeletedTabulars, return on the first match
-		} else {
-			dst.LakekeeperWarehouseActionListDeletedTabulars = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionListDeletedTabulars: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperWarehouseActionListEverything'
-	if jsonDict["action"] == "LakekeeperWarehouseActionListEverything" {
-		// try to unmarshal JSON data into LakekeeperWarehouseActionListEverything
-		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionListEverything)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperWarehouseActionListEverything, return on the first match
-		} else {
-			dst.LakekeeperWarehouseActionListEverything = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionListEverything: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperWarehouseActionListNamespaces'
-	if jsonDict["action"] == "LakekeeperWarehouseActionListNamespaces" {
-		// try to unmarshal JSON data into LakekeeperWarehouseActionListNamespaces
-		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionListNamespaces)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperWarehouseActionListNamespaces, return on the first match
-		} else {
-			dst.LakekeeperWarehouseActionListNamespaces = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionListNamespaces: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperWarehouseActionManageTags'
-	if jsonDict["action"] == "LakekeeperWarehouseActionManageTags" {
-		// try to unmarshal JSON data into LakekeeperWarehouseActionManageTags
-		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionManageTags)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperWarehouseActionManageTags, return on the first match
-		} else {
-			dst.LakekeeperWarehouseActionManageTags = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionManageTags: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperWarehouseActionModifySoftDeletion'
-	if jsonDict["action"] == "LakekeeperWarehouseActionModifySoftDeletion" {
-		// try to unmarshal JSON data into LakekeeperWarehouseActionModifySoftDeletion
-		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionModifySoftDeletion)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperWarehouseActionModifySoftDeletion, return on the first match
-		} else {
-			dst.LakekeeperWarehouseActionModifySoftDeletion = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionModifySoftDeletion: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperWarehouseActionModifyTaskQueueConfig'
-	if jsonDict["action"] == "LakekeeperWarehouseActionModifyTaskQueueConfig" {
-		// try to unmarshal JSON data into LakekeeperWarehouseActionModifyTaskQueueConfig
-		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionModifyTaskQueueConfig)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperWarehouseActionModifyTaskQueueConfig, return on the first match
-		} else {
-			dst.LakekeeperWarehouseActionModifyTaskQueueConfig = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionModifyTaskQueueConfig: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperWarehouseActionReadGrants'
-	if jsonDict["action"] == "LakekeeperWarehouseActionReadGrants" {
-		// try to unmarshal JSON data into LakekeeperWarehouseActionReadGrants
-		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionReadGrants)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperWarehouseActionReadGrants, return on the first match
-		} else {
-			dst.LakekeeperWarehouseActionReadGrants = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionReadGrants: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperWarehouseActionReadSubtreeGrants'
-	if jsonDict["action"] == "LakekeeperWarehouseActionReadSubtreeGrants" {
-		// try to unmarshal JSON data into LakekeeperWarehouseActionReadSubtreeGrants
-		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionReadSubtreeGrants)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperWarehouseActionReadSubtreeGrants, return on the first match
-		} else {
-			dst.LakekeeperWarehouseActionReadSubtreeGrants = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionReadSubtreeGrants: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperWarehouseActionRegisterTable'
-	if jsonDict["action"] == "LakekeeperWarehouseActionRegisterTable" {
-		// try to unmarshal JSON data into LakekeeperWarehouseActionRegisterTable
-		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionRegisterTable)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperWarehouseActionRegisterTable, return on the first match
-		} else {
-			dst.LakekeeperWarehouseActionRegisterTable = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionRegisterTable: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperWarehouseActionRename'
-	if jsonDict["action"] == "LakekeeperWarehouseActionRename" {
-		// try to unmarshal JSON data into LakekeeperWarehouseActionRename
-		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionRename)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperWarehouseActionRename, return on the first match
-		} else {
-			dst.LakekeeperWarehouseActionRename = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionRename: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperWarehouseActionRevokeSubtreeGrants'
-	if jsonDict["action"] == "LakekeeperWarehouseActionRevokeSubtreeGrants" {
-		// try to unmarshal JSON data into LakekeeperWarehouseActionRevokeSubtreeGrants
-		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionRevokeSubtreeGrants)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperWarehouseActionRevokeSubtreeGrants, return on the first match
-		} else {
-			dst.LakekeeperWarehouseActionRevokeSubtreeGrants = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionRevokeSubtreeGrants: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperWarehouseActionSetFormatVersionPolicy'
-	if jsonDict["action"] == "LakekeeperWarehouseActionSetFormatVersionPolicy" {
-		// try to unmarshal JSON data into LakekeeperWarehouseActionSetFormatVersionPolicy
-		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionSetFormatVersionPolicy)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperWarehouseActionSetFormatVersionPolicy, return on the first match
-		} else {
-			dst.LakekeeperWarehouseActionSetFormatVersionPolicy = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionSetFormatVersionPolicy: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperWarehouseActionSetProtection'
-	if jsonDict["action"] == "LakekeeperWarehouseActionSetProtection" {
-		// try to unmarshal JSON data into LakekeeperWarehouseActionSetProtection
-		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionSetProtection)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperWarehouseActionSetProtection, return on the first match
-		} else {
-			dst.LakekeeperWarehouseActionSetProtection = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionSetProtection: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperWarehouseActionUpdateStorage'
-	if jsonDict["action"] == "LakekeeperWarehouseActionUpdateStorage" {
-		// try to unmarshal JSON data into LakekeeperWarehouseActionUpdateStorage
-		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionUpdateStorage)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperWarehouseActionUpdateStorage, return on the first match
-		} else {
-			dst.LakekeeperWarehouseActionUpdateStorage = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionUpdateStorage: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperWarehouseActionUpdateStorageCredential'
-	if jsonDict["action"] == "LakekeeperWarehouseActionUpdateStorageCredential" {
-		// try to unmarshal JSON data into LakekeeperWarehouseActionUpdateStorageCredential
-		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionUpdateStorageCredential)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperWarehouseActionUpdateStorageCredential, return on the first match
-		} else {
-			dst.LakekeeperWarehouseActionUpdateStorageCredential = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionUpdateStorageCredential: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperWarehouseActionUse'
-	if jsonDict["action"] == "LakekeeperWarehouseActionUse" {
-		// try to unmarshal JSON data into LakekeeperWarehouseActionUse
-		err = json.Unmarshal(data, &dst.LakekeeperWarehouseActionUse)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperWarehouseActionUse, return on the first match
-		} else {
-			dst.LakekeeperWarehouseActionUse = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperWarehouseAction as LakekeeperWarehouseActionUse: %s", err.Error())
-		}
-	}
-
 	return nil
 }
 
@@ -1160,6 +824,124 @@ func (obj *LakekeeperWarehouseAction) GetActualInstance() interface{} {
 
 	if obj.LakekeeperWarehouseActionUse != nil {
 		return obj.LakekeeperWarehouseActionUse
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj LakekeeperWarehouseAction) GetActualInstanceValue() interface{} {
+	if obj.LakekeeperWarehouseActionAcceptMovedNamespace != nil {
+		return *obj.LakekeeperWarehouseActionAcceptMovedNamespace
+	}
+
+	if obj.LakekeeperWarehouseActionActivate != nil {
+		return *obj.LakekeeperWarehouseActionActivate
+	}
+
+	if obj.LakekeeperWarehouseActionControlAllTasks != nil {
+		return *obj.LakekeeperWarehouseActionControlAllTasks
+	}
+
+	if obj.LakekeeperWarehouseActionCreateNamespace != nil {
+		return *obj.LakekeeperWarehouseActionCreateNamespace
+	}
+
+	if obj.LakekeeperWarehouseActionDeactivate != nil {
+		return *obj.LakekeeperWarehouseActionDeactivate
+	}
+
+	if obj.LakekeeperWarehouseActionDelete != nil {
+		return *obj.LakekeeperWarehouseActionDelete
+	}
+
+	if obj.LakekeeperWarehouseActionGetAllTasks != nil {
+		return *obj.LakekeeperWarehouseActionGetAllTasks
+	}
+
+	if obj.LakekeeperWarehouseActionGetConfig != nil {
+		return *obj.LakekeeperWarehouseActionGetConfig
+	}
+
+	if obj.LakekeeperWarehouseActionGetEndpointStatistics != nil {
+		return *obj.LakekeeperWarehouseActionGetEndpointStatistics
+	}
+
+	if obj.LakekeeperWarehouseActionGetMetadata != nil {
+		return *obj.LakekeeperWarehouseActionGetMetadata
+	}
+
+	if obj.LakekeeperWarehouseActionGetTaskQueueConfig != nil {
+		return *obj.LakekeeperWarehouseActionGetTaskQueueConfig
+	}
+
+	if obj.LakekeeperWarehouseActionIncludeInList != nil {
+		return *obj.LakekeeperWarehouseActionIncludeInList
+	}
+
+	if obj.LakekeeperWarehouseActionListDeletedTabulars != nil {
+		return *obj.LakekeeperWarehouseActionListDeletedTabulars
+	}
+
+	if obj.LakekeeperWarehouseActionListEverything != nil {
+		return *obj.LakekeeperWarehouseActionListEverything
+	}
+
+	if obj.LakekeeperWarehouseActionListNamespaces != nil {
+		return *obj.LakekeeperWarehouseActionListNamespaces
+	}
+
+	if obj.LakekeeperWarehouseActionManageTags != nil {
+		return *obj.LakekeeperWarehouseActionManageTags
+	}
+
+	if obj.LakekeeperWarehouseActionModifySoftDeletion != nil {
+		return *obj.LakekeeperWarehouseActionModifySoftDeletion
+	}
+
+	if obj.LakekeeperWarehouseActionModifyTaskQueueConfig != nil {
+		return *obj.LakekeeperWarehouseActionModifyTaskQueueConfig
+	}
+
+	if obj.LakekeeperWarehouseActionReadGrants != nil {
+		return *obj.LakekeeperWarehouseActionReadGrants
+	}
+
+	if obj.LakekeeperWarehouseActionReadSubtreeGrants != nil {
+		return *obj.LakekeeperWarehouseActionReadSubtreeGrants
+	}
+
+	if obj.LakekeeperWarehouseActionRegisterTable != nil {
+		return *obj.LakekeeperWarehouseActionRegisterTable
+	}
+
+	if obj.LakekeeperWarehouseActionRename != nil {
+		return *obj.LakekeeperWarehouseActionRename
+	}
+
+	if obj.LakekeeperWarehouseActionRevokeSubtreeGrants != nil {
+		return *obj.LakekeeperWarehouseActionRevokeSubtreeGrants
+	}
+
+	if obj.LakekeeperWarehouseActionSetFormatVersionPolicy != nil {
+		return *obj.LakekeeperWarehouseActionSetFormatVersionPolicy
+	}
+
+	if obj.LakekeeperWarehouseActionSetProtection != nil {
+		return *obj.LakekeeperWarehouseActionSetProtection
+	}
+
+	if obj.LakekeeperWarehouseActionUpdateStorage != nil {
+		return *obj.LakekeeperWarehouseActionUpdateStorage
+	}
+
+	if obj.LakekeeperWarehouseActionUpdateStorageCredential != nil {
+		return *obj.LakekeeperWarehouseActionUpdateStorageCredential
+	}
+
+	if obj.LakekeeperWarehouseActionUse != nil {
+		return *obj.LakekeeperWarehouseActionUse
 	}
 
 	// all schemas are nil

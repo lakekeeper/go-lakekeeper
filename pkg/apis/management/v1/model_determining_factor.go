@@ -89,42 +89,6 @@ func (dst *DeterminingFactor) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	// check if the discriminator value is 'DeterminingFactorAdmissionGate'
-	if jsonDict["type"] == "DeterminingFactorAdmissionGate" {
-		// try to unmarshal JSON data into DeterminingFactorAdmissionGate
-		err = json.Unmarshal(data, &dst.DeterminingFactorAdmissionGate)
-		if err == nil {
-			return nil // data stored in dst.DeterminingFactorAdmissionGate, return on the first match
-		} else {
-			dst.DeterminingFactorAdmissionGate = nil
-			return fmt.Errorf("failed to unmarshal DeterminingFactor as DeterminingFactorAdmissionGate: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'DeterminingFactorPolicy'
-	if jsonDict["type"] == "DeterminingFactorPolicy" {
-		// try to unmarshal JSON data into DeterminingFactorPolicy
-		err = json.Unmarshal(data, &dst.DeterminingFactorPolicy)
-		if err == nil {
-			return nil // data stored in dst.DeterminingFactorPolicy, return on the first match
-		} else {
-			dst.DeterminingFactorPolicy = nil
-			return fmt.Errorf("failed to unmarshal DeterminingFactor as DeterminingFactorPolicy: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'DeterminingFactorSystemAuthority'
-	if jsonDict["type"] == "DeterminingFactorSystemAuthority" {
-		// try to unmarshal JSON data into DeterminingFactorSystemAuthority
-		err = json.Unmarshal(data, &dst.DeterminingFactorSystemAuthority)
-		if err == nil {
-			return nil // data stored in dst.DeterminingFactorSystemAuthority, return on the first match
-		} else {
-			dst.DeterminingFactorSystemAuthority = nil
-			return fmt.Errorf("failed to unmarshal DeterminingFactor as DeterminingFactorSystemAuthority: %s", err.Error())
-		}
-	}
-
 	return nil
 }
 
@@ -160,6 +124,24 @@ func (obj *DeterminingFactor) GetActualInstance() interface{} {
 
 	if obj.DeterminingFactorSystemAuthority != nil {
 		return obj.DeterminingFactorSystemAuthority
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj DeterminingFactor) GetActualInstanceValue() interface{} {
+	if obj.DeterminingFactorAdmissionGate != nil {
+		return *obj.DeterminingFactorAdmissionGate
+	}
+
+	if obj.DeterminingFactorPolicy != nil {
+		return *obj.DeterminingFactorPolicy
+	}
+
+	if obj.DeterminingFactorSystemAuthority != nil {
+		return *obj.DeterminingFactorSystemAuthority
 	}
 
 	// all schemas are nil

@@ -27,15 +27,15 @@ type GetTaskDetailsResponse struct {
 	// When this task attempt was created
 	CreatedAt time.Time `json:"created-at"`
 	// Type of the sub-entity this task operates on. None if this is a warehouse-level task.
-	Entity *WarehouseTaskEntityId `json:"entity,omitempty"`
+	Entity NullableWarehouseTaskEntityId `json:"entity,omitempty"`
 	// Name of the entity this task operates on. None if this is a warehouse-level task.
 	EntityName []string `json:"entity-name,omitempty"`
 	// Last heartbeat timestamp for running tasks
-	LastHeartbeatAt *time.Time `json:"last-heartbeat-at,omitempty"`
+	LastHeartbeatAt NullableTime `json:"last-heartbeat-at,omitempty"`
 	// Parent task ID if this is a sub-task
-	ParentTaskId *string `json:"parent-task-id,omitempty"`
+	ParentTaskId NullableString `json:"parent-task-id,omitempty"`
 	// When the latest attempt of the task was picked up for processing by a worker.
-	PickedUpAt *time.Time `json:"picked-up-at,omitempty"`
+	PickedUpAt NullableTime `json:"picked-up-at,omitempty"`
 	// Progress of the task (0.0 to 1.0)
 	Progress float32 `json:"progress"`
 	// Project ID associated with the task
@@ -43,7 +43,7 @@ type GetTaskDetailsResponse struct {
 	// Name of the queue processing this task
 	QueueName string `json:"queue-name"`
 	// How much worker capacity the task needs, in a unit its queue chooses; unset if the task has none.
-	ResourceDemand *int64 `json:"resource-demand,omitempty"`
+	ResourceDemand NullableInt64 `json:"resource-demand,omitempty"`
 	// When the latest attempt of the task is scheduled for
 	ScheduledFor time.Time `json:"scheduled-for"`
 	// Current status of the task
@@ -51,7 +51,7 @@ type GetTaskDetailsResponse struct {
 	// Unique identifier for the task
 	TaskId string `json:"task-id"`
 	// When the task was last updated
-	UpdatedAt *time.Time `json:"updated-at,omitempty"`
+	UpdatedAt NullableTime `json:"updated-at,omitempty"`
 	// Warehouse ID associated with the task
 	WarehouseId string `json:"warehouse-id"`
 	// History of past attempts
@@ -142,41 +142,52 @@ func (o *GetTaskDetailsResponse) SetCreatedAt(v time.Time) {
 	o.CreatedAt = v
 }
 
-// GetEntity returns the Entity field value if set, zero value otherwise.
+// GetEntity returns the Entity field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *GetTaskDetailsResponse) GetEntity() WarehouseTaskEntityId {
-	if o == nil || IsNil(o.Entity) {
+	if o == nil || IsNil(o.Entity.Get()) {
 		var ret WarehouseTaskEntityId
 		return ret
 	}
-	return *o.Entity
+	return *o.Entity.Get()
 }
 
 // GetEntityOk returns a tuple with the Entity field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *GetTaskDetailsResponse) GetEntityOk() (*WarehouseTaskEntityId, bool) {
-	if o == nil || IsNil(o.Entity) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Entity, true
+	return o.Entity.Get(), o.Entity.IsSet()
 }
 
 // HasEntity returns a boolean if a field has been set.
 func (o *GetTaskDetailsResponse) HasEntity() bool {
-	if o != nil && !IsNil(o.Entity) {
+	if o != nil && o.Entity.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetEntity gets a reference to the given WarehouseTaskEntityId and assigns it to the Entity field.
+// SetEntity gets a reference to the given NullableWarehouseTaskEntityId and assigns it to the Entity field.
 func (o *GetTaskDetailsResponse) SetEntity(v WarehouseTaskEntityId) {
-	o.Entity = &v
+	o.Entity.Set(&v)
 }
 
-// GetEntityName returns the EntityName field value if set, zero value otherwise.
+// SetEntityNil sets the value for Entity to be an explicit nil
+func (o *GetTaskDetailsResponse) SetEntityNil() {
+	o.Entity.Set(nil)
+}
+
+// UnsetEntity ensures that no value is present for Entity, not even an explicit nil
+func (o *GetTaskDetailsResponse) UnsetEntity() {
+	o.Entity.Unset()
+}
+
+// GetEntityName returns the EntityName field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *GetTaskDetailsResponse) GetEntityName() []string {
-	if o == nil || IsNil(o.EntityName) {
+	if o == nil {
 		var ret []string
 		return ret
 	}
@@ -185,6 +196,7 @@ func (o *GetTaskDetailsResponse) GetEntityName() []string {
 
 // GetEntityNameOk returns a tuple with the EntityName field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *GetTaskDetailsResponse) GetEntityNameOk() ([]string, bool) {
 	if o == nil || IsNil(o.EntityName) {
 		return nil, false
@@ -206,100 +218,133 @@ func (o *GetTaskDetailsResponse) SetEntityName(v []string) {
 	o.EntityName = v
 }
 
-// GetLastHeartbeatAt returns the LastHeartbeatAt field value if set, zero value otherwise.
+// GetLastHeartbeatAt returns the LastHeartbeatAt field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *GetTaskDetailsResponse) GetLastHeartbeatAt() time.Time {
-	if o == nil || IsNil(o.LastHeartbeatAt) {
+	if o == nil || IsNil(o.LastHeartbeatAt.Get()) {
 		var ret time.Time
 		return ret
 	}
-	return *o.LastHeartbeatAt
+	return *o.LastHeartbeatAt.Get()
 }
 
 // GetLastHeartbeatAtOk returns a tuple with the LastHeartbeatAt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *GetTaskDetailsResponse) GetLastHeartbeatAtOk() (*time.Time, bool) {
-	if o == nil || IsNil(o.LastHeartbeatAt) {
+	if o == nil {
 		return nil, false
 	}
-	return o.LastHeartbeatAt, true
+	return o.LastHeartbeatAt.Get(), o.LastHeartbeatAt.IsSet()
 }
 
 // HasLastHeartbeatAt returns a boolean if a field has been set.
 func (o *GetTaskDetailsResponse) HasLastHeartbeatAt() bool {
-	if o != nil && !IsNil(o.LastHeartbeatAt) {
+	if o != nil && o.LastHeartbeatAt.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetLastHeartbeatAt gets a reference to the given time.Time and assigns it to the LastHeartbeatAt field.
+// SetLastHeartbeatAt gets a reference to the given NullableTime and assigns it to the LastHeartbeatAt field.
 func (o *GetTaskDetailsResponse) SetLastHeartbeatAt(v time.Time) {
-	o.LastHeartbeatAt = &v
+	o.LastHeartbeatAt.Set(&v)
 }
 
-// GetParentTaskId returns the ParentTaskId field value if set, zero value otherwise.
+// SetLastHeartbeatAtNil sets the value for LastHeartbeatAt to be an explicit nil
+func (o *GetTaskDetailsResponse) SetLastHeartbeatAtNil() {
+	o.LastHeartbeatAt.Set(nil)
+}
+
+// UnsetLastHeartbeatAt ensures that no value is present for LastHeartbeatAt, not even an explicit nil
+func (o *GetTaskDetailsResponse) UnsetLastHeartbeatAt() {
+	o.LastHeartbeatAt.Unset()
+}
+
+// GetParentTaskId returns the ParentTaskId field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *GetTaskDetailsResponse) GetParentTaskId() string {
-	if o == nil || IsNil(o.ParentTaskId) {
+	if o == nil || IsNil(o.ParentTaskId.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.ParentTaskId
+	return *o.ParentTaskId.Get()
 }
 
 // GetParentTaskIdOk returns a tuple with the ParentTaskId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *GetTaskDetailsResponse) GetParentTaskIdOk() (*string, bool) {
-	if o == nil || IsNil(o.ParentTaskId) {
+	if o == nil {
 		return nil, false
 	}
-	return o.ParentTaskId, true
+	return o.ParentTaskId.Get(), o.ParentTaskId.IsSet()
 }
 
 // HasParentTaskId returns a boolean if a field has been set.
 func (o *GetTaskDetailsResponse) HasParentTaskId() bool {
-	if o != nil && !IsNil(o.ParentTaskId) {
+	if o != nil && o.ParentTaskId.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetParentTaskId gets a reference to the given string and assigns it to the ParentTaskId field.
+// SetParentTaskId gets a reference to the given NullableString and assigns it to the ParentTaskId field.
 func (o *GetTaskDetailsResponse) SetParentTaskId(v string) {
-	o.ParentTaskId = &v
+	o.ParentTaskId.Set(&v)
 }
 
-// GetPickedUpAt returns the PickedUpAt field value if set, zero value otherwise.
+// SetParentTaskIdNil sets the value for ParentTaskId to be an explicit nil
+func (o *GetTaskDetailsResponse) SetParentTaskIdNil() {
+	o.ParentTaskId.Set(nil)
+}
+
+// UnsetParentTaskId ensures that no value is present for ParentTaskId, not even an explicit nil
+func (o *GetTaskDetailsResponse) UnsetParentTaskId() {
+	o.ParentTaskId.Unset()
+}
+
+// GetPickedUpAt returns the PickedUpAt field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *GetTaskDetailsResponse) GetPickedUpAt() time.Time {
-	if o == nil || IsNil(o.PickedUpAt) {
+	if o == nil || IsNil(o.PickedUpAt.Get()) {
 		var ret time.Time
 		return ret
 	}
-	return *o.PickedUpAt
+	return *o.PickedUpAt.Get()
 }
 
 // GetPickedUpAtOk returns a tuple with the PickedUpAt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *GetTaskDetailsResponse) GetPickedUpAtOk() (*time.Time, bool) {
-	if o == nil || IsNil(o.PickedUpAt) {
+	if o == nil {
 		return nil, false
 	}
-	return o.PickedUpAt, true
+	return o.PickedUpAt.Get(), o.PickedUpAt.IsSet()
 }
 
 // HasPickedUpAt returns a boolean if a field has been set.
 func (o *GetTaskDetailsResponse) HasPickedUpAt() bool {
-	if o != nil && !IsNil(o.PickedUpAt) {
+	if o != nil && o.PickedUpAt.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetPickedUpAt gets a reference to the given time.Time and assigns it to the PickedUpAt field.
+// SetPickedUpAt gets a reference to the given NullableTime and assigns it to the PickedUpAt field.
 func (o *GetTaskDetailsResponse) SetPickedUpAt(v time.Time) {
-	o.PickedUpAt = &v
+	o.PickedUpAt.Set(&v)
+}
+
+// SetPickedUpAtNil sets the value for PickedUpAt to be an explicit nil
+func (o *GetTaskDetailsResponse) SetPickedUpAtNil() {
+	o.PickedUpAt.Set(nil)
+}
+
+// UnsetPickedUpAt ensures that no value is present for PickedUpAt, not even an explicit nil
+func (o *GetTaskDetailsResponse) UnsetPickedUpAt() {
+	o.PickedUpAt.Unset()
 }
 
 // GetProgress returns the Progress field value
@@ -374,36 +419,47 @@ func (o *GetTaskDetailsResponse) SetQueueName(v string) {
 	o.QueueName = v
 }
 
-// GetResourceDemand returns the ResourceDemand field value if set, zero value otherwise.
+// GetResourceDemand returns the ResourceDemand field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *GetTaskDetailsResponse) GetResourceDemand() int64 {
-	if o == nil || IsNil(o.ResourceDemand) {
+	if o == nil || IsNil(o.ResourceDemand.Get()) {
 		var ret int64
 		return ret
 	}
-	return *o.ResourceDemand
+	return *o.ResourceDemand.Get()
 }
 
 // GetResourceDemandOk returns a tuple with the ResourceDemand field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *GetTaskDetailsResponse) GetResourceDemandOk() (*int64, bool) {
-	if o == nil || IsNil(o.ResourceDemand) {
+	if o == nil {
 		return nil, false
 	}
-	return o.ResourceDemand, true
+	return o.ResourceDemand.Get(), o.ResourceDemand.IsSet()
 }
 
 // HasResourceDemand returns a boolean if a field has been set.
 func (o *GetTaskDetailsResponse) HasResourceDemand() bool {
-	if o != nil && !IsNil(o.ResourceDemand) {
+	if o != nil && o.ResourceDemand.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetResourceDemand gets a reference to the given int64 and assigns it to the ResourceDemand field.
+// SetResourceDemand gets a reference to the given NullableInt64 and assigns it to the ResourceDemand field.
 func (o *GetTaskDetailsResponse) SetResourceDemand(v int64) {
-	o.ResourceDemand = &v
+	o.ResourceDemand.Set(&v)
+}
+
+// SetResourceDemandNil sets the value for ResourceDemand to be an explicit nil
+func (o *GetTaskDetailsResponse) SetResourceDemandNil() {
+	o.ResourceDemand.Set(nil)
+}
+
+// UnsetResourceDemand ensures that no value is present for ResourceDemand, not even an explicit nil
+func (o *GetTaskDetailsResponse) UnsetResourceDemand() {
+	o.ResourceDemand.Unset()
 }
 
 // GetScheduledFor returns the ScheduledFor field value
@@ -478,36 +534,47 @@ func (o *GetTaskDetailsResponse) SetTaskId(v string) {
 	o.TaskId = v
 }
 
-// GetUpdatedAt returns the UpdatedAt field value if set, zero value otherwise.
+// GetUpdatedAt returns the UpdatedAt field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *GetTaskDetailsResponse) GetUpdatedAt() time.Time {
-	if o == nil || IsNil(o.UpdatedAt) {
+	if o == nil || IsNil(o.UpdatedAt.Get()) {
 		var ret time.Time
 		return ret
 	}
-	return *o.UpdatedAt
+	return *o.UpdatedAt.Get()
 }
 
 // GetUpdatedAtOk returns a tuple with the UpdatedAt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *GetTaskDetailsResponse) GetUpdatedAtOk() (*time.Time, bool) {
-	if o == nil || IsNil(o.UpdatedAt) {
+	if o == nil {
 		return nil, false
 	}
-	return o.UpdatedAt, true
+	return o.UpdatedAt.Get(), o.UpdatedAt.IsSet()
 }
 
 // HasUpdatedAt returns a boolean if a field has been set.
 func (o *GetTaskDetailsResponse) HasUpdatedAt() bool {
-	if o != nil && !IsNil(o.UpdatedAt) {
+	if o != nil && o.UpdatedAt.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetUpdatedAt gets a reference to the given time.Time and assigns it to the UpdatedAt field.
+// SetUpdatedAt gets a reference to the given NullableTime and assigns it to the UpdatedAt field.
 func (o *GetTaskDetailsResponse) SetUpdatedAt(v time.Time) {
-	o.UpdatedAt = &v
+	o.UpdatedAt.Set(&v)
+}
+
+// SetUpdatedAtNil sets the value for UpdatedAt to be an explicit nil
+func (o *GetTaskDetailsResponse) SetUpdatedAtNil() {
+	o.UpdatedAt.Set(nil)
+}
+
+// UnsetUpdatedAt ensures that no value is present for UpdatedAt, not even an explicit nil
+func (o *GetTaskDetailsResponse) UnsetUpdatedAt() {
+	o.UpdatedAt.Unset()
 }
 
 // GetWarehouseId returns the WarehouseId field value
@@ -670,32 +737,32 @@ func (o GetTaskDetailsResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["attempt"] = o.Attempt
 	toSerialize["created-at"] = o.CreatedAt
-	if !IsNil(o.Entity) {
-		toSerialize["entity"] = o.Entity
+	if o.Entity.IsSet() {
+		toSerialize["entity"] = o.Entity.Get()
 	}
-	if !IsNil(o.EntityName) {
+	if o.EntityName != nil {
 		toSerialize["entity-name"] = o.EntityName
 	}
-	if !IsNil(o.LastHeartbeatAt) {
-		toSerialize["last-heartbeat-at"] = o.LastHeartbeatAt
+	if o.LastHeartbeatAt.IsSet() {
+		toSerialize["last-heartbeat-at"] = o.LastHeartbeatAt.Get()
 	}
-	if !IsNil(o.ParentTaskId) {
-		toSerialize["parent-task-id"] = o.ParentTaskId
+	if o.ParentTaskId.IsSet() {
+		toSerialize["parent-task-id"] = o.ParentTaskId.Get()
 	}
-	if !IsNil(o.PickedUpAt) {
-		toSerialize["picked-up-at"] = o.PickedUpAt
+	if o.PickedUpAt.IsSet() {
+		toSerialize["picked-up-at"] = o.PickedUpAt.Get()
 	}
 	toSerialize["progress"] = o.Progress
 	toSerialize["project-id"] = o.ProjectId
 	toSerialize["queue-name"] = o.QueueName
-	if !IsNil(o.ResourceDemand) {
-		toSerialize["resource-demand"] = o.ResourceDemand
+	if o.ResourceDemand.IsSet() {
+		toSerialize["resource-demand"] = o.ResourceDemand.Get()
 	}
 	toSerialize["scheduled-for"] = o.ScheduledFor
 	toSerialize["status"] = o.Status
 	toSerialize["task-id"] = o.TaskId
-	if !IsNil(o.UpdatedAt) {
-		toSerialize["updated-at"] = o.UpdatedAt
+	if o.UpdatedAt.IsSet() {
+		toSerialize["updated-at"] = o.UpdatedAt.Get()
 	}
 	toSerialize["warehouse-id"] = o.WarehouseId
 	toSerialize["attempts"] = o.Attempts

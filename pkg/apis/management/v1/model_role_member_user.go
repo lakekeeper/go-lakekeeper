@@ -22,14 +22,14 @@ var _ MappedNullable = &RoleMemberUser{}
 // RoleMemberUser A user assigned to the role.
 type RoleMemberUser struct {
 	// Email; `null` if unknown.
-	Email *string `json:"email,omitempty"`
+	Email NullableString `json:"email,omitempty"`
 	// `IdP` subject id of the user.
 	Id string `json:"id"`
 	// Display name; `null` when the user has no name.
-	Name *string `json:"name,omitempty"`
+	Name NullableString `json:"name,omitempty"`
 	// Whether the principal is a human or an application; `null` when the user is assigned but not provisioned in the catalog (the id is all that's known).
-	UserType *UserType `json:"user-type,omitempty"`
-	Type     string    `json:"type"`
+	UserType NullableUserType `json:"user-type,omitempty"`
+	Type     string           `json:"type"`
 }
 
 type _RoleMemberUser RoleMemberUser
@@ -53,36 +53,47 @@ func NewRoleMemberUserWithDefaults() *RoleMemberUser {
 	return &this
 }
 
-// GetEmail returns the Email field value if set, zero value otherwise.
+// GetEmail returns the Email field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *RoleMemberUser) GetEmail() string {
-	if o == nil || IsNil(o.Email) {
+	if o == nil || IsNil(o.Email.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.Email
+	return *o.Email.Get()
 }
 
 // GetEmailOk returns a tuple with the Email field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *RoleMemberUser) GetEmailOk() (*string, bool) {
-	if o == nil || IsNil(o.Email) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Email, true
+	return o.Email.Get(), o.Email.IsSet()
 }
 
 // HasEmail returns a boolean if a field has been set.
 func (o *RoleMemberUser) HasEmail() bool {
-	if o != nil && !IsNil(o.Email) {
+	if o != nil && o.Email.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetEmail gets a reference to the given string and assigns it to the Email field.
+// SetEmail gets a reference to the given NullableString and assigns it to the Email field.
 func (o *RoleMemberUser) SetEmail(v string) {
-	o.Email = &v
+	o.Email.Set(&v)
+}
+
+// SetEmailNil sets the value for Email to be an explicit nil
+func (o *RoleMemberUser) SetEmailNil() {
+	o.Email.Set(nil)
+}
+
+// UnsetEmail ensures that no value is present for Email, not even an explicit nil
+func (o *RoleMemberUser) UnsetEmail() {
+	o.Email.Unset()
 }
 
 // GetId returns the Id field value
@@ -109,68 +120,90 @@ func (o *RoleMemberUser) SetId(v string) {
 	o.Id = v
 }
 
-// GetName returns the Name field value if set, zero value otherwise.
+// GetName returns the Name field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *RoleMemberUser) GetName() string {
-	if o == nil || IsNil(o.Name) {
+	if o == nil || IsNil(o.Name.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.Name
+	return *o.Name.Get()
 }
 
 // GetNameOk returns a tuple with the Name field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *RoleMemberUser) GetNameOk() (*string, bool) {
-	if o == nil || IsNil(o.Name) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Name, true
+	return o.Name.Get(), o.Name.IsSet()
 }
 
 // HasName returns a boolean if a field has been set.
 func (o *RoleMemberUser) HasName() bool {
-	if o != nil && !IsNil(o.Name) {
+	if o != nil && o.Name.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetName gets a reference to the given string and assigns it to the Name field.
+// SetName gets a reference to the given NullableString and assigns it to the Name field.
 func (o *RoleMemberUser) SetName(v string) {
-	o.Name = &v
+	o.Name.Set(&v)
 }
 
-// GetUserType returns the UserType field value if set, zero value otherwise.
+// SetNameNil sets the value for Name to be an explicit nil
+func (o *RoleMemberUser) SetNameNil() {
+	o.Name.Set(nil)
+}
+
+// UnsetName ensures that no value is present for Name, not even an explicit nil
+func (o *RoleMemberUser) UnsetName() {
+	o.Name.Unset()
+}
+
+// GetUserType returns the UserType field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *RoleMemberUser) GetUserType() UserType {
-	if o == nil || IsNil(o.UserType) {
+	if o == nil || IsNil(o.UserType.Get()) {
 		var ret UserType
 		return ret
 	}
-	return *o.UserType
+	return *o.UserType.Get()
 }
 
 // GetUserTypeOk returns a tuple with the UserType field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *RoleMemberUser) GetUserTypeOk() (*UserType, bool) {
-	if o == nil || IsNil(o.UserType) {
+	if o == nil {
 		return nil, false
 	}
-	return o.UserType, true
+	return o.UserType.Get(), o.UserType.IsSet()
 }
 
 // HasUserType returns a boolean if a field has been set.
 func (o *RoleMemberUser) HasUserType() bool {
-	if o != nil && !IsNil(o.UserType) {
+	if o != nil && o.UserType.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetUserType gets a reference to the given UserType and assigns it to the UserType field.
+// SetUserType gets a reference to the given NullableUserType and assigns it to the UserType field.
 func (o *RoleMemberUser) SetUserType(v UserType) {
-	o.UserType = &v
+	o.UserType.Set(&v)
+}
+
+// SetUserTypeNil sets the value for UserType to be an explicit nil
+func (o *RoleMemberUser) SetUserTypeNil() {
+	o.UserType.Set(nil)
+}
+
+// UnsetUserType ensures that no value is present for UserType, not even an explicit nil
+func (o *RoleMemberUser) UnsetUserType() {
+	o.UserType.Unset()
 }
 
 // GetType returns the Type field value
@@ -207,15 +240,15 @@ func (o RoleMemberUser) MarshalJSON() ([]byte, error) {
 
 func (o RoleMemberUser) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.Email) {
-		toSerialize["email"] = o.Email
+	if o.Email.IsSet() {
+		toSerialize["email"] = o.Email.Get()
 	}
 	toSerialize["id"] = o.Id
-	if !IsNil(o.Name) {
-		toSerialize["name"] = o.Name
+	if o.Name.IsSet() {
+		toSerialize["name"] = o.Name.Get()
 	}
-	if !IsNil(o.UserType) {
-		toSerialize["user-type"] = o.UserType
+	if o.UserType.IsSet() {
+		toSerialize["user-type"] = o.UserType.Get()
 	}
 	toSerialize["type"] = o.Type
 	return toSerialize, nil

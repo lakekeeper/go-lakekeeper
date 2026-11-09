@@ -57,7 +57,7 @@ type S3Profile struct {
 	// Add `\"Principal\": \"*\"` to every statement of the STS session policy. Some S3-compatible STS implementations, such as Yandex Object Storage, reject session policies without a principal, while AWS and MinIO reject policies that have one. Defaults to false.
 	StsSessionPolicyPrincipal NullableBool `json:"sts-session-policy-principal,omitempty"`
 	// Optional session tags for STS assume role operations.
-	StsSessionTags map[string]string `json:"sts-session-tags,omitempty"`
+	StsSessionTags *map[string]string `json:"sts-session-tags,omitempty"`
 	// The validity of the sts tokens in seconds. Default is 3600
 	StsTokenValiditySeconds *int64 `json:"sts-token-validity-seconds,omitempty"`
 }
@@ -763,14 +763,14 @@ func (o *S3Profile) GetStsSessionTags() map[string]string {
 		var ret map[string]string
 		return ret
 	}
-	return o.StsSessionTags
+	return *o.StsSessionTags
 }
 
 // GetStsSessionTagsOk returns a tuple with the StsSessionTags field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *S3Profile) GetStsSessionTagsOk() (map[string]string, bool) {
+func (o *S3Profile) GetStsSessionTagsOk() (*map[string]string, bool) {
 	if o == nil || IsNil(o.StsSessionTags) {
-		return map[string]string{}, false
+		return nil, false
 	}
 	return o.StsSessionTags, true
 }
@@ -786,7 +786,7 @@ func (o *S3Profile) HasStsSessionTags() bool {
 
 // SetStsSessionTags gets a reference to the given map[string]string and assigns it to the StsSessionTags field.
 func (o *S3Profile) SetStsSessionTags(v map[string]string) {
-	o.StsSessionTags = v
+	o.StsSessionTags = &v
 }
 
 // GetStsTokenValiditySeconds returns the StsTokenValiditySeconds field value if set, zero value otherwise.

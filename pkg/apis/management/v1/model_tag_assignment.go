@@ -69,30 +69,6 @@ func (dst *TagAssignment) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	// check if the discriminator value is 'TagAssignmentApply'
-	if jsonDict["type"] == "TagAssignmentApply" {
-		// try to unmarshal JSON data into TagAssignmentApply
-		err = json.Unmarshal(data, &dst.TagAssignmentApply)
-		if err == nil {
-			return nil // data stored in dst.TagAssignmentApply, return on the first match
-		} else {
-			dst.TagAssignmentApply = nil
-			return fmt.Errorf("failed to unmarshal TagAssignment as TagAssignmentApply: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'TagAssignmentOwnership'
-	if jsonDict["type"] == "TagAssignmentOwnership" {
-		// try to unmarshal JSON data into TagAssignmentOwnership
-		err = json.Unmarshal(data, &dst.TagAssignmentOwnership)
-		if err == nil {
-			return nil // data stored in dst.TagAssignmentOwnership, return on the first match
-		} else {
-			dst.TagAssignmentOwnership = nil
-			return fmt.Errorf("failed to unmarshal TagAssignment as TagAssignmentOwnership: %s", err.Error())
-		}
-	}
-
 	return nil
 }
 
@@ -120,6 +96,20 @@ func (obj *TagAssignment) GetActualInstance() interface{} {
 
 	if obj.TagAssignmentOwnership != nil {
 		return obj.TagAssignmentOwnership
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj TagAssignment) GetActualInstanceValue() interface{} {
+	if obj.TagAssignmentApply != nil {
+		return *obj.TagAssignmentApply
+	}
+
+	if obj.TagAssignmentOwnership != nil {
+		return *obj.TagAssignmentOwnership
 	}
 
 	// all schemas are nil

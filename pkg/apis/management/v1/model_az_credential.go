@@ -89,42 +89,6 @@ func (dst *AzCredential) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	// check if the discriminator value is 'AzCredentialClientCredentials'
-	if jsonDict["credential-type"] == "AzCredentialClientCredentials" {
-		// try to unmarshal JSON data into AzCredentialClientCredentials
-		err = json.Unmarshal(data, &dst.AzCredentialClientCredentials)
-		if err == nil {
-			return nil // data stored in dst.AzCredentialClientCredentials, return on the first match
-		} else {
-			dst.AzCredentialClientCredentials = nil
-			return fmt.Errorf("failed to unmarshal AzCredential as AzCredentialClientCredentials: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'AzCredentialManagedIdentity'
-	if jsonDict["credential-type"] == "AzCredentialManagedIdentity" {
-		// try to unmarshal JSON data into AzCredentialManagedIdentity
-		err = json.Unmarshal(data, &dst.AzCredentialManagedIdentity)
-		if err == nil {
-			return nil // data stored in dst.AzCredentialManagedIdentity, return on the first match
-		} else {
-			dst.AzCredentialManagedIdentity = nil
-			return fmt.Errorf("failed to unmarshal AzCredential as AzCredentialManagedIdentity: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'AzCredentialSharedAccessKey'
-	if jsonDict["credential-type"] == "AzCredentialSharedAccessKey" {
-		// try to unmarshal JSON data into AzCredentialSharedAccessKey
-		err = json.Unmarshal(data, &dst.AzCredentialSharedAccessKey)
-		if err == nil {
-			return nil // data stored in dst.AzCredentialSharedAccessKey, return on the first match
-		} else {
-			dst.AzCredentialSharedAccessKey = nil
-			return fmt.Errorf("failed to unmarshal AzCredential as AzCredentialSharedAccessKey: %s", err.Error())
-		}
-	}
-
 	return nil
 }
 
@@ -160,6 +124,24 @@ func (obj *AzCredential) GetActualInstance() interface{} {
 
 	if obj.AzCredentialSharedAccessKey != nil {
 		return obj.AzCredentialSharedAccessKey
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj AzCredential) GetActualInstanceValue() interface{} {
+	if obj.AzCredentialClientCredentials != nil {
+		return *obj.AzCredentialClientCredentials
+	}
+
+	if obj.AzCredentialManagedIdentity != nil {
+		return *obj.AzCredentialManagedIdentity
+	}
+
+	if obj.AzCredentialSharedAccessKey != nil {
+		return *obj.AzCredentialSharedAccessKey
 	}
 
 	// all schemas are nil

@@ -19,10 +19,10 @@ func NewS3AccessKeyWithExternalID(accessKeyID, secretAccessKey, externalID strin
 	leaf := &managementv1.StorageCredentialAccessKey{
 		AccessKeyId:     accessKeyID,
 		SecretAccessKey: secretAccessKey,
-		ExternalId:      &externalID,
 		CredentialType:  credS3AccessKey,
 		Type:            typeS3,
 	}
+	leaf.SetExternalId(externalID)
 	return managementv1.StorageCredentialAccessKeyAsStorageCredential(leaf)
 }
 
@@ -41,10 +41,10 @@ func NewS3AwsSystemIdentity() managementv1.StorageCredential {
 // sets the optional external-id used by some assume-role flows.
 func NewS3AwsSystemIdentityWithExternalID(externalID string) managementv1.StorageCredential {
 	leaf := &managementv1.StorageCredentialAwsSystemIdentity{
-		ExternalId:     &externalID,
 		CredentialType: credS3AwsSystemIdentity,
 		Type:           typeS3,
 	}
+	leaf.SetExternalId(externalID)
 	return managementv1.StorageCredentialAwsSystemIdentityAsStorageCredential(leaf)
 }
 

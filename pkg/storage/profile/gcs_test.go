@@ -18,7 +18,7 @@ func TestNewGCSProfile_Defaults(t *testing.T) {
 	p := sp.StorageProfileGcs
 	assert.Equal(t, "my-gcs-bucket", p.Bucket)
 	assert.Equal(t, "gcs", p.Type)
-	assert.Nil(t, p.KeyPrefix)
+	assert.False(t, p.HasKeyPrefix())
 	assert.Nil(t, p.StsEnabled, "spec default is true server-side; nil here means 'use server default'")
 }
 
@@ -32,7 +32,7 @@ func TestNewGCSProfile_OptionsApplied(t *testing.T) {
 
 	require.NotNil(t, sp.StorageProfileGcs)
 	p := sp.StorageProfileGcs
-	assert.Equal(t, "warehouses/foo", *p.KeyPrefix)
+	assert.Equal(t, "warehouses/foo", p.GetKeyPrefix())
 	require.NotNil(t, p.StsEnabled)
 	assert.False(t, *p.StsEnabled)
 }

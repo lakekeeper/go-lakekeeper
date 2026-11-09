@@ -289,162 +289,6 @@ func (dst *LakekeeperGenericTableAction) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	// check if the discriminator value is 'LakekeeperGenericTableActionControlTasks'
-	if jsonDict["action"] == "LakekeeperGenericTableActionControlTasks" {
-		// try to unmarshal JSON data into LakekeeperGenericTableActionControlTasks
-		err = json.Unmarshal(data, &dst.LakekeeperGenericTableActionControlTasks)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperGenericTableActionControlTasks, return on the first match
-		} else {
-			dst.LakekeeperGenericTableActionControlTasks = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperGenericTableAction as LakekeeperGenericTableActionControlTasks: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperGenericTableActionDrop'
-	if jsonDict["action"] == "LakekeeperGenericTableActionDrop" {
-		// try to unmarshal JSON data into LakekeeperGenericTableActionDrop
-		err = json.Unmarshal(data, &dst.LakekeeperGenericTableActionDrop)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperGenericTableActionDrop, return on the first match
-		} else {
-			dst.LakekeeperGenericTableActionDrop = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperGenericTableAction as LakekeeperGenericTableActionDrop: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperGenericTableActionGetMetadata'
-	if jsonDict["action"] == "LakekeeperGenericTableActionGetMetadata" {
-		// try to unmarshal JSON data into LakekeeperGenericTableActionGetMetadata
-		err = json.Unmarshal(data, &dst.LakekeeperGenericTableActionGetMetadata)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperGenericTableActionGetMetadata, return on the first match
-		} else {
-			dst.LakekeeperGenericTableActionGetMetadata = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperGenericTableAction as LakekeeperGenericTableActionGetMetadata: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperGenericTableActionGetTasks'
-	if jsonDict["action"] == "LakekeeperGenericTableActionGetTasks" {
-		// try to unmarshal JSON data into LakekeeperGenericTableActionGetTasks
-		err = json.Unmarshal(data, &dst.LakekeeperGenericTableActionGetTasks)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperGenericTableActionGetTasks, return on the first match
-		} else {
-			dst.LakekeeperGenericTableActionGetTasks = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperGenericTableAction as LakekeeperGenericTableActionGetTasks: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperGenericTableActionIncludeInList'
-	if jsonDict["action"] == "LakekeeperGenericTableActionIncludeInList" {
-		// try to unmarshal JSON data into LakekeeperGenericTableActionIncludeInList
-		err = json.Unmarshal(data, &dst.LakekeeperGenericTableActionIncludeInList)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperGenericTableActionIncludeInList, return on the first match
-		} else {
-			dst.LakekeeperGenericTableActionIncludeInList = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperGenericTableAction as LakekeeperGenericTableActionIncludeInList: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperGenericTableActionManageTags'
-	if jsonDict["action"] == "LakekeeperGenericTableActionManageTags" {
-		// try to unmarshal JSON data into LakekeeperGenericTableActionManageTags
-		err = json.Unmarshal(data, &dst.LakekeeperGenericTableActionManageTags)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperGenericTableActionManageTags, return on the first match
-		} else {
-			dst.LakekeeperGenericTableActionManageTags = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperGenericTableAction as LakekeeperGenericTableActionManageTags: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperGenericTableActionMove'
-	if jsonDict["action"] == "LakekeeperGenericTableActionMove" {
-		// try to unmarshal JSON data into LakekeeperGenericTableActionMove
-		err = json.Unmarshal(data, &dst.LakekeeperGenericTableActionMove)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperGenericTableActionMove, return on the first match
-		} else {
-			dst.LakekeeperGenericTableActionMove = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperGenericTableAction as LakekeeperGenericTableActionMove: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperGenericTableActionReadData'
-	if jsonDict["action"] == "LakekeeperGenericTableActionReadData" {
-		// try to unmarshal JSON data into LakekeeperGenericTableActionReadData
-		err = json.Unmarshal(data, &dst.LakekeeperGenericTableActionReadData)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperGenericTableActionReadData, return on the first match
-		} else {
-			dst.LakekeeperGenericTableActionReadData = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperGenericTableAction as LakekeeperGenericTableActionReadData: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperGenericTableActionReadGrants'
-	if jsonDict["action"] == "LakekeeperGenericTableActionReadGrants" {
-		// try to unmarshal JSON data into LakekeeperGenericTableActionReadGrants
-		err = json.Unmarshal(data, &dst.LakekeeperGenericTableActionReadGrants)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperGenericTableActionReadGrants, return on the first match
-		} else {
-			dst.LakekeeperGenericTableActionReadGrants = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperGenericTableAction as LakekeeperGenericTableActionReadGrants: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperGenericTableActionRename'
-	if jsonDict["action"] == "LakekeeperGenericTableActionRename" {
-		// try to unmarshal JSON data into LakekeeperGenericTableActionRename
-		err = json.Unmarshal(data, &dst.LakekeeperGenericTableActionRename)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperGenericTableActionRename, return on the first match
-		} else {
-			dst.LakekeeperGenericTableActionRename = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperGenericTableAction as LakekeeperGenericTableActionRename: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperGenericTableActionSetProtection'
-	if jsonDict["action"] == "LakekeeperGenericTableActionSetProtection" {
-		// try to unmarshal JSON data into LakekeeperGenericTableActionSetProtection
-		err = json.Unmarshal(data, &dst.LakekeeperGenericTableActionSetProtection)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperGenericTableActionSetProtection, return on the first match
-		} else {
-			dst.LakekeeperGenericTableActionSetProtection = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperGenericTableAction as LakekeeperGenericTableActionSetProtection: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperGenericTableActionUndrop'
-	if jsonDict["action"] == "LakekeeperGenericTableActionUndrop" {
-		// try to unmarshal JSON data into LakekeeperGenericTableActionUndrop
-		err = json.Unmarshal(data, &dst.LakekeeperGenericTableActionUndrop)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperGenericTableActionUndrop, return on the first match
-		} else {
-			dst.LakekeeperGenericTableActionUndrop = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperGenericTableAction as LakekeeperGenericTableActionUndrop: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperGenericTableActionWriteData'
-	if jsonDict["action"] == "LakekeeperGenericTableActionWriteData" {
-		// try to unmarshal JSON data into LakekeeperGenericTableActionWriteData
-		err = json.Unmarshal(data, &dst.LakekeeperGenericTableActionWriteData)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperGenericTableActionWriteData, return on the first match
-		} else {
-			dst.LakekeeperGenericTableActionWriteData = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperGenericTableAction as LakekeeperGenericTableActionWriteData: %s", err.Error())
-		}
-	}
-
 	return nil
 }
 
@@ -560,6 +404,64 @@ func (obj *LakekeeperGenericTableAction) GetActualInstance() interface{} {
 
 	if obj.LakekeeperGenericTableActionWriteData != nil {
 		return obj.LakekeeperGenericTableActionWriteData
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj LakekeeperGenericTableAction) GetActualInstanceValue() interface{} {
+	if obj.LakekeeperGenericTableActionControlTasks != nil {
+		return *obj.LakekeeperGenericTableActionControlTasks
+	}
+
+	if obj.LakekeeperGenericTableActionDrop != nil {
+		return *obj.LakekeeperGenericTableActionDrop
+	}
+
+	if obj.LakekeeperGenericTableActionGetMetadata != nil {
+		return *obj.LakekeeperGenericTableActionGetMetadata
+	}
+
+	if obj.LakekeeperGenericTableActionGetTasks != nil {
+		return *obj.LakekeeperGenericTableActionGetTasks
+	}
+
+	if obj.LakekeeperGenericTableActionIncludeInList != nil {
+		return *obj.LakekeeperGenericTableActionIncludeInList
+	}
+
+	if obj.LakekeeperGenericTableActionManageTags != nil {
+		return *obj.LakekeeperGenericTableActionManageTags
+	}
+
+	if obj.LakekeeperGenericTableActionMove != nil {
+		return *obj.LakekeeperGenericTableActionMove
+	}
+
+	if obj.LakekeeperGenericTableActionReadData != nil {
+		return *obj.LakekeeperGenericTableActionReadData
+	}
+
+	if obj.LakekeeperGenericTableActionReadGrants != nil {
+		return *obj.LakekeeperGenericTableActionReadGrants
+	}
+
+	if obj.LakekeeperGenericTableActionRename != nil {
+		return *obj.LakekeeperGenericTableActionRename
+	}
+
+	if obj.LakekeeperGenericTableActionSetProtection != nil {
+		return *obj.LakekeeperGenericTableActionSetProtection
+	}
+
+	if obj.LakekeeperGenericTableActionUndrop != nil {
+		return *obj.LakekeeperGenericTableActionUndrop
+	}
+
+	if obj.LakekeeperGenericTableActionWriteData != nil {
+		return *obj.LakekeeperGenericTableActionWriteData
 	}
 
 	// all schemas are nil

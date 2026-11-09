@@ -74,6 +74,10 @@ func (dst *NamespaceIdentOrUuid) UnmarshalJSON(data []byte) error {
 	} else if match == 1 {
 		return nil // exactly one match
 	} else { // no match
+		if err != nil {
+			return fmt.Errorf("data failed to match schemas in oneOf(NamespaceIdentOrUuid): %v", err)
+		}
+
 		return fmt.Errorf("data failed to match schemas in oneOf(NamespaceIdentOrUuid)")
 	}
 }
@@ -102,6 +106,20 @@ func (obj *NamespaceIdentOrUuid) GetActualInstance() interface{} {
 
 	if obj.NamespaceIdentOrUuidByName != nil {
 		return obj.NamespaceIdentOrUuidByName
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj NamespaceIdentOrUuid) GetActualInstanceValue() interface{} {
+	if obj.NamespaceIdentOrUuidById != nil {
+		return *obj.NamespaceIdentOrUuidById
+	}
+
+	if obj.NamespaceIdentOrUuidByName != nil {
+		return *obj.NamespaceIdentOrUuidByName
 	}
 
 	// all schemas are nil
