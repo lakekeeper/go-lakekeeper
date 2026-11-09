@@ -149,78 +149,6 @@ func (dst *LakekeeperServerActionKind) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	// check if the discriminator value is 'LakekeeperServerActionKindCreateProject'
-	if jsonDict["action"] == "LakekeeperServerActionKindCreateProject" {
-		// try to unmarshal JSON data into LakekeeperServerActionKindCreateProject
-		err = json.Unmarshal(data, &dst.LakekeeperServerActionKindCreateProject)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperServerActionKindCreateProject, return on the first match
-		} else {
-			dst.LakekeeperServerActionKindCreateProject = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperServerActionKind as LakekeeperServerActionKindCreateProject: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperServerActionKindDeleteUsers'
-	if jsonDict["action"] == "LakekeeperServerActionKindDeleteUsers" {
-		// try to unmarshal JSON data into LakekeeperServerActionKindDeleteUsers
-		err = json.Unmarshal(data, &dst.LakekeeperServerActionKindDeleteUsers)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperServerActionKindDeleteUsers, return on the first match
-		} else {
-			dst.LakekeeperServerActionKindDeleteUsers = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperServerActionKind as LakekeeperServerActionKindDeleteUsers: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperServerActionKindListUsers'
-	if jsonDict["action"] == "LakekeeperServerActionKindListUsers" {
-		// try to unmarshal JSON data into LakekeeperServerActionKindListUsers
-		err = json.Unmarshal(data, &dst.LakekeeperServerActionKindListUsers)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperServerActionKindListUsers, return on the first match
-		} else {
-			dst.LakekeeperServerActionKindListUsers = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperServerActionKind as LakekeeperServerActionKindListUsers: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperServerActionKindProvisionUsers'
-	if jsonDict["action"] == "LakekeeperServerActionKindProvisionUsers" {
-		// try to unmarshal JSON data into LakekeeperServerActionKindProvisionUsers
-		err = json.Unmarshal(data, &dst.LakekeeperServerActionKindProvisionUsers)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperServerActionKindProvisionUsers, return on the first match
-		} else {
-			dst.LakekeeperServerActionKindProvisionUsers = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperServerActionKind as LakekeeperServerActionKindProvisionUsers: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperServerActionKindReadGrants'
-	if jsonDict["action"] == "LakekeeperServerActionKindReadGrants" {
-		// try to unmarshal JSON data into LakekeeperServerActionKindReadGrants
-		err = json.Unmarshal(data, &dst.LakekeeperServerActionKindReadGrants)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperServerActionKindReadGrants, return on the first match
-		} else {
-			dst.LakekeeperServerActionKindReadGrants = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperServerActionKind as LakekeeperServerActionKindReadGrants: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperServerActionKindUpdateUsers'
-	if jsonDict["action"] == "LakekeeperServerActionKindUpdateUsers" {
-		// try to unmarshal JSON data into LakekeeperServerActionKindUpdateUsers
-		err = json.Unmarshal(data, &dst.LakekeeperServerActionKindUpdateUsers)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperServerActionKindUpdateUsers, return on the first match
-		} else {
-			dst.LakekeeperServerActionKindUpdateUsers = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperServerActionKind as LakekeeperServerActionKindUpdateUsers: %s", err.Error())
-		}
-	}
-
 	return nil
 }
 
@@ -280,6 +208,36 @@ func (obj *LakekeeperServerActionKind) GetActualInstance() interface{} {
 
 	if obj.LakekeeperServerActionKindUpdateUsers != nil {
 		return obj.LakekeeperServerActionKindUpdateUsers
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj LakekeeperServerActionKind) GetActualInstanceValue() interface{} {
+	if obj.LakekeeperServerActionKindCreateProject != nil {
+		return *obj.LakekeeperServerActionKindCreateProject
+	}
+
+	if obj.LakekeeperServerActionKindDeleteUsers != nil {
+		return *obj.LakekeeperServerActionKindDeleteUsers
+	}
+
+	if obj.LakekeeperServerActionKindListUsers != nil {
+		return *obj.LakekeeperServerActionKindListUsers
+	}
+
+	if obj.LakekeeperServerActionKindProvisionUsers != nil {
+		return *obj.LakekeeperServerActionKindProvisionUsers
+	}
+
+	if obj.LakekeeperServerActionKindReadGrants != nil {
+		return *obj.LakekeeperServerActionKindReadGrants
+	}
+
+	if obj.LakekeeperServerActionKindUpdateUsers != nil {
+		return *obj.LakekeeperServerActionKindUpdateUsers
 	}
 
 	// all schemas are nil

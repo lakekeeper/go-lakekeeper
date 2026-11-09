@@ -109,54 +109,6 @@ func (dst *LakekeeperUserAction) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	// check if the discriminator value is 'LakekeeperUserActionDelete'
-	if jsonDict["action"] == "LakekeeperUserActionDelete" {
-		// try to unmarshal JSON data into LakekeeperUserActionDelete
-		err = json.Unmarshal(data, &dst.LakekeeperUserActionDelete)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperUserActionDelete, return on the first match
-		} else {
-			dst.LakekeeperUserActionDelete = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperUserAction as LakekeeperUserActionDelete: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperUserActionRead'
-	if jsonDict["action"] == "LakekeeperUserActionRead" {
-		// try to unmarshal JSON data into LakekeeperUserActionRead
-		err = json.Unmarshal(data, &dst.LakekeeperUserActionRead)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperUserActionRead, return on the first match
-		} else {
-			dst.LakekeeperUserActionRead = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperUserAction as LakekeeperUserActionRead: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperUserActionReadRoleAssignments'
-	if jsonDict["action"] == "LakekeeperUserActionReadRoleAssignments" {
-		// try to unmarshal JSON data into LakekeeperUserActionReadRoleAssignments
-		err = json.Unmarshal(data, &dst.LakekeeperUserActionReadRoleAssignments)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperUserActionReadRoleAssignments, return on the first match
-		} else {
-			dst.LakekeeperUserActionReadRoleAssignments = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperUserAction as LakekeeperUserActionReadRoleAssignments: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperUserActionUpdate'
-	if jsonDict["action"] == "LakekeeperUserActionUpdate" {
-		// try to unmarshal JSON data into LakekeeperUserActionUpdate
-		err = json.Unmarshal(data, &dst.LakekeeperUserActionUpdate)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperUserActionUpdate, return on the first match
-		} else {
-			dst.LakekeeperUserActionUpdate = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperUserAction as LakekeeperUserActionUpdate: %s", err.Error())
-		}
-	}
-
 	return nil
 }
 
@@ -200,6 +152,28 @@ func (obj *LakekeeperUserAction) GetActualInstance() interface{} {
 
 	if obj.LakekeeperUserActionUpdate != nil {
 		return obj.LakekeeperUserActionUpdate
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj LakekeeperUserAction) GetActualInstanceValue() interface{} {
+	if obj.LakekeeperUserActionDelete != nil {
+		return *obj.LakekeeperUserActionDelete
+	}
+
+	if obj.LakekeeperUserActionRead != nil {
+		return *obj.LakekeeperUserActionRead
+	}
+
+	if obj.LakekeeperUserActionReadRoleAssignments != nil {
+		return *obj.LakekeeperUserActionReadRoleAssignments
+	}
+
+	if obj.LakekeeperUserActionUpdate != nil {
+		return *obj.LakekeeperUserActionUpdate
 	}
 
 	// all schemas are nil

@@ -149,78 +149,6 @@ func (dst *LakekeeperServerAction) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	// check if the discriminator value is 'LakekeeperServerActionCreateProject'
-	if jsonDict["action"] == "LakekeeperServerActionCreateProject" {
-		// try to unmarshal JSON data into LakekeeperServerActionCreateProject
-		err = json.Unmarshal(data, &dst.LakekeeperServerActionCreateProject)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperServerActionCreateProject, return on the first match
-		} else {
-			dst.LakekeeperServerActionCreateProject = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperServerAction as LakekeeperServerActionCreateProject: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperServerActionDeleteUsers'
-	if jsonDict["action"] == "LakekeeperServerActionDeleteUsers" {
-		// try to unmarshal JSON data into LakekeeperServerActionDeleteUsers
-		err = json.Unmarshal(data, &dst.LakekeeperServerActionDeleteUsers)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperServerActionDeleteUsers, return on the first match
-		} else {
-			dst.LakekeeperServerActionDeleteUsers = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperServerAction as LakekeeperServerActionDeleteUsers: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperServerActionListUsers'
-	if jsonDict["action"] == "LakekeeperServerActionListUsers" {
-		// try to unmarshal JSON data into LakekeeperServerActionListUsers
-		err = json.Unmarshal(data, &dst.LakekeeperServerActionListUsers)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperServerActionListUsers, return on the first match
-		} else {
-			dst.LakekeeperServerActionListUsers = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperServerAction as LakekeeperServerActionListUsers: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperServerActionProvisionUsers'
-	if jsonDict["action"] == "LakekeeperServerActionProvisionUsers" {
-		// try to unmarshal JSON data into LakekeeperServerActionProvisionUsers
-		err = json.Unmarshal(data, &dst.LakekeeperServerActionProvisionUsers)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperServerActionProvisionUsers, return on the first match
-		} else {
-			dst.LakekeeperServerActionProvisionUsers = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperServerAction as LakekeeperServerActionProvisionUsers: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperServerActionReadGrants'
-	if jsonDict["action"] == "LakekeeperServerActionReadGrants" {
-		// try to unmarshal JSON data into LakekeeperServerActionReadGrants
-		err = json.Unmarshal(data, &dst.LakekeeperServerActionReadGrants)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperServerActionReadGrants, return on the first match
-		} else {
-			dst.LakekeeperServerActionReadGrants = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperServerAction as LakekeeperServerActionReadGrants: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperServerActionUpdateUsers'
-	if jsonDict["action"] == "LakekeeperServerActionUpdateUsers" {
-		// try to unmarshal JSON data into LakekeeperServerActionUpdateUsers
-		err = json.Unmarshal(data, &dst.LakekeeperServerActionUpdateUsers)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperServerActionUpdateUsers, return on the first match
-		} else {
-			dst.LakekeeperServerActionUpdateUsers = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperServerAction as LakekeeperServerActionUpdateUsers: %s", err.Error())
-		}
-	}
-
 	return nil
 }
 
@@ -280,6 +208,36 @@ func (obj *LakekeeperServerAction) GetActualInstance() interface{} {
 
 	if obj.LakekeeperServerActionUpdateUsers != nil {
 		return obj.LakekeeperServerActionUpdateUsers
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj LakekeeperServerAction) GetActualInstanceValue() interface{} {
+	if obj.LakekeeperServerActionCreateProject != nil {
+		return *obj.LakekeeperServerActionCreateProject
+	}
+
+	if obj.LakekeeperServerActionDeleteUsers != nil {
+		return *obj.LakekeeperServerActionDeleteUsers
+	}
+
+	if obj.LakekeeperServerActionListUsers != nil {
+		return *obj.LakekeeperServerActionListUsers
+	}
+
+	if obj.LakekeeperServerActionProvisionUsers != nil {
+		return *obj.LakekeeperServerActionProvisionUsers
+	}
+
+	if obj.LakekeeperServerActionReadGrants != nil {
+		return *obj.LakekeeperServerActionReadGrants
+	}
+
+	if obj.LakekeeperServerActionUpdateUsers != nil {
+		return *obj.LakekeeperServerActionUpdateUsers
 	}
 
 	// all schemas are nil

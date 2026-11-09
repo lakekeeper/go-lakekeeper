@@ -25,7 +25,7 @@ type WhoamiResponse struct {
 	// Timestamp when the user was created
 	CreatedAt time.Time `json:"created-at"`
 	// Email of the user
-	Email *string `json:"email,omitempty"`
+	Email NullableString `json:"email,omitempty"`
 	// The user's ID
 	Id string `json:"id"`
 	// The endpoint that last updated the user
@@ -33,7 +33,7 @@ type WhoamiResponse struct {
 	// Name of the user
 	Name string `json:"name"`
 	// Timestamp when the user was last updated
-	UpdatedAt *time.Time `json:"updated-at,omitempty"`
+	UpdatedAt NullableTime `json:"updated-at,omitempty"`
 	// Type of the user
 	UserType UserType `json:"user-type"`
 	// Whether the authenticated principal is an instance admin (configured via `LAKEKEEPER__INSTANCE_ADMINS`). Instance admins may modify the spec of warehouses marked `managed-by: instance-admin`. Only ever `true` for a principal acting directly; role-assumed requests do not inherit it.
@@ -89,36 +89,47 @@ func (o *WhoamiResponse) SetCreatedAt(v time.Time) {
 	o.CreatedAt = v
 }
 
-// GetEmail returns the Email field value if set, zero value otherwise.
+// GetEmail returns the Email field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *WhoamiResponse) GetEmail() string {
-	if o == nil || IsNil(o.Email) {
+	if o == nil || IsNil(o.Email.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.Email
+	return *o.Email.Get()
 }
 
 // GetEmailOk returns a tuple with the Email field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *WhoamiResponse) GetEmailOk() (*string, bool) {
-	if o == nil || IsNil(o.Email) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Email, true
+	return o.Email.Get(), o.Email.IsSet()
 }
 
 // HasEmail returns a boolean if a field has been set.
 func (o *WhoamiResponse) HasEmail() bool {
-	if o != nil && !IsNil(o.Email) {
+	if o != nil && o.Email.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetEmail gets a reference to the given string and assigns it to the Email field.
+// SetEmail gets a reference to the given NullableString and assigns it to the Email field.
 func (o *WhoamiResponse) SetEmail(v string) {
-	o.Email = &v
+	o.Email.Set(&v)
+}
+
+// SetEmailNil sets the value for Email to be an explicit nil
+func (o *WhoamiResponse) SetEmailNil() {
+	o.Email.Set(nil)
+}
+
+// UnsetEmail ensures that no value is present for Email, not even an explicit nil
+func (o *WhoamiResponse) UnsetEmail() {
+	o.Email.Unset()
 }
 
 // GetId returns the Id field value
@@ -193,36 +204,47 @@ func (o *WhoamiResponse) SetName(v string) {
 	o.Name = v
 }
 
-// GetUpdatedAt returns the UpdatedAt field value if set, zero value otherwise.
+// GetUpdatedAt returns the UpdatedAt field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *WhoamiResponse) GetUpdatedAt() time.Time {
-	if o == nil || IsNil(o.UpdatedAt) {
+	if o == nil || IsNil(o.UpdatedAt.Get()) {
 		var ret time.Time
 		return ret
 	}
-	return *o.UpdatedAt
+	return *o.UpdatedAt.Get()
 }
 
 // GetUpdatedAtOk returns a tuple with the UpdatedAt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *WhoamiResponse) GetUpdatedAtOk() (*time.Time, bool) {
-	if o == nil || IsNil(o.UpdatedAt) {
+	if o == nil {
 		return nil, false
 	}
-	return o.UpdatedAt, true
+	return o.UpdatedAt.Get(), o.UpdatedAt.IsSet()
 }
 
 // HasUpdatedAt returns a boolean if a field has been set.
 func (o *WhoamiResponse) HasUpdatedAt() bool {
-	if o != nil && !IsNil(o.UpdatedAt) {
+	if o != nil && o.UpdatedAt.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetUpdatedAt gets a reference to the given time.Time and assigns it to the UpdatedAt field.
+// SetUpdatedAt gets a reference to the given NullableTime and assigns it to the UpdatedAt field.
 func (o *WhoamiResponse) SetUpdatedAt(v time.Time) {
-	o.UpdatedAt = &v
+	o.UpdatedAt.Set(&v)
+}
+
+// SetUpdatedAtNil sets the value for UpdatedAt to be an explicit nil
+func (o *WhoamiResponse) SetUpdatedAtNil() {
+	o.UpdatedAt.Set(nil)
+}
+
+// UnsetUpdatedAt ensures that no value is present for UpdatedAt, not even an explicit nil
+func (o *WhoamiResponse) UnsetUpdatedAt() {
+	o.UpdatedAt.Unset()
 }
 
 // GetUserType returns the UserType field value
@@ -284,14 +306,14 @@ func (o WhoamiResponse) MarshalJSON() ([]byte, error) {
 func (o WhoamiResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["created-at"] = o.CreatedAt
-	if !IsNil(o.Email) {
-		toSerialize["email"] = o.Email
+	if o.Email.IsSet() {
+		toSerialize["email"] = o.Email.Get()
 	}
 	toSerialize["id"] = o.Id
 	toSerialize["last-updated-with"] = o.LastUpdatedWith
 	toSerialize["name"] = o.Name
-	if !IsNil(o.UpdatedAt) {
-		toSerialize["updated-at"] = o.UpdatedAt
+	if o.UpdatedAt.IsSet() {
+		toSerialize["updated-at"] = o.UpdatedAt.Get()
 	}
 	toSerialize["user-type"] = o.UserType
 	toSerialize["is-instance-admin"] = o.IsInstanceAdmin

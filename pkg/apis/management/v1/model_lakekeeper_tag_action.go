@@ -169,90 +169,6 @@ func (dst *LakekeeperTagAction) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	// check if the discriminator value is 'LakekeeperTagActionApply'
-	if jsonDict["action"] == "LakekeeperTagActionApply" {
-		// try to unmarshal JSON data into LakekeeperTagActionApply
-		err = json.Unmarshal(data, &dst.LakekeeperTagActionApply)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperTagActionApply, return on the first match
-		} else {
-			dst.LakekeeperTagActionApply = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperTagAction as LakekeeperTagActionApply: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperTagActionDelete'
-	if jsonDict["action"] == "LakekeeperTagActionDelete" {
-		// try to unmarshal JSON data into LakekeeperTagActionDelete
-		err = json.Unmarshal(data, &dst.LakekeeperTagActionDelete)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperTagActionDelete, return on the first match
-		} else {
-			dst.LakekeeperTagActionDelete = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperTagAction as LakekeeperTagActionDelete: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperTagActionRead'
-	if jsonDict["action"] == "LakekeeperTagActionRead" {
-		// try to unmarshal JSON data into LakekeeperTagActionRead
-		err = json.Unmarshal(data, &dst.LakekeeperTagActionRead)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperTagActionRead, return on the first match
-		} else {
-			dst.LakekeeperTagActionRead = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperTagAction as LakekeeperTagActionRead: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperTagActionReadAttachments'
-	if jsonDict["action"] == "LakekeeperTagActionReadAttachments" {
-		// try to unmarshal JSON data into LakekeeperTagActionReadAttachments
-		err = json.Unmarshal(data, &dst.LakekeeperTagActionReadAttachments)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperTagActionReadAttachments, return on the first match
-		} else {
-			dst.LakekeeperTagActionReadAttachments = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperTagAction as LakekeeperTagActionReadAttachments: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperTagActionReadGrants'
-	if jsonDict["action"] == "LakekeeperTagActionReadGrants" {
-		// try to unmarshal JSON data into LakekeeperTagActionReadGrants
-		err = json.Unmarshal(data, &dst.LakekeeperTagActionReadGrants)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperTagActionReadGrants, return on the first match
-		} else {
-			dst.LakekeeperTagActionReadGrants = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperTagAction as LakekeeperTagActionReadGrants: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperTagActionRemove'
-	if jsonDict["action"] == "LakekeeperTagActionRemove" {
-		// try to unmarshal JSON data into LakekeeperTagActionRemove
-		err = json.Unmarshal(data, &dst.LakekeeperTagActionRemove)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperTagActionRemove, return on the first match
-		} else {
-			dst.LakekeeperTagActionRemove = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperTagAction as LakekeeperTagActionRemove: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperTagActionUpdate'
-	if jsonDict["action"] == "LakekeeperTagActionUpdate" {
-		// try to unmarshal JSON data into LakekeeperTagActionUpdate
-		err = json.Unmarshal(data, &dst.LakekeeperTagActionUpdate)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperTagActionUpdate, return on the first match
-		} else {
-			dst.LakekeeperTagActionUpdate = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperTagAction as LakekeeperTagActionUpdate: %s", err.Error())
-		}
-	}
-
 	return nil
 }
 
@@ -320,6 +236,40 @@ func (obj *LakekeeperTagAction) GetActualInstance() interface{} {
 
 	if obj.LakekeeperTagActionUpdate != nil {
 		return obj.LakekeeperTagActionUpdate
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj LakekeeperTagAction) GetActualInstanceValue() interface{} {
+	if obj.LakekeeperTagActionApply != nil {
+		return *obj.LakekeeperTagActionApply
+	}
+
+	if obj.LakekeeperTagActionDelete != nil {
+		return *obj.LakekeeperTagActionDelete
+	}
+
+	if obj.LakekeeperTagActionRead != nil {
+		return *obj.LakekeeperTagActionRead
+	}
+
+	if obj.LakekeeperTagActionReadAttachments != nil {
+		return *obj.LakekeeperTagActionReadAttachments
+	}
+
+	if obj.LakekeeperTagActionReadGrants != nil {
+		return *obj.LakekeeperTagActionReadGrants
+	}
+
+	if obj.LakekeeperTagActionRemove != nil {
+		return *obj.LakekeeperTagActionRemove
+	}
+
+	if obj.LakekeeperTagActionUpdate != nil {
+		return *obj.LakekeeperTagActionUpdate
 	}
 
 	// all schemas are nil

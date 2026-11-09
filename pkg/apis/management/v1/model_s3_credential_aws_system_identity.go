@@ -21,8 +21,8 @@ var _ MappedNullable = &S3CredentialAwsSystemIdentity{}
 
 // S3CredentialAwsSystemIdentity Authenticate to AWS using the identity configured on the system  that runs lakekeeper. The AWS SDK is used to load the credentials.
 type S3CredentialAwsSystemIdentity struct {
-	ExternalId     *string `json:"external-id,omitempty"`
-	CredentialType string  `json:"credential-type"`
+	ExternalId     NullableString `json:"external-id,omitempty"`
+	CredentialType string         `json:"credential-type"`
 }
 
 type _S3CredentialAwsSystemIdentity S3CredentialAwsSystemIdentity
@@ -45,36 +45,47 @@ func NewS3CredentialAwsSystemIdentityWithDefaults() *S3CredentialAwsSystemIdenti
 	return &this
 }
 
-// GetExternalId returns the ExternalId field value if set, zero value otherwise.
+// GetExternalId returns the ExternalId field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *S3CredentialAwsSystemIdentity) GetExternalId() string {
-	if o == nil || IsNil(o.ExternalId) {
+	if o == nil || IsNil(o.ExternalId.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.ExternalId
+	return *o.ExternalId.Get()
 }
 
 // GetExternalIdOk returns a tuple with the ExternalId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *S3CredentialAwsSystemIdentity) GetExternalIdOk() (*string, bool) {
-	if o == nil || IsNil(o.ExternalId) {
+	if o == nil {
 		return nil, false
 	}
-	return o.ExternalId, true
+	return o.ExternalId.Get(), o.ExternalId.IsSet()
 }
 
 // HasExternalId returns a boolean if a field has been set.
 func (o *S3CredentialAwsSystemIdentity) HasExternalId() bool {
-	if o != nil && !IsNil(o.ExternalId) {
+	if o != nil && o.ExternalId.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetExternalId gets a reference to the given string and assigns it to the ExternalId field.
+// SetExternalId gets a reference to the given NullableString and assigns it to the ExternalId field.
 func (o *S3CredentialAwsSystemIdentity) SetExternalId(v string) {
-	o.ExternalId = &v
+	o.ExternalId.Set(&v)
+}
+
+// SetExternalIdNil sets the value for ExternalId to be an explicit nil
+func (o *S3CredentialAwsSystemIdentity) SetExternalIdNil() {
+	o.ExternalId.Set(nil)
+}
+
+// UnsetExternalId ensures that no value is present for ExternalId, not even an explicit nil
+func (o *S3CredentialAwsSystemIdentity) UnsetExternalId() {
+	o.ExternalId.Unset()
 }
 
 // GetCredentialType returns the CredentialType field value
@@ -111,8 +122,8 @@ func (o S3CredentialAwsSystemIdentity) MarshalJSON() ([]byte, error) {
 
 func (o S3CredentialAwsSystemIdentity) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.ExternalId) {
-		toSerialize["external-id"] = o.ExternalId
+	if o.ExternalId.IsSet() {
+		toSerialize["external-id"] = o.ExternalId.Get()
 	}
 	toSerialize["credential-type"] = o.CredentialType
 	return toSerialize, nil

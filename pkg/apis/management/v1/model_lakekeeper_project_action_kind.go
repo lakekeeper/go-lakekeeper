@@ -389,222 +389,6 @@ func (dst *LakekeeperProjectActionKind) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	// check if the discriminator value is 'LakekeeperProjectActionKindControlProjectTasks'
-	if jsonDict["action"] == "LakekeeperProjectActionKindControlProjectTasks" {
-		// try to unmarshal JSON data into LakekeeperProjectActionKindControlProjectTasks
-		err = json.Unmarshal(data, &dst.LakekeeperProjectActionKindControlProjectTasks)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperProjectActionKindControlProjectTasks, return on the first match
-		} else {
-			dst.LakekeeperProjectActionKindControlProjectTasks = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperProjectActionKind as LakekeeperProjectActionKindControlProjectTasks: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperProjectActionKindCreateRole'
-	if jsonDict["action"] == "LakekeeperProjectActionKindCreateRole" {
-		// try to unmarshal JSON data into LakekeeperProjectActionKindCreateRole
-		err = json.Unmarshal(data, &dst.LakekeeperProjectActionKindCreateRole)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperProjectActionKindCreateRole, return on the first match
-		} else {
-			dst.LakekeeperProjectActionKindCreateRole = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperProjectActionKind as LakekeeperProjectActionKindCreateRole: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperProjectActionKindCreateTag'
-	if jsonDict["action"] == "LakekeeperProjectActionKindCreateTag" {
-		// try to unmarshal JSON data into LakekeeperProjectActionKindCreateTag
-		err = json.Unmarshal(data, &dst.LakekeeperProjectActionKindCreateTag)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperProjectActionKindCreateTag, return on the first match
-		} else {
-			dst.LakekeeperProjectActionKindCreateTag = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperProjectActionKind as LakekeeperProjectActionKindCreateTag: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperProjectActionKindCreateWarehouse'
-	if jsonDict["action"] == "LakekeeperProjectActionKindCreateWarehouse" {
-		// try to unmarshal JSON data into LakekeeperProjectActionKindCreateWarehouse
-		err = json.Unmarshal(data, &dst.LakekeeperProjectActionKindCreateWarehouse)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperProjectActionKindCreateWarehouse, return on the first match
-		} else {
-			dst.LakekeeperProjectActionKindCreateWarehouse = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperProjectActionKind as LakekeeperProjectActionKindCreateWarehouse: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperProjectActionKindDelete'
-	if jsonDict["action"] == "LakekeeperProjectActionKindDelete" {
-		// try to unmarshal JSON data into LakekeeperProjectActionKindDelete
-		err = json.Unmarshal(data, &dst.LakekeeperProjectActionKindDelete)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperProjectActionKindDelete, return on the first match
-		} else {
-			dst.LakekeeperProjectActionKindDelete = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperProjectActionKind as LakekeeperProjectActionKindDelete: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperProjectActionKindGetEndpointStatistics'
-	if jsonDict["action"] == "LakekeeperProjectActionKindGetEndpointStatistics" {
-		// try to unmarshal JSON data into LakekeeperProjectActionKindGetEndpointStatistics
-		err = json.Unmarshal(data, &dst.LakekeeperProjectActionKindGetEndpointStatistics)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperProjectActionKindGetEndpointStatistics, return on the first match
-		} else {
-			dst.LakekeeperProjectActionKindGetEndpointStatistics = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperProjectActionKind as LakekeeperProjectActionKindGetEndpointStatistics: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperProjectActionKindGetMetadata'
-	if jsonDict["action"] == "LakekeeperProjectActionKindGetMetadata" {
-		// try to unmarshal JSON data into LakekeeperProjectActionKindGetMetadata
-		err = json.Unmarshal(data, &dst.LakekeeperProjectActionKindGetMetadata)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperProjectActionKindGetMetadata, return on the first match
-		} else {
-			dst.LakekeeperProjectActionKindGetMetadata = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperProjectActionKind as LakekeeperProjectActionKindGetMetadata: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperProjectActionKindGetProjectTasks'
-	if jsonDict["action"] == "LakekeeperProjectActionKindGetProjectTasks" {
-		// try to unmarshal JSON data into LakekeeperProjectActionKindGetProjectTasks
-		err = json.Unmarshal(data, &dst.LakekeeperProjectActionKindGetProjectTasks)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperProjectActionKindGetProjectTasks, return on the first match
-		} else {
-			dst.LakekeeperProjectActionKindGetProjectTasks = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperProjectActionKind as LakekeeperProjectActionKindGetProjectTasks: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperProjectActionKindGetTaskQueueConfig'
-	if jsonDict["action"] == "LakekeeperProjectActionKindGetTaskQueueConfig" {
-		// try to unmarshal JSON data into LakekeeperProjectActionKindGetTaskQueueConfig
-		err = json.Unmarshal(data, &dst.LakekeeperProjectActionKindGetTaskQueueConfig)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperProjectActionKindGetTaskQueueConfig, return on the first match
-		} else {
-			dst.LakekeeperProjectActionKindGetTaskQueueConfig = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperProjectActionKind as LakekeeperProjectActionKindGetTaskQueueConfig: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperProjectActionKindIncludeInList'
-	if jsonDict["action"] == "LakekeeperProjectActionKindIncludeInList" {
-		// try to unmarshal JSON data into LakekeeperProjectActionKindIncludeInList
-		err = json.Unmarshal(data, &dst.LakekeeperProjectActionKindIncludeInList)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperProjectActionKindIncludeInList, return on the first match
-		} else {
-			dst.LakekeeperProjectActionKindIncludeInList = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperProjectActionKind as LakekeeperProjectActionKindIncludeInList: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperProjectActionKindListRoles'
-	if jsonDict["action"] == "LakekeeperProjectActionKindListRoles" {
-		// try to unmarshal JSON data into LakekeeperProjectActionKindListRoles
-		err = json.Unmarshal(data, &dst.LakekeeperProjectActionKindListRoles)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperProjectActionKindListRoles, return on the first match
-		} else {
-			dst.LakekeeperProjectActionKindListRoles = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperProjectActionKind as LakekeeperProjectActionKindListRoles: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperProjectActionKindListTags'
-	if jsonDict["action"] == "LakekeeperProjectActionKindListTags" {
-		// try to unmarshal JSON data into LakekeeperProjectActionKindListTags
-		err = json.Unmarshal(data, &dst.LakekeeperProjectActionKindListTags)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperProjectActionKindListTags, return on the first match
-		} else {
-			dst.LakekeeperProjectActionKindListTags = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperProjectActionKind as LakekeeperProjectActionKindListTags: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperProjectActionKindListWarehouses'
-	if jsonDict["action"] == "LakekeeperProjectActionKindListWarehouses" {
-		// try to unmarshal JSON data into LakekeeperProjectActionKindListWarehouses
-		err = json.Unmarshal(data, &dst.LakekeeperProjectActionKindListWarehouses)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperProjectActionKindListWarehouses, return on the first match
-		} else {
-			dst.LakekeeperProjectActionKindListWarehouses = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperProjectActionKind as LakekeeperProjectActionKindListWarehouses: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperProjectActionKindModifyTaskQueueConfig'
-	if jsonDict["action"] == "LakekeeperProjectActionKindModifyTaskQueueConfig" {
-		// try to unmarshal JSON data into LakekeeperProjectActionKindModifyTaskQueueConfig
-		err = json.Unmarshal(data, &dst.LakekeeperProjectActionKindModifyTaskQueueConfig)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperProjectActionKindModifyTaskQueueConfig, return on the first match
-		} else {
-			dst.LakekeeperProjectActionKindModifyTaskQueueConfig = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperProjectActionKind as LakekeeperProjectActionKindModifyTaskQueueConfig: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperProjectActionKindReadGrants'
-	if jsonDict["action"] == "LakekeeperProjectActionKindReadGrants" {
-		// try to unmarshal JSON data into LakekeeperProjectActionKindReadGrants
-		err = json.Unmarshal(data, &dst.LakekeeperProjectActionKindReadGrants)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperProjectActionKindReadGrants, return on the first match
-		} else {
-			dst.LakekeeperProjectActionKindReadGrants = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperProjectActionKind as LakekeeperProjectActionKindReadGrants: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperProjectActionKindReadSubtreeGrants'
-	if jsonDict["action"] == "LakekeeperProjectActionKindReadSubtreeGrants" {
-		// try to unmarshal JSON data into LakekeeperProjectActionKindReadSubtreeGrants
-		err = json.Unmarshal(data, &dst.LakekeeperProjectActionKindReadSubtreeGrants)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperProjectActionKindReadSubtreeGrants, return on the first match
-		} else {
-			dst.LakekeeperProjectActionKindReadSubtreeGrants = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperProjectActionKind as LakekeeperProjectActionKindReadSubtreeGrants: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperProjectActionKindRename'
-	if jsonDict["action"] == "LakekeeperProjectActionKindRename" {
-		// try to unmarshal JSON data into LakekeeperProjectActionKindRename
-		err = json.Unmarshal(data, &dst.LakekeeperProjectActionKindRename)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperProjectActionKindRename, return on the first match
-		} else {
-			dst.LakekeeperProjectActionKindRename = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperProjectActionKind as LakekeeperProjectActionKindRename: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperProjectActionKindSearchRoles'
-	if jsonDict["action"] == "LakekeeperProjectActionKindSearchRoles" {
-		// try to unmarshal JSON data into LakekeeperProjectActionKindSearchRoles
-		err = json.Unmarshal(data, &dst.LakekeeperProjectActionKindSearchRoles)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperProjectActionKindSearchRoles, return on the first match
-		} else {
-			dst.LakekeeperProjectActionKindSearchRoles = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperProjectActionKind as LakekeeperProjectActionKindSearchRoles: %s", err.Error())
-		}
-	}
-
 	return nil
 }
 
@@ -760,6 +544,84 @@ func (obj *LakekeeperProjectActionKind) GetActualInstance() interface{} {
 
 	if obj.LakekeeperProjectActionKindSearchRoles != nil {
 		return obj.LakekeeperProjectActionKindSearchRoles
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj LakekeeperProjectActionKind) GetActualInstanceValue() interface{} {
+	if obj.LakekeeperProjectActionKindControlProjectTasks != nil {
+		return *obj.LakekeeperProjectActionKindControlProjectTasks
+	}
+
+	if obj.LakekeeperProjectActionKindCreateRole != nil {
+		return *obj.LakekeeperProjectActionKindCreateRole
+	}
+
+	if obj.LakekeeperProjectActionKindCreateTag != nil {
+		return *obj.LakekeeperProjectActionKindCreateTag
+	}
+
+	if obj.LakekeeperProjectActionKindCreateWarehouse != nil {
+		return *obj.LakekeeperProjectActionKindCreateWarehouse
+	}
+
+	if obj.LakekeeperProjectActionKindDelete != nil {
+		return *obj.LakekeeperProjectActionKindDelete
+	}
+
+	if obj.LakekeeperProjectActionKindGetEndpointStatistics != nil {
+		return *obj.LakekeeperProjectActionKindGetEndpointStatistics
+	}
+
+	if obj.LakekeeperProjectActionKindGetMetadata != nil {
+		return *obj.LakekeeperProjectActionKindGetMetadata
+	}
+
+	if obj.LakekeeperProjectActionKindGetProjectTasks != nil {
+		return *obj.LakekeeperProjectActionKindGetProjectTasks
+	}
+
+	if obj.LakekeeperProjectActionKindGetTaskQueueConfig != nil {
+		return *obj.LakekeeperProjectActionKindGetTaskQueueConfig
+	}
+
+	if obj.LakekeeperProjectActionKindIncludeInList != nil {
+		return *obj.LakekeeperProjectActionKindIncludeInList
+	}
+
+	if obj.LakekeeperProjectActionKindListRoles != nil {
+		return *obj.LakekeeperProjectActionKindListRoles
+	}
+
+	if obj.LakekeeperProjectActionKindListTags != nil {
+		return *obj.LakekeeperProjectActionKindListTags
+	}
+
+	if obj.LakekeeperProjectActionKindListWarehouses != nil {
+		return *obj.LakekeeperProjectActionKindListWarehouses
+	}
+
+	if obj.LakekeeperProjectActionKindModifyTaskQueueConfig != nil {
+		return *obj.LakekeeperProjectActionKindModifyTaskQueueConfig
+	}
+
+	if obj.LakekeeperProjectActionKindReadGrants != nil {
+		return *obj.LakekeeperProjectActionKindReadGrants
+	}
+
+	if obj.LakekeeperProjectActionKindReadSubtreeGrants != nil {
+		return *obj.LakekeeperProjectActionKindReadSubtreeGrants
+	}
+
+	if obj.LakekeeperProjectActionKindRename != nil {
+		return *obj.LakekeeperProjectActionKindRename
+	}
+
+	if obj.LakekeeperProjectActionKindSearchRoles != nil {
+		return *obj.LakekeeperProjectActionKindSearchRoles
 	}
 
 	// all schemas are nil

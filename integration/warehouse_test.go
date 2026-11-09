@@ -173,7 +173,7 @@ func TestWarehouse_SetProtection(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusOK, r.StatusCode)
 	assert.True(t, resp.Protected)
-	assert.NotNil(t, resp.UpdatedAt)
+	assert.NotNil(t, resp.UpdatedAt.Get())
 
 	// Unprotect before MustCreateWarehouse's delete cleanup runs (cleanups
 	// are LIFO, so this one fires first). Without it, deletion 409s on the

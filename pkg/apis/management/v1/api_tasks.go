@@ -320,6 +320,7 @@ func (a *TasksAPIService) GetProjectTaskDetailsExecute(r ApiGetProjectTaskDetail
 		parameterAddToHeaderOrQuery(localVarQueryParams, "numAttempts", r.numAttempts, "form", "")
 	} else {
 		var defaultValue int32 = 5
+		parameterAddToHeaderOrQuery(localVarQueryParams, "numAttempts", defaultValue, "form", "")
 		r.numAttempts = &defaultValue
 	}
 	// to determine the Content-Type header
@@ -572,6 +573,7 @@ func (a *TasksAPIService) GetTaskDetailsExecute(r ApiGetTaskDetailsRequest) (*Ge
 		parameterAddToHeaderOrQuery(localVarQueryParams, "numAttempts", r.numAttempts, "form", "")
 	} else {
 		var defaultValue int32 = 5
+		parameterAddToHeaderOrQuery(localVarQueryParams, "numAttempts", defaultValue, "form", "")
 		r.numAttempts = &defaultValue
 	}
 	// to determine the Content-Type header

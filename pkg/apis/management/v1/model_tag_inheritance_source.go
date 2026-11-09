@@ -69,30 +69,6 @@ func (dst *TagInheritanceSource) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	// check if the discriminator value is 'TagInheritanceSourceNamespace'
-	if jsonDict["type"] == "TagInheritanceSourceNamespace" {
-		// try to unmarshal JSON data into TagInheritanceSourceNamespace
-		err = json.Unmarshal(data, &dst.TagInheritanceSourceNamespace)
-		if err == nil {
-			return nil // data stored in dst.TagInheritanceSourceNamespace, return on the first match
-		} else {
-			dst.TagInheritanceSourceNamespace = nil
-			return fmt.Errorf("failed to unmarshal TagInheritanceSource as TagInheritanceSourceNamespace: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'TagInheritanceSourceWarehouse'
-	if jsonDict["type"] == "TagInheritanceSourceWarehouse" {
-		// try to unmarshal JSON data into TagInheritanceSourceWarehouse
-		err = json.Unmarshal(data, &dst.TagInheritanceSourceWarehouse)
-		if err == nil {
-			return nil // data stored in dst.TagInheritanceSourceWarehouse, return on the first match
-		} else {
-			dst.TagInheritanceSourceWarehouse = nil
-			return fmt.Errorf("failed to unmarshal TagInheritanceSource as TagInheritanceSourceWarehouse: %s", err.Error())
-		}
-	}
-
 	return nil
 }
 
@@ -120,6 +96,20 @@ func (obj *TagInheritanceSource) GetActualInstance() interface{} {
 
 	if obj.TagInheritanceSourceWarehouse != nil {
 		return obj.TagInheritanceSourceWarehouse
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj TagInheritanceSource) GetActualInstanceValue() interface{} {
+	if obj.TagInheritanceSourceNamespace != nil {
+		return *obj.TagInheritanceSourceNamespace
+	}
+
+	if obj.TagInheritanceSourceWarehouse != nil {
+		return *obj.TagInheritanceSourceWarehouse
 	}
 
 	// all schemas are nil

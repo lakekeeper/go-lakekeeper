@@ -21,9 +21,9 @@ var _ MappedNullable = &StorageCredentialAwsSystemIdentity{}
 
 // StorageCredentialAwsSystemIdentity struct for StorageCredentialAwsSystemIdentity
 type StorageCredentialAwsSystemIdentity struct {
-	ExternalId     *string `json:"external-id,omitempty"`
-	CredentialType string  `json:"credential-type"`
-	Type           string  `json:"type"`
+	ExternalId     NullableString `json:"external-id,omitempty"`
+	CredentialType string         `json:"credential-type"`
+	Type           string         `json:"type"`
 }
 
 type _StorageCredentialAwsSystemIdentity StorageCredentialAwsSystemIdentity
@@ -47,36 +47,47 @@ func NewStorageCredentialAwsSystemIdentityWithDefaults() *StorageCredentialAwsSy
 	return &this
 }
 
-// GetExternalId returns the ExternalId field value if set, zero value otherwise.
+// GetExternalId returns the ExternalId field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *StorageCredentialAwsSystemIdentity) GetExternalId() string {
-	if o == nil || IsNil(o.ExternalId) {
+	if o == nil || IsNil(o.ExternalId.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.ExternalId
+	return *o.ExternalId.Get()
 }
 
 // GetExternalIdOk returns a tuple with the ExternalId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *StorageCredentialAwsSystemIdentity) GetExternalIdOk() (*string, bool) {
-	if o == nil || IsNil(o.ExternalId) {
+	if o == nil {
 		return nil, false
 	}
-	return o.ExternalId, true
+	return o.ExternalId.Get(), o.ExternalId.IsSet()
 }
 
 // HasExternalId returns a boolean if a field has been set.
 func (o *StorageCredentialAwsSystemIdentity) HasExternalId() bool {
-	if o != nil && !IsNil(o.ExternalId) {
+	if o != nil && o.ExternalId.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetExternalId gets a reference to the given string and assigns it to the ExternalId field.
+// SetExternalId gets a reference to the given NullableString and assigns it to the ExternalId field.
 func (o *StorageCredentialAwsSystemIdentity) SetExternalId(v string) {
-	o.ExternalId = &v
+	o.ExternalId.Set(&v)
+}
+
+// SetExternalIdNil sets the value for ExternalId to be an explicit nil
+func (o *StorageCredentialAwsSystemIdentity) SetExternalIdNil() {
+	o.ExternalId.Set(nil)
+}
+
+// UnsetExternalId ensures that no value is present for ExternalId, not even an explicit nil
+func (o *StorageCredentialAwsSystemIdentity) UnsetExternalId() {
+	o.ExternalId.Unset()
 }
 
 // GetCredentialType returns the CredentialType field value
@@ -137,8 +148,8 @@ func (o StorageCredentialAwsSystemIdentity) MarshalJSON() ([]byte, error) {
 
 func (o StorageCredentialAwsSystemIdentity) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.ExternalId) {
-		toSerialize["external-id"] = o.ExternalId
+	if o.ExternalId.IsSet() {
+		toSerialize["external-id"] = o.ExternalId.Get()
 	}
 	toSerialize["credential-type"] = o.CredentialType
 	toSerialize["type"] = o.Type

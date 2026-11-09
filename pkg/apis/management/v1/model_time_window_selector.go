@@ -69,30 +69,6 @@ func (dst *TimeWindowSelector) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	// check if the discriminator value is 'TimeWindowSelectorPageToken'
-	if jsonDict["type"] == "TimeWindowSelectorPageToken" {
-		// try to unmarshal JSON data into TimeWindowSelectorPageToken
-		err = json.Unmarshal(data, &dst.TimeWindowSelectorPageToken)
-		if err == nil {
-			return nil // data stored in dst.TimeWindowSelectorPageToken, return on the first match
-		} else {
-			dst.TimeWindowSelectorPageToken = nil
-			return fmt.Errorf("failed to unmarshal TimeWindowSelector as TimeWindowSelectorPageToken: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'TimeWindowSelectorWindow'
-	if jsonDict["type"] == "TimeWindowSelectorWindow" {
-		// try to unmarshal JSON data into TimeWindowSelectorWindow
-		err = json.Unmarshal(data, &dst.TimeWindowSelectorWindow)
-		if err == nil {
-			return nil // data stored in dst.TimeWindowSelectorWindow, return on the first match
-		} else {
-			dst.TimeWindowSelectorWindow = nil
-			return fmt.Errorf("failed to unmarshal TimeWindowSelector as TimeWindowSelectorWindow: %s", err.Error())
-		}
-	}
-
 	return nil
 }
 
@@ -120,6 +96,20 @@ func (obj *TimeWindowSelector) GetActualInstance() interface{} {
 
 	if obj.TimeWindowSelectorWindow != nil {
 		return obj.TimeWindowSelectorWindow
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj TimeWindowSelector) GetActualInstanceValue() interface{} {
+	if obj.TimeWindowSelectorPageToken != nil {
+		return *obj.TimeWindowSelectorPageToken
+	}
+
+	if obj.TimeWindowSelectorWindow != nil {
+		return *obj.TimeWindowSelectorWindow
 	}
 
 	// all schemas are nil

@@ -20,8 +20,8 @@ func TestNewADLSProfile_Defaults(t *testing.T) {
 	assert.Equal(t, "acct", p.AccountName)
 	assert.Equal(t, "fs", p.Filesystem)
 	assert.Equal(t, "adls", p.Type)
-	assert.Nil(t, p.KeyPrefix)
-	assert.Nil(t, p.AuthorityHost)
+	assert.False(t, p.HasKeyPrefix())
+	assert.False(t, p.HasAuthorityHost())
 	assert.Nil(t, p.SasEnabled)
 }
 
@@ -39,10 +39,10 @@ func TestNewADLSProfile_OptionsApplied(t *testing.T) {
 
 	require.NotNil(t, sp.StorageProfileAdls)
 	p := sp.StorageProfileAdls
-	assert.Equal(t, "warehouses/foo", *p.KeyPrefix)
-	assert.Equal(t, "https://login.microsoftonline.de", *p.AuthorityHost)
-	assert.Equal(t, "dfs.core.windows.de", *p.Host)
+	assert.Equal(t, "warehouses/foo", p.GetKeyPrefix())
+	assert.Equal(t, "https://login.microsoftonline.de", p.GetAuthorityHost())
+	assert.Equal(t, "dfs.core.windows.de", p.GetHost())
 	assert.True(t, *p.AllowAlternativeProtocols)
 	assert.False(t, *p.SasEnabled)
-	assert.Equal(t, int64(1800), *p.SasTokenValiditySeconds)
+	assert.Equal(t, int64(1800), p.GetSasTokenValiditySeconds())
 }

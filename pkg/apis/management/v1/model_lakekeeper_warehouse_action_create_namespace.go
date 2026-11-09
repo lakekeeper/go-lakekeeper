@@ -23,8 +23,8 @@ var _ MappedNullable = &LakekeeperWarehouseActionCreateNamespace{}
 type LakekeeperWarehouseActionCreateNamespace struct {
 	Action string `json:"action"`
 	// Name of the namespace to create.
-	Name       NullableString    `json:"name,omitempty"`
-	Properties map[string]string `json:"properties,omitempty"`
+	Name       NullableString     `json:"name,omitempty"`
+	Properties *map[string]string `json:"properties,omitempty"`
 }
 
 type _LakekeeperWarehouseActionCreateNamespace LakekeeperWarehouseActionCreateNamespace
@@ -120,14 +120,14 @@ func (o *LakekeeperWarehouseActionCreateNamespace) GetProperties() map[string]st
 		var ret map[string]string
 		return ret
 	}
-	return o.Properties
+	return *o.Properties
 }
 
 // GetPropertiesOk returns a tuple with the Properties field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *LakekeeperWarehouseActionCreateNamespace) GetPropertiesOk() (map[string]string, bool) {
+func (o *LakekeeperWarehouseActionCreateNamespace) GetPropertiesOk() (*map[string]string, bool) {
 	if o == nil || IsNil(o.Properties) {
-		return map[string]string{}, false
+		return nil, false
 	}
 	return o.Properties, true
 }
@@ -143,7 +143,7 @@ func (o *LakekeeperWarehouseActionCreateNamespace) HasProperties() bool {
 
 // SetProperties gets a reference to the given map[string]string and assigns it to the Properties field.
 func (o *LakekeeperWarehouseActionCreateNamespace) SetProperties(v map[string]string) {
-	o.Properties = v
+	o.Properties = &v
 }
 
 func (o LakekeeperWarehouseActionCreateNamespace) MarshalJSON() ([]byte, error) {

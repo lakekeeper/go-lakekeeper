@@ -69,30 +69,6 @@ func (dst *ServerAssignment) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	// check if the discriminator value is 'ServerAssignmentAdmin'
-	if jsonDict["type"] == "ServerAssignmentAdmin" {
-		// try to unmarshal JSON data into ServerAssignmentAdmin
-		err = json.Unmarshal(data, &dst.ServerAssignmentAdmin)
-		if err == nil {
-			return nil // data stored in dst.ServerAssignmentAdmin, return on the first match
-		} else {
-			dst.ServerAssignmentAdmin = nil
-			return fmt.Errorf("failed to unmarshal ServerAssignment as ServerAssignmentAdmin: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'ServerAssignmentOperator'
-	if jsonDict["type"] == "ServerAssignmentOperator" {
-		// try to unmarshal JSON data into ServerAssignmentOperator
-		err = json.Unmarshal(data, &dst.ServerAssignmentOperator)
-		if err == nil {
-			return nil // data stored in dst.ServerAssignmentOperator, return on the first match
-		} else {
-			dst.ServerAssignmentOperator = nil
-			return fmt.Errorf("failed to unmarshal ServerAssignment as ServerAssignmentOperator: %s", err.Error())
-		}
-	}
-
 	return nil
 }
 
@@ -120,6 +96,20 @@ func (obj *ServerAssignment) GetActualInstance() interface{} {
 
 	if obj.ServerAssignmentOperator != nil {
 		return obj.ServerAssignmentOperator
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj ServerAssignment) GetActualInstanceValue() interface{} {
+	if obj.ServerAssignmentAdmin != nil {
+		return *obj.ServerAssignmentAdmin
+	}
+
+	if obj.ServerAssignmentOperator != nil {
+		return *obj.ServerAssignmentOperator
 	}
 
 	// all schemas are nil

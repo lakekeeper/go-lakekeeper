@@ -309,174 +309,6 @@ func (dst *LakekeeperViewAction) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	// check if the discriminator value is 'LakekeeperViewActionChangeSecurityMode'
-	if jsonDict["action"] == "LakekeeperViewActionChangeSecurityMode" {
-		// try to unmarshal JSON data into LakekeeperViewActionChangeSecurityMode
-		err = json.Unmarshal(data, &dst.LakekeeperViewActionChangeSecurityMode)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperViewActionChangeSecurityMode, return on the first match
-		} else {
-			dst.LakekeeperViewActionChangeSecurityMode = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperViewAction as LakekeeperViewActionChangeSecurityMode: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperViewActionCommit'
-	if jsonDict["action"] == "LakekeeperViewActionCommit" {
-		// try to unmarshal JSON data into LakekeeperViewActionCommit
-		err = json.Unmarshal(data, &dst.LakekeeperViewActionCommit)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperViewActionCommit, return on the first match
-		} else {
-			dst.LakekeeperViewActionCommit = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperViewAction as LakekeeperViewActionCommit: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperViewActionControlTasks'
-	if jsonDict["action"] == "LakekeeperViewActionControlTasks" {
-		// try to unmarshal JSON data into LakekeeperViewActionControlTasks
-		err = json.Unmarshal(data, &dst.LakekeeperViewActionControlTasks)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperViewActionControlTasks, return on the first match
-		} else {
-			dst.LakekeeperViewActionControlTasks = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperViewAction as LakekeeperViewActionControlTasks: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperViewActionDrop'
-	if jsonDict["action"] == "LakekeeperViewActionDrop" {
-		// try to unmarshal JSON data into LakekeeperViewActionDrop
-		err = json.Unmarshal(data, &dst.LakekeeperViewActionDrop)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperViewActionDrop, return on the first match
-		} else {
-			dst.LakekeeperViewActionDrop = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperViewAction as LakekeeperViewActionDrop: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperViewActionGetMetadata'
-	if jsonDict["action"] == "LakekeeperViewActionGetMetadata" {
-		// try to unmarshal JSON data into LakekeeperViewActionGetMetadata
-		err = json.Unmarshal(data, &dst.LakekeeperViewActionGetMetadata)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperViewActionGetMetadata, return on the first match
-		} else {
-			dst.LakekeeperViewActionGetMetadata = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperViewAction as LakekeeperViewActionGetMetadata: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperViewActionGetTasks'
-	if jsonDict["action"] == "LakekeeperViewActionGetTasks" {
-		// try to unmarshal JSON data into LakekeeperViewActionGetTasks
-		err = json.Unmarshal(data, &dst.LakekeeperViewActionGetTasks)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperViewActionGetTasks, return on the first match
-		} else {
-			dst.LakekeeperViewActionGetTasks = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperViewAction as LakekeeperViewActionGetTasks: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperViewActionIncludeInList'
-	if jsonDict["action"] == "LakekeeperViewActionIncludeInList" {
-		// try to unmarshal JSON data into LakekeeperViewActionIncludeInList
-		err = json.Unmarshal(data, &dst.LakekeeperViewActionIncludeInList)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperViewActionIncludeInList, return on the first match
-		} else {
-			dst.LakekeeperViewActionIncludeInList = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperViewAction as LakekeeperViewActionIncludeInList: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperViewActionManageTags'
-	if jsonDict["action"] == "LakekeeperViewActionManageTags" {
-		// try to unmarshal JSON data into LakekeeperViewActionManageTags
-		err = json.Unmarshal(data, &dst.LakekeeperViewActionManageTags)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperViewActionManageTags, return on the first match
-		} else {
-			dst.LakekeeperViewActionManageTags = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperViewAction as LakekeeperViewActionManageTags: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperViewActionMove'
-	if jsonDict["action"] == "LakekeeperViewActionMove" {
-		// try to unmarshal JSON data into LakekeeperViewActionMove
-		err = json.Unmarshal(data, &dst.LakekeeperViewActionMove)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperViewActionMove, return on the first match
-		} else {
-			dst.LakekeeperViewActionMove = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperViewAction as LakekeeperViewActionMove: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperViewActionReadGrants'
-	if jsonDict["action"] == "LakekeeperViewActionReadGrants" {
-		// try to unmarshal JSON data into LakekeeperViewActionReadGrants
-		err = json.Unmarshal(data, &dst.LakekeeperViewActionReadGrants)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperViewActionReadGrants, return on the first match
-		} else {
-			dst.LakekeeperViewActionReadGrants = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperViewAction as LakekeeperViewActionReadGrants: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperViewActionRename'
-	if jsonDict["action"] == "LakekeeperViewActionRename" {
-		// try to unmarshal JSON data into LakekeeperViewActionRename
-		err = json.Unmarshal(data, &dst.LakekeeperViewActionRename)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperViewActionRename, return on the first match
-		} else {
-			dst.LakekeeperViewActionRename = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperViewAction as LakekeeperViewActionRename: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperViewActionSelect'
-	if jsonDict["action"] == "LakekeeperViewActionSelect" {
-		// try to unmarshal JSON data into LakekeeperViewActionSelect
-		err = json.Unmarshal(data, &dst.LakekeeperViewActionSelect)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperViewActionSelect, return on the first match
-		} else {
-			dst.LakekeeperViewActionSelect = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperViewAction as LakekeeperViewActionSelect: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperViewActionSetProtection'
-	if jsonDict["action"] == "LakekeeperViewActionSetProtection" {
-		// try to unmarshal JSON data into LakekeeperViewActionSetProtection
-		err = json.Unmarshal(data, &dst.LakekeeperViewActionSetProtection)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperViewActionSetProtection, return on the first match
-		} else {
-			dst.LakekeeperViewActionSetProtection = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperViewAction as LakekeeperViewActionSetProtection: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperViewActionUndrop'
-	if jsonDict["action"] == "LakekeeperViewActionUndrop" {
-		// try to unmarshal JSON data into LakekeeperViewActionUndrop
-		err = json.Unmarshal(data, &dst.LakekeeperViewActionUndrop)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperViewActionUndrop, return on the first match
-		} else {
-			dst.LakekeeperViewActionUndrop = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperViewAction as LakekeeperViewActionUndrop: %s", err.Error())
-		}
-	}
-
 	return nil
 }
 
@@ -600,6 +432,68 @@ func (obj *LakekeeperViewAction) GetActualInstance() interface{} {
 
 	if obj.LakekeeperViewActionUndrop != nil {
 		return obj.LakekeeperViewActionUndrop
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj LakekeeperViewAction) GetActualInstanceValue() interface{} {
+	if obj.LakekeeperViewActionChangeSecurityMode != nil {
+		return *obj.LakekeeperViewActionChangeSecurityMode
+	}
+
+	if obj.LakekeeperViewActionCommit != nil {
+		return *obj.LakekeeperViewActionCommit
+	}
+
+	if obj.LakekeeperViewActionControlTasks != nil {
+		return *obj.LakekeeperViewActionControlTasks
+	}
+
+	if obj.LakekeeperViewActionDrop != nil {
+		return *obj.LakekeeperViewActionDrop
+	}
+
+	if obj.LakekeeperViewActionGetMetadata != nil {
+		return *obj.LakekeeperViewActionGetMetadata
+	}
+
+	if obj.LakekeeperViewActionGetTasks != nil {
+		return *obj.LakekeeperViewActionGetTasks
+	}
+
+	if obj.LakekeeperViewActionIncludeInList != nil {
+		return *obj.LakekeeperViewActionIncludeInList
+	}
+
+	if obj.LakekeeperViewActionManageTags != nil {
+		return *obj.LakekeeperViewActionManageTags
+	}
+
+	if obj.LakekeeperViewActionMove != nil {
+		return *obj.LakekeeperViewActionMove
+	}
+
+	if obj.LakekeeperViewActionReadGrants != nil {
+		return *obj.LakekeeperViewActionReadGrants
+	}
+
+	if obj.LakekeeperViewActionRename != nil {
+		return *obj.LakekeeperViewActionRename
+	}
+
+	if obj.LakekeeperViewActionSelect != nil {
+		return *obj.LakekeeperViewActionSelect
+	}
+
+	if obj.LakekeeperViewActionSetProtection != nil {
+		return *obj.LakekeeperViewActionSetProtection
+	}
+
+	if obj.LakekeeperViewActionUndrop != nil {
+		return *obj.LakekeeperViewActionUndrop
 	}
 
 	// all schemas are nil

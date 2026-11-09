@@ -149,78 +149,6 @@ func (dst *TagAttachmentTarget) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	// check if the discriminator value is 'TagAttachmentTargetColumn'
-	if jsonDict["type"] == "TagAttachmentTargetColumn" {
-		// try to unmarshal JSON data into TagAttachmentTargetColumn
-		err = json.Unmarshal(data, &dst.TagAttachmentTargetColumn)
-		if err == nil {
-			return nil // data stored in dst.TagAttachmentTargetColumn, return on the first match
-		} else {
-			dst.TagAttachmentTargetColumn = nil
-			return fmt.Errorf("failed to unmarshal TagAttachmentTarget as TagAttachmentTargetColumn: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'TagAttachmentTargetGenericTable'
-	if jsonDict["type"] == "TagAttachmentTargetGenericTable" {
-		// try to unmarshal JSON data into TagAttachmentTargetGenericTable
-		err = json.Unmarshal(data, &dst.TagAttachmentTargetGenericTable)
-		if err == nil {
-			return nil // data stored in dst.TagAttachmentTargetGenericTable, return on the first match
-		} else {
-			dst.TagAttachmentTargetGenericTable = nil
-			return fmt.Errorf("failed to unmarshal TagAttachmentTarget as TagAttachmentTargetGenericTable: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'TagAttachmentTargetNamespace'
-	if jsonDict["type"] == "TagAttachmentTargetNamespace" {
-		// try to unmarshal JSON data into TagAttachmentTargetNamespace
-		err = json.Unmarshal(data, &dst.TagAttachmentTargetNamespace)
-		if err == nil {
-			return nil // data stored in dst.TagAttachmentTargetNamespace, return on the first match
-		} else {
-			dst.TagAttachmentTargetNamespace = nil
-			return fmt.Errorf("failed to unmarshal TagAttachmentTarget as TagAttachmentTargetNamespace: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'TagAttachmentTargetTable'
-	if jsonDict["type"] == "TagAttachmentTargetTable" {
-		// try to unmarshal JSON data into TagAttachmentTargetTable
-		err = json.Unmarshal(data, &dst.TagAttachmentTargetTable)
-		if err == nil {
-			return nil // data stored in dst.TagAttachmentTargetTable, return on the first match
-		} else {
-			dst.TagAttachmentTargetTable = nil
-			return fmt.Errorf("failed to unmarshal TagAttachmentTarget as TagAttachmentTargetTable: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'TagAttachmentTargetView'
-	if jsonDict["type"] == "TagAttachmentTargetView" {
-		// try to unmarshal JSON data into TagAttachmentTargetView
-		err = json.Unmarshal(data, &dst.TagAttachmentTargetView)
-		if err == nil {
-			return nil // data stored in dst.TagAttachmentTargetView, return on the first match
-		} else {
-			dst.TagAttachmentTargetView = nil
-			return fmt.Errorf("failed to unmarshal TagAttachmentTarget as TagAttachmentTargetView: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'TagAttachmentTargetWarehouse'
-	if jsonDict["type"] == "TagAttachmentTargetWarehouse" {
-		// try to unmarshal JSON data into TagAttachmentTargetWarehouse
-		err = json.Unmarshal(data, &dst.TagAttachmentTargetWarehouse)
-		if err == nil {
-			return nil // data stored in dst.TagAttachmentTargetWarehouse, return on the first match
-		} else {
-			dst.TagAttachmentTargetWarehouse = nil
-			return fmt.Errorf("failed to unmarshal TagAttachmentTarget as TagAttachmentTargetWarehouse: %s", err.Error())
-		}
-	}
-
 	return nil
 }
 
@@ -280,6 +208,36 @@ func (obj *TagAttachmentTarget) GetActualInstance() interface{} {
 
 	if obj.TagAttachmentTargetWarehouse != nil {
 		return obj.TagAttachmentTargetWarehouse
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj TagAttachmentTarget) GetActualInstanceValue() interface{} {
+	if obj.TagAttachmentTargetColumn != nil {
+		return *obj.TagAttachmentTargetColumn
+	}
+
+	if obj.TagAttachmentTargetGenericTable != nil {
+		return *obj.TagAttachmentTargetGenericTable
+	}
+
+	if obj.TagAttachmentTargetNamespace != nil {
+		return *obj.TagAttachmentTargetNamespace
+	}
+
+	if obj.TagAttachmentTargetTable != nil {
+		return *obj.TagAttachmentTargetTable
+	}
+
+	if obj.TagAttachmentTargetView != nil {
+		return *obj.TagAttachmentTargetView
+	}
+
+	if obj.TagAttachmentTargetWarehouse != nil {
+		return *obj.TagAttachmentTargetWarehouse
 	}
 
 	// all schemas are nil

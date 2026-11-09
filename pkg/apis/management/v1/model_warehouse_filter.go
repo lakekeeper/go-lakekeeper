@@ -89,42 +89,6 @@ func (dst *WarehouseFilter) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	// check if the discriminator value is 'WarehouseFilterAll'
-	if jsonDict["type"] == "WarehouseFilterAll" {
-		// try to unmarshal JSON data into WarehouseFilterAll
-		err = json.Unmarshal(data, &dst.WarehouseFilterAll)
-		if err == nil {
-			return nil // data stored in dst.WarehouseFilterAll, return on the first match
-		} else {
-			dst.WarehouseFilterAll = nil
-			return fmt.Errorf("failed to unmarshal WarehouseFilter as WarehouseFilterAll: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'WarehouseFilterUnmapped'
-	if jsonDict["type"] == "WarehouseFilterUnmapped" {
-		// try to unmarshal JSON data into WarehouseFilterUnmapped
-		err = json.Unmarshal(data, &dst.WarehouseFilterUnmapped)
-		if err == nil {
-			return nil // data stored in dst.WarehouseFilterUnmapped, return on the first match
-		} else {
-			dst.WarehouseFilterUnmapped = nil
-			return fmt.Errorf("failed to unmarshal WarehouseFilter as WarehouseFilterUnmapped: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'WarehouseFilterWarehouseId'
-	if jsonDict["type"] == "WarehouseFilterWarehouseId" {
-		// try to unmarshal JSON data into WarehouseFilterWarehouseId
-		err = json.Unmarshal(data, &dst.WarehouseFilterWarehouseId)
-		if err == nil {
-			return nil // data stored in dst.WarehouseFilterWarehouseId, return on the first match
-		} else {
-			dst.WarehouseFilterWarehouseId = nil
-			return fmt.Errorf("failed to unmarshal WarehouseFilter as WarehouseFilterWarehouseId: %s", err.Error())
-		}
-	}
-
 	return nil
 }
 
@@ -160,6 +124,24 @@ func (obj *WarehouseFilter) GetActualInstance() interface{} {
 
 	if obj.WarehouseFilterWarehouseId != nil {
 		return obj.WarehouseFilterWarehouseId
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj WarehouseFilter) GetActualInstanceValue() interface{} {
+	if obj.WarehouseFilterAll != nil {
+		return *obj.WarehouseFilterAll
+	}
+
+	if obj.WarehouseFilterUnmapped != nil {
+		return *obj.WarehouseFilterUnmapped
+	}
+
+	if obj.WarehouseFilterWarehouseId != nil {
+		return *obj.WarehouseFilterWarehouseId
 	}
 
 	// all schemas are nil

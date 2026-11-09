@@ -26,8 +26,8 @@ type LakekeeperTableActionCommit struct {
 	// The branch and tag names this commit creates, moves, or removes. Empty when the commit targets no ref by name.
 	TargetRefs []string `json:"target_refs,omitempty"`
 	// The kinds of metadata updates this commit contains. A check that names none asks about a commit of any kind.
-	UpdateKinds       []TableUpdateKind `json:"update_kinds,omitempty"`
-	UpdatedProperties map[string]string `json:"updated_properties,omitempty"`
+	UpdateKinds       []TableUpdateKind  `json:"update_kinds,omitempty"`
+	UpdatedProperties *map[string]string `json:"updated_properties,omitempty"`
 }
 
 type _LakekeeperTableActionCommit LakekeeperTableActionCommit
@@ -176,14 +176,14 @@ func (o *LakekeeperTableActionCommit) GetUpdatedProperties() map[string]string {
 		var ret map[string]string
 		return ret
 	}
-	return o.UpdatedProperties
+	return *o.UpdatedProperties
 }
 
 // GetUpdatedPropertiesOk returns a tuple with the UpdatedProperties field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *LakekeeperTableActionCommit) GetUpdatedPropertiesOk() (map[string]string, bool) {
+func (o *LakekeeperTableActionCommit) GetUpdatedPropertiesOk() (*map[string]string, bool) {
 	if o == nil || IsNil(o.UpdatedProperties) {
-		return map[string]string{}, false
+		return nil, false
 	}
 	return o.UpdatedProperties, true
 }
@@ -199,7 +199,7 @@ func (o *LakekeeperTableActionCommit) HasUpdatedProperties() bool {
 
 // SetUpdatedProperties gets a reference to the given map[string]string and assigns it to the UpdatedProperties field.
 func (o *LakekeeperTableActionCommit) SetUpdatedProperties(v map[string]string) {
-	o.UpdatedProperties = v
+	o.UpdatedProperties = &v
 }
 
 func (o LakekeeperTableActionCommit) MarshalJSON() ([]byte, error) {

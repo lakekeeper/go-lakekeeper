@@ -89,42 +89,6 @@ func (dst *TabularIdentUuid) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	// check if the discriminator value is 'TabularIdentUuidGenericTable'
-	if jsonDict["type"] == "TabularIdentUuidGenericTable" {
-		// try to unmarshal JSON data into TabularIdentUuidGenericTable
-		err = json.Unmarshal(data, &dst.TabularIdentUuidGenericTable)
-		if err == nil {
-			return nil // data stored in dst.TabularIdentUuidGenericTable, return on the first match
-		} else {
-			dst.TabularIdentUuidGenericTable = nil
-			return fmt.Errorf("failed to unmarshal TabularIdentUuid as TabularIdentUuidGenericTable: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'TabularIdentUuidTable'
-	if jsonDict["type"] == "TabularIdentUuidTable" {
-		// try to unmarshal JSON data into TabularIdentUuidTable
-		err = json.Unmarshal(data, &dst.TabularIdentUuidTable)
-		if err == nil {
-			return nil // data stored in dst.TabularIdentUuidTable, return on the first match
-		} else {
-			dst.TabularIdentUuidTable = nil
-			return fmt.Errorf("failed to unmarshal TabularIdentUuid as TabularIdentUuidTable: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'TabularIdentUuidView'
-	if jsonDict["type"] == "TabularIdentUuidView" {
-		// try to unmarshal JSON data into TabularIdentUuidView
-		err = json.Unmarshal(data, &dst.TabularIdentUuidView)
-		if err == nil {
-			return nil // data stored in dst.TabularIdentUuidView, return on the first match
-		} else {
-			dst.TabularIdentUuidView = nil
-			return fmt.Errorf("failed to unmarshal TabularIdentUuid as TabularIdentUuidView: %s", err.Error())
-		}
-	}
-
 	return nil
 }
 
@@ -160,6 +124,24 @@ func (obj *TabularIdentUuid) GetActualInstance() interface{} {
 
 	if obj.TabularIdentUuidView != nil {
 		return obj.TabularIdentUuidView
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj TabularIdentUuid) GetActualInstanceValue() interface{} {
+	if obj.TabularIdentUuidGenericTable != nil {
+		return *obj.TabularIdentUuidGenericTable
+	}
+
+	if obj.TabularIdentUuidTable != nil {
+		return *obj.TabularIdentUuidTable
+	}
+
+	if obj.TabularIdentUuidView != nil {
+		return *obj.TabularIdentUuidView
 	}
 
 	// all schemas are nil

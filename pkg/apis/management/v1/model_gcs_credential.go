@@ -69,30 +69,6 @@ func (dst *GcsCredential) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	// check if the discriminator value is 'GcsCredentialServiceAccountKey'
-	if jsonDict["credential-type"] == "GcsCredentialServiceAccountKey" {
-		// try to unmarshal JSON data into GcsCredentialServiceAccountKey
-		err = json.Unmarshal(data, &dst.GcsCredentialServiceAccountKey)
-		if err == nil {
-			return nil // data stored in dst.GcsCredentialServiceAccountKey, return on the first match
-		} else {
-			dst.GcsCredentialServiceAccountKey = nil
-			return fmt.Errorf("failed to unmarshal GcsCredential as GcsCredentialServiceAccountKey: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'GcsCredentialSystemIdentity'
-	if jsonDict["credential-type"] == "GcsCredentialSystemIdentity" {
-		// try to unmarshal JSON data into GcsCredentialSystemIdentity
-		err = json.Unmarshal(data, &dst.GcsCredentialSystemIdentity)
-		if err == nil {
-			return nil // data stored in dst.GcsCredentialSystemIdentity, return on the first match
-		} else {
-			dst.GcsCredentialSystemIdentity = nil
-			return fmt.Errorf("failed to unmarshal GcsCredential as GcsCredentialSystemIdentity: %s", err.Error())
-		}
-	}
-
 	return nil
 }
 
@@ -120,6 +96,20 @@ func (obj *GcsCredential) GetActualInstance() interface{} {
 
 	if obj.GcsCredentialSystemIdentity != nil {
 		return obj.GcsCredentialSystemIdentity
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj GcsCredential) GetActualInstanceValue() interface{} {
+	if obj.GcsCredentialServiceAccountKey != nil {
+		return *obj.GcsCredentialServiceAccountKey
+	}
+
+	if obj.GcsCredentialSystemIdentity != nil {
+		return *obj.GcsCredentialSystemIdentity
 	}
 
 	// all schemas are nil

@@ -109,54 +109,6 @@ func (dst *ControlTaskAction) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	// check if the discriminator value is 'ControlTaskActionCancel'
-	if jsonDict["action-type"] == "ControlTaskActionCancel" {
-		// try to unmarshal JSON data into ControlTaskActionCancel
-		err = json.Unmarshal(data, &dst.ControlTaskActionCancel)
-		if err == nil {
-			return nil // data stored in dst.ControlTaskActionCancel, return on the first match
-		} else {
-			dst.ControlTaskActionCancel = nil
-			return fmt.Errorf("failed to unmarshal ControlTaskAction as ControlTaskActionCancel: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'ControlTaskActionRunAt'
-	if jsonDict["action-type"] == "ControlTaskActionRunAt" {
-		// try to unmarshal JSON data into ControlTaskActionRunAt
-		err = json.Unmarshal(data, &dst.ControlTaskActionRunAt)
-		if err == nil {
-			return nil // data stored in dst.ControlTaskActionRunAt, return on the first match
-		} else {
-			dst.ControlTaskActionRunAt = nil
-			return fmt.Errorf("failed to unmarshal ControlTaskAction as ControlTaskActionRunAt: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'ControlTaskActionRunNow'
-	if jsonDict["action-type"] == "ControlTaskActionRunNow" {
-		// try to unmarshal JSON data into ControlTaskActionRunNow
-		err = json.Unmarshal(data, &dst.ControlTaskActionRunNow)
-		if err == nil {
-			return nil // data stored in dst.ControlTaskActionRunNow, return on the first match
-		} else {
-			dst.ControlTaskActionRunNow = nil
-			return fmt.Errorf("failed to unmarshal ControlTaskAction as ControlTaskActionRunNow: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'ControlTaskActionStop'
-	if jsonDict["action-type"] == "ControlTaskActionStop" {
-		// try to unmarshal JSON data into ControlTaskActionStop
-		err = json.Unmarshal(data, &dst.ControlTaskActionStop)
-		if err == nil {
-			return nil // data stored in dst.ControlTaskActionStop, return on the first match
-		} else {
-			dst.ControlTaskActionStop = nil
-			return fmt.Errorf("failed to unmarshal ControlTaskAction as ControlTaskActionStop: %s", err.Error())
-		}
-	}
-
 	return nil
 }
 
@@ -200,6 +152,28 @@ func (obj *ControlTaskAction) GetActualInstance() interface{} {
 
 	if obj.ControlTaskActionStop != nil {
 		return obj.ControlTaskActionStop
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj ControlTaskAction) GetActualInstanceValue() interface{} {
+	if obj.ControlTaskActionCancel != nil {
+		return *obj.ControlTaskActionCancel
+	}
+
+	if obj.ControlTaskActionRunAt != nil {
+		return *obj.ControlTaskActionRunAt
+	}
+
+	if obj.ControlTaskActionRunNow != nil {
+		return *obj.ControlTaskActionRunNow
+	}
+
+	if obj.ControlTaskActionStop != nil {
+		return *obj.ControlTaskActionStop
 	}
 
 	// all schemas are nil

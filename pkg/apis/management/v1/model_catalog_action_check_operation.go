@@ -228,6 +228,10 @@ func (dst *CatalogActionCheckOperation) UnmarshalJSON(data []byte) error {
 	} else if match == 1 {
 		return nil // exactly one match
 	} else { // no match
+		if err != nil {
+			return fmt.Errorf("data failed to match schemas in oneOf(CatalogActionCheckOperation): %v", err)
+		}
+
 		return fmt.Errorf("data failed to match schemas in oneOf(CatalogActionCheckOperation)")
 	}
 }
@@ -312,6 +316,48 @@ func (obj *CatalogActionCheckOperation) GetActualInstance() interface{} {
 
 	if obj.CatalogActionCheckOperationWarehouse != nil {
 		return obj.CatalogActionCheckOperationWarehouse
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj CatalogActionCheckOperation) GetActualInstanceValue() interface{} {
+	if obj.CatalogActionCheckOperationGenericTable != nil {
+		return *obj.CatalogActionCheckOperationGenericTable
+	}
+
+	if obj.CatalogActionCheckOperationNamespace != nil {
+		return *obj.CatalogActionCheckOperationNamespace
+	}
+
+	if obj.CatalogActionCheckOperationProject != nil {
+		return *obj.CatalogActionCheckOperationProject
+	}
+
+	if obj.CatalogActionCheckOperationServer != nil {
+		return *obj.CatalogActionCheckOperationServer
+	}
+
+	if obj.CatalogActionCheckOperationTable != nil {
+		return *obj.CatalogActionCheckOperationTable
+	}
+
+	if obj.CatalogActionCheckOperationView != nil {
+		return *obj.CatalogActionCheckOperationView
+	}
+
+	if obj.CatalogActionCheckOperationViewInDefinerView != nil {
+		return *obj.CatalogActionCheckOperationViewInDefinerView
+	}
+
+	if obj.CatalogActionCheckOperationViewReplace != nil {
+		return *obj.CatalogActionCheckOperationViewReplace
+	}
+
+	if obj.CatalogActionCheckOperationWarehouse != nil {
+		return *obj.CatalogActionCheckOperationWarehouse
 	}
 
 	// all schemas are nil

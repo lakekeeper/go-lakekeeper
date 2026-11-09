@@ -24,9 +24,9 @@ type StorageProfileGcs struct {
 	// Name of the GCS bucket
 	Bucket string `json:"bucket"`
 	// Subpath in the bucket to use.
-	KeyPrefix *string `json:"key-prefix,omitempty"`
+	KeyPrefix NullableString `json:"key-prefix,omitempty"`
 	// Storage layout for namespace and tabular paths.
-	StorageLayout *StorageLayout `json:"storage-layout,omitempty"`
+	StorageLayout NullableStorageLayout `json:"storage-layout,omitempty"`
 	// Enable STS (Security Token Service) downscoped token generation for GCS. When disabled, clients cannot use vended credentials for this storage profile. Defaults to true.
 	StsEnabled *bool  `json:"sts-enabled,omitempty"`
 	Type       string `json:"type"`
@@ -77,68 +77,90 @@ func (o *StorageProfileGcs) SetBucket(v string) {
 	o.Bucket = v
 }
 
-// GetKeyPrefix returns the KeyPrefix field value if set, zero value otherwise.
+// GetKeyPrefix returns the KeyPrefix field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *StorageProfileGcs) GetKeyPrefix() string {
-	if o == nil || IsNil(o.KeyPrefix) {
+	if o == nil || IsNil(o.KeyPrefix.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.KeyPrefix
+	return *o.KeyPrefix.Get()
 }
 
 // GetKeyPrefixOk returns a tuple with the KeyPrefix field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *StorageProfileGcs) GetKeyPrefixOk() (*string, bool) {
-	if o == nil || IsNil(o.KeyPrefix) {
+	if o == nil {
 		return nil, false
 	}
-	return o.KeyPrefix, true
+	return o.KeyPrefix.Get(), o.KeyPrefix.IsSet()
 }
 
 // HasKeyPrefix returns a boolean if a field has been set.
 func (o *StorageProfileGcs) HasKeyPrefix() bool {
-	if o != nil && !IsNil(o.KeyPrefix) {
+	if o != nil && o.KeyPrefix.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetKeyPrefix gets a reference to the given string and assigns it to the KeyPrefix field.
+// SetKeyPrefix gets a reference to the given NullableString and assigns it to the KeyPrefix field.
 func (o *StorageProfileGcs) SetKeyPrefix(v string) {
-	o.KeyPrefix = &v
+	o.KeyPrefix.Set(&v)
 }
 
-// GetStorageLayout returns the StorageLayout field value if set, zero value otherwise.
+// SetKeyPrefixNil sets the value for KeyPrefix to be an explicit nil
+func (o *StorageProfileGcs) SetKeyPrefixNil() {
+	o.KeyPrefix.Set(nil)
+}
+
+// UnsetKeyPrefix ensures that no value is present for KeyPrefix, not even an explicit nil
+func (o *StorageProfileGcs) UnsetKeyPrefix() {
+	o.KeyPrefix.Unset()
+}
+
+// GetStorageLayout returns the StorageLayout field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *StorageProfileGcs) GetStorageLayout() StorageLayout {
-	if o == nil || IsNil(o.StorageLayout) {
+	if o == nil || IsNil(o.StorageLayout.Get()) {
 		var ret StorageLayout
 		return ret
 	}
-	return *o.StorageLayout
+	return *o.StorageLayout.Get()
 }
 
 // GetStorageLayoutOk returns a tuple with the StorageLayout field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *StorageProfileGcs) GetStorageLayoutOk() (*StorageLayout, bool) {
-	if o == nil || IsNil(o.StorageLayout) {
+	if o == nil {
 		return nil, false
 	}
-	return o.StorageLayout, true
+	return o.StorageLayout.Get(), o.StorageLayout.IsSet()
 }
 
 // HasStorageLayout returns a boolean if a field has been set.
 func (o *StorageProfileGcs) HasStorageLayout() bool {
-	if o != nil && !IsNil(o.StorageLayout) {
+	if o != nil && o.StorageLayout.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetStorageLayout gets a reference to the given StorageLayout and assigns it to the StorageLayout field.
+// SetStorageLayout gets a reference to the given NullableStorageLayout and assigns it to the StorageLayout field.
 func (o *StorageProfileGcs) SetStorageLayout(v StorageLayout) {
-	o.StorageLayout = &v
+	o.StorageLayout.Set(&v)
+}
+
+// SetStorageLayoutNil sets the value for StorageLayout to be an explicit nil
+func (o *StorageProfileGcs) SetStorageLayoutNil() {
+	o.StorageLayout.Set(nil)
+}
+
+// UnsetStorageLayout ensures that no value is present for StorageLayout, not even an explicit nil
+func (o *StorageProfileGcs) UnsetStorageLayout() {
+	o.StorageLayout.Unset()
 }
 
 // GetStsEnabled returns the StsEnabled field value if set, zero value otherwise.
@@ -208,11 +230,11 @@ func (o StorageProfileGcs) MarshalJSON() ([]byte, error) {
 func (o StorageProfileGcs) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["bucket"] = o.Bucket
-	if !IsNil(o.KeyPrefix) {
-		toSerialize["key-prefix"] = o.KeyPrefix
+	if o.KeyPrefix.IsSet() {
+		toSerialize["key-prefix"] = o.KeyPrefix.Get()
 	}
-	if !IsNil(o.StorageLayout) {
-		toSerialize["storage-layout"] = o.StorageLayout
+	if o.StorageLayout.IsSet() {
+		toSerialize["storage-layout"] = o.StorageLayout.Get()
 	}
 	if !IsNil(o.StsEnabled) {
 		toSerialize["sts-enabled"] = o.StsEnabled

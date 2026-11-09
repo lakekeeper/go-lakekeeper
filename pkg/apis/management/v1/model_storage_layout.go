@@ -89,42 +89,6 @@ func (dst *StorageLayout) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	// check if the discriminator value is 'StorageLayoutDefault'
-	if jsonDict["type"] == "StorageLayoutDefault" {
-		// try to unmarshal JSON data into StorageLayoutDefault
-		err = json.Unmarshal(data, &dst.StorageLayoutDefault)
-		if err == nil {
-			return nil // data stored in dst.StorageLayoutDefault, return on the first match
-		} else {
-			dst.StorageLayoutDefault = nil
-			return fmt.Errorf("failed to unmarshal StorageLayout as StorageLayoutDefault: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'StorageLayoutFullHierarchy'
-	if jsonDict["type"] == "StorageLayoutFullHierarchy" {
-		// try to unmarshal JSON data into StorageLayoutFullHierarchy
-		err = json.Unmarshal(data, &dst.StorageLayoutFullHierarchy)
-		if err == nil {
-			return nil // data stored in dst.StorageLayoutFullHierarchy, return on the first match
-		} else {
-			dst.StorageLayoutFullHierarchy = nil
-			return fmt.Errorf("failed to unmarshal StorageLayout as StorageLayoutFullHierarchy: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'StorageLayoutTabularOnly'
-	if jsonDict["type"] == "StorageLayoutTabularOnly" {
-		// try to unmarshal JSON data into StorageLayoutTabularOnly
-		err = json.Unmarshal(data, &dst.StorageLayoutTabularOnly)
-		if err == nil {
-			return nil // data stored in dst.StorageLayoutTabularOnly, return on the first match
-		} else {
-			dst.StorageLayoutTabularOnly = nil
-			return fmt.Errorf("failed to unmarshal StorageLayout as StorageLayoutTabularOnly: %s", err.Error())
-		}
-	}
-
 	return nil
 }
 
@@ -160,6 +124,24 @@ func (obj *StorageLayout) GetActualInstance() interface{} {
 
 	if obj.StorageLayoutTabularOnly != nil {
 		return obj.StorageLayoutTabularOnly
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj StorageLayout) GetActualInstanceValue() interface{} {
+	if obj.StorageLayoutDefault != nil {
+		return *obj.StorageLayoutDefault
+	}
+
+	if obj.StorageLayoutFullHierarchy != nil {
+		return *obj.StorageLayoutFullHierarchy
+	}
+
+	if obj.StorageLayoutTabularOnly != nil {
+		return *obj.StorageLayoutTabularOnly
 	}
 
 	// all schemas are nil

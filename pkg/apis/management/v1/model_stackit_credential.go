@@ -11,79 +11,169 @@ API version: 0.0.0
 package managementv1
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 )
 
-// StackitCredential - Credentials for STACKIT Object Storage.  Its own enum rather than a reuse of `S3Credential`, so STACKIT can gain authentication methods without inheriting AWS-only ones.
+// checks if the StackitCredential type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &StackitCredential{}
+
+// StackitCredential Credentials for STACKIT Object Storage.  Its own enum rather than a reuse of `S3Credential`, so STACKIT can gain authentication methods without inheriting AWS-only ones.
 type StackitCredential struct {
-	StackitCredentialAccessKey *StackitCredentialAccessKey
+	// Access key ID of a key created in the STACKIT credentials group.
+	AccessKeyId string `json:"access-key-id"`
+	// Secret shown once when the access key was created.
+	SecretAccessKey string `json:"secret-access-key"`
+	CredentialType  string `json:"credential-type"`
 }
 
-// StackitCredentialAccessKeyAsStackitCredential is a convenience function that returns StackitCredentialAccessKey wrapped in StackitCredential
-func StackitCredentialAccessKeyAsStackitCredential(v *StackitCredentialAccessKey) StackitCredential {
-	return StackitCredential{
-		StackitCredentialAccessKey: v,
+type _StackitCredential StackitCredential
+
+// NewStackitCredential instantiates a new StackitCredential object
+// This constructor will assign default values to properties that have it defined,
+// and makes sure properties required by API are set, but the set of arguments
+// will change when the set of required properties is changed
+func NewStackitCredential(accessKeyId string, secretAccessKey string, credentialType string) *StackitCredential {
+	this := StackitCredential{}
+	this.AccessKeyId = accessKeyId
+	this.SecretAccessKey = secretAccessKey
+	this.CredentialType = credentialType
+	return &this
+}
+
+// NewStackitCredentialWithDefaults instantiates a new StackitCredential object
+// This constructor will only assign default values to properties that have it defined,
+// but it doesn't guarantee that properties required by API are set
+func NewStackitCredentialWithDefaults() *StackitCredential {
+	this := StackitCredential{}
+	return &this
+}
+
+// GetAccessKeyId returns the AccessKeyId field value
+func (o *StackitCredential) GetAccessKeyId() string {
+	if o == nil {
+		var ret string
+		return ret
 	}
+
+	return o.AccessKeyId
 }
 
-// Unmarshal JSON data into one of the pointers in the struct
-func (dst *StackitCredential) UnmarshalJSON(data []byte) error {
-	var err error
-	// use discriminator value to speed up the lookup
-	var jsonDict map[string]interface{}
-	err = newStrictDecoder(data).Decode(&jsonDict)
+// GetAccessKeyIdOk returns a tuple with the AccessKeyId field value
+// and a boolean to check if the value has been set.
+func (o *StackitCredential) GetAccessKeyIdOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.AccessKeyId, true
+}
+
+// SetAccessKeyId sets field value
+func (o *StackitCredential) SetAccessKeyId(v string) {
+	o.AccessKeyId = v
+}
+
+// GetSecretAccessKey returns the SecretAccessKey field value
+func (o *StackitCredential) GetSecretAccessKey() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.SecretAccessKey
+}
+
+// GetSecretAccessKeyOk returns a tuple with the SecretAccessKey field value
+// and a boolean to check if the value has been set.
+func (o *StackitCredential) GetSecretAccessKeyOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.SecretAccessKey, true
+}
+
+// SetSecretAccessKey sets field value
+func (o *StackitCredential) SetSecretAccessKey(v string) {
+	o.SecretAccessKey = v
+}
+
+// GetCredentialType returns the CredentialType field value
+func (o *StackitCredential) GetCredentialType() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.CredentialType
+}
+
+// GetCredentialTypeOk returns a tuple with the CredentialType field value
+// and a boolean to check if the value has been set.
+func (o *StackitCredential) GetCredentialTypeOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.CredentialType, true
+}
+
+// SetCredentialType sets field value
+func (o *StackitCredential) SetCredentialType(v string) {
+	o.CredentialType = v
+}
+
+func (o StackitCredential) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
 	if err != nil {
-		return fmt.Errorf("failed to unmarshal JSON into map for the discriminator lookup")
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
+func (o StackitCredential) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	toSerialize["access-key-id"] = o.AccessKeyId
+	toSerialize["secret-access-key"] = o.SecretAccessKey
+	toSerialize["credential-type"] = o.CredentialType
+	return toSerialize, nil
+}
+
+func (o *StackitCredential) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"access-key-id",
+		"secret-access-key",
+		"credential-type",
 	}
 
-	// check if the discriminator value is 'stackit-access-key'
-	if jsonDict["credential-type"] == "stackit-access-key" {
-		// try to unmarshal JSON data into StackitCredentialAccessKey
-		err = json.Unmarshal(data, &dst.StackitCredentialAccessKey)
-		if err == nil {
-			return nil // data stored in dst.StackitCredentialAccessKey, return on the first match
-		} else {
-			dst.StackitCredentialAccessKey = nil
-			return fmt.Errorf("failed to unmarshal StackitCredential as StackitCredentialAccessKey: %s", err.Error())
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err
+	}
+
+	for _, requiredProperty := range requiredProperties {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
 	}
 
-	// check if the discriminator value is 'StackitCredentialAccessKey'
-	if jsonDict["credential-type"] == "StackitCredentialAccessKey" {
-		// try to unmarshal JSON data into StackitCredentialAccessKey
-		err = json.Unmarshal(data, &dst.StackitCredentialAccessKey)
-		if err == nil {
-			return nil // data stored in dst.StackitCredentialAccessKey, return on the first match
-		} else {
-			dst.StackitCredentialAccessKey = nil
-			return fmt.Errorf("failed to unmarshal StackitCredential as StackitCredentialAccessKey: %s", err.Error())
-		}
+	varStackitCredential := _StackitCredential{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	err = decoder.Decode(&varStackitCredential)
+
+	if err != nil {
+		return err
 	}
 
-	return nil
-}
+	*o = StackitCredential(varStackitCredential)
 
-// Marshal data from the first non-nil pointers in the struct to JSON
-func (src StackitCredential) MarshalJSON() ([]byte, error) {
-	if src.StackitCredentialAccessKey != nil {
-		return json.Marshal(&src.StackitCredentialAccessKey)
-	}
-
-	return nil, nil // no data in oneOf schemas
-}
-
-// Get the actual instance
-func (obj *StackitCredential) GetActualInstance() interface{} {
-	if obj == nil {
-		return nil
-	}
-	if obj.StackitCredentialAccessKey != nil {
-		return obj.StackitCredentialAccessKey
-	}
-
-	// all schemas are nil
-	return nil
+	return err
 }
 
 type NullableStackitCredential struct {

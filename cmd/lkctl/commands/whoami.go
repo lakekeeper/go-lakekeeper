@@ -53,12 +53,12 @@ func printWhoami(w io.Writer, output string, u *managementv1.WhoamiResponse) err
 	case "text":
 		fmt.Fprintln(tw, "ID\tNAME\tEMAIL\tUSER TYPE\tINSTANCE ADMIN")
 		fmt.Fprintf(tw, "%s\t%s\t%s\t%s\t%t\n",
-			u.Id, u.Name, formatStringPtr(u.Email), u.UserType, u.IsInstanceAdmin)
+			u.Id, u.Name, formatStringPtr(u.Email.Get()), u.UserType, u.IsInstanceAdmin)
 	case "wide":
 		fmt.Fprintln(tw, "ID\tNAME\tEMAIL\tUSER TYPE\tINSTANCE ADMIN\tCREATED AT\tUPDATED AT\tLAST UPDATED WITH")
 		fmt.Fprintf(tw, "%s\t%s\t%s\t%s\t%t\t%s\t%s\t%s\n",
-			u.Id, u.Name, formatStringPtr(u.Email), u.UserType, u.IsInstanceAdmin,
-			u.CreatedAt.Format(time.RFC3339), formatTimePtr(u.UpdatedAt), u.LastUpdatedWith)
+			u.Id, u.Name, formatStringPtr(u.Email.Get()), u.UserType, u.IsInstanceAdmin,
+			u.CreatedAt.Format(time.RFC3339), formatTimePtr(u.UpdatedAt.Get()), u.LastUpdatedWith)
 	default:
 		return fmt.Errorf("unknown output format: %s", output)
 	}

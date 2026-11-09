@@ -74,6 +74,10 @@ func (dst *TabularIdentOrUuid) UnmarshalJSON(data []byte) error {
 	} else if match == 1 {
 		return nil // exactly one match
 	} else { // no match
+		if err != nil {
+			return fmt.Errorf("data failed to match schemas in oneOf(TabularIdentOrUuid): %v", err)
+		}
+
 		return fmt.Errorf("data failed to match schemas in oneOf(TabularIdentOrUuid)")
 	}
 }
@@ -102,6 +106,20 @@ func (obj *TabularIdentOrUuid) GetActualInstance() interface{} {
 
 	if obj.TabularIdentOrUuidByName != nil {
 		return obj.TabularIdentOrUuidByName
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj TabularIdentOrUuid) GetActualInstanceValue() interface{} {
+	if obj.TabularIdentOrUuidById != nil {
+		return *obj.TabularIdentOrUuidById
+	}
+
+	if obj.TabularIdentOrUuidByName != nil {
+		return *obj.TabularIdentOrUuidByName
 	}
 
 	// all schemas are nil

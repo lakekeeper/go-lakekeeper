@@ -22,9 +22,9 @@ var _ MappedNullable = &StorageProfileOneLake{}
 // StorageProfileOneLake `OneLake` (Microsoft Fabric) profile. Knows how to construct `OneLake` URLs from workspace + lakehouse IDs and how to derive the workspace-private-link endpoint host.
 type StorageProfileOneLake struct {
 	// The authority host to use for authentication. Default: `https://login.microsoftonline.com`.
-	AuthorityHost *string `json:"authority-host,omitempty"`
+	AuthorityHost NullableString `json:"authority-host,omitempty"`
 	// Subpath beneath `<top-level-folder>/` inside the lakehouse — the root directory under which Lakekeeper writes all warehouse data.
-	DirectoryRelPath *string `json:"directory-rel-path,omitempty"`
+	DirectoryRelPath NullableString `json:"directory-rel-path,omitempty"`
 	// Endpoint connection mode. Defaults to the global endpoint.
 	EndpointMode *EndpointMode `json:"endpoint-mode,omitempty"`
 	// UUID of the lakehouse within the workspace.
@@ -32,9 +32,9 @@ type StorageProfileOneLake struct {
 	// Enable SAS-token generation. Defaults to true.
 	SasEnabled *bool `json:"sas-enabled,omitempty"`
 	// SAS-token validity in seconds. Default: 3600. Max: 3600 (`OneLake` cap).
-	SasTokenValiditySeconds *int64 `json:"sas-token-validity-seconds,omitempty"`
+	SasTokenValiditySeconds NullableInt64 `json:"sas-token-validity-seconds,omitempty"`
 	// Storage layout for namespace and tabular paths.
-	StorageLayout *StorageLayout `json:"storage-layout,omitempty"`
+	StorageLayout NullableStorageLayout `json:"storage-layout,omitempty"`
 	// Top-level managed folder. Defaults to `Files`.
 	TopLevelFolder *TopLevelFolder `json:"top-level-folder,omitempty"`
 	// UUID of the Fabric workspace this warehouse lives in.
@@ -64,68 +64,90 @@ func NewStorageProfileOneLakeWithDefaults() *StorageProfileOneLake {
 	return &this
 }
 
-// GetAuthorityHost returns the AuthorityHost field value if set, zero value otherwise.
+// GetAuthorityHost returns the AuthorityHost field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *StorageProfileOneLake) GetAuthorityHost() string {
-	if o == nil || IsNil(o.AuthorityHost) {
+	if o == nil || IsNil(o.AuthorityHost.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.AuthorityHost
+	return *o.AuthorityHost.Get()
 }
 
 // GetAuthorityHostOk returns a tuple with the AuthorityHost field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *StorageProfileOneLake) GetAuthorityHostOk() (*string, bool) {
-	if o == nil || IsNil(o.AuthorityHost) {
+	if o == nil {
 		return nil, false
 	}
-	return o.AuthorityHost, true
+	return o.AuthorityHost.Get(), o.AuthorityHost.IsSet()
 }
 
 // HasAuthorityHost returns a boolean if a field has been set.
 func (o *StorageProfileOneLake) HasAuthorityHost() bool {
-	if o != nil && !IsNil(o.AuthorityHost) {
+	if o != nil && o.AuthorityHost.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetAuthorityHost gets a reference to the given string and assigns it to the AuthorityHost field.
+// SetAuthorityHost gets a reference to the given NullableString and assigns it to the AuthorityHost field.
 func (o *StorageProfileOneLake) SetAuthorityHost(v string) {
-	o.AuthorityHost = &v
+	o.AuthorityHost.Set(&v)
 }
 
-// GetDirectoryRelPath returns the DirectoryRelPath field value if set, zero value otherwise.
+// SetAuthorityHostNil sets the value for AuthorityHost to be an explicit nil
+func (o *StorageProfileOneLake) SetAuthorityHostNil() {
+	o.AuthorityHost.Set(nil)
+}
+
+// UnsetAuthorityHost ensures that no value is present for AuthorityHost, not even an explicit nil
+func (o *StorageProfileOneLake) UnsetAuthorityHost() {
+	o.AuthorityHost.Unset()
+}
+
+// GetDirectoryRelPath returns the DirectoryRelPath field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *StorageProfileOneLake) GetDirectoryRelPath() string {
-	if o == nil || IsNil(o.DirectoryRelPath) {
+	if o == nil || IsNil(o.DirectoryRelPath.Get()) {
 		var ret string
 		return ret
 	}
-	return *o.DirectoryRelPath
+	return *o.DirectoryRelPath.Get()
 }
 
 // GetDirectoryRelPathOk returns a tuple with the DirectoryRelPath field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *StorageProfileOneLake) GetDirectoryRelPathOk() (*string, bool) {
-	if o == nil || IsNil(o.DirectoryRelPath) {
+	if o == nil {
 		return nil, false
 	}
-	return o.DirectoryRelPath, true
+	return o.DirectoryRelPath.Get(), o.DirectoryRelPath.IsSet()
 }
 
 // HasDirectoryRelPath returns a boolean if a field has been set.
 func (o *StorageProfileOneLake) HasDirectoryRelPath() bool {
-	if o != nil && !IsNil(o.DirectoryRelPath) {
+	if o != nil && o.DirectoryRelPath.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetDirectoryRelPath gets a reference to the given string and assigns it to the DirectoryRelPath field.
+// SetDirectoryRelPath gets a reference to the given NullableString and assigns it to the DirectoryRelPath field.
 func (o *StorageProfileOneLake) SetDirectoryRelPath(v string) {
-	o.DirectoryRelPath = &v
+	o.DirectoryRelPath.Set(&v)
+}
+
+// SetDirectoryRelPathNil sets the value for DirectoryRelPath to be an explicit nil
+func (o *StorageProfileOneLake) SetDirectoryRelPathNil() {
+	o.DirectoryRelPath.Set(nil)
+}
+
+// UnsetDirectoryRelPath ensures that no value is present for DirectoryRelPath, not even an explicit nil
+func (o *StorageProfileOneLake) UnsetDirectoryRelPath() {
+	o.DirectoryRelPath.Unset()
 }
 
 // GetEndpointMode returns the EndpointMode field value if set, zero value otherwise.
@@ -216,68 +238,90 @@ func (o *StorageProfileOneLake) SetSasEnabled(v bool) {
 	o.SasEnabled = &v
 }
 
-// GetSasTokenValiditySeconds returns the SasTokenValiditySeconds field value if set, zero value otherwise.
+// GetSasTokenValiditySeconds returns the SasTokenValiditySeconds field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *StorageProfileOneLake) GetSasTokenValiditySeconds() int64 {
-	if o == nil || IsNil(o.SasTokenValiditySeconds) {
+	if o == nil || IsNil(o.SasTokenValiditySeconds.Get()) {
 		var ret int64
 		return ret
 	}
-	return *o.SasTokenValiditySeconds
+	return *o.SasTokenValiditySeconds.Get()
 }
 
 // GetSasTokenValiditySecondsOk returns a tuple with the SasTokenValiditySeconds field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *StorageProfileOneLake) GetSasTokenValiditySecondsOk() (*int64, bool) {
-	if o == nil || IsNil(o.SasTokenValiditySeconds) {
+	if o == nil {
 		return nil, false
 	}
-	return o.SasTokenValiditySeconds, true
+	return o.SasTokenValiditySeconds.Get(), o.SasTokenValiditySeconds.IsSet()
 }
 
 // HasSasTokenValiditySeconds returns a boolean if a field has been set.
 func (o *StorageProfileOneLake) HasSasTokenValiditySeconds() bool {
-	if o != nil && !IsNil(o.SasTokenValiditySeconds) {
+	if o != nil && o.SasTokenValiditySeconds.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetSasTokenValiditySeconds gets a reference to the given int64 and assigns it to the SasTokenValiditySeconds field.
+// SetSasTokenValiditySeconds gets a reference to the given NullableInt64 and assigns it to the SasTokenValiditySeconds field.
 func (o *StorageProfileOneLake) SetSasTokenValiditySeconds(v int64) {
-	o.SasTokenValiditySeconds = &v
+	o.SasTokenValiditySeconds.Set(&v)
 }
 
-// GetStorageLayout returns the StorageLayout field value if set, zero value otherwise.
+// SetSasTokenValiditySecondsNil sets the value for SasTokenValiditySeconds to be an explicit nil
+func (o *StorageProfileOneLake) SetSasTokenValiditySecondsNil() {
+	o.SasTokenValiditySeconds.Set(nil)
+}
+
+// UnsetSasTokenValiditySeconds ensures that no value is present for SasTokenValiditySeconds, not even an explicit nil
+func (o *StorageProfileOneLake) UnsetSasTokenValiditySeconds() {
+	o.SasTokenValiditySeconds.Unset()
+}
+
+// GetStorageLayout returns the StorageLayout field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *StorageProfileOneLake) GetStorageLayout() StorageLayout {
-	if o == nil || IsNil(o.StorageLayout) {
+	if o == nil || IsNil(o.StorageLayout.Get()) {
 		var ret StorageLayout
 		return ret
 	}
-	return *o.StorageLayout
+	return *o.StorageLayout.Get()
 }
 
 // GetStorageLayoutOk returns a tuple with the StorageLayout field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *StorageProfileOneLake) GetStorageLayoutOk() (*StorageLayout, bool) {
-	if o == nil || IsNil(o.StorageLayout) {
+	if o == nil {
 		return nil, false
 	}
-	return o.StorageLayout, true
+	return o.StorageLayout.Get(), o.StorageLayout.IsSet()
 }
 
 // HasStorageLayout returns a boolean if a field has been set.
 func (o *StorageProfileOneLake) HasStorageLayout() bool {
-	if o != nil && !IsNil(o.StorageLayout) {
+	if o != nil && o.StorageLayout.IsSet() {
 		return true
 	}
 
 	return false
 }
 
-// SetStorageLayout gets a reference to the given StorageLayout and assigns it to the StorageLayout field.
+// SetStorageLayout gets a reference to the given NullableStorageLayout and assigns it to the StorageLayout field.
 func (o *StorageProfileOneLake) SetStorageLayout(v StorageLayout) {
-	o.StorageLayout = &v
+	o.StorageLayout.Set(&v)
+}
+
+// SetStorageLayoutNil sets the value for StorageLayout to be an explicit nil
+func (o *StorageProfileOneLake) SetStorageLayoutNil() {
+	o.StorageLayout.Set(nil)
+}
+
+// UnsetStorageLayout ensures that no value is present for StorageLayout, not even an explicit nil
+func (o *StorageProfileOneLake) UnsetStorageLayout() {
+	o.StorageLayout.Unset()
 }
 
 // GetTopLevelFolder returns the TopLevelFolder field value if set, zero value otherwise.
@@ -370,11 +414,11 @@ func (o StorageProfileOneLake) MarshalJSON() ([]byte, error) {
 
 func (o StorageProfileOneLake) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.AuthorityHost) {
-		toSerialize["authority-host"] = o.AuthorityHost
+	if o.AuthorityHost.IsSet() {
+		toSerialize["authority-host"] = o.AuthorityHost.Get()
 	}
-	if !IsNil(o.DirectoryRelPath) {
-		toSerialize["directory-rel-path"] = o.DirectoryRelPath
+	if o.DirectoryRelPath.IsSet() {
+		toSerialize["directory-rel-path"] = o.DirectoryRelPath.Get()
 	}
 	if !IsNil(o.EndpointMode) {
 		toSerialize["endpoint-mode"] = o.EndpointMode
@@ -383,11 +427,11 @@ func (o StorageProfileOneLake) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.SasEnabled) {
 		toSerialize["sas-enabled"] = o.SasEnabled
 	}
-	if !IsNil(o.SasTokenValiditySeconds) {
-		toSerialize["sas-token-validity-seconds"] = o.SasTokenValiditySeconds
+	if o.SasTokenValiditySeconds.IsSet() {
+		toSerialize["sas-token-validity-seconds"] = o.SasTokenValiditySeconds.Get()
 	}
-	if !IsNil(o.StorageLayout) {
-		toSerialize["storage-layout"] = o.StorageLayout
+	if o.StorageLayout.IsSet() {
+		toSerialize["storage-layout"] = o.StorageLayout.Get()
 	}
 	if !IsNil(o.TopLevelFolder) {
 		toSerialize["top-level-folder"] = o.TopLevelFolder

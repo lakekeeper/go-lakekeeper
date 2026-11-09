@@ -189,102 +189,6 @@ func (dst *ViewAssignment) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	// check if the discriminator value is 'ViewAssignmentDescribe'
-	if jsonDict["type"] == "ViewAssignmentDescribe" {
-		// try to unmarshal JSON data into ViewAssignmentDescribe
-		err = json.Unmarshal(data, &dst.ViewAssignmentDescribe)
-		if err == nil {
-			return nil // data stored in dst.ViewAssignmentDescribe, return on the first match
-		} else {
-			dst.ViewAssignmentDescribe = nil
-			return fmt.Errorf("failed to unmarshal ViewAssignment as ViewAssignmentDescribe: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'ViewAssignmentManageGrants'
-	if jsonDict["type"] == "ViewAssignmentManageGrants" {
-		// try to unmarshal JSON data into ViewAssignmentManageGrants
-		err = json.Unmarshal(data, &dst.ViewAssignmentManageGrants)
-		if err == nil {
-			return nil // data stored in dst.ViewAssignmentManageGrants, return on the first match
-		} else {
-			dst.ViewAssignmentManageGrants = nil
-			return fmt.Errorf("failed to unmarshal ViewAssignment as ViewAssignmentManageGrants: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'ViewAssignmentManageTags'
-	if jsonDict["type"] == "ViewAssignmentManageTags" {
-		// try to unmarshal JSON data into ViewAssignmentManageTags
-		err = json.Unmarshal(data, &dst.ViewAssignmentManageTags)
-		if err == nil {
-			return nil // data stored in dst.ViewAssignmentManageTags, return on the first match
-		} else {
-			dst.ViewAssignmentManageTags = nil
-			return fmt.Errorf("failed to unmarshal ViewAssignment as ViewAssignmentManageTags: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'ViewAssignmentModify'
-	if jsonDict["type"] == "ViewAssignmentModify" {
-		// try to unmarshal JSON data into ViewAssignmentModify
-		err = json.Unmarshal(data, &dst.ViewAssignmentModify)
-		if err == nil {
-			return nil // data stored in dst.ViewAssignmentModify, return on the first match
-		} else {
-			dst.ViewAssignmentModify = nil
-			return fmt.Errorf("failed to unmarshal ViewAssignment as ViewAssignmentModify: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'ViewAssignmentOwnership'
-	if jsonDict["type"] == "ViewAssignmentOwnership" {
-		// try to unmarshal JSON data into ViewAssignmentOwnership
-		err = json.Unmarshal(data, &dst.ViewAssignmentOwnership)
-		if err == nil {
-			return nil // data stored in dst.ViewAssignmentOwnership, return on the first match
-		} else {
-			dst.ViewAssignmentOwnership = nil
-			return fmt.Errorf("failed to unmarshal ViewAssignment as ViewAssignmentOwnership: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'ViewAssignmentPassGrants'
-	if jsonDict["type"] == "ViewAssignmentPassGrants" {
-		// try to unmarshal JSON data into ViewAssignmentPassGrants
-		err = json.Unmarshal(data, &dst.ViewAssignmentPassGrants)
-		if err == nil {
-			return nil // data stored in dst.ViewAssignmentPassGrants, return on the first match
-		} else {
-			dst.ViewAssignmentPassGrants = nil
-			return fmt.Errorf("failed to unmarshal ViewAssignment as ViewAssignmentPassGrants: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'ViewAssignmentSelect'
-	if jsonDict["type"] == "ViewAssignmentSelect" {
-		// try to unmarshal JSON data into ViewAssignmentSelect
-		err = json.Unmarshal(data, &dst.ViewAssignmentSelect)
-		if err == nil {
-			return nil // data stored in dst.ViewAssignmentSelect, return on the first match
-		} else {
-			dst.ViewAssignmentSelect = nil
-			return fmt.Errorf("failed to unmarshal ViewAssignment as ViewAssignmentSelect: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'ViewAssignmentWrite'
-	if jsonDict["type"] == "ViewAssignmentWrite" {
-		// try to unmarshal JSON data into ViewAssignmentWrite
-		err = json.Unmarshal(data, &dst.ViewAssignmentWrite)
-		if err == nil {
-			return nil // data stored in dst.ViewAssignmentWrite, return on the first match
-		} else {
-			dst.ViewAssignmentWrite = nil
-			return fmt.Errorf("failed to unmarshal ViewAssignment as ViewAssignmentWrite: %s", err.Error())
-		}
-	}
-
 	return nil
 }
 
@@ -360,6 +264,44 @@ func (obj *ViewAssignment) GetActualInstance() interface{} {
 
 	if obj.ViewAssignmentWrite != nil {
 		return obj.ViewAssignmentWrite
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj ViewAssignment) GetActualInstanceValue() interface{} {
+	if obj.ViewAssignmentDescribe != nil {
+		return *obj.ViewAssignmentDescribe
+	}
+
+	if obj.ViewAssignmentManageGrants != nil {
+		return *obj.ViewAssignmentManageGrants
+	}
+
+	if obj.ViewAssignmentManageTags != nil {
+		return *obj.ViewAssignmentManageTags
+	}
+
+	if obj.ViewAssignmentModify != nil {
+		return *obj.ViewAssignmentModify
+	}
+
+	if obj.ViewAssignmentOwnership != nil {
+		return *obj.ViewAssignmentOwnership
+	}
+
+	if obj.ViewAssignmentPassGrants != nil {
+		return *obj.ViewAssignmentPassGrants
+	}
+
+	if obj.ViewAssignmentSelect != nil {
+		return *obj.ViewAssignmentSelect
+	}
+
+	if obj.ViewAssignmentWrite != nil {
+		return *obj.ViewAssignmentWrite
 	}
 
 	// all schemas are nil

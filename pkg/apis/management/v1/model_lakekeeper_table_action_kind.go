@@ -309,174 +309,6 @@ func (dst *LakekeeperTableActionKind) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	// check if the discriminator value is 'LakekeeperTableActionKindCommit'
-	if jsonDict["action"] == "LakekeeperTableActionKindCommit" {
-		// try to unmarshal JSON data into LakekeeperTableActionKindCommit
-		err = json.Unmarshal(data, &dst.LakekeeperTableActionKindCommit)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperTableActionKindCommit, return on the first match
-		} else {
-			dst.LakekeeperTableActionKindCommit = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperTableActionKind as LakekeeperTableActionKindCommit: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperTableActionKindControlTasks'
-	if jsonDict["action"] == "LakekeeperTableActionKindControlTasks" {
-		// try to unmarshal JSON data into LakekeeperTableActionKindControlTasks
-		err = json.Unmarshal(data, &dst.LakekeeperTableActionKindControlTasks)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperTableActionKindControlTasks, return on the first match
-		} else {
-			dst.LakekeeperTableActionKindControlTasks = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperTableActionKind as LakekeeperTableActionKindControlTasks: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperTableActionKindDrop'
-	if jsonDict["action"] == "LakekeeperTableActionKindDrop" {
-		// try to unmarshal JSON data into LakekeeperTableActionKindDrop
-		err = json.Unmarshal(data, &dst.LakekeeperTableActionKindDrop)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperTableActionKindDrop, return on the first match
-		} else {
-			dst.LakekeeperTableActionKindDrop = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperTableActionKind as LakekeeperTableActionKindDrop: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperTableActionKindGetMetadata'
-	if jsonDict["action"] == "LakekeeperTableActionKindGetMetadata" {
-		// try to unmarshal JSON data into LakekeeperTableActionKindGetMetadata
-		err = json.Unmarshal(data, &dst.LakekeeperTableActionKindGetMetadata)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperTableActionKindGetMetadata, return on the first match
-		} else {
-			dst.LakekeeperTableActionKindGetMetadata = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperTableActionKind as LakekeeperTableActionKindGetMetadata: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperTableActionKindGetTasks'
-	if jsonDict["action"] == "LakekeeperTableActionKindGetTasks" {
-		// try to unmarshal JSON data into LakekeeperTableActionKindGetTasks
-		err = json.Unmarshal(data, &dst.LakekeeperTableActionKindGetTasks)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperTableActionKindGetTasks, return on the first match
-		} else {
-			dst.LakekeeperTableActionKindGetTasks = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperTableActionKind as LakekeeperTableActionKindGetTasks: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperTableActionKindIncludeInList'
-	if jsonDict["action"] == "LakekeeperTableActionKindIncludeInList" {
-		// try to unmarshal JSON data into LakekeeperTableActionKindIncludeInList
-		err = json.Unmarshal(data, &dst.LakekeeperTableActionKindIncludeInList)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperTableActionKindIncludeInList, return on the first match
-		} else {
-			dst.LakekeeperTableActionKindIncludeInList = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperTableActionKind as LakekeeperTableActionKindIncludeInList: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperTableActionKindManageTags'
-	if jsonDict["action"] == "LakekeeperTableActionKindManageTags" {
-		// try to unmarshal JSON data into LakekeeperTableActionKindManageTags
-		err = json.Unmarshal(data, &dst.LakekeeperTableActionKindManageTags)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperTableActionKindManageTags, return on the first match
-		} else {
-			dst.LakekeeperTableActionKindManageTags = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperTableActionKind as LakekeeperTableActionKindManageTags: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperTableActionKindMove'
-	if jsonDict["action"] == "LakekeeperTableActionKindMove" {
-		// try to unmarshal JSON data into LakekeeperTableActionKindMove
-		err = json.Unmarshal(data, &dst.LakekeeperTableActionKindMove)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperTableActionKindMove, return on the first match
-		} else {
-			dst.LakekeeperTableActionKindMove = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperTableActionKind as LakekeeperTableActionKindMove: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperTableActionKindReadData'
-	if jsonDict["action"] == "LakekeeperTableActionKindReadData" {
-		// try to unmarshal JSON data into LakekeeperTableActionKindReadData
-		err = json.Unmarshal(data, &dst.LakekeeperTableActionKindReadData)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperTableActionKindReadData, return on the first match
-		} else {
-			dst.LakekeeperTableActionKindReadData = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperTableActionKind as LakekeeperTableActionKindReadData: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperTableActionKindReadGrants'
-	if jsonDict["action"] == "LakekeeperTableActionKindReadGrants" {
-		// try to unmarshal JSON data into LakekeeperTableActionKindReadGrants
-		err = json.Unmarshal(data, &dst.LakekeeperTableActionKindReadGrants)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperTableActionKindReadGrants, return on the first match
-		} else {
-			dst.LakekeeperTableActionKindReadGrants = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperTableActionKind as LakekeeperTableActionKindReadGrants: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperTableActionKindRename'
-	if jsonDict["action"] == "LakekeeperTableActionKindRename" {
-		// try to unmarshal JSON data into LakekeeperTableActionKindRename
-		err = json.Unmarshal(data, &dst.LakekeeperTableActionKindRename)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperTableActionKindRename, return on the first match
-		} else {
-			dst.LakekeeperTableActionKindRename = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperTableActionKind as LakekeeperTableActionKindRename: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperTableActionKindSetProtection'
-	if jsonDict["action"] == "LakekeeperTableActionKindSetProtection" {
-		// try to unmarshal JSON data into LakekeeperTableActionKindSetProtection
-		err = json.Unmarshal(data, &dst.LakekeeperTableActionKindSetProtection)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperTableActionKindSetProtection, return on the first match
-		} else {
-			dst.LakekeeperTableActionKindSetProtection = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperTableActionKind as LakekeeperTableActionKindSetProtection: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperTableActionKindUndrop'
-	if jsonDict["action"] == "LakekeeperTableActionKindUndrop" {
-		// try to unmarshal JSON data into LakekeeperTableActionKindUndrop
-		err = json.Unmarshal(data, &dst.LakekeeperTableActionKindUndrop)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperTableActionKindUndrop, return on the first match
-		} else {
-			dst.LakekeeperTableActionKindUndrop = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperTableActionKind as LakekeeperTableActionKindUndrop: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'LakekeeperTableActionKindWriteData'
-	if jsonDict["action"] == "LakekeeperTableActionKindWriteData" {
-		// try to unmarshal JSON data into LakekeeperTableActionKindWriteData
-		err = json.Unmarshal(data, &dst.LakekeeperTableActionKindWriteData)
-		if err == nil {
-			return nil // data stored in dst.LakekeeperTableActionKindWriteData, return on the first match
-		} else {
-			dst.LakekeeperTableActionKindWriteData = nil
-			return fmt.Errorf("failed to unmarshal LakekeeperTableActionKind as LakekeeperTableActionKindWriteData: %s", err.Error())
-		}
-	}
-
 	return nil
 }
 
@@ -600,6 +432,68 @@ func (obj *LakekeeperTableActionKind) GetActualInstance() interface{} {
 
 	if obj.LakekeeperTableActionKindWriteData != nil {
 		return obj.LakekeeperTableActionKindWriteData
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj LakekeeperTableActionKind) GetActualInstanceValue() interface{} {
+	if obj.LakekeeperTableActionKindCommit != nil {
+		return *obj.LakekeeperTableActionKindCommit
+	}
+
+	if obj.LakekeeperTableActionKindControlTasks != nil {
+		return *obj.LakekeeperTableActionKindControlTasks
+	}
+
+	if obj.LakekeeperTableActionKindDrop != nil {
+		return *obj.LakekeeperTableActionKindDrop
+	}
+
+	if obj.LakekeeperTableActionKindGetMetadata != nil {
+		return *obj.LakekeeperTableActionKindGetMetadata
+	}
+
+	if obj.LakekeeperTableActionKindGetTasks != nil {
+		return *obj.LakekeeperTableActionKindGetTasks
+	}
+
+	if obj.LakekeeperTableActionKindIncludeInList != nil {
+		return *obj.LakekeeperTableActionKindIncludeInList
+	}
+
+	if obj.LakekeeperTableActionKindManageTags != nil {
+		return *obj.LakekeeperTableActionKindManageTags
+	}
+
+	if obj.LakekeeperTableActionKindMove != nil {
+		return *obj.LakekeeperTableActionKindMove
+	}
+
+	if obj.LakekeeperTableActionKindReadData != nil {
+		return *obj.LakekeeperTableActionKindReadData
+	}
+
+	if obj.LakekeeperTableActionKindReadGrants != nil {
+		return *obj.LakekeeperTableActionKindReadGrants
+	}
+
+	if obj.LakekeeperTableActionKindRename != nil {
+		return *obj.LakekeeperTableActionKindRename
+	}
+
+	if obj.LakekeeperTableActionKindSetProtection != nil {
+		return *obj.LakekeeperTableActionKindSetProtection
+	}
+
+	if obj.LakekeeperTableActionKindUndrop != nil {
+		return *obj.LakekeeperTableActionKindUndrop
+	}
+
+	if obj.LakekeeperTableActionKindWriteData != nil {
+		return *obj.LakekeeperTableActionKindWriteData
 	}
 
 	// all schemas are nil

@@ -23,8 +23,8 @@ var _ MappedNullable = &LakekeeperNamespaceActionCreateTable{}
 type LakekeeperNamespaceActionCreateTable struct {
 	Action string `json:"action"`
 	// Name of the table to create.
-	Name       NullableString    `json:"name,omitempty"`
-	Properties map[string]string `json:"properties,omitempty"`
+	Name       NullableString     `json:"name,omitempty"`
+	Properties *map[string]string `json:"properties,omitempty"`
 	// Table ID, if externally provided (e.g. via register).
 	TableId NullableString `json:"table_id,omitempty"`
 }
@@ -122,14 +122,14 @@ func (o *LakekeeperNamespaceActionCreateTable) GetProperties() map[string]string
 		var ret map[string]string
 		return ret
 	}
-	return o.Properties
+	return *o.Properties
 }
 
 // GetPropertiesOk returns a tuple with the Properties field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *LakekeeperNamespaceActionCreateTable) GetPropertiesOk() (map[string]string, bool) {
+func (o *LakekeeperNamespaceActionCreateTable) GetPropertiesOk() (*map[string]string, bool) {
 	if o == nil || IsNil(o.Properties) {
-		return map[string]string{}, false
+		return nil, false
 	}
 	return o.Properties, true
 }
@@ -145,7 +145,7 @@ func (o *LakekeeperNamespaceActionCreateTable) HasProperties() bool {
 
 // SetProperties gets a reference to the given map[string]string and assigns it to the Properties field.
 func (o *LakekeeperNamespaceActionCreateTable) SetProperties(v map[string]string) {
-	o.Properties = v
+	o.Properties = &v
 }
 
 // GetTableId returns the TableId field value if set, zero value otherwise (both if not set or set to explicit null).

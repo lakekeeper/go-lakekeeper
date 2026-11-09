@@ -189,102 +189,6 @@ func (dst *GrantResourceResponse) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	// check if the discriminator value is 'GrantResourceGenericTable'
-	if jsonDict["type"] == "GrantResourceGenericTable" {
-		// try to unmarshal JSON data into GrantResourceGenericTable
-		err = json.Unmarshal(data, &dst.GrantResourceGenericTable)
-		if err == nil {
-			return nil // data stored in dst.GrantResourceGenericTable, return on the first match
-		} else {
-			dst.GrantResourceGenericTable = nil
-			return fmt.Errorf("failed to unmarshal GrantResourceResponse as GrantResourceGenericTable: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'GrantResourceNamespace'
-	if jsonDict["type"] == "GrantResourceNamespace" {
-		// try to unmarshal JSON data into GrantResourceNamespace
-		err = json.Unmarshal(data, &dst.GrantResourceNamespace)
-		if err == nil {
-			return nil // data stored in dst.GrantResourceNamespace, return on the first match
-		} else {
-			dst.GrantResourceNamespace = nil
-			return fmt.Errorf("failed to unmarshal GrantResourceResponse as GrantResourceNamespace: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'GrantResourceProject'
-	if jsonDict["type"] == "GrantResourceProject" {
-		// try to unmarshal JSON data into GrantResourceProject
-		err = json.Unmarshal(data, &dst.GrantResourceProject)
-		if err == nil {
-			return nil // data stored in dst.GrantResourceProject, return on the first match
-		} else {
-			dst.GrantResourceProject = nil
-			return fmt.Errorf("failed to unmarshal GrantResourceResponse as GrantResourceProject: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'GrantResourceServer'
-	if jsonDict["type"] == "GrantResourceServer" {
-		// try to unmarshal JSON data into GrantResourceServer
-		err = json.Unmarshal(data, &dst.GrantResourceServer)
-		if err == nil {
-			return nil // data stored in dst.GrantResourceServer, return on the first match
-		} else {
-			dst.GrantResourceServer = nil
-			return fmt.Errorf("failed to unmarshal GrantResourceResponse as GrantResourceServer: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'GrantResourceTable'
-	if jsonDict["type"] == "GrantResourceTable" {
-		// try to unmarshal JSON data into GrantResourceTable
-		err = json.Unmarshal(data, &dst.GrantResourceTable)
-		if err == nil {
-			return nil // data stored in dst.GrantResourceTable, return on the first match
-		} else {
-			dst.GrantResourceTable = nil
-			return fmt.Errorf("failed to unmarshal GrantResourceResponse as GrantResourceTable: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'GrantResourceTag'
-	if jsonDict["type"] == "GrantResourceTag" {
-		// try to unmarshal JSON data into GrantResourceTag
-		err = json.Unmarshal(data, &dst.GrantResourceTag)
-		if err == nil {
-			return nil // data stored in dst.GrantResourceTag, return on the first match
-		} else {
-			dst.GrantResourceTag = nil
-			return fmt.Errorf("failed to unmarshal GrantResourceResponse as GrantResourceTag: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'GrantResourceView'
-	if jsonDict["type"] == "GrantResourceView" {
-		// try to unmarshal JSON data into GrantResourceView
-		err = json.Unmarshal(data, &dst.GrantResourceView)
-		if err == nil {
-			return nil // data stored in dst.GrantResourceView, return on the first match
-		} else {
-			dst.GrantResourceView = nil
-			return fmt.Errorf("failed to unmarshal GrantResourceResponse as GrantResourceView: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'GrantResourceWarehouse'
-	if jsonDict["type"] == "GrantResourceWarehouse" {
-		// try to unmarshal JSON data into GrantResourceWarehouse
-		err = json.Unmarshal(data, &dst.GrantResourceWarehouse)
-		if err == nil {
-			return nil // data stored in dst.GrantResourceWarehouse, return on the first match
-		} else {
-			dst.GrantResourceWarehouse = nil
-			return fmt.Errorf("failed to unmarshal GrantResourceResponse as GrantResourceWarehouse: %s", err.Error())
-		}
-	}
-
 	return nil
 }
 
@@ -360,6 +264,44 @@ func (obj *GrantResourceResponse) GetActualInstance() interface{} {
 
 	if obj.GrantResourceWarehouse != nil {
 		return obj.GrantResourceWarehouse
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj GrantResourceResponse) GetActualInstanceValue() interface{} {
+	if obj.GrantResourceGenericTable != nil {
+		return *obj.GrantResourceGenericTable
+	}
+
+	if obj.GrantResourceNamespace != nil {
+		return *obj.GrantResourceNamespace
+	}
+
+	if obj.GrantResourceProject != nil {
+		return *obj.GrantResourceProject
+	}
+
+	if obj.GrantResourceServer != nil {
+		return *obj.GrantResourceServer
+	}
+
+	if obj.GrantResourceTable != nil {
+		return *obj.GrantResourceTable
+	}
+
+	if obj.GrantResourceTag != nil {
+		return *obj.GrantResourceTag
+	}
+
+	if obj.GrantResourceView != nil {
+		return *obj.GrantResourceView
+	}
+
+	if obj.GrantResourceWarehouse != nil {
+		return *obj.GrantResourceWarehouse
 	}
 
 	// all schemas are nil

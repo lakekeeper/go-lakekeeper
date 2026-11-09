@@ -209,114 +209,6 @@ func (dst *NamespaceAssignment) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	// check if the discriminator value is 'NamespaceAssignmentCreate'
-	if jsonDict["type"] == "NamespaceAssignmentCreate" {
-		// try to unmarshal JSON data into NamespaceAssignmentCreate
-		err = json.Unmarshal(data, &dst.NamespaceAssignmentCreate)
-		if err == nil {
-			return nil // data stored in dst.NamespaceAssignmentCreate, return on the first match
-		} else {
-			dst.NamespaceAssignmentCreate = nil
-			return fmt.Errorf("failed to unmarshal NamespaceAssignment as NamespaceAssignmentCreate: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'NamespaceAssignmentDescribe'
-	if jsonDict["type"] == "NamespaceAssignmentDescribe" {
-		// try to unmarshal JSON data into NamespaceAssignmentDescribe
-		err = json.Unmarshal(data, &dst.NamespaceAssignmentDescribe)
-		if err == nil {
-			return nil // data stored in dst.NamespaceAssignmentDescribe, return on the first match
-		} else {
-			dst.NamespaceAssignmentDescribe = nil
-			return fmt.Errorf("failed to unmarshal NamespaceAssignment as NamespaceAssignmentDescribe: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'NamespaceAssignmentManageGrants'
-	if jsonDict["type"] == "NamespaceAssignmentManageGrants" {
-		// try to unmarshal JSON data into NamespaceAssignmentManageGrants
-		err = json.Unmarshal(data, &dst.NamespaceAssignmentManageGrants)
-		if err == nil {
-			return nil // data stored in dst.NamespaceAssignmentManageGrants, return on the first match
-		} else {
-			dst.NamespaceAssignmentManageGrants = nil
-			return fmt.Errorf("failed to unmarshal NamespaceAssignment as NamespaceAssignmentManageGrants: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'NamespaceAssignmentManageTags'
-	if jsonDict["type"] == "NamespaceAssignmentManageTags" {
-		// try to unmarshal JSON data into NamespaceAssignmentManageTags
-		err = json.Unmarshal(data, &dst.NamespaceAssignmentManageTags)
-		if err == nil {
-			return nil // data stored in dst.NamespaceAssignmentManageTags, return on the first match
-		} else {
-			dst.NamespaceAssignmentManageTags = nil
-			return fmt.Errorf("failed to unmarshal NamespaceAssignment as NamespaceAssignmentManageTags: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'NamespaceAssignmentModify'
-	if jsonDict["type"] == "NamespaceAssignmentModify" {
-		// try to unmarshal JSON data into NamespaceAssignmentModify
-		err = json.Unmarshal(data, &dst.NamespaceAssignmentModify)
-		if err == nil {
-			return nil // data stored in dst.NamespaceAssignmentModify, return on the first match
-		} else {
-			dst.NamespaceAssignmentModify = nil
-			return fmt.Errorf("failed to unmarshal NamespaceAssignment as NamespaceAssignmentModify: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'NamespaceAssignmentOwnership'
-	if jsonDict["type"] == "NamespaceAssignmentOwnership" {
-		// try to unmarshal JSON data into NamespaceAssignmentOwnership
-		err = json.Unmarshal(data, &dst.NamespaceAssignmentOwnership)
-		if err == nil {
-			return nil // data stored in dst.NamespaceAssignmentOwnership, return on the first match
-		} else {
-			dst.NamespaceAssignmentOwnership = nil
-			return fmt.Errorf("failed to unmarshal NamespaceAssignment as NamespaceAssignmentOwnership: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'NamespaceAssignmentPassGrants'
-	if jsonDict["type"] == "NamespaceAssignmentPassGrants" {
-		// try to unmarshal JSON data into NamespaceAssignmentPassGrants
-		err = json.Unmarshal(data, &dst.NamespaceAssignmentPassGrants)
-		if err == nil {
-			return nil // data stored in dst.NamespaceAssignmentPassGrants, return on the first match
-		} else {
-			dst.NamespaceAssignmentPassGrants = nil
-			return fmt.Errorf("failed to unmarshal NamespaceAssignment as NamespaceAssignmentPassGrants: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'NamespaceAssignmentSelect'
-	if jsonDict["type"] == "NamespaceAssignmentSelect" {
-		// try to unmarshal JSON data into NamespaceAssignmentSelect
-		err = json.Unmarshal(data, &dst.NamespaceAssignmentSelect)
-		if err == nil {
-			return nil // data stored in dst.NamespaceAssignmentSelect, return on the first match
-		} else {
-			dst.NamespaceAssignmentSelect = nil
-			return fmt.Errorf("failed to unmarshal NamespaceAssignment as NamespaceAssignmentSelect: %s", err.Error())
-		}
-	}
-
-	// check if the discriminator value is 'NamespaceAssignmentWrite'
-	if jsonDict["type"] == "NamespaceAssignmentWrite" {
-		// try to unmarshal JSON data into NamespaceAssignmentWrite
-		err = json.Unmarshal(data, &dst.NamespaceAssignmentWrite)
-		if err == nil {
-			return nil // data stored in dst.NamespaceAssignmentWrite, return on the first match
-		} else {
-			dst.NamespaceAssignmentWrite = nil
-			return fmt.Errorf("failed to unmarshal NamespaceAssignment as NamespaceAssignmentWrite: %s", err.Error())
-		}
-	}
-
 	return nil
 }
 
@@ -400,6 +292,48 @@ func (obj *NamespaceAssignment) GetActualInstance() interface{} {
 
 	if obj.NamespaceAssignmentWrite != nil {
 		return obj.NamespaceAssignmentWrite
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj NamespaceAssignment) GetActualInstanceValue() interface{} {
+	if obj.NamespaceAssignmentCreate != nil {
+		return *obj.NamespaceAssignmentCreate
+	}
+
+	if obj.NamespaceAssignmentDescribe != nil {
+		return *obj.NamespaceAssignmentDescribe
+	}
+
+	if obj.NamespaceAssignmentManageGrants != nil {
+		return *obj.NamespaceAssignmentManageGrants
+	}
+
+	if obj.NamespaceAssignmentManageTags != nil {
+		return *obj.NamespaceAssignmentManageTags
+	}
+
+	if obj.NamespaceAssignmentModify != nil {
+		return *obj.NamespaceAssignmentModify
+	}
+
+	if obj.NamespaceAssignmentOwnership != nil {
+		return *obj.NamespaceAssignmentOwnership
+	}
+
+	if obj.NamespaceAssignmentPassGrants != nil {
+		return *obj.NamespaceAssignmentPassGrants
+	}
+
+	if obj.NamespaceAssignmentSelect != nil {
+		return *obj.NamespaceAssignmentSelect
+	}
+
+	if obj.NamespaceAssignmentWrite != nil {
+		return *obj.NamespaceAssignmentWrite
 	}
 
 	// all schemas are nil

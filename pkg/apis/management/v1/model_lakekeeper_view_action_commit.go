@@ -21,9 +21,9 @@ var _ MappedNullable = &LakekeeperViewActionCommit{}
 
 // LakekeeperViewActionCommit struct for LakekeeperViewActionCommit
 type LakekeeperViewActionCommit struct {
-	Action            string            `json:"action"`
-	RemovedProperties []string          `json:"removed_properties,omitempty"`
-	UpdatedProperties map[string]string `json:"updated_properties,omitempty"`
+	Action            string             `json:"action"`
+	RemovedProperties []string           `json:"removed_properties,omitempty"`
+	UpdatedProperties *map[string]string `json:"updated_properties,omitempty"`
 }
 
 type _LakekeeperViewActionCommit LakekeeperViewActionCommit
@@ -108,14 +108,14 @@ func (o *LakekeeperViewActionCommit) GetUpdatedProperties() map[string]string {
 		var ret map[string]string
 		return ret
 	}
-	return o.UpdatedProperties
+	return *o.UpdatedProperties
 }
 
 // GetUpdatedPropertiesOk returns a tuple with the UpdatedProperties field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *LakekeeperViewActionCommit) GetUpdatedPropertiesOk() (map[string]string, bool) {
+func (o *LakekeeperViewActionCommit) GetUpdatedPropertiesOk() (*map[string]string, bool) {
 	if o == nil || IsNil(o.UpdatedProperties) {
-		return map[string]string{}, false
+		return nil, false
 	}
 	return o.UpdatedProperties, true
 }
@@ -131,7 +131,7 @@ func (o *LakekeeperViewActionCommit) HasUpdatedProperties() bool {
 
 // SetUpdatedProperties gets a reference to the given map[string]string and assigns it to the UpdatedProperties field.
 func (o *LakekeeperViewActionCommit) SetUpdatedProperties(v map[string]string) {
-	o.UpdatedProperties = v
+	o.UpdatedProperties = &v
 }
 
 func (o LakekeeperViewActionCommit) MarshalJSON() ([]byte, error) {
