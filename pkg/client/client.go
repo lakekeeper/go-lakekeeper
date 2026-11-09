@@ -156,7 +156,7 @@ func (c *Client) runBootstrap(ctx context.Context, s settings) error {
 	if err != nil {
 		return err
 	}
-	if info != nil && info.Bootstrapped {
+	if info.GetBootstrapped() {
 		return nil
 	}
 

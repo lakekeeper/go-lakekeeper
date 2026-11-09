@@ -138,15 +138,16 @@ Key points:
 ## Bootstrap Flow
 
 When `WithInitialBootstrap(true, isOperator, userType)` is passed to
-`NewWithAuthSource`, the client calls `ServerAPI.GetServerInfo` during
-construction; if the server reports `bootstrapped: false`, it then calls
-`ServerAPI.Bootstrap` automatically. This happens at most once per client
-instance (see [`pkg/client/client.go`](../pkg/client/client.go) →
-`runBootstrap`).
+`NewWithAuthSource`, the client calls the server façade's `Server.Info`
+during construction; if the server reports `bootstrapped: false`, it then
+calls `Server.Bootstrap` automatically. An already bootstrapped server is
+left alone. This happens at most once per client instance (see
+[`pkg/client/client.go`](../pkg/client/client.go) → `runBootstrap`), and a
+failure fails construction with the façade's `*client.APIError`.
 
 If the first argument is `false` (the user did not accept the terms of
-use), the option is a no-op — the constructor never calls
-`GetServerInfo` or `Bootstrap`.
+use), the option is a no-op — the constructor never calls `Info` or
+`Bootstrap`.
 
 ## Project Scoping
 

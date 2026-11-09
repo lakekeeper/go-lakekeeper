@@ -44,9 +44,9 @@ func newServerInfoCmd(opts *clientOptions) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			info, _, err := c.ServerAPI.GetServerInfo(ctx).Execute()
+			info, err := c.Server.Info(ctx)
 			if err != nil {
-				return client.WrapAPIError("get server info", err, nil)
+				return err
 			}
 
 			switch output {
@@ -87,17 +87,17 @@ func newServerBootstrapCmd(opts *clientOptions) *cobra.Command {
 			}
 
 			req := managementv1.NewBootstrapRequest(acceptTermsOfUse)
-			req.IsOperator = &asOperator
+			req.SetIsOperator(asOperator)
 
-			if _, err := c.ServerAPI.Bootstrap(ctx).BootstrapRequest(*req).Execute(); err != nil {
-				return client.WrapAPIError("bootstrap", err, nil)
+			if err := c.Server.Bootstrap(ctx, req); err != nil {
+				return err
 			}
 
 			switch output {
 			case "json":
-				info, _, err := c.ServerAPI.GetServerInfo(ctx).Execute()
+				info, err := c.Server.Info(ctx)
 				if err != nil {
-					return client.WrapAPIError("get server info", err, nil)
+					return err
 				}
 				return printJSON(cmd.OutOrStdout(), info)
 			case "text":
@@ -291,17 +291,17 @@ func newServerRevokeCmd(opts *clientOptions) *cobra.Command {
 }
 
 func printServerInfo(w io.Writer, info *managementv1.ServerInfo) error {
-	fmt.Fprintf(w, "ID: %s\n", info.ServerId)
-	fmt.Fprintf(w, "Version: %s\n", info.Version)
+	fmt.Fprintf(w, "ID: %s\n", info.GetServerId())
+	fmt.Fprintf(w, "Version: %s\n", info.GetVersion())
 	fmt.Fprintf(w, "Lakekeeper Version: %s\n", info.GetLakekeeperVersion())
-	fmt.Fprintf(w, "Default Project ID: %s\n", formatStringPtr(info.DefaultProjectId.Get()))
-	fmt.Fprintf(w, "Bootstrapped: %t\n", info.Bootstrapped)
-	fmt.Fprintf(w, "Authorization Backend: %s\n", info.AuthzBackend)
-	fmt.Fprintf(w, "AWS System Identities Enabled: %t\n", info.AwsSystemIdentitiesEnabled)
-	fmt.Fprintf(w, "Azure System Identities Enabled: %t\n", info.AzureSystemIdentitiesEnabled)
-	fmt.Fprintf(w, "GCP System Identities Enabled: %t\n", info.GcpSystemIdentitiesEnabled)
+	fmt.Fprintf(w, "Default Project ID: %s\n", info.GetDefaultProjectId())
+	fmt.Fprintf(w, "Bootstrapped: %t\n", info.GetBootstrapped())
+	fmt.Fprintf(w, "Authorization Backend: %s\n", info.GetAuthzBackend())
+	fmt.Fprintf(w, "AWS System Identities Enabled: %t\n", info.GetAwsSystemIdentitiesEnabled())
+	fmt.Fprintf(w, "Azure System Identities Enabled: %t\n", info.GetAzureSystemIdentitiesEnabled())
+	fmt.Fprintf(w, "GCP System Identities Enabled: %t\n", info.GetGcpSystemIdentitiesEnabled())
 	fmt.Fprintln(w, "Queues:")
-	for _, q := range info.Queues {
+	for _, q := range info.GetQueues() {
 		fmt.Fprintf(w, "  %s\n", q)
 	}
 	return nil

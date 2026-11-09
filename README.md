@@ -115,17 +115,19 @@ func main() {
         log.Fatalf("create client: %v", err)
     }
 
-    info, _, err := c.ServerAPI.GetServerInfo(ctx).Execute()
+    info, err := c.Server.Info(ctx)
     if err != nil {
         log.Fatalf("server info: %v", err)
     }
-    log.Printf("connected to lakekeeper %s", info.Version)
+    log.Printf("connected to lakekeeper %s", info.GetVersion())
 }
 ```
 
-The generated services are exposed as fields on `*client.Client`:
-`c.ServerAPI`, `c.ProjectAPI`, `c.WarehouseAPI`, `c.RoleAPI`, `c.UserAPI`,
-`c.PermissionsOpenfgaAPI`, etc. See
+Resource façades on `*client.Client` (`c.Server`, `c.Projects`,
+`c.Warehouses`, `c.Roles`, `c.Users`, `c.Permissions`) cover the common
+operations in one call each. The generated services stay exposed as fields
+(`c.ServerAPI`, `c.ProjectAPI`, `c.WarehouseAPI`, `c.TasksAPI`, etc.) for
+everything else. See
 [docs/PACKAGES.md](docs/PACKAGES.md) for the full surface and
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how requests flow
 end-to-end.

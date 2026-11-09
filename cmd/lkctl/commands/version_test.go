@@ -1,10 +1,14 @@
 package commands
 
 import (
+	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
+	"github.com/lakekeeper/go-lakekeeper/pkg/client"
+	"github.com/lakekeeper/go-lakekeeper/pkg/testutil"
 	"github.com/lakekeeper/go-lakekeeper/pkg/version"
 )
 
@@ -60,4 +64,29 @@ func TestPrintClientVersionLongOmitsEmptyGitTag(t *testing.T) {
 	}
 	got := printClientVersion(&v, false)
 	assert.NotContains(t, got, "GitTag")
+}
+
+func TestVersion_PrintsServerVersion(t *testing.T) {
+	t.Parallel()
+	mux, baseURL := testutil.NewServer(t)
+	testutil.Respond(t, mux, "GET /management/v1/info", http.StatusOK, serverTestInfoBody)
+
+	out, err := runLkctl(t, baseURL, "version", "-o", "json", "--short")
+
+	require.NoError(t, err)
+	assert.Contains(t, out, `"lakekeeper": "0.15.0"`)
+}
+
+func TestVersion_ServerErrorKeepsStatus(t *testing.T) {
+	t.Parallel()
+	mux, baseURL := testutil.NewServer(t)
+	testutil.Respond(t, mux, "GET /management/v1/info", http.StatusForbidden,
+		`{"error":{"code":403,"message":"Forbidden","type":"NotAuthorized","stack":[]}}`)
+
+	_, err := runLkctl(t, baseURL, "version")
+
+	require.ErrorContains(t, err, "get server info: 403 Forbidden")
+	var apiErr *client.APIError
+	require.ErrorAs(t, err, &apiErr)
+	assert.Equal(t, http.StatusForbidden, apiErr.StatusCode)
 }
