@@ -17,13 +17,13 @@ package profile
 
 import managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
 
-// Discriminator string values for the StorageProfile oneOf, taken from the
-// spec. Kept here so callers don't need to remember the magic strings, and so
-// a regen that changes them surfaces as a build-time mismatch.
+// Discriminator values of the StorageProfile oneOf (the "type" field), taken
+// from the spec. Exported so callers can switch on a profile's type without
+// repeating the strings.
 const (
-	typeS3   = "s3"
-	typeGCS  = "gcs"
-	typeADLS = "adls"
+	StorageProfileTypeS3   = "s3"
+	StorageProfileTypeGCS  = "gcs"
+	StorageProfileTypeADLS = "adls"
 )
 
 // ptrTo is a small helper used internally to take the address of a literal.

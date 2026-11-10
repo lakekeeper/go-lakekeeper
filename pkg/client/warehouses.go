@@ -104,6 +104,21 @@ func (w *Warehouses) SetProtection(ctx context.Context, id string, req *manageme
 	return entityResult(op, out, resp, err)
 }
 
+// UpdateDeleteProfile sets what happens to the warehouse's tables and views
+// when they are dropped, and returns the updated warehouse. Build the profile
+// with profile.NewHardDeleteProfile or profile.NewSoftDeleteProfile:
+//
+//	req := managementv1.NewUpdateWarehouseDeleteProfileRequest(profile.NewSoftDeleteProfile(24 * time.Hour))
+//	wh, err := c.Warehouses.UpdateDeleteProfile(ctx, id, req)
+func (w *Warehouses) UpdateDeleteProfile(ctx context.Context, id string, req *managementv1.UpdateWarehouseDeleteProfileRequest) (*managementv1.GetWarehouseResponse, error) {
+	const op = "update warehouse delete profile"
+	if req == nil {
+		return nil, errors.New(op + ": request must not be nil")
+	}
+	out, resp, err := w.api.UpdateWarehouseDeleteProfile(ctx, id).UpdateWarehouseDeleteProfileRequest(*req).Execute()
+	return entityResult(op, out, resp, err)
+}
+
 // GetWarehouseStatisticsOptions holds the query parameters of
 // Warehouses.Statistics. A nil pointer or a zero field sends nothing for that
 // parameter.

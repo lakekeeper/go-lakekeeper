@@ -27,13 +27,22 @@ const (
 	PrincipalRole
 )
 
+// Wire-format principal types: the values of AssignmentRow.PrincipalType, and
+// the JSON key ("user" or "role") that carries the principal id in an
+// assignment. PrincipalKind is the typed counterpart for BuildAssignment.
+const (
+	PrincipalTypeUser = "user"
+	PrincipalTypeRole = "role"
+)
+
 // AssignmentRow is the flattened, principal-agnostic projection of a single
 // permission assignment.
 type AssignmentRow struct {
-	// PrincipalType is the wire-format principal kind ("user" or "role"),
-	// lowercase. Display layers (e.g. lkctl's table printer) capitalize as
-	// needed; do not capitalize here so equality checks against the wire
-	// value stay direct in tests using assert.ElementsMatch.
+	// PrincipalType is the wire-format principal kind, PrincipalTypeUser
+	// ("user") or PrincipalTypeRole ("role"), lowercase. Display layers
+	// (e.g. lkctl's table printer) capitalize as needed; do not capitalize
+	// here so equality checks against the wire value stay direct in tests
+	// using assert.ElementsMatch.
 	PrincipalType string
 	PrincipalID   string
 	Relation      string
@@ -56,9 +65,9 @@ func BuildAssignment[T any](relation string, kind PrincipalKind, id string) (T, 
 	payload := map[string]string{"type": relation}
 	switch kind {
 	case PrincipalUser:
-		payload["user"] = id
+		payload[PrincipalTypeUser] = id
 	case PrincipalRole:
-		payload["role"] = id
+		payload[PrincipalTypeRole] = id
 	default:
 		return zero, fmt.Errorf("unknown principal kind %d", kind)
 	}
@@ -151,10 +160,10 @@ func DescribeAssignment(a any) (AssignmentRow, bool) {
 	row := AssignmentRow{Relation: raw.Type}
 	switch {
 	case raw.User != "":
-		row.PrincipalType = "user"
+		row.PrincipalType = PrincipalTypeUser
 		row.PrincipalID = raw.User
 	case raw.Role != "":
-		row.PrincipalType = "role"
+		row.PrincipalType = PrincipalTypeRole
 		row.PrincipalID = raw.Role
 	}
 	return row, true

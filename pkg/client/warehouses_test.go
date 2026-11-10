@@ -11,6 +11,7 @@ import (
 
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
 	"github.com/lakekeeper/go-lakekeeper/pkg/client"
+	"github.com/lakekeeper/go-lakekeeper/pkg/storage/profile"
 	"github.com/lakekeeper/go-lakekeeper/pkg/testutil"
 )
 
@@ -27,6 +28,9 @@ func TestWarehouses_NilRequestsRejected(t *testing.T) {
 	require.ErrorContains(t, err, "request must not be nil")
 
 	_, err = c.Warehouses.SetProtection(t.Context(), "id", nil)
+	require.ErrorContains(t, err, "request must not be nil")
+
+	_, err = c.Warehouses.UpdateDeleteProfile(t.Context(), "id", nil)
 	require.ErrorContains(t, err, "request must not be nil")
 }
 
@@ -269,6 +273,37 @@ func TestWarehouses_SetProtection_SendsFlagAndReturnsState(t *testing.T) {
 	assert.Equal(t, map[string]any{"protected": true}, decodeWarehouseRequestBody(t, sent))
 	assert.True(t, got.GetProtected())
 	assert.Equal(t, "2026-05-04T10:00:00Z", got.GetUpdatedAt().UTC().Format(time.RFC3339))
+}
+
+func TestWarehouses_UpdateDeleteProfile_SendsProfileAndReturnsWarehouse(t *testing.T) {
+	t.Parallel()
+	mux, c := testutil.ServerMux(t)
+	reqs := testutil.Respond(t, mux, "POST /management/v1/warehouse/{id}/delete-profile", http.StatusOK, warehouseBody)
+
+	got, err := c.Warehouses.UpdateDeleteProfile(t.Context(), warehouseID,
+		managementv1.NewUpdateWarehouseDeleteProfileRequest(profile.NewSoftDeleteProfile(time.Hour)))
+
+	require.NoError(t, err)
+	sent := reqs.Last(t)
+	assert.Equal(t, "/management/v1/warehouse/"+warehouseID+"/delete-profile", sent.Path)
+	assert.Equal(t, map[string]any{"delete-profile": map[string]any{"type": "soft", "expiration-seconds": float64(3600)}},
+		decodeWarehouseRequestBody(t, sent))
+	assert.Equal(t, "test-wh", got.GetName())
+}
+
+func TestWarehouses_UpdateDeleteProfile_ServerErrorIsAPIError(t *testing.T) {
+	t.Parallel()
+	mux, c := testutil.ServerMux(t)
+	testutil.Respond(t, mux, "POST /management/v1/warehouse/{id}/delete-profile", http.StatusBadRequest,
+		`{"error":{"code":400,"message":"invalid expiration","type":"BadRequest","stack":[]}}`)
+
+	_, err := c.Warehouses.UpdateDeleteProfile(t.Context(), warehouseID,
+		managementv1.NewUpdateWarehouseDeleteProfileRequest(profile.NewHardDeleteProfile()))
+
+	require.ErrorContains(t, err, "update warehouse delete profile: 400 Bad Request")
+	var apiErr *client.APIError
+	require.ErrorAs(t, err, &apiErr)
+	assert.Equal(t, http.StatusBadRequest, apiErr.StatusCode)
 }
 
 const warehouseStatisticsBody = `{

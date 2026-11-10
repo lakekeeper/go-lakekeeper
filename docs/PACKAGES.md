@@ -111,9 +111,12 @@ wh, err := c.Warehouses.Create(ctx, req, lakekeeper.WithProject(projectID))
 
 What it re-exports:
 - `Client`, `Option`, and every constructor from [`pkg/client`](#pkgclient).
-- All profile and credential builders from `pkg/storage/{profile,credential}`.
+- All storage profile, delete profile and credential builders from
+  `pkg/storage/{profile,credential}`, and the profiles' discriminator
+  constants (`StorageProfileTypeS3`, `DeleteProfileTypeSoft`, …).
 - Permission helpers (`PrincipalSet`, `BuildAssignment`,
-  `BuildAssignmentSet`, `DescribeAssignment`).
+  `BuildAssignmentSet`, `DescribeAssignment`) and the principal constants
+  (`PrincipalUser`, `PrincipalTypeUser`, …).
 - Common request and response types — `Warehouse`, `Project`, `Role`,
   `User`, `CreateWarehouseRequest`, `*Assignment` family, etc. — as
   identity-preserving aliases. Values flow between the umbrella and the
@@ -173,7 +176,7 @@ generator's `(value, *http.Response, error)` triple.
 
 | Field | Purpose |
 |---|---|
-| `c.Warehouses` | Create and List (project-scoped); Get / Rename / Activate / Deactivate / SetProtection / Statistics / Delete (by warehouse id) |
+| `c.Warehouses` | Create and List (project-scoped); Get / Rename / Activate / Deactivate / SetProtection / UpdateDeleteProfile / Statistics / Delete (by warehouse id) |
 | `c.Projects` | Create / Get / Delete / List / Rename (Get and Rename act on the `WithProject` project, else the server's default project; Delete requires `WithProject`) |
 | `c.Roles` | Create / Get / Delete / List / Update / Search (project-scoped; `List` takes `client.ListRolesOptions` for paging) |
 | `c.Users` | Create / Get / Delete / List (paged, server-side name filter) / Update / Whoami; not project-scoped |
@@ -194,7 +197,7 @@ reachable only through the [embedded generated
 services](#escape-hatch-embedded-generated-services): tags, tasks, grants,
 authorization checks, namespace and tabular protections, warehouse managed
 access, and the less common warehouse operations (storage credential and
-profile updates, delete profile, undrop, tabular search, …). For those, custom request
+profile updates, undrop, tabular search, …). For those, custom request
 options, or the raw `*http.Response`, use the escape hatch.
 
 ### Façade conventions
@@ -575,7 +578,8 @@ hard-code which discriminator branch each relation belongs to.
 
 | Symbol | Description |
 |---|---|
-| `PrincipalKind` (constants `PrincipalUser`, `PrincipalRole`) | Wire-format principal discriminator |
+| `PrincipalKind` (constants `PrincipalUser`, `PrincipalRole`) | Principal kind passed to `BuildAssignment` |
+| `PrincipalTypeUser`, `PrincipalTypeRole` | Wire-format principal types (`"user"`, `"role"`): the values of `AssignmentRow.PrincipalType` |
 | `PrincipalSet` | `{Users []string; Roles []string}` for multi-relation grant/revoke |
 | `AssignmentRow` | Flattened `{PrincipalType, PrincipalID, Relation}` projection used by display layers |
 | `BuildAssignment[T any](relation string, kind PrincipalKind, id string) (T, error)` | Builds a typed `*Assignment` for any resource by JSON-roundtripping the wire shape into the union's generated `UnmarshalJSON` |
@@ -651,6 +655,34 @@ different variant, replacing the
 `profile.AsS3` / `AsGCS` / `AsADLS` and `credential.AsS3AccessKey` /
 `AsS3AwsSystemIdentity` / etc. are also re-exported from the umbrella as
 `lakekeeper.AsS3Profile` etc.
+
+The `StorageProfileTypeS3` / `StorageProfileTypeGCS` /
+`StorageProfileTypeADLS` constants hold the union's `type` discriminator
+values.
+
+### Delete profiles
+
+A warehouse's `TabularDeleteProfile` decides what happens to dropped tables
+and views: a hard profile removes them immediately, a soft profile keeps
+them, undroppable, until the expiration passes. Build one with
+`NewHardDeleteProfile` or `NewSoftDeleteProfile`, and pass it to
+`CreateWarehouseRequest.SetDeleteProfile` or to
+`c.Warehouses.UpdateDeleteProfile`:
+
+```go
+req := managementv1.NewUpdateWarehouseDeleteProfileRequest(
+    profile.NewSoftDeleteProfile(7 * 24 * time.Hour))
+wh, err := c.Warehouses.UpdateDeleteProfile(ctx, id, req)
+
+if soft, ok := profile.AsSoftDeleteProfile(wh.GetDeleteProfile()); ok {
+    fmt.Println(soft.GetExpirationSeconds())
+}
+```
+
+The API counts the expiration in whole seconds, so `NewSoftDeleteProfile`
+truncates its `time.Duration`. `DeleteProfileTypeHard` and
+`DeleteProfileTypeSoft` hold the `type` discriminator values. All of these
+are re-exported from the umbrella under the same names.
 
 ---
 

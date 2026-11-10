@@ -3,6 +3,7 @@ package lakekeeper_test
 import (
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -61,8 +62,29 @@ func TestUmbrellaPermissionConsts(t *testing.T) {
 	row, ok := lakekeeper.DescribeAssignment(out[0])
 	require.True(t, ok)
 	assert.Equal(t, "user", row.PrincipalType)
+	assert.Equal(t, lakekeeper.PrincipalTypeUser, row.PrincipalType)
 	assert.Equal(t, "alice", row.PrincipalID)
 	assert.Equal(t, "admin", row.Relation)
+}
+
+// TestUmbrellaDeleteProfile confirms the delete profile re-exports build the
+// generated union and that the request built from it is the generated type.
+func TestUmbrellaDeleteProfile(t *testing.T) {
+	t.Parallel()
+
+	profileOf := func(req *managementv1.UpdateWarehouseDeleteProfileRequest) managementv1.TabularDeleteProfile {
+		return req.DeleteProfile
+	}
+
+	req := lakekeeper.NewUpdateWarehouseDeleteProfileRequest(lakekeeper.NewSoftDeleteProfile(time.Hour))
+	soft, ok := lakekeeper.AsSoftDeleteProfile(profileOf(req))
+	require.True(t, ok)
+	assert.Equal(t, lakekeeper.DeleteProfileTypeSoft, soft.GetType())
+	assert.Equal(t, int64(3600), soft.GetExpirationSeconds())
+
+	hard, ok := lakekeeper.AsHardDeleteProfile(lakekeeper.NewHardDeleteProfile())
+	require.True(t, ok)
+	assert.Equal(t, lakekeeper.DeleteProfileTypeHard, hard.GetType())
 }
 
 // TestUmbrellaFacadeCallOptions confirms the umbrella exposes the façade call
