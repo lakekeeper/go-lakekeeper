@@ -67,7 +67,7 @@ func newWarehouseListCmd(opts *clientOptions, project *string) *cobra.Command {
 
 			resp, err := c.Warehouses.List(ctx,
 				&client.ListWarehousesOptions{Status: toEnums[managementv1.WarehouseStatus](status)},
-				projectOption(cmd, *project)...)
+				projectFlagOptions(cmd, *project)...)
 			if err != nil {
 				return err
 			}
@@ -160,7 +160,7 @@ func newWarehouseCreateCmd(opts *clientOptions, project *string) *cobra.Command 
 			// A project-id in the config is sent as the x-project-id header,
 			// like --project; the façade rejects a config project that
 			// contradicts --project.
-			wh, err := c.Warehouses.Create(ctx, &req, projectOption(cmd, *project)...)
+			wh, err := c.Warehouses.Create(ctx, &req, projectFlagOptions(cmd, *project)...)
 			if err != nil {
 				return err
 			}

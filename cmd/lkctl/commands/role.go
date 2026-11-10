@@ -63,14 +63,14 @@ func newRoleListCmd(opts *clientOptions, project *string) *cobra.Command {
 				nextToken string
 			)
 			if listOpts.name != "" {
-				roles, err = findRolesByName(ctx, c, listOpts.name, listOpts.limit, projectOption(cmd, *project)...)
+				roles, err = findRolesByName(ctx, c, listOpts.name, listOpts.limit, projectFlagOptions(cmd, *project)...)
 				if err != nil {
 					return err
 				}
 			} else {
 				resp, err := c.Roles.List(ctx,
 					&client.ListRolesOptions{PageSize: listOpts.limit, PageToken: listOpts.token},
-					projectOption(cmd, *project)...)
+					projectFlagOptions(cmd, *project)...)
 				if err != nil {
 					return err
 				}
@@ -166,7 +166,7 @@ func newRoleGetCmd(opts *clientOptions, project *string) *cobra.Command {
 				return err
 			}
 
-			role, err := c.Roles.Get(ctx, args[0], projectOption(cmd, *project)...)
+			role, err := c.Roles.Get(ctx, args[0], projectFlagOptions(cmd, *project)...)
 			if err != nil {
 				return err
 			}
@@ -213,7 +213,7 @@ func newRoleCreateCmd(opts *clientOptions, project *string) *cobra.Command {
 			if description != "" {
 				req.SetDescription(description)
 			}
-			role, err := c.Roles.Create(ctx, req, projectOption(cmd, *project)...)
+			role, err := c.Roles.Create(ctx, req, projectFlagOptions(cmd, *project)...)
 			if err != nil {
 				return err
 			}
@@ -256,7 +256,7 @@ func newRoleUpdateCmd(opts *clientOptions, project *string) *cobra.Command {
 			if description != "" {
 				req.SetDescription(description)
 			}
-			role, err := c.Roles.Update(ctx, args[0], req, projectOption(cmd, *project)...)
+			role, err := c.Roles.Update(ctx, args[0], req, projectFlagOptions(cmd, *project)...)
 			if err != nil {
 				return err
 			}
@@ -290,7 +290,7 @@ func newRoleDeleteCmd(opts *clientOptions, project *string) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			if err := c.Roles.Delete(ctx, args[0], projectOption(cmd, *project)...); err != nil {
+			if err := c.Roles.Delete(ctx, args[0], projectFlagOptions(cmd, *project)...); err != nil {
 				return err
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "Role %s deleted\n", args[0])

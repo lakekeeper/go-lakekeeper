@@ -200,10 +200,10 @@ const projectArgHelp = "PROJECT-ID is optional; when omitted, the server's defau
 const projectRequiredHelp = "PROJECT-ID is required: changing permissions never falls back to the server's default project. " +
 	"To target the default project, pass its id (the nil UUID 00000000-0000-0000-0000-000000000000 unless the operator configured another)."
 
-// optionalProject maps the optional [PROJECT-ID] argument to façade call
+// projectArgOptions maps the optional [PROJECT-ID] argument to façade call
 // options: no argument sends no project, like an omitted -p. A given but
 // empty argument becomes WithProject(""), which the façade rejects.
-func optionalProject(args []string) []client.CallOption {
+func projectArgOptions(args []string) []client.CallOption {
 	if len(args) == 0 {
 		return nil
 	}
@@ -235,7 +235,7 @@ func newProjectAccessCmd(opts *clientOptions) *cobra.Command {
 			resp, err := c.Permissions.Projects.Access(ctx, &client.GetProjectAccessOptions{
 				PrincipalUser: access.user,
 				PrincipalRole: access.role,
-			}, optionalProject(args)...)
+			}, projectArgOptions(args)...)
 			if err != nil {
 				return err
 			}
@@ -276,7 +276,7 @@ func newProjectAssignmentsCmd(opts *clientOptions) *cobra.Command {
 
 			resp, err := c.Permissions.Projects.Assignments(ctx, &client.GetProjectAssignmentsOptions{
 				Relations: toEnums[managementv1.ProjectRelation](assignments.relations),
-			}, optionalProject(args)...)
+			}, projectArgOptions(args)...)
 			if err != nil {
 				return err
 			}

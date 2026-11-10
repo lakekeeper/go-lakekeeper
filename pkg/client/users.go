@@ -14,11 +14,12 @@ type Users struct {
 
 // Create provisions a user.
 func (u *Users) Create(ctx context.Context, req *managementv1.CreateUserRequest) (*managementv1.User, error) {
+	const op = "create user"
 	if req == nil {
-		return nil, errors.New("create user: request must not be nil")
+		return nil, errors.New(op + ": request must not be nil")
 	}
 	out, resp, err := u.api.CreateUser(ctx).CreateUserRequest(*req).Execute()
-	return entityResult("create user", out, resp, err)
+	return entityResult(op, out, resp, err)
 }
 
 // Get fetches a user by id.
@@ -60,11 +61,12 @@ func (u *Users) List(ctx context.Context, opts *ListUserOptions) (*managementv1.
 
 // Update mutates a user's profile fields.
 func (u *Users) Update(ctx context.Context, userID string, req *managementv1.UpdateUserRequest) error {
+	const op = "update user"
 	if req == nil {
-		return errors.New("update user: request must not be nil")
+		return errors.New(op + ": request must not be nil")
 	}
 	resp, err := u.api.UpdateUser(ctx, userID).UpdateUserRequest(*req).Execute()
-	return WrapAPIError("update user", err, resp)
+	return WrapAPIError(op, err, resp)
 }
 
 // Whoami returns the calling principal's user record.

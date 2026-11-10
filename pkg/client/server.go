@@ -23,9 +23,10 @@ func (s *Server) Info(ctx context.Context) (*managementv1.ServerInfo, error) {
 // 400 *APIError; check Info's bootstrapped flag first, or use
 // WithInitialBootstrap, which does that at construction time.
 func (s *Server) Bootstrap(ctx context.Context, req *managementv1.BootstrapRequest) error {
+	const op = "bootstrap"
 	if req == nil {
-		return errors.New("bootstrap: request must not be nil")
+		return errors.New(op + ": request must not be nil")
 	}
 	resp, err := s.api.Bootstrap(ctx).BootstrapRequest(*req).Execute()
-	return WrapAPIError("bootstrap", err, resp)
+	return WrapAPIError(op, err, resp)
 }

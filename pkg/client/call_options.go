@@ -91,24 +91,34 @@ func withRequiredProject[R projectScoped[R]](op string, req R, opts []CallOption
 	return withProject(op, req, opts)
 }
 
-// projectFromBody reconciles a request model's deprecated project-id body
-// field with opts, so the project is sent as the header like everywhere
-// else. A body project becomes WithProject; if opts already name a different
-// one, it returns ErrProjectIDConflict. The caller must still unset the field
-// on its copy of the body, so it is never sent.
-func projectFromBody(op, bodyProjectID string, opts []CallOption) ([]CallOption, error) {
-	if bodyProjectID == "" {
-		return opts, nil
+// bodyProjectModel is a generated request model that still carries the
+// deprecated project-id body field (CreateWarehouseRequest,
+// CreateRoleRequest, SearchRoleRequest).
+type bodyProjectModel[T any] interface {
+	*T
+	GetProjectId() string
+	UnsetProjectId()
+}
+
+// withBodyProject is withProject for a request whose body model still has the
+// deprecated project-id field. The body project is sent as the header like
+// everywhere else: alone it acts like WithProject, equal to it it is dropped,
+// and a different one fails with ErrProjectIDConflict. It returns the
+// configured builder and a copy of body with the field unset, so the field is
+// never sent and the caller's body is not modified.
+func withBodyProject[R projectScoped[R], T any, PT bodyProjectModel[T]](op string, req R, body *T, opts []CallOption) (R, T, error) {
+	cp := *body
+	if bodyProjectID := PT(&cp).GetProjectId(); bodyProjectID != "" {
+		o := resolveCallOptions(opts)
+		switch {
+		case !o.projectSet:
+			opts = []CallOption{WithProject(bodyProjectID)}
+		case o.projectID != "" && o.projectID != bodyProjectID:
+			return req, cp, fmt.Errorf("%s: %w: body %q, WithProject %q", op, ErrProjectIDConflict, bodyProjectID, o.projectID)
+		}
+		// An empty WithProject is left to withProject (ErrEmptyProjectID).
 	}
-	o := resolveCallOptions(opts)
-	switch {
-	case !o.projectSet:
-		return []CallOption{WithProject(bodyProjectID)}, nil
-	case o.projectID == "":
-		return opts, nil // withProject reports ErrEmptyProjectID
-	case o.projectID != bodyProjectID:
-		return nil, fmt.Errorf("%s: %w: body %q, WithProject %q", op, ErrProjectIDConflict, bodyProjectID, o.projectID)
-	default:
-		return opts, nil
-	}
+	PT(&cp).UnsetProjectId()
+	req, err := withProject(op, req, opts)
+	return req, cp, err
 }

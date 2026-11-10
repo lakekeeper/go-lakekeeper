@@ -18,11 +18,12 @@ type Projects struct {
 
 // Create creates a new project and returns the resulting metadata.
 func (p *Projects) Create(ctx context.Context, req *managementv1.CreateProjectRequest) (*managementv1.CreateProjectResponse, error) {
+	const op = "create project"
 	if req == nil {
-		return nil, errors.New("create project: request must not be nil")
+		return nil, errors.New(op + ": request must not be nil")
 	}
 	out, resp, err := p.api.CreateProject(ctx).CreateProjectRequest(*req).Execute()
-	return entityResult("create project", out, resp, err)
+	return entityResult(op, out, resp, err)
 }
 
 // Get fetches the project named by WithProject, or the server's default
@@ -61,10 +62,10 @@ func (p *Projects) List(ctx context.Context) (*managementv1.ListProjectsResponse
 // Rename changes the display name of the project named by WithProject, or of
 // the server's default project when none is named.
 func (p *Projects) Rename(ctx context.Context, req *managementv1.RenameProjectRequest, callOpts ...CallOption) error {
-	if req == nil {
-		return errors.New("rename project: request must not be nil")
-	}
 	const op = "rename project"
+	if req == nil {
+		return errors.New(op + ": request must not be nil")
+	}
 	call, err := withProject(op, p.api.RenameProject(ctx), callOpts)
 	if err != nil {
 		return err

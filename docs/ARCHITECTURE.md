@@ -210,7 +210,7 @@ c.Warehouses.List(ctx, nil)                                // no project sent
 How a project is sent is decided in one file,
 `pkg/client/call_options.go`: `withProject` (header or nothing, empty
 rejected), `withRequiredProject` (the destructive calls: no fallback),
-and `projectFromBody` (the deprecated body field). Every project-scoped
+and `withBodyProject` (the deprecated body field). Every project-scoped
 façade method goes through them. `lkctl`'s `-p/--project` flag and the
 optional `[PROJECT-ID]` argument of `project access` and `project
 assignments` have no default: omitted, they send no option; given, they

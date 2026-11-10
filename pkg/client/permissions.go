@@ -206,12 +206,13 @@ type GetProjectAccessOptions struct {
 
 // Access returns the allowed actions on a project.
 func (p *ProjectPermissions) Access(ctx context.Context, opts *GetProjectAccessOptions, callOpts ...CallOption) (*managementv1.GetProjectAccessResponse, error) {
-	req, err := withProject("get project access", p.api.GetProjectAccess(ctx), callOpts)
+	const op = "get project access"
+	req, err := withProject(op, p.api.GetProjectAccess(ctx), callOpts)
 	if err != nil {
 		return nil, err
 	}
 	out, resp, err := withPrincipal(req, opts).Execute()
-	return entityResult("get project access", out, resp, err)
+	return entityResult(op, out, resp, err)
 }
 
 // GetProjectAssignmentsOptions holds the query parameters of
@@ -224,12 +225,13 @@ type GetProjectAssignmentsOptions struct {
 
 // Assignments lists the assignments on a project.
 func (p *ProjectPermissions) Assignments(ctx context.Context, opts *GetProjectAssignmentsOptions, callOpts ...CallOption) (*managementv1.GetProjectAssignmentsResponse, error) {
-	req, err := withProject("get project assignments", p.api.GetProjectAssignments(ctx), callOpts)
+	const op = "get project assignments"
+	req, err := withProject(op, p.api.GetProjectAssignments(ctx), callOpts)
 	if err != nil {
 		return nil, err
 	}
 	out, resp, err := withRelations(req, opts).Execute()
-	return entityResult("get project assignments", out, resp, err)
+	return entityResult(op, out, resp, err)
 }
 
 // Grant writes assignments on the project named by WithProject, which is

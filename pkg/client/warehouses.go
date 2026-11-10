@@ -26,13 +26,7 @@ func (w *Warehouses) Create(ctx context.Context, req *managementv1.CreateWarehou
 	if req == nil {
 		return nil, errors.New(op + ": request must not be nil")
 	}
-	body := *req
-	callOpts, err := projectFromBody(op, body.GetProjectId(), callOpts)
-	if err != nil {
-		return nil, err
-	}
-	body.UnsetProjectId()
-	call, err := withProject(op, w.api.CreateWarehouse(ctx), callOpts)
+	call, body, err := withBodyProject(op, w.api.CreateWarehouse(ctx), req, callOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +58,8 @@ type ListWarehousesOptions struct {
 // List returns the warehouses of a project. Name the project with
 // WithProject; without it the server applies its default project.
 func (w *Warehouses) List(ctx context.Context, opts *ListWarehousesOptions, callOpts ...CallOption) (*managementv1.ListWarehousesResponse, error) {
-	req, err := withProject("list warehouses", w.api.ListWarehouses(ctx), callOpts)
+	const op = "list warehouses"
+	req, err := withProject(op, w.api.ListWarehouses(ctx), callOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -72,16 +67,17 @@ func (w *Warehouses) List(ctx context.Context, opts *ListWarehousesOptions, call
 		req = req.WarehouseStatus(opts.Status)
 	}
 	out, resp, err := req.Execute()
-	return entityResult("list warehouses", out, resp, err)
+	return entityResult(op, out, resp, err)
 }
 
 // Rename changes a warehouse's display name.
 func (w *Warehouses) Rename(ctx context.Context, id string, req *managementv1.RenameWarehouseRequest) (*managementv1.GetWarehouseResponse, error) {
+	const op = "rename warehouse"
 	if req == nil {
-		return nil, errors.New("rename warehouse: request must not be nil")
+		return nil, errors.New(op + ": request must not be nil")
 	}
 	out, resp, err := w.api.RenameWarehouse(ctx, id).RenameWarehouseRequest(*req).Execute()
-	return entityResult("rename warehouse", out, resp, err)
+	return entityResult(op, out, resp, err)
 }
 
 // Activate transitions a warehouse from inactive to active.
@@ -100,11 +96,12 @@ func (w *Warehouses) Deactivate(ctx context.Context, id string) error {
 // SetProtection toggles the protection flag on a warehouse. While protected,
 // the warehouse cannot be deleted.
 func (w *Warehouses) SetProtection(ctx context.Context, id string, req *managementv1.SetProtectionRequest) (*managementv1.ProtectionResponse, error) {
+	const op = "set warehouse protection"
 	if req == nil {
-		return nil, errors.New("set warehouse protection: request must not be nil")
+		return nil, errors.New(op + ": request must not be nil")
 	}
 	out, resp, err := w.api.SetWarehouseProtection(ctx, id).SetProtectionRequest(*req).Execute()
-	return entityResult("set warehouse protection", out, resp, err)
+	return entityResult(op, out, resp, err)
 }
 
 // GetWarehouseStatisticsOptions holds the query parameters of

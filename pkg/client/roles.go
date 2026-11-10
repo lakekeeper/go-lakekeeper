@@ -23,13 +23,7 @@ func (r *Roles) Create(ctx context.Context, req *managementv1.CreateRoleRequest,
 	if req == nil {
 		return nil, errors.New(op + ": request must not be nil")
 	}
-	body := *req
-	callOpts, err := projectFromBody(op, body.GetProjectId(), callOpts)
-	if err != nil {
-		return nil, err
-	}
-	body.UnsetProjectId()
-	call, err := withProject(op, r.api.CreateRole(ctx), callOpts)
+	call, body, err := withBodyProject(op, r.api.CreateRole(ctx), req, callOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -39,22 +33,24 @@ func (r *Roles) Create(ctx context.Context, req *managementv1.CreateRoleRequest,
 
 // Get retrieves a role by id.
 func (r *Roles) Get(ctx context.Context, roleID string, callOpts ...CallOption) (*managementv1.Role, error) {
-	req, err := withProject("get role", r.api.GetRole(ctx, roleID), callOpts)
+	const op = "get role"
+	req, err := withProject(op, r.api.GetRole(ctx, roleID), callOpts)
 	if err != nil {
 		return nil, err
 	}
 	out, resp, err := req.Execute()
-	return entityResult("get role", out, resp, err)
+	return entityResult(op, out, resp, err)
 }
 
 // Delete removes a role.
 func (r *Roles) Delete(ctx context.Context, roleID string, callOpts ...CallOption) error {
-	req, err := withProject("delete role", r.api.DeleteRole(ctx, roleID), callOpts)
+	const op = "delete role"
+	req, err := withProject(op, r.api.DeleteRole(ctx, roleID), callOpts)
 	if err != nil {
 		return err
 	}
 	resp, err := req.Execute()
-	return WrapAPIError("delete role", err, resp)
+	return WrapAPIError(op, err, resp)
 }
 
 // ListRolesOptions holds the query parameters of Roles.List. A nil pointer
@@ -70,7 +66,8 @@ type ListRolesOptions struct {
 // List returns one page of roles. Page through the project with the
 // response's NextPageToken.
 func (r *Roles) List(ctx context.Context, opts *ListRolesOptions, callOpts ...CallOption) (*managementv1.ListRolesResponse, error) {
-	req, err := withProject("list roles", r.api.ListRoles(ctx), callOpts)
+	const op = "list roles"
+	req, err := withProject(op, r.api.ListRoles(ctx), callOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -78,20 +75,21 @@ func (r *Roles) List(ctx context.Context, opts *ListRolesOptions, callOpts ...Ca
 		req = withPaging(req, opts.PageSize, opts.PageToken)
 	}
 	out, resp, err := req.Execute()
-	return entityResult("list roles", out, resp, err)
+	return entityResult(op, out, resp, err)
 }
 
 // Update mutates a role's name/description.
 func (r *Roles) Update(ctx context.Context, roleID string, req *managementv1.UpdateRoleRequest, callOpts ...CallOption) (*managementv1.Role, error) {
+	const op = "update role"
 	if req == nil {
-		return nil, errors.New("update role: request must not be nil")
+		return nil, errors.New(op + ": request must not be nil")
 	}
-	call, err := withProject("update role", r.api.UpdateRole(ctx, roleID), callOpts)
+	call, err := withProject(op, r.api.UpdateRole(ctx, roleID), callOpts)
 	if err != nil {
 		return nil, err
 	}
 	out, resp, err := call.UpdateRoleRequest(*req).Execute()
-	return entityResult("update role", out, resp, err)
+	return entityResult(op, out, resp, err)
 }
 
 // Search runs the server's fuzzy role search over req.Search and returns the
@@ -106,13 +104,7 @@ func (r *Roles) Search(ctx context.Context, req *managementv1.SearchRoleRequest,
 	if req == nil {
 		return nil, errors.New(op + ": request must not be nil")
 	}
-	body := *req
-	callOpts, err := projectFromBody(op, body.GetProjectId(), callOpts)
-	if err != nil {
-		return nil, err
-	}
-	body.UnsetProjectId()
-	call, err := withProject(op, r.api.SearchRole(ctx), callOpts)
+	call, body, err := withBodyProject(op, r.api.SearchRole(ctx), req, callOpts)
 	if err != nil {
 		return nil, err
 	}
