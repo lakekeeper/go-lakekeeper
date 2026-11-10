@@ -171,8 +171,9 @@ use), the option is a no-op — the constructor never calls `Info` or
 Resources that belong to a project (warehouses, roles) take the project
 per call, and so do `Projects.Get`, `Rename`, `Delete`, and
 `Permissions.Projects`, which act on the project they name (the server's
-default project when they name none). A project-scoped façade method
-accepts a trailing, optional `...client.CallOption`;
+default project when they name none, except for the destructive calls
+below). A project-scoped façade method accepts a trailing
+`...client.CallOption`;
 `client.WithProject(id)` names the project.
 A method takes the option only when its endpoint accepts `x-project-id`:
 for warehouses that is Create and List, while the calls that address a
@@ -191,10 +192,12 @@ c.Warehouses.List(ctx, nil)                                // no project sent
 - `WithProject("")` is not "no project": the call fails with
   `client.ErrEmptyProjectID` before sending anything, so an unset variable
   can't silently target the default project.
-- `Projects.Delete` is the one exception to "omitting is valid": without
-  `WithProject` it fails with `client.ErrProjectRequired` and sends
-  nothing, so a project is never deleted by omission. To delete the
-  default project, name it.
+- The destructive project-level calls are the exception to "omitting is
+  valid": `Projects.Delete` and `Permissions.Projects.Grant` / `Revoke`
+  fail with `client.ErrProjectRequired` without `WithProject` and send
+  nothing, so a project is never deleted, and its permissions never
+  changed, by omission. To act on the default project, name it. This
+  deliberately deviates from the façade spec (VAK-853).
 - The façades never send the deprecated `projectId` query parameter or
   `project-id` body field. When both are sent, Lakekeeper lets the
   deprecated one win over the header. A request model that still carries
@@ -204,13 +207,17 @@ c.Warehouses.List(ctx, nil)                                // no project sent
   project fails with `client.ErrProjectIDConflict`. The caller's request
   is not modified.
 
-The one place that decides how a project is sent is the unexported
-`withProject` helper in `pkg/client/call_options.go`. `lkctl`'s
-`-p/--project` flag and the optional `[PROJECT-ID]` argument of the
-`project` permission commands have no default: omitted, they send no
-option; given, they map to `WithProject`, so an explicit empty value is
-rejected. There is no client-wide default project: each call names
-its project or leaves the choice to the server.
+How a project is sent is decided in one file,
+`pkg/client/call_options.go`: `withProject` (header or nothing, empty
+rejected), `withRequiredProject` (the destructive calls: no fallback),
+and `projectFromBody` (the deprecated body field). Every project-scoped
+façade method goes through them. `lkctl`'s `-p/--project` flag and the
+optional `[PROJECT-ID]` argument of `project access` and `project
+assignments` have no default: omitted, they send no option; given, they
+map to `WithProject`, so an explicit empty value is rejected. `project
+delete`, `grant`, and `revoke` take a required `PROJECT-ID`. There is no
+client-wide default project: each call names its project or leaves the
+choice to the server.
 
 Callers of the generated services (the escape hatch) set the header
 themselves (`c.RoleAPI.ListRoles(ctx).XProjectId(projectID).Execute()`)

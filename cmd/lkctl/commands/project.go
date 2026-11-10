@@ -191,9 +191,14 @@ func newProjectDeleteCmd(opts *clientOptions) *cobra.Command {
 	return cmd
 }
 
-// projectArgHelp documents the optional [PROJECT-ID] argument of the
-// project permission commands.
+// projectArgHelp documents the optional [PROJECT-ID] argument of project
+// access and assignments.
 const projectArgHelp = "PROJECT-ID is optional; when omitted, the server's default project is used."
+
+// projectRequiredHelp documents the required PROJECT-ID of grant and
+// revoke, which never fall back to the server's default project.
+const projectRequiredHelp = "PROJECT-ID is required: changing permissions never falls back to the server's default project. " +
+	"To target the default project, pass its id (the nil UUID 00000000-0000-0000-0000-000000000000 unless the operator configured another)."
 
 // optionalProject maps the optional [PROJECT-ID] argument to façade call
 // options: no argument sends no project, like an omitted -p. A given but
@@ -300,11 +305,11 @@ func newProjectGrantCmd(opts *clientOptions) *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:     "grant [PROJECT-ID]",
+		Use:     "grant PROJECT-ID",
 		Aliases: []string{"assign"},
 		Short:   "Add project assignments",
-		Long:    "Add project assignments.\n\n" + projectArgHelp,
-		Args:    cobra.MaximumNArgs(1),
+		Long:    "Add project assignments.\n\n" + projectRequiredHelp,
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			set, err := buildAssignmentSet[managementv1.ProjectAssignment](assignments, users, roles)
 			if err != nil {
@@ -316,7 +321,7 @@ func newProjectGrantCmd(opts *clientOptions) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			if err := c.Permissions.Projects.Grant(ctx, set, optionalProject(args)...); err != nil {
+			if err := c.Permissions.Projects.Grant(ctx, set, client.WithProject(args[0])); err != nil {
 				return err
 			}
 			fmt.Fprintln(cmd.OutOrStdout(), "Project permissions updated")
@@ -341,16 +346,16 @@ func newProjectRevokeCmd(opts *clientOptions) *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:     "revoke [PROJECT-ID]",
+		Use:     "revoke PROJECT-ID",
 		Aliases: []string{"unassign"},
 		Short:   "Remove project assignments",
-		Long:    "Remove project assignments.\n\n" + projectArgHelp,
-		Example: `  # Revoke project_admin from a user on the server's default project
-  lkctl project revoke --users 0198618c-5be8-7a82-a0b9-1076c9dd12f0 --assignments project_admin
+		Long:    "Remove project assignments.\n\n" + projectRequiredHelp,
+		Example: `  # Revoke project_admin from a user on the default project (nil UUID in the default configuration)
+  lkctl project revoke 00000000-0000-0000-0000-000000000000 --users oidc~alice --assignments project_admin
 
   # Revoke select from a role on a specific project
   lkctl project revoke 0198618c-5be8-7a82-a0b9-1076c9dd12f0 --roles 11111111-2222-3333-4444-555555555555 --assignments select`,
-		Args: cobra.MaximumNArgs(1),
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			set, err := buildAssignmentSet[managementv1.ProjectAssignment](assignments, users, roles)
 			if err != nil {
@@ -362,7 +367,7 @@ func newProjectRevokeCmd(opts *clientOptions) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			if err := c.Permissions.Projects.Revoke(ctx, set, optionalProject(args)...); err != nil {
+			if err := c.Permissions.Projects.Revoke(ctx, set, client.WithProject(args[0])); err != nil {
 				return err
 			}
 			fmt.Fprintln(cmd.OutOrStdout(), "Project permissions updated")

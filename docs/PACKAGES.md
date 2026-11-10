@@ -206,7 +206,9 @@ options, or the raw `*http.Response`, use the escape hatch.
 - **Project scoping** is a trailing `...client.CallOption`;
   `client.WithProject(id)` sends `x-project-id`, omitting it lets the
   server apply its default project, and `WithProject("")` fails with
-  `client.ErrEmptyProjectID`. See
+  `client.ErrEmptyProjectID`. The destructive project-level calls
+  (`Projects.Delete`, `Permissions.Projects.Grant` / `Revoke`) require
+  the option and fail with `client.ErrProjectRequired` without it. See
   [ARCHITECTURE.md](ARCHITECTURE.md#project-scoping).
 
 ```go
@@ -242,9 +244,10 @@ role ids select their project, so these methods take no
 `client.CallOption`.
 
 `Projects` and `Server` have no `id` argument. `Projects` methods name
-the project with a trailing `client.WithProject(id)`; without it the
-server's default project applies. The server is a single resource and is
-not project-scoped.
+the project with a trailing `client.WithProject(id)`. Without it,
+`Access` and `Assignments` use the server's default project, while
+`Grant` and `Revoke` fail with `client.ErrProjectRequired`. The server is
+a single resource and is not project-scoped.
 
 ```go
 err := c.Permissions.Projects.Grant(ctx, projectSet, client.WithProject(projectID))

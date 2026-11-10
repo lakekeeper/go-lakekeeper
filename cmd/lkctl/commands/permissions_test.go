@@ -150,11 +150,11 @@ func TestProjectGrantAndRevoke_ProjectArgumentSelectsProject(t *testing.T) {
 	mux, baseURL := testutil.NewServer(t)
 	reqs := testutil.Respond(t, mux, "POST /management/v1/permissions/project/assignments", http.StatusNoContent, nil)
 
-	out, err := runLkctl(t, baseURL, "project", "grant", "--users", permUserID, "--assignments", "select")
+	out, err := runLkctl(t, baseURL, "project", "grant", projectTestID, "--users", permUserID, "--assignments", "select")
 	require.NoError(t, err)
 	assert.Contains(t, out, "Project permissions updated")
 	got := reqs.Last(t)
-	assert.NotContains(t, got.Header, "X-Project-Id", "omitted [PROJECT-ID] must leave the project to the server")
+	assert.Equal(t, projectTestID, got.Header.Get("X-Project-Id"))
 	assert.JSONEq(t, `{"writes":[{"type":"select","user":"oidc~alice"}]}`, string(got.Body))
 
 	_, err = runLkctl(t, baseURL, "project", "revoke", projectTestID, "--roles", permRoleID, "--assignments", "select")
@@ -162,19 +162,30 @@ func TestProjectGrantAndRevoke_ProjectArgumentSelectsProject(t *testing.T) {
 	got = reqs.Last(t)
 	assert.Equal(t, projectTestID, got.Header.Get("X-Project-Id"))
 	assert.JSONEq(t, `{"deletes":[{"type":"select","role":"`+permRoleID+`"}]}`, string(got.Body))
+}
 
-	_, err = runLkctl(t, baseURL, "project", "grant", projectTestID, "--users", permUserID, "--assignments", "select")
-	require.NoError(t, err)
-	assert.Equal(t, projectTestID, reqs.Last(t).Header.Get("X-Project-Id"))
+// Changing a project's permissions never falls back to the server's default
+// project: grant and revoke require PROJECT-ID, unlike access and
+// assignments.
+func TestProjectGrantAndRevoke_RequireProjectArgument(t *testing.T) {
+	t.Parallel()
+	for _, sub := range []string{"grant", "revoke"} {
+		t.Run(sub, func(t *testing.T) {
+			t.Parallel()
+			mux, baseURL := testutil.NewServer(t)
+			reqs := testutil.Respond(t, mux, "/", http.StatusNoContent, nil)
 
-	_, err = runLkctl(t, baseURL, "project", "revoke", "--users", permUserID, "--assignments", "select")
-	require.NoError(t, err)
-	assert.NotContains(t, reqs.Last(t).Header, "X-Project-Id")
+			_, err := runLkctl(t, baseURL, "project", sub, "--users", permUserID, "--assignments", "select")
+
+			require.ErrorContains(t, err, "accepts 1 arg(s), received 0")
+			assert.Zero(t, reqs.Len(), "no request must be sent")
+		})
+	}
 }
 
 func TestProjectPermissionCommands_HelpNamesDefaultProject(t *testing.T) {
 	t.Parallel()
-	for _, sub := range []string{"access", "assignments", "grant", "revoke"} {
+	for _, sub := range []string{"access", "assignments"} {
 		t.Run(sub, func(t *testing.T) {
 			t.Parallel()
 			_, baseURL := testutil.NewServer(t)

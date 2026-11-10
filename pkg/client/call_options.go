@@ -9,9 +9,10 @@ import (
 // with WithProject(""), before any request is sent.
 var ErrEmptyProjectID = errors.New("project id must not be empty")
 
-// ErrProjectRequired is returned, before any request is sent, by a method
-// that must not fall back to the server's default project (Projects.Delete)
-// when it is called without WithProject.
+// ErrProjectRequired is returned, before any request is sent, by a
+// destructive project-level method (Projects.Delete, and Grant and Revoke on
+// Permissions.Projects) called without WithProject. These never fall back to
+// the server's default project.
 var ErrProjectRequired = errors.New("project must be named with WithProject")
 
 // ErrProjectIDConflict is returned, before any request is sent, when a
@@ -20,7 +21,10 @@ var ErrProjectRequired = errors.New("project must be named with WithProject")
 var ErrProjectIDConflict = errors.New("project id in the request body does not match WithProject")
 
 // CallOption configures a single façade call. Project-scoped façade methods
-// take a trailing variadic ...CallOption; omitting it is always valid.
+// take a trailing variadic ...CallOption. Omitting it lets the server apply
+// its default project, except on the destructive project-level methods
+// (Projects.Delete, Permissions.Projects.Grant and Revoke), which return
+// ErrProjectRequired without it.
 type CallOption func(*callOptions)
 
 type callOptions struct {
@@ -75,6 +79,16 @@ func withProject[R projectScoped[R]](op string, req R, opts []CallOption) (R, er
 	default:
 		return req.XProjectId(o.projectID), nil
 	}
+}
+
+// withRequiredProject is withProject for the destructive project-level
+// methods: without a project option it returns ErrProjectRequired (wrapped
+// with op) instead of leaving the project to the server.
+func withRequiredProject[R projectScoped[R]](op string, req R, opts []CallOption) (R, error) {
+	if !resolveCallOptions(opts).projectSet {
+		return req, fmt.Errorf("%s: %w", op, ErrProjectRequired)
+	}
+	return withProject(op, req, opts)
 }
 
 // projectFromBody reconciles a request model's deprecated project-id body

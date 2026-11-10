@@ -149,16 +149,21 @@ lkctl project rename <PROJECT-ID> new-name
 # Delete a project
 lkctl project delete <PROJECT-ID>
 
-# Permissions — PROJECT-ID is optional (sent as the x-project-id header)
+# Permissions (PROJECT-ID is sent as the x-project-id header)
 lkctl project access      [PROJECT-ID]                 # show allowed actions for the current user
 lkctl project access      [PROJECT-ID] --user <ID>     # or for a specific user
 lkctl project assignments [PROJECT-ID]                 # list assignments
-lkctl project grant       [PROJECT-ID] --users <U> --assignments project_admin
-lkctl project revoke      [PROJECT-ID] --roles <R> --assignments select
+lkctl project grant       PROJECT-ID --users <U> --assignments project_admin
+lkctl project revoke      PROJECT-ID --roles <R> --assignments select
 ```
 
-When `[PROJECT-ID]` is omitted, no project is sent and the server's
-default project is used, the same as omitting `-p` on other commands.
+For `access` and `assignments`, `[PROJECT-ID]` is optional: when omitted,
+no project is sent and the server's default project is used, the same as
+omitting `-p` on other commands. `grant` and `revoke` change permissions,
+so `PROJECT-ID` is required and never falls back to the default project;
+to target it, pass its id (the nil UUID
+`00000000-0000-0000-0000-000000000000` unless the operator configured
+another).
 An empty `PROJECT-ID` (`""`, e.g. from an unset variable) is an error, on
 these commands and on `get`, `rename`, and `delete`; so is an explicit
 empty `-p ""`.

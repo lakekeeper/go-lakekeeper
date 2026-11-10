@@ -97,6 +97,42 @@ func TestWithProject_EmptyIDIsRejectedBeforeAnyRequest(t *testing.T) {
 	}
 }
 
+// Destructive project-level calls never fall back to the server's default
+// project: without WithProject they would delete it, or change its
+// permissions. They require the option, unlike every other project-scoped
+// method, and send nothing without it.
+func TestProjectRequiredMethods_WithoutProjectAreRejected(t *testing.T) {
+	t.Parallel()
+	assignments, err := permissions.BuildAssignmentSet[managementv1.ProjectAssignment](
+		[]string{"select"}, permissions.PrincipalSet{Users: []string{"oidc~alice"}})
+	require.NoError(t, err)
+
+	calls := map[string]func(context.Context, *client.Client) error{
+		"Projects.Delete": func(ctx context.Context, c *client.Client) error {
+			return c.Projects.Delete(ctx)
+		},
+		"Permissions.Projects.Grant": func(ctx context.Context, c *client.Client) error {
+			return c.Permissions.Projects.Grant(ctx, assignments)
+		},
+		"Permissions.Projects.Revoke": func(ctx context.Context, c *client.Client) error {
+			return c.Permissions.Projects.Revoke(ctx, assignments)
+		},
+	}
+
+	for name, call := range calls {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			mux, c := testutil.ServerMux(t)
+			reqs := testutil.Respond(t, mux, "/", http.StatusNoContent, nil)
+
+			err := call(t.Context(), c)
+
+			require.ErrorIs(t, err, client.ErrProjectRequired)
+			assert.Zero(t, reqs.Len(), "no request must be sent")
+		})
+	}
+}
+
 // bodyProjectCall is a façade method whose request model still has the
 // deprecated project-id body field. The façade must never send that field:
 // it moves the project to the x-project-id header instead.

@@ -3,7 +3,6 @@ package client
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
 )
@@ -45,10 +44,7 @@ func (p *Projects) Get(ctx context.Context, callOpts ...CallOption) (*management
 // project, name it explicitly.
 func (p *Projects) Delete(ctx context.Context, callOpts ...CallOption) error {
 	const op = "delete project"
-	if !resolveCallOptions(callOpts).projectSet {
-		return fmt.Errorf("%s: %w", op, ErrProjectRequired)
-	}
-	req, err := withProject(op, p.api.DeleteProject(ctx), callOpts)
+	req, err := withRequiredProject(op, p.api.DeleteProject(ctx), callOpts)
 	if err != nil {
 		return err
 	}

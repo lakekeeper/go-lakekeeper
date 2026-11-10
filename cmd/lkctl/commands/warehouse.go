@@ -152,15 +152,14 @@ func newWarehouseCreateCmd(opts *clientOptions, project *string) *cobra.Command 
 			if req.GetWarehouseName() != args[0] {
 				return errors.New("warehouse name in config does not match the name argument")
 			}
-			// A project-id in the config is sent as the x-project-id header,
-			// like --project; the façade rejects a config project that
-			// contradicts --project.
-
 			ctx := cmd.Context()
 			c, err := newClient(ctx, opts)
 			if err != nil {
 				return err
 			}
+			// A project-id in the config is sent as the x-project-id header,
+			// like --project; the façade rejects a config project that
+			// contradicts --project.
 			wh, err := c.Warehouses.Create(ctx, &req, projectOption(cmd, *project)...)
 			if err != nil {
 				return err

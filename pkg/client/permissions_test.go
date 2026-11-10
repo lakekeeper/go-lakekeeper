@@ -216,10 +216,10 @@ func permissionCalls(t *testing.T) []struct {
 			return err
 		}},
 		{"project grant", "POST /management/v1/permissions/project/assignments", "grant project assignments", func(c *client.Client) error {
-			return c.Permissions.Projects.Grant(t.Context(), projectSet)
+			return c.Permissions.Projects.Grant(t.Context(), projectSet, client.WithProject(permProjectID))
 		}},
 		{"project revoke", "POST /management/v1/permissions/project/assignments", "revoke project assignments", func(c *client.Client) error {
-			return c.Permissions.Projects.Revoke(t.Context(), projectSet)
+			return c.Permissions.Projects.Revoke(t.Context(), projectSet, client.WithProject(permProjectID))
 		}},
 		{"server access", "GET /management/v1/permissions/server/access", "get server access", func(c *client.Client) error {
 			_, err := c.Permissions.Server.Access(t.Context(), nil)
@@ -266,6 +266,9 @@ func TestPermissions_ServerErrorIsAPIError(t *testing.T) {
 // server's default project. None of them may send a project of its own.
 func TestPermissions_SendNoProjectAndNoQueryByDefault(t *testing.T) {
 	t.Parallel()
+	// Grant and revoke on a project require WithProject, so their calls in
+	// permissionCalls name one; every other call sends no project.
+	namesProject := map[string]bool{"project grant": true, "project revoke": true}
 	for _, tc := range permissionCalls(t) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
@@ -276,7 +279,11 @@ func TestPermissions_SendNoProjectAndNoQueryByDefault(t *testing.T) {
 			require.NoError(t, tc.call(c))
 
 			got := reqs.Last(t)
-			assert.NotContains(t, got.Header, "X-Project-Id")
+			if namesProject[tc.name] {
+				assert.Equal(t, permProjectID, got.Header.Get("X-Project-Id"))
+			} else {
+				assert.NotContains(t, got.Header, "X-Project-Id")
+			}
 			assert.Empty(t, got.Query, "nil options must send no query parameters")
 		})
 	}
@@ -356,8 +363,8 @@ func TestProjectPermissions_EmptyAssignmentsRejected(t *testing.T) {
 	mux, c := testutil.ServerMux(t)
 	reqs := testutil.Respond(t, mux, "POST /management/v1/permissions/project/assignments", http.StatusNoContent, nil)
 
-	require.ErrorContains(t, c.Permissions.Projects.Grant(t.Context(), nil), "grant project assignments: no assignments")
-	require.ErrorContains(t, c.Permissions.Projects.Revoke(t.Context(), nil), "revoke project assignments: no assignments")
+	require.ErrorContains(t, c.Permissions.Projects.Grant(t.Context(), nil, client.WithProject(permProjectID)), "grant project assignments: no assignments")
+	require.ErrorContains(t, c.Permissions.Projects.Revoke(t.Context(), nil, client.WithProject(permProjectID)), "revoke project assignments: no assignments")
 	assert.Zero(t, reqs.Len(), "no request must be sent")
 }
 

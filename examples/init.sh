@@ -13,7 +13,7 @@ lkctl user create oidc~cfb55bf6-fcbb-4a1e-bfec-30c6649b52f8 "Peter Cold" human -
 
 echo == 3. Grant Access To UI User
 
-lkctl project grant --users oidc~cfb55bf6-fcbb-4a1e-bfec-30c6649b52f8 --assignments project_admin
+lkctl project grant 00000000-0000-0000-0000-000000000000 --users oidc~cfb55bf6-fcbb-4a1e-bfec-30c6649b52f8 --assignments project_admin
 
 echo == 4. Create Trino, DuckDB, Starrocks Users
 
@@ -23,7 +23,7 @@ lkctl user create oidc~7515be4b-ce5b-4371-ab31-f40b97f74ec6 service-account-star
 
 echo == 5. Grant Access To Trino, DuckDB, Starrocks Users as Project Admins
 
-lkctl project grant \
+lkctl project grant 00000000-0000-0000-0000-000000000000 \
     --users oidc~94eb1d88-7854-43a0-b517-a75f92c533a5 \
     --users oidc~7a5da0c5-24e2-4148-a8d9-71c748275928 \
     --users oidc~7515be4b-ce5b-4371-ab31-f40b97f74ec6 \

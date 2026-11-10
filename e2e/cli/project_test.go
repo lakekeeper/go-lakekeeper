@@ -63,9 +63,11 @@ func TestProjectGrantRevoke(t *testing.T) {
 
 	user := MustProvisionUser(t)
 
-	// grant project_admin to user on default project
+	// grant project_admin to user on the default project; grant and revoke
+	// require the project id, so the nil UUID is named explicitly.
+	const defaultProject = "00000000-0000-0000-0000-000000000000"
 	runOK(t,
-		"project", "grant",
+		"project", "grant", defaultProject,
 		"--users", user,
 		"--assignments", "project_admin",
 	)
@@ -80,7 +82,7 @@ func TestProjectGrantRevoke(t *testing.T) {
 
 	// revoke
 	runOK(t,
-		"project", "revoke",
+		"project", "revoke", defaultProject,
 		"--users", user,
 		"--assignments", "project_admin",
 	)

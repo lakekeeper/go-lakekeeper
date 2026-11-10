@@ -187,8 +187,10 @@ func (p *RolePermissions) update(ctx context.Context, op, roleID string, req man
 	return WrapAPIError(op, err, resp)
 }
 
-// ProjectPermissions manages the permissions of a project. The project is
-// the WithProject option; without it the server applies its default project.
+// ProjectPermissions manages the permissions of a project, named by the
+// WithProject option. Access and Assignments fall back to the server's
+// default project without it; Grant and Revoke change permissions, so they
+// require it and return ErrProjectRequired otherwise.
 type ProjectPermissions struct {
 	api *managementv1.PermissionsOpenfgaAPIService
 }
@@ -230,12 +232,14 @@ func (p *ProjectPermissions) Assignments(ctx context.Context, opts *GetProjectAs
 	return entityResult("get project assignments", out, resp, err)
 }
 
-// Grant writes assignments on a project.
+// Grant writes assignments on the project named by WithProject, which is
+// required.
 func (p *ProjectPermissions) Grant(ctx context.Context, assignments []managementv1.ProjectAssignment, callOpts ...CallOption) error {
 	return p.update(ctx, "grant project assignments", managementv1.UpdateProjectAssignmentsRequest{Writes: assignments}, callOpts)
 }
 
-// Revoke deletes assignments on a project.
+// Revoke deletes assignments on the project named by WithProject, which is
+// required.
 func (p *ProjectPermissions) Revoke(ctx context.Context, assignments []managementv1.ProjectAssignment, callOpts ...CallOption) error {
 	return p.update(ctx, "revoke project assignments", managementv1.UpdateProjectAssignmentsRequest{Deletes: assignments}, callOpts)
 }
@@ -244,7 +248,7 @@ func (p *ProjectPermissions) update(ctx context.Context, op string, req manageme
 	if len(req.GetWrites()) == 0 && len(req.GetDeletes()) == 0 {
 		return errNoAssignments(op)
 	}
-	call, err := withProject(op, p.api.UpdateProjectAssignments(ctx), callOpts)
+	call, err := withRequiredProject(op, p.api.UpdateProjectAssignments(ctx), callOpts)
 	if err != nil {
 		return err
 	}

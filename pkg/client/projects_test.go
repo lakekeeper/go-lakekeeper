@@ -61,20 +61,6 @@ func TestProjects_Delete_WithProjectSendsHeader(t *testing.T) {
 	assert.Equal(t, projectA, reqs.Last(t).Header.Get("x-project-id"))
 }
 
-// Deleting is the one call where the server's default project is never a
-// safe fallback: without WithProject it would delete that project. Delete
-// therefore requires the option, unlike every other project-scoped method.
-func TestProjects_Delete_WithoutProjectIsRejected(t *testing.T) {
-	t.Parallel()
-	mux, c := testutil.ServerMux(t)
-	reqs := testutil.Respond(t, mux, "DELETE /management/v1/project", http.StatusNoContent, nil)
-
-	err := c.Projects.Delete(t.Context())
-
-	require.ErrorIs(t, err, client.ErrProjectRequired)
-	assert.Zero(t, reqs.Len(), "no request must be sent")
-}
-
 func TestProjects_Create_SendsBodyAndReturnsID(t *testing.T) {
 	t.Parallel()
 	mux, c := testutil.ServerMux(t)

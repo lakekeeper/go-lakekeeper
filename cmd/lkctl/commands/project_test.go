@@ -67,7 +67,7 @@ func TestProjectRevokeNoUsersOrRoles(t *testing.T) {
 	var buf bytes.Buffer
 	root.SetOut(&buf)
 	root.SetErr(&buf)
-	root.SetArgs([]string{"revoke", "--assignments", "project_admin"})
+	root.SetArgs([]string{"revoke", projectTestID, "--assignments", "project_admin"})
 
 	err := root.Execute()
 	require.Error(t, err)
@@ -104,7 +104,7 @@ func TestProjectGrantNoUsersOrRoles(t *testing.T) {
 	var buf bytes.Buffer
 	root.SetOut(&buf)
 	root.SetErr(&buf)
-	root.SetArgs([]string{"grant", "--assignments", "project_admin"})
+	root.SetArgs([]string{"grant", projectTestID, "--assignments", "project_admin"})
 
 	err := root.Execute()
 	require.Error(t, err)
