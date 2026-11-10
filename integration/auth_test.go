@@ -34,10 +34,10 @@ func TestIntegrationAccessTokenAuthSource(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	info, _, err := c.ServerAPI.GetServerInfo(t.Context()).Execute()
+	info, err := c.Server.Info(t.Context())
 	require.NoError(t, err)
-	assert.NotEmpty(t, info.ServerId)
-	assert.True(t, info.Bootstrapped)
+	assert.NotEmpty(t, info.GetServerId())
+	assert.True(t, info.GetBootstrapped())
 }
 
 func TestIntegrationK8sServiceAccountAuthSource(t *testing.T) {
@@ -53,8 +53,8 @@ func TestIntegrationK8sServiceAccountAuthSource(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	info, _, err := c.ServerAPI.GetServerInfo(t.Context()).Execute()
+	info, err := c.Server.Info(t.Context())
 	require.NoError(t, err)
-	assert.NotEmpty(t, info.ServerId)
-	assert.True(t, info.Bootstrapped)
+	assert.NotEmpty(t, info.GetServerId())
+	assert.True(t, info.GetBootstrapped())
 }

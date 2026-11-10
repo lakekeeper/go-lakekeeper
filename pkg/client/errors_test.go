@@ -26,7 +26,7 @@ func TestFacadeError_JSONBodyCarriesStatus(t *testing.T) {
 		_, _ = w.Write([]byte(roleNotFoundBody))
 	})
 
-	_, err := c.Roles.Get(t.Context(), "p", "1234")
+	_, err := c.Roles.Get(t.Context(), "1234", client.WithProject("p"))
 
 	var apiErr *client.APIError
 	require.ErrorAs(t, err, &apiErr, "want *client.APIError, got %T: %v", err, err)
@@ -42,7 +42,7 @@ func TestFacadeError_JSONBodyDecodedIntoErrorModel(t *testing.T) {
 		_, _ = w.Write([]byte(roleNotFoundBody))
 	})
 
-	_, err := c.Roles.Get(t.Context(), "p", "1234")
+	_, err := c.Roles.Get(t.Context(), "1234", client.WithProject("p"))
 
 	var apiErr *client.APIError
 	require.ErrorAs(t, err, &apiErr)
@@ -61,7 +61,7 @@ func TestFacadeError_JSONBodyReachesGeneratedError(t *testing.T) {
 		_, _ = w.Write([]byte(roleNotFoundBody))
 	})
 
-	_, err := c.Roles.Get(t.Context(), "p", "1234")
+	_, err := c.Roles.Get(t.Context(), "1234", client.WithProject("p"))
 
 	var genErr *managementv1.GenericOpenAPIError
 	require.ErrorAs(t, err, &genErr, "errors.As must reach the generated error, got %T: %v", err, err)
@@ -77,7 +77,7 @@ func TestFacadeError_TextShowsOperationStatusAndServerMessage(t *testing.T) {
 		_, _ = w.Write([]byte(roleNotFoundBody))
 	})
 
-	_, err := c.Roles.Get(t.Context(), "p", "1234")
+	_, err := c.Roles.Get(t.Context(), "1234", client.WithProject("p"))
 
 	require.ErrorContains(t, err, "get role: 404 Not Found")
 	require.ErrorContains(t, err, "Role 1234 not found")
@@ -93,7 +93,7 @@ func TestFacadeError_LongBodyTruncatedInTextButKeptWhole(t *testing.T) {
 		_, _ = w.Write([]byte(long))
 	})
 
-	_, err := c.Roles.Get(t.Context(), "p", "1234")
+	_, err := c.Roles.Get(t.Context(), "1234", client.WithProject("p"))
 
 	require.Less(t, len(err.Error()), 2000, "error text must truncate the body")
 	require.ErrorContains(t, err, "...(truncated)")
@@ -111,7 +111,7 @@ func TestFacadeError_NoBody(t *testing.T) {
 		w.WriteHeader(http.StatusForbidden)
 	})
 
-	err := c.Roles.Delete(t.Context(), "p", "1234")
+	err := c.Roles.Delete(t.Context(), "1234", client.WithProject("p"))
 
 	require.EqualError(t, err, "delete role: 403 Forbidden")
 	var apiErr *client.APIError
@@ -129,7 +129,7 @@ func TestFacadeError_CancelledContextKeepsChain(t *testing.T) {
 	ctx, cancel := context.WithCancel(t.Context())
 	cancel()
 
-	_, err := c.Roles.Get(ctx, "p", "1234")
+	_, err := c.Roles.Get(ctx, "1234", client.WithProject("p"))
 
 	require.ErrorIs(t, err, context.Canceled)
 	require.ErrorContains(t, err, "get role: ")
@@ -144,7 +144,7 @@ func TestFacadeError_TransportFailureKeepsChain(t *testing.T) {
 	c, err := client.New(t.Context(), srv.URL, "tok", client.WithoutRetries())
 	require.NoError(t, err)
 
-	_, err = c.Roles.Get(t.Context(), "p", "1234")
+	_, err = c.Roles.Get(t.Context(), "1234", client.WithProject("p"))
 
 	var opErr *net.OpError
 	require.ErrorAs(t, err, &opErr, "transport errors must stay reachable")

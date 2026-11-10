@@ -20,10 +20,20 @@ func TestRoleLifecycle(t *testing.T) {
 
 	getOut := runOK(t, "role", "get", roleID, "--output", "json")
 	var got struct {
-		ID string `json:"id"`
+		ID   string `json:"id"`
+		Name string `json:"name"`
 	}
 	decodeJSON(t, getOut, &got)
 	assert.Equal(t, roleID, got.ID)
+
+	// --name searches the whole (default) project for the exact name.
+	listOut := runOK(t, "role", "list", "--name", got.Name, "--output", "json")
+	var listed []struct {
+		ID string `json:"id"`
+	}
+	decodeJSON(t, listOut, &listed)
+	require.Len(t, listed, 1)
+	assert.Equal(t, roleID, listed[0].ID)
 }
 
 func TestRoleGrantAssigneeToUser(t *testing.T) {

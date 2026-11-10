@@ -5,13 +5,13 @@ package integration
 import (
 	"context"
 	"encoding/json"
-	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
+	"github.com/lakekeeper/go-lakekeeper/pkg/client"
 	"github.com/lakekeeper/go-lakekeeper/pkg/storage/credential"
 	"github.com/lakekeeper/go-lakekeeper/pkg/storage/profile"
 )
@@ -77,7 +77,6 @@ func TestWireFormat_CredentialVariants(t *testing.T) {
 			)
 
 			req := managementv1.NewCreateWarehouseRequest(sp, "wire-format-"+tc.name)
-			req.SetProjectId(defaultProjectID)
 			req.SetStorageCredential(tc.credential)
 
 			b, err := json.Marshal(req)
@@ -123,26 +122,24 @@ func TestWireFormat_AccessKeyEndToEnd(t *testing.T) {
 	sc := credential.NewS3AccessKey("minio-root-user", "minio-root-password")
 
 	req := managementv1.NewCreateWarehouseRequest(sp, "wire-format-roundtrip")
-	req.SetProjectId(defaultProjectID)
 	req.SetStorageCredential(sc)
 
-	wh, r, err := c.WarehouseAPI.CreateWarehouse(t.Context()).CreateWarehouseRequest(*req).Execute()
+	wh, err := c.Warehouses.Create(t.Context(), req, client.WithProject(defaultProjectID))
 	require.NoError(t, err)
-	require.Equal(t, http.StatusCreated, r.StatusCode)
 
 	t.Cleanup(func() {
-		if _, err := c.WarehouseAPI.DeleteWarehouse(context.Background(), wh.WarehouseId).Execute(); err != nil {
+		if err := c.Warehouses.Delete(context.Background(), wh.GetWarehouseId()); err != nil {
 			t.Errorf("delete warehouse: %v", err)
 		}
 	})
 
-	got, _, err := c.WarehouseAPI.GetWarehouse(t.Context(), wh.WarehouseId).Execute()
+	got, err := c.Warehouses.Get(t.Context(), wh.GetWarehouseId())
 	require.NoError(t, err)
 	require.NotNil(t, got)
 
 	// Marshal the round-tripped storage profile and decode to a map so we
 	// assert on keys, not on whitespace/field-order quirks of the encoder.
-	bytes, err := json.Marshal(got.StorageProfile)
+	bytes, err := json.Marshal(got.GetStorageProfile())
 	require.NoError(t, err)
 
 	var wire map[string]any

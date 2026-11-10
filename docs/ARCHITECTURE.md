@@ -43,12 +43,15 @@ graph TD
     ICEBERG --> LKCAT
 ```
 
-`pkg/client.Client` **embeds** `*managementv1.APIClient`. That means every
-generated service is reachable as a public field on `Client`
-(`c.ProjectAPI`, `c.WarehouseAPI`, `c.RoleAPI`, `c.UserAPI`, `c.ServerAPI`,
-`c.PermissionsOpenfgaAPI`, `c.AuthorizationAPI`, `c.TasksAPI`). The facade
-itself only adds:
+`pkg/client.Client` adds:
 
+- **Resource façades** (`c.Warehouses`, `c.Projects`, `c.Roles`,
+  `c.Users`, `c.Server`, `c.Permissions`): one method call per
+  operation, returning `(value, error)`. They own request construction,
+  query options and paging, **Project scoping** (see below), and the one
+  error model. They cover every operation `lkctl` uses, and `lkctl`
+  commands call nothing else; see
+  [PACKAGES.md](PACKAGES.md#resource-façades-one-call-ergonomic-surface).
 - **Auth wiring** through `core.AuthRoundTripper`, which injects the
   `Authorization` header on every outbound request.
 - **Retries** by wrapping the auth-injecting transport in
@@ -56,6 +59,14 @@ itself only adds:
 - **Optional bootstrap** at construction time via `WithInitialBootstrap`.
 - **`CatalogV1(ctx, projectID, warehouse, …)`** — a one-shot helper that
   delegates to `apache/iceberg-go`.
+
+`Client` also **embeds** `*managementv1.APIClient`, the escape hatch: every
+generated service stays reachable as a public field (`c.ProjectAPI`,
+`c.WarehouseAPI`, `c.RoleAPI`, `c.UserAPI`, `c.ServerAPI`,
+`c.PermissionsOpenfgaAPI`, `c.AuthorizationAPI`, `c.GrantAPI`, `c.TagAPI`,
+`c.TasksAPI`). Use it for operations without a façade (tags, tasks,
+grants, authorization checks, …) or when you need the raw
+`*http.Response`.
 
 ## Server-side context
 
@@ -83,19 +94,23 @@ environment for this SDK.
 
 ## Request Lifecycle
 
-Every SDK call follows the same path from the generated service through
-the embedded `APIClient` and out to the wire.
+Every SDK call follows the same path from the resource façade through the
+generated service and the embedded `APIClient` and out to the wire. Callers
+of the escape hatch enter at the generated service and get the raw triple
+back.
 
 ```mermaid
 sequenceDiagram
     participant Caller
+    participant Facade as c.Projects<br/>(or any façade)
     participant Service as ProjectAPI<br/>(or any *APIService)
     participant APIClient as managementv1.APIClient
     participant HTTP as retryablehttp StandardClient
     participant Auth as AuthRoundTripper
     participant API as Lakekeeper API
 
-    Caller->>Service: ListProjects(ctx).Execute()
+    Caller->>Facade: List(ctx)
+    Facade->>Service: ListProjects(ctx).Execute()
     Service->>APIClient: prepareRequest(ctx, ...)
     APIClient->>HTTP: client.Do(req)
     Note over HTTP: Retries on 429 and 5xx<br/>via retryablehttp
@@ -108,7 +123,9 @@ sequenceDiagram
     HTTP-->>APIClient: *http.Response
     Note over APIClient: Generated decode → typed result<br/>or *GenericOpenAPIError
     APIClient-->>Service: *result, *http.Response, err
-    Service-->>Caller: *ListProjectsResponse, *http.Response, nil
+    Service-->>Facade: *ListProjectsResponse, *http.Response, err
+    Note over Facade: WrapAPIError(op, err, resp)
+    Facade-->>Caller: *ListProjectsResponse, error
 ```
 
 Key points:
@@ -138,22 +155,73 @@ Key points:
 ## Bootstrap Flow
 
 When `WithInitialBootstrap(true, isOperator, userType)` is passed to
-`NewWithAuthSource`, the client calls `ServerAPI.GetServerInfo` during
-construction; if the server reports `bootstrapped: false`, it then calls
-`ServerAPI.Bootstrap` automatically. This happens at most once per client
-instance (see [`pkg/client/client.go`](../pkg/client/client.go) →
-`runBootstrap`).
+`NewWithAuthSource`, the client calls the server façade's `Server.Info`
+during construction; if the server reports `bootstrapped: false`, it then
+calls `Server.Bootstrap` automatically. An already bootstrapped server is
+left alone. This happens at most once per client instance (see
+[`pkg/client/client.go`](../pkg/client/client.go) → `runBootstrap`), and a
+failure fails construction with the façade's `*client.APIError`.
 
 If the first argument is `false` (the user did not accept the terms of
-use), the option is a no-op — the constructor never calls
-`GetServerInfo` or `Bootstrap`.
+use), the option is a no-op — the constructor never calls `Info` or
+`Bootstrap`.
 
 ## Project Scoping
 
-Resources that belong to a project (warehouses, roles) are accessed
-through the generated services with the project ID supplied per call.
-The wire convention is the `x-project-id` header; the generated service
-methods accept it as a setter on the fluent request builder
-(`c.RoleAPI.ListRoles(ctx).XProjectId(projectID).Execute()`). Project-
-independent resources (`ServerAPI`, `UserAPI`, `ProjectAPI`) do not need
-the header.
+Resources that belong to a project (warehouses, roles) take the project
+per call, and so do `Projects.Get`, `Rename`, `Delete`, and
+`Permissions.Projects`, which act on the project they name (the server's
+default project when they name none, except for the destructive calls
+below). A project-scoped façade method accepts a trailing
+`...client.CallOption`;
+`client.WithProject(id)` names the project.
+A method takes the option only when its endpoint accepts `x-project-id`:
+for warehouses that is Create and List, while the calls that address a
+warehouse by id (`Get`, `Rename`, `Statistics`, …) take none:
+
+```go
+c.Warehouses.List(ctx, nil, client.WithProject(projectID)) // x-project-id: <projectID>
+c.Warehouses.List(ctx, nil)                                // no project sent
+```
+
+- With `WithProject`, the façade sends the `x-project-id` header.
+- Without it, the façade sends no project. The server then applies its
+  **default project**: the nil UUID unless the operator set
+  `LAKEKEEPER__DEFAULT_PROJECT_ID`. If the operator disabled the default
+  project, the server answers 400 `ProjectIdMissing`.
+- `WithProject("")` is not "no project": the call fails with
+  `client.ErrEmptyProjectID` before sending anything, so an unset variable
+  can't silently target the default project.
+- The destructive project-level calls are the exception to "omitting is
+  valid": `Projects.Delete` and `Permissions.Projects.Grant` / `Revoke`
+  fail with `client.ErrProjectRequired` without `WithProject` and send
+  nothing, so a project is never deleted, and its permissions never
+  changed, by omission. To act on the default project, name it. This
+  deliberately deviates from the façade spec (VAK-853).
+- The façades never send the deprecated `projectId` query parameter or
+  `project-id` body field. When both are sent, Lakekeeper lets the
+  deprecated one win over the header. A request model that still carries
+  the body field (`CreateWarehouseRequest`, `CreateRoleRequest`,
+  `SearchRoleRequest`) has it moved to the header: alone it acts like
+  `WithProject`, equal to `WithProject` it is dropped, and a different
+  project fails with `client.ErrProjectIDConflict`. The caller's request
+  is not modified.
+
+How a project is sent is decided in one file,
+`pkg/client/call_options.go`: `withProject` (header or nothing, empty
+rejected), `withRequiredProject` (the destructive calls: no fallback),
+and `withBodyProject` (the deprecated body field). Every project-scoped
+façade method goes through them. `lkctl`'s `-p/--project` flag and the
+optional `[PROJECT-ID]` argument of `project access` and `project
+assignments` have no default: omitted, they send no option; given, they
+map to `WithProject`, so an explicit empty value is rejected. `project
+delete`, `grant`, and `revoke` take a required `PROJECT-ID`. There is no
+client-wide default project: each call names its project or leaves the
+choice to the server.
+
+Callers of the generated services (the escape hatch) set the header
+themselves (`c.RoleAPI.ListRoles(ctx).XProjectId(projectID).Execute()`)
+and should leave the deprecated `ProjectId(...)` query builder and
+`project-id` body field unset, for the reason above. Project-independent
+operations (server, users, project create and list) do not need the
+header.

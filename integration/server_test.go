@@ -10,18 +10,18 @@ import (
 	"github.com/stretchr/testify/require"
 
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
+	"github.com/lakekeeper/go-lakekeeper/pkg/client"
 )
 
 func TestServer_Info(t *testing.T) {
 	c := sharedClient
 
-	info, _, err := c.ServerAPI.GetServerInfo(t.Context()).Execute()
+	info, err := c.Server.Info(t.Context())
 	require.NoError(t, err)
-	assert.True(t, info.Bootstrapped)
-	assert.NotEmpty(t, info.ServerId)
-	require.NotNil(t, info.DefaultProjectId.Get())
-	assert.NotEmpty(t, *info.DefaultProjectId.Get())
-	assert.Equal(t, "openfga", info.AuthzBackend)
+	assert.True(t, info.GetBootstrapped())
+	assert.NotEmpty(t, info.GetServerId())
+	assert.NotEmpty(t, info.GetDefaultProjectId())
+	assert.Equal(t, "openfga", info.GetAuthzBackend())
 }
 
 // TestServer_Bootstrap_RejectsRebootstrap confirms that the server rejects a
@@ -35,9 +35,8 @@ func TestServer_Info(t *testing.T) {
 func TestServer_Bootstrap_RejectsRebootstrap(t *testing.T) {
 	c := sharedClient
 
-	req := managementv1.NewBootstrapRequest(true)
-	r, err := c.ServerAPI.Bootstrap(t.Context()).BootstrapRequest(*req).Execute()
-	require.Error(t, err)
-	require.NotNil(t, r)
-	assert.Equal(t, http.StatusBadRequest, r.StatusCode)
+	err := c.Server.Bootstrap(t.Context(), managementv1.NewBootstrapRequest(true))
+	var apiErr *client.APIError
+	require.ErrorAs(t, err, &apiErr)
+	assert.Equal(t, http.StatusBadRequest, apiErr.StatusCode)
 }

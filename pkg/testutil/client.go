@@ -1,3 +1,9 @@
+// Package testutil is the httptest harness for façade and command tests: a
+// test server, a *client.Client pointed at it, and a recorder for the
+// requests the server receives.
+//
+// Façade tests must live in package client_test (pkg/client importing this
+// package from an internal test would be an import cycle).
 package testutil
 
 import (
@@ -5,128 +11,130 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
-	"os"
+	"net/url"
+	"sync"
 	"testing"
 
 	"github.com/lakekeeper/go-lakekeeper/pkg/client"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
-// setup sets up a test HTTP server along with a Client that is
-// configured to talk to that test server.  Tests should register handlers on
-// mux which provide mock responses for the API method being tested.
-func ServerMux(t *testing.T) (*http.ServeMux, *client.Client) {
+// NewServer starts an httptest server serving the returned mux and returns
+// the server's base URL. The server is closed when the test ends. Use it
+// directly when the code under test builds its own client, as lkctl commands
+// do (pass the URL as --base-url).
+func NewServer(t *testing.T) (*http.ServeMux, string) {
 	t.Helper()
-	// mux is the HTTP request multiplexer used with the test server.
 	mux := http.NewServeMux()
-
-	// server is a test HTTP server used to provide mock API responses.
 	server := httptest.NewServer(mux)
 	t.Cleanup(server.Close)
+	return mux, server.URL
+}
 
-	c, err := client.New(t.Context(), server.URL, "test-token", client.WithoutRetries())
+// ServerMux starts a test server like NewServer and returns a *client.Client
+// talking to it, with a static token and retries disabled. Register handlers
+// on the mux (Respond, or mux.HandleFunc for custom behaviour) before calling
+// the façade under test.
+func ServerMux(t *testing.T) (*http.ServeMux, *client.Client) {
+	t.Helper()
+	mux, baseURL := NewServer(t)
+	c, err := client.New(t.Context(), baseURL, "test-token", client.WithoutRetries())
 	if err != nil {
 		t.Fatal(err)
 	}
-
 	return mux, c
 }
 
-func TestURL(t *testing.T, r *http.Request, want string) {
-	if got := r.RequestURI; got != want {
-		t.Errorf("Request url: %+v, want %s", got, want)
-	}
+// CapturedRequest is a copy of a request the test server received, safe to
+// read after the call under test has returned.
+type CapturedRequest struct {
+	Method string
+	Path   string // URL path, without the query
+	Query  url.Values
+	Header http.Header
+	Body   []byte
 }
 
-func TestMethod(t *testing.T, r *http.Request, want string) {
-	if got := r.Method; got != want {
-		t.Errorf("Request method: %s, want %s", got, want)
-	}
+// RequestLog records the requests a handler registered with Respond receives.
+// It is safe for concurrent use.
+type RequestLog struct {
+	mu   sync.Mutex
+	reqs []CapturedRequest
 }
 
-func TestHeader(t *testing.T, r *http.Request, key, want string) {
-	if got := r.Header.Get(key); got != want {
-		t.Errorf("Request header: %s, want %s", got, want)
-	}
+// Len returns how many requests were received.
+func (l *RequestLog) Len() int {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	return len(l.reqs)
 }
 
-// Tests that a given form attribute has a value in a form request. Useful
-// for testing file upload API requests.
-func TestFormBody(t *testing.T, r *http.Request, key, want string) {
-	if got := r.FormValue(key); got != want {
-		t.Errorf("Request body for key %s got: %s, want %s", key, got, want)
-	}
-}
-
-// testBodyJSON tests that the JSON request body is what we expect. The want
-// argument is typically either a struct, a map[string]string, or a
-// map[string]any, though other types are handled as well.
-//
-// Calls t.Fatal if decoding the request body fails, failing the test
-// immediately.
-//
-// When the request body is not equal to "want", the error is reported but the
-// test is allowed to continue. You can use the return value to end the test on
-// error: returns true if the decoded body is identical to want, false
-// otherwise.
-func TestBodyJSON[T any](t *testing.T, r *http.Request, want T) bool {
-	var got T
-
-	if err := json.NewDecoder(r.Body).Decode(&got); err != nil {
-		t.Fatalf("Failed to decode JSON from request body: %v", err)
-	}
-
-	return assert.Equal(t, want, got)
-}
-
-// testParam checks whether the given request contains the expected parameter and whether the parameter has the expected value.
-func TestParam(t *testing.T, r *http.Request, key, value string) {
-	require.True(t, r.URL.Query().Has(key), "Request does not contain the %q parameter", key)
-	assert.Len(t, r.URL.Query()[key], 1, "Request contains multiple %q parameters when only one is expected", key)
-	require.Equal(t, value, r.URL.Query().Get(key))
-}
-
-func MustWriteHTTPResponse(t *testing.T, w io.Writer, fixturePath string) {
+// Last returns the most recent request. It fails the test immediately if no
+// request was received.
+func (l *RequestLog) Last(t *testing.T) CapturedRequest {
 	t.Helper()
-	f, err := os.Open(fixturePath)
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	if len(l.reqs) == 0 {
+		t.Fatal("test server received no request")
+	}
+	return l.reqs[len(l.reqs)-1]
+}
+
+func (l *RequestLog) add(r *http.Request) error {
+	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		t.Fatalf("error opening fixture file: %v", err)
+		return err
 	}
-	defer f.Close()
-
-	if _, err = io.Copy(w, f); err != nil {
-		t.Fatalf("error writing response: %v", err)
-	}
-}
-
-// mustWriteJSONResponse writes a JSON response to w.
-// It uses t.Fatal to stop the test and report an error if encoding the response fails.
-// This helper is useful when implementing handlers in unit tests.
-func MustWriteJSONResponse(t *testing.T, w io.Writer, response any) {
-	t.Helper()
-	if err := json.NewEncoder(w).Encode(response); err != nil {
-		t.Fatalf("Failed to write response: %v", err)
-	}
-}
-
-// mustWriteErrorResponse writes an error response to w in a format that CheckResponse can parse.
-// It uses t.Fatal to stop the test and report an error if encoding the response fails.
-// This is useful when testing error conditions.
-func MustWriteErrorResponse(t *testing.T, w io.Writer, err error) {
-	t.Helper()
-	MustWriteJSONResponse(t, w, map[string]any{
-		"error": err.Error(),
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	l.reqs = append(l.reqs, CapturedRequest{
+		Method: r.Method,
+		Path:   r.URL.Path,
+		Query:  r.URL.Query(),
+		Header: r.Header.Clone(),
+		Body:   body,
 	})
+	return nil
 }
 
-func LoadFixture(t *testing.T, filePath string) []byte {
+// Respond registers pattern (a ServeMux pattern such as
+// "GET /management/v1/warehouse/{id}") on mux. Every matching request is
+// recorded in the returned log and answered with status and body:
+//
+//   - nil: no body (for 204 responses or bodiless errors);
+//   - string or []byte: written as is, with Content-Type application/json
+//     (use it for literal JSON payloads and Lakekeeper error bodies);
+//   - anything else: encoded as JSON.
+func Respond(t *testing.T, mux *http.ServeMux, pattern string, status int, body any) *RequestLog {
 	t.Helper()
-	content, err := os.ReadFile(filePath)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	return content
+	log := &RequestLog{}
+	mux.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
+		if err := log.add(r); err != nil {
+			t.Errorf("read request body: %v", err)
+		}
+		if body == nil {
+			w.WriteHeader(status)
+			return
+		}
+		var payload []byte
+		switch b := body.(type) {
+		case string:
+			payload = []byte(b)
+		case []byte:
+			payload = b
+		default:
+			var err error
+			if payload, err = json.Marshal(b); err != nil {
+				t.Errorf("encode response: %v", err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(status)
+		if _, err := w.Write(payload); err != nil {
+			t.Errorf("write response: %v", err)
+		}
+	})
+	return log
 }

@@ -10,13 +10,15 @@
 //	)
 //	sc := lakekeeper.NewS3AccessKey("ak", "sk")
 //	req := lakekeeper.NewCreateWarehouseRequest(sp, "main")
-//	req.SetProjectId(projectID)
 //	req.SetStorageCredential(sc)
-//	wh, err := c.Warehouses.Create(ctx, req)
+//	wh, err := c.Warehouses.Create(ctx, req, lakekeeper.WithProject(projectID))
 //
 // What it re-exports:
 //
-//   - Client + constructors, APIError and WrapAPIError from pkg/client
+//   - Client + constructors and client Options, APIError and WrapAPIError
+//     from pkg/client
+//   - CallOption and WithProject, and every façade …Options type (e.g.
+//     ListWarehousesOptions, ListRolesOptions, GetServerAccessOptions)
 //   - Storage profile/credential builders from pkg/storage/{profile,credential}
 //   - Permission builders from pkg/permissions
 //   - The most common Management API request/response types
@@ -82,6 +84,47 @@ type (
 
 	// APIError is the error a façade returns for a server error response.
 	APIError = client.APIError
+
+	// CallOption configures one façade call (see WithProject).
+	CallOption = client.CallOption
+
+	// ListWarehousesOptions holds the query parameters of Warehouses.List.
+	ListWarehousesOptions = client.ListWarehousesOptions
+
+	// GetWarehouseStatisticsOptions holds the query parameters of
+	// Warehouses.Statistics.
+	GetWarehouseStatisticsOptions = client.GetWarehouseStatisticsOptions
+
+	// ListUserOptions holds the query parameters of Users.List.
+	ListUserOptions = client.ListUserOptions
+
+	// GetWarehouseAccessByIDOptions holds the query parameters of
+	// Permissions.Warehouses.Access.
+	GetWarehouseAccessByIDOptions = client.GetWarehouseAccessByIDOptions
+	// GetWarehouseAssignmentsByIDOptions holds the query parameters of
+	// Permissions.Warehouses.Assignments.
+	GetWarehouseAssignmentsByIDOptions = client.GetWarehouseAssignmentsByIDOptions
+	// GetAuthorizerRoleActionsOptions holds the query parameters of
+	// Permissions.Roles.Access.
+	GetAuthorizerRoleActionsOptions = client.GetAuthorizerRoleActionsOptions
+	// GetRoleAssignmentsByIDOptions holds the query parameters of
+	// Permissions.Roles.Assignments.
+	GetRoleAssignmentsByIDOptions = client.GetRoleAssignmentsByIDOptions
+	// GetProjectAccessOptions holds the query parameters of
+	// Permissions.Projects.Access.
+	GetProjectAccessOptions = client.GetProjectAccessOptions
+	// GetProjectAssignmentsOptions holds the query parameters of
+	// Permissions.Projects.Assignments.
+	GetProjectAssignmentsOptions = client.GetProjectAssignmentsOptions
+	// GetServerAccessOptions holds the query parameters of
+	// Permissions.Server.Access.
+	GetServerAccessOptions = client.GetServerAccessOptions
+	// GetServerAssignmentsOptions holds the query parameters of
+	// Permissions.Server.Assignments.
+	GetServerAssignmentsOptions = client.GetServerAssignmentsOptions
+
+	// ListRolesOptions holds the query parameters of Roles.List.
+	ListRolesOptions = client.ListRolesOptions
 )
 
 var (
@@ -97,6 +140,8 @@ var (
 	WithInitialBootstrap = client.WithInitialBootstrap
 
 	WrapAPIError = client.WrapAPIError
+
+	WithProject = client.WithProject
 )
 
 // Storage profile builders + option types.

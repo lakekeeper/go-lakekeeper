@@ -1,13 +1,13 @@
 package commands
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
 	"text/tabwriter"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
@@ -25,7 +25,7 @@ func newRoleCmd(opts *clientOptions) *cobra.Command {
 		},
 	}
 
-	cmd.PersistentFlags().StringVarP(&project, "project", "p", uuid.Nil.String(), "Select a project")
+	addProjectFlag(cmd, &project)
 
 	cmd.AddCommand(newRoleListCmd(opts, &project))
 	cmd.AddCommand(newRoleGetCmd(opts, &project))
@@ -58,25 +58,23 @@ func newRoleListCmd(opts *clientOptions, project *string) *cobra.Command {
 				return err
 			}
 
-			req := c.RoleAPI.ListRoles(ctx).XProjectId(*project).PageSize(listOpts.limit)
-			if listOpts.token != "" {
-				req = req.PageToken(listOpts.token)
-			}
-
-			resp, _, err := req.Execute()
-			if err != nil {
-				return client.WrapAPIError("list roles", err, nil)
-			}
-
-			roles := resp.Roles
+			var (
+				roles     []managementv1.Role
+				nextToken string
+			)
 			if listOpts.name != "" {
-				filtered := make([]managementv1.Role, 0, len(roles))
-				for i := range roles {
-					if roles[i].Name == listOpts.name {
-						filtered = append(filtered, roles[i])
-					}
+				roles, err = findRolesByName(ctx, c, listOpts.name, listOpts.limit, projectFlagOptions(cmd, *project)...)
+				if err != nil {
+					return err
 				}
-				roles = filtered
+			} else {
+				resp, err := c.Roles.List(ctx,
+					&client.ListRolesOptions{PageSize: listOpts.limit, PageToken: listOpts.token},
+					projectFlagOptions(cmd, *project)...)
+				if err != nil {
+					return err
+				}
+				roles, nextToken = resp.GetRoles(), resp.GetNextPageToken()
 			}
 
 			switch output {
@@ -90,8 +88,8 @@ func newRoleListCmd(opts *clientOptions, project *string) *cobra.Command {
 				if err := printRoles(cmd.OutOrStdout(), output, roles...); err != nil {
 					return err
 				}
-				if resp.NextPageToken.Get() != nil {
-					fmt.Fprintf(cmd.OutOrStdout(), "\nNext page token: %s\n", *resp.NextPageToken.Get())
+				if nextToken != "" {
+					fmt.Fprintf(cmd.OutOrStdout(), "\nNext page token: %s\n", nextToken)
 				}
 				return nil
 			default:
@@ -101,8 +99,57 @@ func newRoleListCmd(opts *clientOptions, project *string) *cobra.Command {
 	}
 
 	addListFlags(cmd, &listOpts)
+	cmd.Flags().Lookup("name").Usage = "Show only the role named exactly this, searched across the whole project (not just the current page)"
+	cmd.MarkFlagsMutuallyExclusive("name", "token")
 	cmd.Flags().StringVarP(&output, "output", "o", "text", "Output format. One of: json|text|wide")
 	return cmd
+}
+
+// findRolesByName returns the role named exactly name, or none. Lakekeeper
+// keeps role names unique per project (ignoring case), so there is at most
+// one. It runs the server's role search and keeps the exact match. The search
+// returns only the 10 nearest roles and truncates the search string to 64
+// characters, so it can miss an exact match (for example among 10 or more
+// names that differ only in punctuation). On a miss it therefore pages
+// through the whole listing, pageSize roles at a time, before reporting none.
+func findRolesByName(ctx context.Context, c *client.Client, name string, pageSize int64, callOpts ...client.CallOption) ([]managementv1.Role, error) {
+	found, err := c.Roles.Search(ctx, managementv1.NewSearchRoleRequest(name), callOpts...)
+	if err != nil {
+		return nil, err
+	}
+	if matches := exactRoleNameMatches(found.GetRoles(), name); len(matches) > 0 {
+		return matches, nil
+	}
+
+	matches := []managementv1.Role{}
+	opts := &client.ListRolesOptions{PageSize: pageSize}
+	seen := map[string]bool{}
+	for {
+		page, err := c.Roles.List(ctx, opts, callOpts...)
+		if err != nil {
+			return nil, err
+		}
+		matches = append(matches, exactRoleNameMatches(page.GetRoles(), name)...)
+		opts.PageToken = page.GetNextPageToken()
+		if opts.PageToken == "" {
+			return matches, nil
+		}
+		// A token the server already gave would page in a circle forever.
+		if seen[opts.PageToken] {
+			return nil, fmt.Errorf("list roles: server returned a repeated page token %q", opts.PageToken)
+		}
+		seen[opts.PageToken] = true
+	}
+}
+
+func exactRoleNameMatches(roles []managementv1.Role, name string) []managementv1.Role {
+	matches := make([]managementv1.Role, 0, 1)
+	for i := range roles {
+		if roles[i].GetName() == name {
+			matches = append(matches, roles[i])
+		}
+	}
+	return matches
 }
 
 func newRoleGetCmd(opts *clientOptions, project *string) *cobra.Command {
@@ -119,9 +166,9 @@ func newRoleGetCmd(opts *clientOptions, project *string) *cobra.Command {
 				return err
 			}
 
-			role, _, err := c.RoleAPI.GetRole(ctx, args[0]).XProjectId(*project).Execute()
+			role, err := c.Roles.Get(ctx, args[0], projectFlagOptions(cmd, *project)...)
 			if err != nil {
-				return client.WrapAPIError("get role", err, nil)
+				return err
 			}
 
 			switch output {
@@ -166,14 +213,14 @@ func newRoleCreateCmd(opts *clientOptions, project *string) *cobra.Command {
 			if description != "" {
 				req.SetDescription(description)
 			}
-			role, _, err := c.RoleAPI.CreateRole(ctx).XProjectId(*project).CreateRoleRequest(*req).Execute()
+			role, err := c.Roles.Create(ctx, req, projectFlagOptions(cmd, *project)...)
 			if err != nil {
-				return client.WrapAPIError("create role", err, nil)
+				return err
 			}
 
 			switch output {
 			case "text":
-				fmt.Fprintf(cmd.OutOrStdout(), "Role %s created with id %s\n", args[0], role.Id)
+				fmt.Fprintf(cmd.OutOrStdout(), "Role %s created with id %s\n", args[0], role.GetId())
 				return nil
 			case "json":
 				return printJSON(cmd.OutOrStdout(), role)
@@ -209,9 +256,9 @@ func newRoleUpdateCmd(opts *clientOptions, project *string) *cobra.Command {
 			if description != "" {
 				req.SetDescription(description)
 			}
-			role, _, err := c.RoleAPI.UpdateRole(ctx, args[0]).XProjectId(*project).UpdateRoleRequest(*req).Execute()
+			role, err := c.Roles.Update(ctx, args[0], req, projectFlagOptions(cmd, *project)...)
 			if err != nil {
-				return client.WrapAPIError("update role", err, nil)
+				return err
 			}
 
 			switch output {
@@ -243,8 +290,8 @@ func newRoleDeleteCmd(opts *clientOptions, project *string) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			if _, err := c.RoleAPI.DeleteRole(ctx, args[0]).XProjectId(*project).Execute(); err != nil {
-				return client.WrapAPIError("delete role", err, nil)
+			if err := c.Roles.Delete(ctx, args[0], projectFlagOptions(cmd, *project)...); err != nil {
+				return err
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "Role %s deleted\n", args[0])
 			return nil
@@ -274,23 +321,19 @@ func newRoleAccessCmd(opts *clientOptions) *cobra.Command {
 				return err
 			}
 
-			req := c.PermissionsOpenfgaAPI.GetAuthorizerRoleActions(ctx, args[0])
-			if access.user != "" {
-				req = req.PrincipalUser(access.user)
-			}
-			if access.role != "" {
-				req = req.PrincipalRole(access.role)
-			}
-			resp, _, err := req.Execute()
+			resp, err := c.Permissions.Roles.Access(ctx, args[0], &client.GetAuthorizerRoleActionsOptions{
+				PrincipalUser: access.user,
+				PrincipalRole: access.role,
+			})
 			if err != nil {
-				return client.WrapAPIError("get role access", err, nil)
+				return err
 			}
 
 			switch output {
 			case "json":
 				return printJSON(cmd.OutOrStdout(), resp)
 			case "text":
-				return printAllowedActions(cmd.OutOrStdout(), resp.AllowedActions)
+				return printAllowedActions(cmd.OutOrStdout(), resp.GetAllowedActions())
 			default:
 				return fmt.Errorf("unknown output format: %s", output)
 			}
@@ -319,25 +362,18 @@ func newRoleAssignmentsCmd(opts *clientOptions) *cobra.Command {
 				return err
 			}
 
-			req := c.PermissionsOpenfgaAPI.GetRoleAssignmentsById(ctx, args[0])
-			if len(assignments.relations) > 0 {
-				rels := make([]managementv1.RoleRelation, 0, len(assignments.relations))
-				for _, r := range assignments.relations {
-					rels = append(rels, managementv1.RoleRelation(r))
-				}
-				req = req.Relations(rels)
-			}
-
-			resp, _, err := req.Execute()
+			resp, err := c.Permissions.Roles.Assignments(ctx, args[0], &client.GetRoleAssignmentsByIDOptions{
+				Relations: toEnums[managementv1.RoleRelation](assignments.relations),
+			})
 			if err != nil {
-				return client.WrapAPIError("get role assignments", err, nil)
+				return err
 			}
 
 			switch output {
 			case "json":
 				return printJSON(cmd.OutOrStdout(), resp)
 			case "text":
-				return printAssignments(cmd.OutOrStdout(), resp.Assignments...)
+				return printAssignments(cmd.OutOrStdout(), resp.GetAssignments()...)
 			default:
 				return fmt.Errorf("unknown output format: %s", output)
 			}
@@ -366,16 +402,14 @@ func newRoleGrantCmd(opts *clientOptions) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			req := managementv1.NewUpdateRoleAssignmentsRequest()
-			req.Writes = set
 
 			ctx := cmd.Context()
 			c, err := newClient(ctx, opts)
 			if err != nil {
 				return err
 			}
-			if _, err := c.PermissionsOpenfgaAPI.UpdateRoleAssignmentsById(ctx, args[0]).UpdateRoleAssignmentsRequest(*req).Execute(); err != nil {
-				return client.WrapAPIError("update role assignments", err, nil)
+			if err := c.Permissions.Roles.Grant(ctx, args[0], set); err != nil {
+				return err
 			}
 			fmt.Fprintln(cmd.OutOrStdout(), "Role permissions updated")
 			return nil
@@ -413,16 +447,14 @@ func newRoleRevokeCmd(opts *clientOptions) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			req := managementv1.NewUpdateRoleAssignmentsRequest()
-			req.Deletes = set
 
 			ctx := cmd.Context()
 			c, err := newClient(ctx, opts)
 			if err != nil {
 				return err
 			}
-			if _, err := c.PermissionsOpenfgaAPI.UpdateRoleAssignmentsById(ctx, args[0]).UpdateRoleAssignmentsRequest(*req).Execute(); err != nil {
-				return client.WrapAPIError("update role assignments", err, nil)
+			if err := c.Permissions.Roles.Revoke(ctx, args[0], set); err != nil {
+				return err
 			}
 			fmt.Fprintln(cmd.OutOrStdout(), "Role permissions updated")
 			return nil
@@ -444,20 +476,23 @@ func printRoles(w io.Writer, output string, roles ...managementv1.Role) error {
 		fmt.Fprintln(tw, "ID\tNAME\tPROJECT ID\tCREATED AT\tUPDATED AT\tDESCRIPTION")
 		for i := range roles {
 			r := &roles[i]
+			updatedAt, _ := r.GetUpdatedAtOk()
+			description, _ := r.GetDescriptionOk()
 			fmt.Fprintf(tw, "%s\t%s\t%s\t%s\t%s\t%s\n",
-				r.Id, r.Name, r.ProjectId,
-				r.CreatedAt.Format(time.RFC3339),
-				formatTimePtr(r.UpdatedAt.Get()),
-				formatStringPtr(r.Description.Get()))
+				r.GetId(), r.GetName(), r.GetProjectId(),
+				r.GetCreatedAt().Format(time.RFC3339),
+				formatTimePtr(updatedAt),
+				formatStringPtr(description))
 		}
 	} else {
 		fmt.Fprintln(tw, "ID\tNAME\tPROJECT ID\tCREATED AT\tUPDATED AT")
 		for i := range roles {
 			r := &roles[i]
+			updatedAt, _ := r.GetUpdatedAtOk()
 			fmt.Fprintf(tw, "%s\t%s\t%s\t%s\t%s\n",
-				r.Id, r.Name, r.ProjectId,
-				r.CreatedAt.Format(time.RFC3339),
-				formatTimePtr(r.UpdatedAt.Get()))
+				r.GetId(), r.GetName(), r.GetProjectId(),
+				r.GetCreatedAt().Format(time.RFC3339),
+				formatTimePtr(updatedAt))
 		}
 	}
 	return tw.Flush()

@@ -125,13 +125,13 @@ func MustProvisionUser(t *testing.T, c *client.Client) *managementv1.User {
 	req.SetUserType(managementv1.USERTYPE_HUMAN)
 	req.SetUpdateIfExists(false)
 
-	user, _, err := c.UserAPI.CreateUser(t.Context()).CreateUserRequest(*req).Execute()
+	user, err := c.Users.Create(t.Context(), req)
 	if err != nil {
 		t.Fatalf("create user: %v", err)
 	}
 
 	t.Cleanup(func() {
-		if _, err := c.UserAPI.DeleteUser(context.Background(), user.Id).Execute(); err != nil {
+		if err := c.Users.Delete(context.Background(), user.GetId()); err != nil {
 			t.Errorf("delete user: %v", err)
 		}
 	})
@@ -144,13 +144,13 @@ func MustCreateRole(t *testing.T, c *client.Client, projectID string) *managemen
 	t.Helper()
 
 	req := managementv1.NewCreateRoleRequest(randomName("test-role"))
-	role, _, err := c.RoleAPI.CreateRole(t.Context()).XProjectId(projectID).CreateRoleRequest(*req).Execute()
+	role, err := c.Roles.Create(t.Context(), req, client.WithProject(projectID))
 	if err != nil {
 		t.Fatalf("create role: %v", err)
 	}
 
 	t.Cleanup(func() {
-		if _, err := c.RoleAPI.DeleteRole(context.Background(), role.Id).XProjectId(projectID).Execute(); err != nil {
+		if err := c.Roles.Delete(context.Background(), role.GetId(), client.WithProject(projectID)); err != nil {
 			t.Errorf("delete role: %v", err)
 		}
 	})
@@ -162,18 +162,17 @@ func MustCreateRole(t *testing.T, c *client.Client, projectID string) *managemen
 func MustCreateProject(t *testing.T, c *client.Client) string {
 	t.Helper()
 
-	req := managementv1.NewCreateProjectRequest(randomName("test-project"))
-	created, _, err := c.ProjectAPI.CreateProject(t.Context()).CreateProjectRequest(*req).Execute()
+	created, err := c.Projects.Create(t.Context(), managementv1.NewCreateProjectRequest(randomName("test-project")))
 	if err != nil {
 		t.Fatalf("create project: %v", err)
 	}
 
 	t.Cleanup(func() {
-		if _, err := c.ProjectAPI.DeleteProject(context.Background()).XProjectId(created.ProjectId).Execute(); err != nil {
+		if err := c.Projects.Delete(context.Background(), client.WithProject(created.GetProjectId())); err != nil {
 			t.Errorf("delete project: %v", err)
 		}
 	})
-	return created.ProjectId
+	return created.GetProjectId()
 }
 
 // MustCreateWarehouse creates a warehouse against the in-stack MinIO under the
@@ -194,20 +193,25 @@ func MustCreateWarehouse(t *testing.T, c *client.Client, projectID string) (stri
 	sc := credential.NewS3AccessKey("minio-root-user", "minio-root-password")
 
 	req := managementv1.NewCreateWarehouseRequest(sp, name)
-	req.SetProjectId(projectID)
 	req.SetStorageCredential(sc)
 
-	wh, err := c.Warehouses.Create(t.Context(), req)
+	// An empty projectID leaves the project to the server's default;
+	// WithProject("") would be rejected.
+	var callOpts []client.CallOption
+	if projectID != "" {
+		callOpts = append(callOpts, client.WithProject(projectID))
+	}
+	wh, err := c.Warehouses.Create(t.Context(), req, callOpts...)
 	if err != nil {
 		t.Fatalf("create warehouse: %v", err)
 	}
 
 	t.Cleanup(func() {
-		if err := c.Warehouses.Delete(context.Background(), wh.WarehouseId); err != nil {
+		if err := c.Warehouses.Delete(context.Background(), wh.GetWarehouseId()); err != nil {
 			t.Errorf("delete warehouse: %v", err)
 		}
 	})
-	return wh.WarehouseId, name
+	return wh.GetWarehouseId(), name
 }
 
 // *_GetAccess tests assert allowed actions via assertAllowedActionsSubset,

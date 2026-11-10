@@ -57,7 +57,6 @@ positionally, plus `Set<Field>(value)` mutators for everything else:
 
 ```go
 req := managementv1.NewCreateWarehouseRequest(sp, "main")  // required: profile, name
-req.SetProjectId(projectID)                                // optional
 req.SetStorageCredential(sc)                               // optional
 ```
 
@@ -105,10 +104,9 @@ sp := lakekeeper.NewS3Profile("bucket", "us-east-1",
 sc := lakekeeper.NewS3AccessKey("ak", "sk")
 
 req := lakekeeper.NewCreateWarehouseRequest(sp, "main")
-req.SetProjectId(projectID)
 req.SetStorageCredential(sc)
 
-wh, err := c.Warehouses.Create(ctx, req)
+wh, err := c.Warehouses.Create(ctx, req, lakekeeper.WithProject(projectID))
 ```
 
 What it re-exports:
@@ -138,12 +136,14 @@ provides no behaviour of its own — every symbol resolves through
 
 **Import path:** `github.com/lakekeeper/go-lakekeeper/pkg/client`
 
-The top-level facade. `Client` embeds the generated
-`*managementv1.APIClient`, so each generated service handle is reachable as
-a public field directly on `Client`. The facade adds auth wiring (via
-`core.AuthSource` and a custom `http.RoundTripper`), optional retry
-behaviour, optional bootstrap on construction, and a `CatalogV1` helper
-that delegates to `apache/iceberg-go`.
+The top-level facade and the public SDK interface. `Client` carries the
+resource façades (`Warehouses`, `Projects`, `Roles`, `Users`, `Server`,
+`Permissions`), auth wiring (via `core.AuthSource` and a custom
+`http.RoundTripper`), optional retry behaviour, optional bootstrap on
+construction, and a `CatalogV1` helper that delegates to
+`apache/iceberg-go`. It also embeds the generated
+`*managementv1.APIClient` as the escape hatch, so each generated service
+handle is reachable as a public field directly on `Client`.
 
 ### Constructors
 
@@ -168,21 +168,113 @@ generator's `(value, *http.Response, error)` triple.
 
 | Field | Purpose |
 |---|---|
-| `c.Warehouses` | Create / Get / Delete / List / Rename / Activate / Deactivate / SetProtection / Statistics |
-| `c.Projects` | Create / Get / Delete / List / Rename |
-| `c.Roles` | Create / Get / Delete / List / Update (project-scoped) |
-| `c.Users` | Create / Get / Delete / List / Update / Whoami |
-| `c.Server` | Info / Bootstrap |
+| `c.Warehouses` | Create and List (project-scoped); Get / Rename / Activate / Deactivate / SetProtection / Statistics / Delete (by warehouse id) |
+| `c.Projects` | Create / Get / Delete / List / Rename (Get and Rename act on the `WithProject` project, else the server's default project; Delete requires `WithProject`) |
+| `c.Roles` | Create / Get / Delete / List / Update / Search (project-scoped; `List` takes `client.ListRolesOptions` for paging) |
+| `c.Users` | Create / Get / Delete / List (paged, server-side name filter) / Update / Whoami; not project-scoped |
+| `c.Server` | Info / Bootstrap (takes `*managementv1.BootstrapRequest`); not project-scoped. `WithInitialBootstrap` uses the same two calls |
+| `c.Permissions` | Access / Assignments / Grant / Revoke, per resource kind: `.Warehouses`, `.Roles`, `.Projects` (project-scoped), `.Server` |
 
 ```go
-wh, err := c.Warehouses.Create(ctx, req)         // façade — one call
-wh, _, err := c.WarehouseAPI.CreateWarehouse(ctx). // generator — full control
-    CreateWarehouseRequest(*req).Execute()
+wh, err := c.Warehouses.Get(ctx, id)                // façade — one call
+wh, _, err := c.WarehouseAPI.GetWarehouse(ctx, id). // generator — full control
+    Execute()
 ```
 
-The façades cover roughly 90% of `lkctl`'s call sites. For endpoints with
-extra query params, custom request options, or where you need the raw
-`*http.Response`, reach for the embedded generated service handles below.
+**Coverage.** The façades cover every operation `lkctl` uses on
+warehouses, projects, roles, users, and the server, plus access,
+assignments, grant, and revoke for warehouse, role, project, and server
+permissions. `lkctl` commands call only the façades. Not covered, and
+reachable only through the [embedded generated
+services](#escape-hatch-embedded-generated-services): tags, tasks, grants,
+authorization checks, namespace and tabular protections, warehouse managed
+access, and the less common warehouse operations (storage credential and
+profile updates, delete profile, undrop, tabular search, …). For those, custom request
+options, or the raw `*http.Response`, use the escape hatch.
+
+### Façade conventions
+
+- **Entities and request bodies** are the generated `managementv1` models.
+  Read fields through their `GetX()` accessors.
+- **Query parameters** are the only façade-owned types: one
+  `<Operation>Options` struct per list or query operation (for example
+  `client.ListWarehousesOptions`, `client.GetWarehouseStatisticsOptions`),
+  passed as a pointer. `nil` or a zero field sends nothing for that
+  parameter.
+- **List results** are the generated list response; page with its
+  `GetNextPageToken()` accessor.
+- **Project scoping** is a trailing `...client.CallOption`;
+  `client.WithProject(id)` sends `x-project-id`, omitting it lets the
+  server apply its default project, and `WithProject("")` fails with
+  `client.ErrEmptyProjectID`. The destructive project-level calls
+  (`Projects.Delete`, `Permissions.Projects.Grant` / `Revoke`) require
+  the option and fail with `client.ErrProjectRequired` without it. See
+  [ARCHITECTURE.md](ARCHITECTURE.md#project-scoping).
+
+```go
+resp, err := c.Warehouses.List(ctx,
+    &client.ListWarehousesOptions{Status: []managementv1.WarehouseStatus{managementv1.WAREHOUSESTATUS_ACTIVE}},
+    client.WithProject(projectID))
+
+stats, err := c.Warehouses.Statistics(ctx, warehouseID,
+    &client.GetWarehouseStatisticsOptions{PageSize: 50, PageToken: token})
+next := stats.GetNextPageToken() // "" on the last page
+
+users, err := c.Users.List(ctx,
+    &client.ListUserOptions{Name: "peter", PageSize: 50, PageToken: token})
+```
+
+### Permissions façade
+
+`c.Permissions` holds one sub-façade per resource kind (`Warehouses`,
+`Roles`, `Projects`, `Server`). Each has the same four methods, taking the
+resource id and the resource's generated types:
+
+| Method | Request | Returns |
+|---|---|---|
+| `Access(ctx, id, *<Op>Options)` | allowed actions; options name another principal (`PrincipalUser` / `PrincipalRole`) | generated access response |
+| `Assignments(ctx, id, *<Op>Options)` | assignments; options filter by `Relations` | generated assignments response |
+| `Grant(ctx, id, []<Resource>Assignment)` | the update request's `writes` | `error` |
+| `Revoke(ctx, id, []<Resource>Assignment)` | the update request's `deletes` | `error` |
+
+Grant and Revoke build the update request themselves and reject an empty
+slice before any request is sent. Pass what
+[`permissions.BuildAssignmentSet`](#pkgpermissions) builds. Warehouse and
+role ids select their project, so these methods take no
+`client.CallOption`.
+
+`Projects` and `Server` have no `id` argument. `Projects` methods name
+the project with a trailing `client.WithProject(id)`. Without it,
+`Access` and `Assignments` use the server's default project, while
+`Grant` and `Revoke` fail with `client.ErrProjectRequired`. The server is
+a single resource and is not project-scoped.
+
+```go
+err := c.Permissions.Projects.Grant(ctx, projectSet, client.WithProject(projectID))
+resp, err := c.Permissions.Server.Assignments(ctx,
+    &client.GetServerAssignmentsOptions{Relations: []managementv1.ServerRelation{managementv1.SERVERRELATION_ADMIN}})
+```
+
+```go
+set, err := permissions.BuildAssignmentSet[managementv1.WarehouseAssignment](
+    []string{"select"}, permissions.PrincipalSet{Roles: []string{roleID}})
+if err != nil {
+    return err
+}
+if err := c.Permissions.Warehouses.Grant(ctx, warehouseID, set); err != nil {
+    return err
+}
+access, err := c.Permissions.Warehouses.Access(ctx, warehouseID,
+    &client.GetWarehouseAccessByIDOptions{PrincipalRole: roleID})
+```
+
+`Roles.Access` reads the role's authorizer actions
+(`GetAuthorizerRoleActions`); `Warehouses.Access`, `Projects.Access`, and
+`Server.Access` read the deprecated-upstream `/access` endpoints
+(`GetWarehouseAccessById`, `GetProjectAccess`, `GetServerAccess`). They
+return the action sets `lkctl` already printed, so its output is
+unchanged. `Projects` uses the header variants of the project endpoints,
+not the `…ById` path variants.
 
 ### Errors
 
@@ -202,6 +294,9 @@ helpers. Transport failures and context cancellation are not `APIError`s;
 they come back wrapped with `%w`, so `errors.Is(err, context.Canceled)`
 works.
 
+A façade method that returns an entity never returns `(nil, nil)`: a
+success status with an empty body fails with `client.ErrEmptyResponse`.
+
 `client.WrapAPIError(op, err, resp)` is the one constructor. Callers of
 the embedded generated services use it to get the same error the façades
 return:
@@ -213,13 +308,13 @@ if err != nil {
 }
 ```
 
-`resp` may be `nil`; the status is then unknown. `lkctl` commands that
-still call generated services directly pass `nil` until they move to a
-façade.
+`resp` may be `nil`; the status is then unknown.
 
-### Embedded service handles (generator-shaped fluent surface)
+### Escape hatch: embedded generated services
 
-Every generated service is exposed as a field on `*Client`:
+`Client` embeds the generated `*managementv1.APIClient`, so every generated
+service is exposed as a field on `*Client`, with the generator's fluent
+builders and its `(value, *http.Response, error)` result:
 
 | Field | Purpose |
 |---|---|
@@ -229,12 +324,16 @@ Every generated service is exposed as a field on `*Client`:
 | `c.RoleAPI` | Roles |
 | `c.WarehouseAPI` | Warehouses, namespaces, tabular protections |
 | `c.PermissionsOpenfgaAPI` | Assignments and access checks |
-| `c.AuthorizationAPI` | Authorization metadata |
+| `c.AuthorizationAPI` | Authorization metadata and action checks |
+| `c.GrantAPI` | Grants |
+| `c.TagAPI` | Tags |
 | `c.TasksAPI` | Background task introspection |
 
-Project-scoping (where the API needs `x-project-id`) is handled by passing
-the project ID into the relevant generated method — see the godoc on each
-service for specifics.
+On a project-scoped endpoint, name the project with the builder's
+`XProjectId(id)` (the `x-project-id` header) and leave the deprecated
+`ProjectId(id)` query builder and `project-id` body field unset; see
+[ARCHITECTURE.md](ARCHITECTURE.md#project-scoping). Wrap errors with
+[`client.WrapAPIError`](#errors) to get the façades' error type.
 
 ### Catalog helper
 
@@ -436,14 +535,16 @@ without exchanging it through an IdP.
 It contains the generated `*APIClient`, per-resource `*APIService` types
 (`ProjectAPIService`, `WarehouseAPIService`, `RoleAPIService`,
 `UserAPIService`, `ServerAPIService`, `PermissionsOpenfgaAPIService`,
-`AuthorizationAPIService`, `TasksAPIService`), and a few hundred model
-types (one file per model, prefix `model_`).
+`AuthorizationAPIService`, `GrantAPIService`, `TagAPIService`,
+`TasksAPIService`), and a few hundred model types (one file per model,
+prefix `model_`).
 
 The generated client is normally accessed through
 [`pkg/client`](#pkgclient) rather than instantiated directly. Use the
-embedded service fields on `*client.Client` for routine operations, and
-reach for the raw `managementv1` types when constructing requests
-(e.g. `managementv1.NewBootstrapRequest(true)`).
+resource façades on `*client.Client` for routine operations and the
+embedded service fields only for operations without a façade. The
+`managementv1` model types stay the entities and request bodies the
+façades take and return (e.g. `managementv1.NewBootstrapRequest(true)`).
 
 ---
 
@@ -527,8 +628,8 @@ builders:
 ```go
 wh, err := c.Warehouses.Get(ctx, id)
 
-if s3, ok := profile.AsS3(wh.StorageProfile); ok {
-    fmt.Println(s3.Bucket, s3.Region)
+if s3, ok := profile.AsS3(wh.GetStorageProfile()); ok {
+    fmt.Println(s3.GetBucket(), s3.GetRegion())
 }
 ```
 
@@ -615,8 +716,18 @@ Build-time version info injected via `ldflags` by goreleaser and
 
 **Import path:** `github.com/lakekeeper/go-lakekeeper/pkg/testutil`
 
-Test helpers shared across unit and integration tests. Not intended for
-use outside tests.
+The `httptest` harness for façade and `lkctl` command tests. Not intended
+for use outside tests.
+
+| Helper | Purpose |
+|---|---|
+| `NewServer(t)` | Starts a test server; returns its `*http.ServeMux` and base URL |
+| `ServerMux(t)` | `NewServer` plus a `*client.Client` pointed at it (static token, no retries) |
+| `Respond(t, mux, pattern, status, body)` | Registers a canned response and returns a `*RequestLog` |
+| `RequestLog.Last(t)` / `Len()` | The recorded requests as `CapturedRequest` (method, path, query, header, body) |
+
+Façade tests live in `package client_test` (an internal test importing
+`testutil` would be an import cycle).
 
 ---
 
@@ -624,4 +735,7 @@ use outside tests.
 
 The CLI binary entry point. Delegates immediately to
 `cmd/lkctl/commands.NewCommand()`, which builds the Cobra command tree.
+Commands call the `pkg/client` façades only, never a generated
+`*APIService`; they use `managementv1` for model types. A `forbidigo` rule
+in `.golangci.yml` enforces this for `cmd/` (`make lint`).
 See [CLI.md](CLI.md) for the full command reference.

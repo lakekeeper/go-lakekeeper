@@ -47,6 +47,8 @@ Import aliases are enforced by `importas`; use exactly these:
 - `github.com/sirupsen/logrus` → `log`
 - `github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1` → `managementv1`
 
+`forbidigo` rejects any reference from `cmd/` to the generated services (`c.WarehouseAPI`, `*managementv1.XAPIService`, `managementv1.NewAPIClient`); `lkctl` calls the `pkg/client` façades only. A command that needs an operation without a façade adds the façade method first.
+
 ## Generation
 
 `make generate` regenerates `pkg/apis/management/v1/` from `api/openapi/management-open-api.yaml` (`openapi-generator-cli` → postprocess). To change generated code, change the spec, the postprocessor, or the generator config, then regenerate.

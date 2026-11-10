@@ -15,6 +15,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
+	"github.com/lakekeeper/go-lakekeeper/pkg/client"
 	"github.com/lakekeeper/go-lakekeeper/pkg/permissions"
 )
 
@@ -27,7 +28,7 @@ func TestPermissions_Warehouse_GetAuthzProps(t *testing.T) {
 	resp, r, err := c.PermissionsOpenfgaAPI.GetWarehouseById(t.Context(), wh).Execute()
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusOK, r.StatusCode)
-	assert.False(t, resp.ManagedAccess)
+	assert.False(t, resp.GetManagedAccess())
 }
 
 func TestPermissions_Warehouse_SetManagedAccess(t *testing.T) {
@@ -39,7 +40,7 @@ func TestPermissions_Warehouse_SetManagedAccess(t *testing.T) {
 	resp, r, err := c.PermissionsOpenfgaAPI.GetWarehouseById(t.Context(), wh).Execute()
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusOK, r.StatusCode)
-	assert.False(t, resp.ManagedAccess)
+	assert.False(t, resp.GetManagedAccess())
 
 	setReq := managementv1.NewSetManagedAccessRequest(true)
 	r, err = c.PermissionsOpenfgaAPI.SetWarehouseManagedAccess(t.Context(), wh).SetManagedAccessRequest(*setReq).Execute()
@@ -48,7 +49,7 @@ func TestPermissions_Warehouse_SetManagedAccess(t *testing.T) {
 
 	resp, _, err = c.PermissionsOpenfgaAPI.GetWarehouseById(t.Context(), wh).Execute()
 	require.NoError(t, err)
-	assert.True(t, resp.ManagedAccess)
+	assert.True(t, resp.GetManagedAccess())
 }
 
 func TestPermissions_Warehouse_GetAccess(t *testing.T) {
@@ -57,9 +58,8 @@ func TestPermissions_Warehouse_GetAccess(t *testing.T) {
 	project := MustCreateProject(t, c)
 	wh, _ := MustCreateWarehouse(t, c, project)
 
-	resp, r, err := c.PermissionsOpenfgaAPI.GetWarehouseAccessById(t.Context(), wh).Execute()
+	resp, err := c.Permissions.Warehouses.Access(t.Context(), wh, nil)
 	require.NoError(t, err)
-	assert.Equal(t, http.StatusOK, r.StatusCode)
 
 	want := []managementv1.WarehouseAction{
 		managementv1.WAREHOUSEACTION_CREATE_NAMESPACE,
@@ -91,7 +91,7 @@ func TestPermissions_Warehouse_GetAccess(t *testing.T) {
 		managementv1.WAREHOUSEACTION_SET_FORMAT_VERSION_POLICY,
 		managementv1.WAREHOUSEACTION_GRANT_WRITE,
 	}
-	assertAllowedActionsSubset(t, want, resp.AllowedActions, managementv1.AllowedWarehouseActionEnumValues)
+	assertAllowedActionsSubset(t, want, resp.GetAllowedActions(), managementv1.AllowedWarehouseActionEnumValues)
 }
 
 func TestPermissions_Warehouse_GetAssignments(t *testing.T) {
@@ -100,13 +100,12 @@ func TestPermissions_Warehouse_GetAssignments(t *testing.T) {
 	project := MustCreateProject(t, c)
 	wh, _ := MustCreateWarehouse(t, c, project)
 
-	resp, r, err := c.PermissionsOpenfgaAPI.GetWarehouseAssignmentsById(t.Context(), wh).Execute()
+	resp, err := c.Permissions.Warehouses.Assignments(t.Context(), wh, nil)
 	require.NoError(t, err)
-	assert.Equal(t, http.StatusOK, r.StatusCode)
 
 	assert.ElementsMatch(t,
 		[]permissions.AssignmentRow{{PrincipalType: "user", PrincipalID: adminID, Relation: "ownership"}},
-		describeAssignments(t, resp.Assignments),
+		describeAssignments(t, resp.GetAssignments()),
 	)
 }
 
@@ -117,42 +116,33 @@ func TestPermissions_Warehouse_Update(t *testing.T) {
 	wh, _ := MustCreateWarehouse(t, c, project)
 	user := MustProvisionUser(t, c)
 
-	resp, _, err := c.PermissionsOpenfgaAPI.GetWarehouseAssignmentsById(t.Context(), wh).Execute()
+	resp, err := c.Permissions.Warehouses.Assignments(t.Context(), wh, nil)
 	require.NoError(t, err)
 	assert.ElementsMatch(t,
 		[]permissions.AssignmentRow{{PrincipalType: "user", PrincipalID: adminID, Relation: "ownership"}},
-		describeAssignments(t, resp.Assignments),
+		describeAssignments(t, resp.GetAssignments()),
 	)
 
-	addReq := managementv1.NewUpdateWarehouseAssignmentsRequest()
-	addReq.Writes = append(addReq.Writes, userAssignment[managementv1.WarehouseAssignment](t, "describe", user.Id))
+	describe := []managementv1.WarehouseAssignment{userAssignment[managementv1.WarehouseAssignment](t, "describe", user.GetId())}
+	require.NoError(t, c.Permissions.Warehouses.Grant(t.Context(), wh, describe))
 
-	r, err := c.PermissionsOpenfgaAPI.UpdateWarehouseAssignmentsById(t.Context(), wh).UpdateWarehouseAssignmentsRequest(*addReq).Execute()
-	require.NoError(t, err)
-	assert.Equal(t, http.StatusNoContent, r.StatusCode)
-
-	resp, _, err = c.PermissionsOpenfgaAPI.GetWarehouseAssignmentsById(t.Context(), wh).Execute()
+	resp, err = c.Permissions.Warehouses.Assignments(t.Context(), wh, nil)
 	require.NoError(t, err)
 	assert.ElementsMatch(t,
 		[]permissions.AssignmentRow{
 			{PrincipalType: "user", PrincipalID: adminID, Relation: "ownership"},
-			{PrincipalType: "user", PrincipalID: user.Id, Relation: "describe"},
+			{PrincipalType: "user", PrincipalID: user.GetId(), Relation: "describe"},
 		},
-		describeAssignments(t, resp.Assignments),
+		describeAssignments(t, resp.GetAssignments()),
 	)
 
-	delReq := managementv1.NewUpdateWarehouseAssignmentsRequest()
-	delReq.Deletes = append(delReq.Deletes, userAssignment[managementv1.WarehouseAssignment](t, "describe", user.Id))
+	require.NoError(t, c.Permissions.Warehouses.Revoke(t.Context(), wh, describe))
 
-	r, err = c.PermissionsOpenfgaAPI.UpdateWarehouseAssignmentsById(t.Context(), wh).UpdateWarehouseAssignmentsRequest(*delReq).Execute()
-	require.NoError(t, err)
-	assert.Equal(t, http.StatusNoContent, r.StatusCode)
-
-	resp, _, err = c.PermissionsOpenfgaAPI.GetWarehouseAssignmentsById(t.Context(), wh).Execute()
+	resp, err = c.Permissions.Warehouses.Assignments(t.Context(), wh, nil)
 	require.NoError(t, err)
 	assert.ElementsMatch(t,
 		[]permissions.AssignmentRow{{PrincipalType: "user", PrincipalID: adminID, Relation: "ownership"}},
-		describeAssignments(t, resp.Assignments),
+		describeAssignments(t, resp.GetAssignments()),
 	)
 }
 
@@ -163,17 +153,13 @@ func TestPermissions_Warehouse_SameAdd(t *testing.T) {
 	project := MustCreateProject(t, c)
 	wh, _ := MustCreateWarehouse(t, c, project)
 
-	req := managementv1.NewUpdateWarehouseAssignmentsRequest()
-	req.Writes = append(req.Writes, userAssignment[managementv1.WarehouseAssignment](t, "modify", user.Id))
+	modify := []managementv1.WarehouseAssignment{userAssignment[managementv1.WarehouseAssignment](t, "modify", user.GetId())}
+	require.NoError(t, c.Permissions.Warehouses.Grant(t.Context(), wh, modify))
 
-	r, err := c.PermissionsOpenfgaAPI.UpdateWarehouseAssignmentsById(t.Context(), wh).UpdateWarehouseAssignmentsRequest(*req).Execute()
-	require.NoError(t, err)
-	assert.Equal(t, http.StatusNoContent, r.StatusCode)
-
-	r, err = c.PermissionsOpenfgaAPI.UpdateWarehouseAssignmentsById(t.Context(), wh).UpdateWarehouseAssignmentsRequest(*req).Execute()
-	require.Error(t, err)
-	require.NotNil(t, r)
-	assert.Equal(t, http.StatusConflict, r.StatusCode)
+	err := c.Permissions.Warehouses.Grant(t.Context(), wh, modify)
+	var apiErr *client.APIError
+	require.ErrorAs(t, err, &apiErr)
+	assert.Equal(t, http.StatusConflict, apiErr.StatusCode)
 	assert.Contains(t, errorBody(err), "TupleAlreadyExistsError")
 }
 
@@ -184,20 +170,16 @@ func TestPermissions_Warehouse_Add_Role(t *testing.T) {
 	wh, _ := MustCreateWarehouse(t, c, project)
 	role := MustCreateRole(t, c, project)
 
-	addReq := managementv1.NewUpdateWarehouseAssignmentsRequest()
-	addReq.Writes = append(addReq.Writes, roleAssignment[managementv1.WarehouseAssignment](t, "describe", role.Id))
+	require.NoError(t, c.Permissions.Warehouses.Grant(t.Context(), wh,
+		[]managementv1.WarehouseAssignment{roleAssignment[managementv1.WarehouseAssignment](t, "describe", role.GetId())}))
 
-	r, err := c.PermissionsOpenfgaAPI.UpdateWarehouseAssignmentsById(t.Context(), wh).UpdateWarehouseAssignmentsRequest(*addReq).Execute()
-	require.NoError(t, err)
-	assert.Equal(t, http.StatusNoContent, r.StatusCode)
-
-	resp, _, err := c.PermissionsOpenfgaAPI.GetWarehouseAssignmentsById(t.Context(), wh).Execute()
+	resp, err := c.Permissions.Warehouses.Assignments(t.Context(), wh, nil)
 	require.NoError(t, err)
 	assert.ElementsMatch(t,
 		[]permissions.AssignmentRow{
 			{PrincipalType: "user", PrincipalID: adminID, Relation: "ownership"},
-			{PrincipalType: "role", PrincipalID: role.Id, Relation: "describe"},
+			{PrincipalType: "role", PrincipalID: role.GetId(), Relation: "describe"},
 		},
-		describeAssignments(t, resp.Assignments),
+		describeAssignments(t, resp.GetAssignments()),
 	)
 }

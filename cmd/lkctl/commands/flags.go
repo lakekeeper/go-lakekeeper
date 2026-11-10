@@ -2,6 +2,8 @@ package commands
 
 import (
 	"github.com/spf13/cobra"
+
+	"github.com/lakekeeper/go-lakekeeper/pkg/client"
 )
 
 // listOpts captures the standard pagination flags shared by `list` subcommands.
@@ -23,6 +25,26 @@ type assignmentsOpts struct {
 	relations []string
 }
 
+// addProjectFlag registers the persistent -p/--project flag of a resource
+// command. It has no default: when omitted, no project is sent and the server
+// applies its default project. Turn the value into façade call options with
+// projectFlagOptions.
+func addProjectFlag(cmd *cobra.Command, project *string) {
+	cmd.PersistentFlags().StringVarP(project, "project", "p", "",
+		"Project ID; when omitted, the server's default project is used")
+}
+
+// projectFlagOptions maps the -p/--project flag to façade call options. An
+// omitted -p gives none, so the server applies its default project. A given
+// -p, even an empty one, becomes WithProject, so `-p "$UNSET"` fails with
+// client.ErrEmptyProjectID instead of silently targeting the default project.
+func projectFlagOptions(cmd *cobra.Command, project string) []client.CallOption {
+	if !cmd.Flags().Changed("project") {
+		return nil
+	}
+	return []client.CallOption{client.WithProject(project)}
+}
+
 func addListFlags(cmd *cobra.Command, opts *listOpts) {
 	cmd.Flags().Int64Var(&opts.limit, "limit", 100, "Upper bound on the number of results returned to the client")
 	cmd.Flags().StringVar(&opts.token, "token", "", "Pagination token")
@@ -36,4 +58,18 @@ func addAccessFlags(cmd *cobra.Command, opts *accessOpts) {
 
 func addAssignmentsFlags(cmd *cobra.Command, opts *assignmentsOpts) {
 	cmd.Flags().StringSliceVar(&opts.relations, "relations", nil, "Filter by relations (repeat for multiple, also accepts comma-separated values)")
+}
+
+// toEnums converts string flag values (e.g. --relations, --status) into a
+// generated string enum type. Empty input gives nil, so a façade option
+// built from it sends nothing.
+func toEnums[E ~string](values []string) []E {
+	if len(values) == 0 {
+		return nil
+	}
+	out := make([]E, 0, len(values))
+	for _, v := range values {
+		out = append(out, E(v))
+	}
+	return out
 }

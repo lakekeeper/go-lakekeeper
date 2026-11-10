@@ -137,11 +137,11 @@ lkctl server revoke  --users <USER-ID> --assignments admin
 # List all projects
 lkctl project list
 
-# Get a project by ID
+# Get a project by ID (sent as the x-project-id header)
 lkctl project get <PROJECT-ID>
 
 # Create a project
-PROJECT_ID=$(lkctl project create my-project | jq -r .)
+PROJECT_ID=$(lkctl project create my-project -o json | jq -r '."project-id"')
 
 # Rename a project
 lkctl project rename <PROJECT-ID> new-name
@@ -149,13 +149,24 @@ lkctl project rename <PROJECT-ID> new-name
 # Delete a project
 lkctl project delete <PROJECT-ID>
 
-# Permissions — PROJECT-ID is optional and defaults to the bootstrap project
+# Permissions (PROJECT-ID is sent as the x-project-id header)
 lkctl project access      [PROJECT-ID]                 # show allowed actions for the current user
 lkctl project access      [PROJECT-ID] --user <ID>     # or for a specific user
 lkctl project assignments [PROJECT-ID]                 # list assignments
-lkctl project grant       [PROJECT-ID] --users <U> --assignments project_admin
-lkctl project revoke      [PROJECT-ID] --roles <R> --assignments select
+lkctl project grant       PROJECT-ID --users <U> --assignments project_admin
+lkctl project revoke      PROJECT-ID --roles <R> --assignments select
 ```
+
+For `access` and `assignments`, `[PROJECT-ID]` is optional: when omitted,
+no project is sent and the server's default project is used, the same as
+omitting `-p` on other commands. `grant` and `revoke` change permissions,
+so `PROJECT-ID` is required and never falls back to the default project;
+to target it, pass its id (the nil UUID
+`00000000-0000-0000-0000-000000000000` unless the operator configured
+another).
+An empty `PROJECT-ID` (`""`, e.g. from an unset variable) is an error, on
+these commands and on `get`, `rename`, and `delete`; so is an explicit
+empty `-p ""`.
 
 `grant` and `revoke` accept `--users`, `--roles`, and `--assignments` as
 repeatable / comma-separated string slices. `--user` / `--role` are
@@ -163,15 +174,18 @@ mutually exclusive on the singular `access` command.
 
 ### `lkctl warehouse`
 
-Warehouses are project-scoped. Use `--project` / `-p` to specify the
-project UUID.
+Warehouses belong to a project. `list` and `create` take the project
+UUID from `--project` / `-p`. When omitted, no project is sent and the
+server's default project is used (the nil UUID unless the operator
+configured another; an error if the operator disabled it). The other
+subcommands address a warehouse by its id and ignore `-p`.
 
 ```sh
 # List warehouses in a project (filter with --status active|inactive, repeatable)
 lkctl warehouse list --project <PROJECT-ID>
 
 # Get a specific warehouse
-lkctl warehouse get <WAREHOUSE-ID> --project <PROJECT-ID>
+lkctl warehouse get <WAREHOUSE-ID>
 
 # Create a warehouse from a JSON config file
 lkctl warehouse create "my-warehouse" -f warehouse-config.json --project <PROJECT-ID>
@@ -180,16 +194,16 @@ lkctl warehouse create "my-warehouse" -f warehouse-config.json --project <PROJEC
 cat warehouse-config.json | lkctl warehouse create "my-warehouse" -f - --project <PROJECT-ID>
 
 # Lifecycle
-lkctl warehouse rename     <WAREHOUSE-ID> "new-name" --project <PROJECT-ID>
-lkctl warehouse activate   <WAREHOUSE-ID>            --project <PROJECT-ID>
-lkctl warehouse deactivate <WAREHOUSE-ID>            --project <PROJECT-ID>
-lkctl warehouse delete     <WAREHOUSE-ID>            --project <PROJECT-ID>
+lkctl warehouse rename     <WAREHOUSE-ID> "new-name"
+lkctl warehouse activate   <WAREHOUSE-ID>
+lkctl warehouse deactivate <WAREHOUSE-ID>
+lkctl warehouse delete     <WAREHOUSE-ID>
 
 # Protection (boolean, blocks delete while true)
-lkctl warehouse set-protection <WAREHOUSE-ID> --protected=true  --project <PROJECT-ID>
+lkctl warehouse set-protection <WAREHOUSE-ID> --protected=true
 
-# Statistics (paginated; --page-size, --page-token)
-lkctl warehouse statistics <WAREHOUSE-ID> --project <PROJECT-ID>
+# Statistics (paginated; --page-size, default 100, and --page-token)
+lkctl warehouse statistics <WAREHOUSE-ID>
 
 # Permissions
 lkctl warehouse access      <WAREHOUSE-ID>
@@ -199,10 +213,13 @@ lkctl warehouse revoke      <WAREHOUSE-ID> --roles <R> --assignments describe
 ```
 
 The `-f` flag for `create` accepts a JSON file that maps to
-`managementv1.CreateWarehouseRequest`. Example config:
+`managementv1.CreateWarehouseRequest`; its `warehouse-name` must match the
+name argument. A `project-id` in the config is sent like `-p`, as the
+`x-project-id` header; when both are given they must match. Example config:
 
 ```json
 {
+  "warehouse-name": "my-warehouse",
   "storage-profile": { ... },
   "storage-credential": { ... },
   "delete-profile": { "type": "hard" }
@@ -211,11 +228,18 @@ The `-f` flag for `create` accepts a JSON file that maps to
 
 ### `lkctl role`
 
-Roles are project-scoped. Use `--project` / `-p`.
+Roles are project-scoped. Use `--project` / `-p` to specify the project
+UUID. When omitted, no project is sent and the server's default project is
+used, as for `lkctl warehouse`. The permission subcommands (`access`,
+`assignments`, `grant`, `revoke`) ignore `-p`: their endpoints address the
+role by id alone.
 
 ```sh
-# List roles
+# List roles (one page; --limit, --token)
 lkctl role list --project <PROJECT-ID>
+
+# Find the role named exactly "data-readers" anywhere in the project
+lkctl role list --name data-readers --project <PROJECT-ID>
 
 # Get / create / update / delete
 lkctl role get    <ROLE-ID>
@@ -230,11 +254,18 @@ lkctl role grant       <ROLE-ID> --users <U> --assignments assignee   # alias: r
 lkctl role revoke      <ROLE-ID> --roles <R> --assignments ownership  # alias: role unassign
 ```
 
+`role list --name` returns the role whose name matches exactly, from the
+whole project rather than the current page; it cannot be combined with
+`--token`. It asks the server's role search first. That search returns only
+the 10 closest names (and only looks at the first 64 characters), so when it
+finds no exact match, `lkctl` pages through every role before printing none.
+
 ### `lkctl user`
 
 ```sh
-# List users
+# List users; --name filters on the server, across all pages
 lkctl user list
+lkctl user list --name peter
 
 # Get a user
 lkctl user get <USER-ID>
@@ -261,13 +292,17 @@ lkctl whoami        # the authenticated principal, including whether it is an in
 
 ## Pagination
 
-`list` subcommands accept `--limit` (default 100), `--token` (page token),
-and `--name` (server-side name filter):
+`role list` and `user list` accept `--limit` (default 100), `--token`
+(page token), and `--name` (name filter; for `role list` an exact match
+across the whole project, see [`lkctl role`](#lkctl-role)):
 
 ```sh
-lkctl project list --limit 10
-lkctl project list --limit 10 --token <next-page-token>
+lkctl user list --limit 10
+lkctl user list --limit 10 --token <next-page-token>
 ```
+
+`project list` is not paginated: the server returns every project visible
+to the caller in one response.
 
 `warehouse statistics` is paginated separately with `--page-size` and
 `--page-token`.

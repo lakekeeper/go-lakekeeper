@@ -7,45 +7,107 @@ import (
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
 )
 
-// Roles is a one-call façade over RoleAPIService. All operations require
-// a project id, threaded through as the X-Project-Id header. For request
-// options (paging, custom headers), reach for c.RoleAPI.
+// Roles is a one-call façade over RoleAPIService. Every operation is
+// project-scoped: name the Project with WithProject, or omit it and the server
+// applies its default project. Role permissions live on c.Permissions.Roles.
+// Role membership has no façade; reach for the embedded c.RoleAPI.
 type Roles struct {
 	api *managementv1.RoleAPIService
 }
 
-// Create creates a role in the given project.
-func (r *Roles) Create(ctx context.Context, projectID string, req *managementv1.CreateRoleRequest) (*managementv1.Role, error) {
+// Create creates a role. A project in req's deprecated ProjectId field is
+// sent as the header, like WithProject; naming a different project in both
+// fails with ErrProjectIDConflict. req itself is not modified.
+func (r *Roles) Create(ctx context.Context, req *managementv1.CreateRoleRequest, callOpts ...CallOption) (*managementv1.Role, error) {
+	const op = "create role"
 	if req == nil {
-		return nil, errors.New("create role: request must not be nil")
+		return nil, errors.New(op + ": request must not be nil")
 	}
-	out, resp, err := r.api.CreateRole(ctx).XProjectId(projectID).CreateRoleRequest(*req).Execute()
-	return out, WrapAPIError("create role", err, resp)
+	call, body, err := withBodyProject(op, r.api.CreateRole(ctx), req, callOpts)
+	if err != nil {
+		return nil, err
+	}
+	out, resp, err := call.CreateRoleRequest(body).Execute()
+	return entityResult(op, out, resp, err)
 }
 
-// Get retrieves a role by id, scoped to the given project.
-func (r *Roles) Get(ctx context.Context, projectID, roleID string) (*managementv1.Role, error) {
-	out, resp, err := r.api.GetRole(ctx, roleID).XProjectId(projectID).Execute()
-	return out, WrapAPIError("get role", err, resp)
+// Get retrieves a role by id.
+func (r *Roles) Get(ctx context.Context, roleID string, callOpts ...CallOption) (*managementv1.Role, error) {
+	const op = "get role"
+	req, err := withProject(op, r.api.GetRole(ctx, roleID), callOpts)
+	if err != nil {
+		return nil, err
+	}
+	out, resp, err := req.Execute()
+	return entityResult(op, out, resp, err)
 }
 
 // Delete removes a role.
-func (r *Roles) Delete(ctx context.Context, projectID, roleID string) error {
-	resp, err := r.api.DeleteRole(ctx, roleID).XProjectId(projectID).Execute()
-	return WrapAPIError("delete role", err, resp)
+func (r *Roles) Delete(ctx context.Context, roleID string, callOpts ...CallOption) error {
+	const op = "delete role"
+	req, err := withProject(op, r.api.DeleteRole(ctx, roleID), callOpts)
+	if err != nil {
+		return err
+	}
+	resp, err := req.Execute()
+	return WrapAPIError(op, err, resp)
 }
 
-// List returns roles in the given project.
-func (r *Roles) List(ctx context.Context, projectID string) (*managementv1.ListRolesResponse, error) {
-	out, resp, err := r.api.ListRoles(ctx).XProjectId(projectID).Execute()
-	return out, WrapAPIError("list roles", err, resp)
+// ListRolesOptions holds the query parameters of Roles.List. A nil pointer
+// or a zero field sends nothing.
+type ListRolesOptions struct {
+	// PageSize caps the number of roles in one page; zero uses the server's
+	// default page size.
+	PageSize int64
+	// PageToken continues a listing from a previous page's NextPageToken.
+	PageToken string
+}
+
+// List returns one page of roles. Page through the project with the
+// response's NextPageToken.
+func (r *Roles) List(ctx context.Context, opts *ListRolesOptions, callOpts ...CallOption) (*managementv1.ListRolesResponse, error) {
+	const op = "list roles"
+	req, err := withProject(op, r.api.ListRoles(ctx), callOpts)
+	if err != nil {
+		return nil, err
+	}
+	if opts != nil {
+		req = withPaging(req, opts.PageSize, opts.PageToken)
+	}
+	out, resp, err := req.Execute()
+	return entityResult(op, out, resp, err)
 }
 
 // Update mutates a role's name/description.
-func (r *Roles) Update(ctx context.Context, projectID, roleID string, req *managementv1.UpdateRoleRequest) (*managementv1.Role, error) {
+func (r *Roles) Update(ctx context.Context, roleID string, req *managementv1.UpdateRoleRequest, callOpts ...CallOption) (*managementv1.Role, error) {
+	const op = "update role"
 	if req == nil {
-		return nil, errors.New("update role: request must not be nil")
+		return nil, errors.New(op + ": request must not be nil")
 	}
-	out, resp, err := r.api.UpdateRole(ctx, roleID).XProjectId(projectID).UpdateRoleRequest(*req).Execute()
-	return out, WrapAPIError("update role", err, resp)
+	call, err := withProject(op, r.api.UpdateRole(ctx, roleID), callOpts)
+	if err != nil {
+		return nil, err
+	}
+	out, resp, err := call.UpdateRoleRequest(*req).Execute()
+	return entityResult(op, out, resp, err)
+}
+
+// Search runs the server's fuzzy role search over req.Search and returns the
+// best matches. The server truncates the search string to 64 characters and
+// returns a fixed number of roles (currently 10), ranked by
+// trigram distance; a role with exactly the searched name is usually, but not
+// always, among them. To prove a name is absent, page through List.
+//
+// A project in req's deprecated ProjectId field is handled as in Create.
+func (r *Roles) Search(ctx context.Context, req *managementv1.SearchRoleRequest, callOpts ...CallOption) (*managementv1.SearchRoleResponse, error) {
+	const op = "search roles"
+	if req == nil {
+		return nil, errors.New(op + ": request must not be nil")
+	}
+	call, body, err := withBodyProject(op, r.api.SearchRole(ctx), req, callOpts)
+	if err != nil {
+		return nil, err
+	}
+	out, resp, err := call.SearchRoleRequest(body).Execute()
+	return entityResult(op, out, resp, err)
 }
