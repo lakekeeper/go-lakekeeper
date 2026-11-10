@@ -159,6 +159,9 @@ lkctl project revoke      [PROJECT-ID] --roles <R> --assignments select
 
 When `[PROJECT-ID]` is omitted, no project is sent and the server's
 default project is used, the same as omitting `-p` on other commands.
+An empty `PROJECT-ID` (`""`, e.g. from an unset variable) is an error, on
+these commands and on `get`, `rename`, and `delete`; so is an explicit
+empty `-p ""`.
 
 `grant` and `revoke` accept `--users`, `--roles`, and `--assignments` as
 repeatable / comma-separated string slices. `--user` / `--role` are

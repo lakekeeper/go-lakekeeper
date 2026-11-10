@@ -18,20 +18,32 @@ type Warehouses struct {
 // Create creates a warehouse in a project and returns it. Name the project
 // with WithProject; without it the server applies its default project.
 //
-// Leave req's deprecated ProjectId field unset: when it is set, the server
-// uses it instead of the WithProject project.
+// A project in req's deprecated ProjectId field (e.g. from a JSON config) is
+// sent as the header, like WithProject; naming a different project in both
+// fails with ErrProjectIDConflict. req itself is not modified.
 func (w *Warehouses) Create(ctx context.Context, req *managementv1.CreateWarehouseRequest, callOpts ...CallOption) (*managementv1.GetWarehouseResponse, error) {
+	const op = "create warehouse"
 	if req == nil {
-		return nil, errors.New("create warehouse: request must not be nil")
+		return nil, errors.New(op + ": request must not be nil")
 	}
-	out, resp, err := withProject(w.api.CreateWarehouse(ctx), callOpts).CreateWarehouseRequest(*req).Execute()
-	return out, WrapAPIError("create warehouse", err, resp)
+	body := *req
+	callOpts, err := projectFromBody(op, body.GetProjectId(), callOpts)
+	if err != nil {
+		return nil, err
+	}
+	body.UnsetProjectId()
+	call, err := withProject(op, w.api.CreateWarehouse(ctx), callOpts)
+	if err != nil {
+		return nil, err
+	}
+	out, resp, err := call.CreateWarehouseRequest(body).Execute()
+	return entityResult(op, out, resp, err)
 }
 
 // Get retrieves a warehouse by id.
 func (w *Warehouses) Get(ctx context.Context, id string) (*managementv1.GetWarehouseResponse, error) {
 	out, resp, err := w.api.GetWarehouse(ctx, id).Execute()
-	return out, WrapAPIError("get warehouse", err, resp)
+	return entityResult("get warehouse", out, resp, err)
 }
 
 // Delete removes a warehouse by id. The server enforces protection — to
@@ -52,12 +64,15 @@ type ListWarehousesOptions struct {
 // List returns the warehouses of a project. Name the project with
 // WithProject; without it the server applies its default project.
 func (w *Warehouses) List(ctx context.Context, opts *ListWarehousesOptions, callOpts ...CallOption) (*managementv1.ListWarehousesResponse, error) {
-	req := withProject(w.api.ListWarehouses(ctx), callOpts)
+	req, err := withProject("list warehouses", w.api.ListWarehouses(ctx), callOpts)
+	if err != nil {
+		return nil, err
+	}
 	if opts != nil && len(opts.Status) > 0 {
 		req = req.WarehouseStatus(opts.Status)
 	}
 	out, resp, err := req.Execute()
-	return out, WrapAPIError("list warehouses", err, resp)
+	return entityResult("list warehouses", out, resp, err)
 }
 
 // Rename changes a warehouse's display name.
@@ -66,7 +81,7 @@ func (w *Warehouses) Rename(ctx context.Context, id string, req *managementv1.Re
 		return nil, errors.New("rename warehouse: request must not be nil")
 	}
 	out, resp, err := w.api.RenameWarehouse(ctx, id).RenameWarehouseRequest(*req).Execute()
-	return out, WrapAPIError("rename warehouse", err, resp)
+	return entityResult("rename warehouse", out, resp, err)
 }
 
 // Activate transitions a warehouse from inactive to active.
@@ -89,7 +104,7 @@ func (w *Warehouses) SetProtection(ctx context.Context, id string, req *manageme
 		return nil, errors.New("set warehouse protection: request must not be nil")
 	}
 	out, resp, err := w.api.SetWarehouseProtection(ctx, id).SetProtectionRequest(*req).Execute()
-	return out, WrapAPIError("set warehouse protection", err, resp)
+	return entityResult("set warehouse protection", out, resp, err)
 }
 
 // GetWarehouseStatisticsOptions holds the query parameters of
@@ -108,13 +123,8 @@ type GetWarehouseStatisticsOptions struct {
 func (w *Warehouses) Statistics(ctx context.Context, id string, opts *GetWarehouseStatisticsOptions) (*managementv1.WarehouseStatisticsResponse, error) {
 	req := w.api.GetWarehouseStatistics(ctx, id)
 	if opts != nil {
-		if opts.PageSize != 0 {
-			req = req.PageSize(opts.PageSize)
-		}
-		if opts.PageToken != "" {
-			req = req.PageToken(opts.PageToken)
-		}
+		req = withPaging(req, opts.PageSize, opts.PageToken)
 	}
 	out, resp, err := req.Execute()
-	return out, WrapAPIError("get warehouse statistics", err, resp)
+	return entityResult("get warehouse statistics", out, resp, err)
 }

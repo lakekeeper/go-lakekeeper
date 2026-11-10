@@ -15,7 +15,7 @@ type Server struct {
 // Info returns the server's bootstrap state and version metadata.
 func (s *Server) Info(ctx context.Context) (*managementv1.ServerInfo, error) {
 	out, resp, err := s.api.GetServerInfo(ctx).Execute()
-	return out, WrapAPIError("get server info", err, resp)
+	return entityResult("get server info", out, resp, err)
 }
 
 // Bootstrap performs initial server setup with the calling principal.

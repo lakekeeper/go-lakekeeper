@@ -21,27 +21,37 @@ func (p *Projects) Create(ctx context.Context, req *managementv1.CreateProjectRe
 		return nil, errors.New("create project: request must not be nil")
 	}
 	out, resp, err := p.api.CreateProject(ctx).CreateProjectRequest(*req).Execute()
-	return out, WrapAPIError("create project", err, resp)
+	return entityResult("create project", out, resp, err)
 }
 
 // Get fetches the project named by WithProject, or the server's default
 // project when none is named.
 func (p *Projects) Get(ctx context.Context, callOpts ...CallOption) (*managementv1.GetProjectResponse, error) {
-	out, resp, err := withProject(p.api.GetProject(ctx), callOpts).Execute()
-	return out, WrapAPIError("get project", err, resp)
+	const op = "get project"
+	req, err := withProject(op, p.api.GetProject(ctx), callOpts)
+	if err != nil {
+		return nil, err
+	}
+	out, resp, err := req.Execute()
+	return entityResult(op, out, resp, err)
 }
 
 // Delete removes the project named by WithProject. Without it, the server
 // deletes its default project, so name the project unless that is intended.
 func (p *Projects) Delete(ctx context.Context, callOpts ...CallOption) error {
-	resp, err := withProject(p.api.DeleteProject(ctx), callOpts).Execute()
-	return WrapAPIError("delete project", err, resp)
+	const op = "delete project"
+	req, err := withProject(op, p.api.DeleteProject(ctx), callOpts)
+	if err != nil {
+		return err
+	}
+	resp, err := req.Execute()
+	return WrapAPIError(op, err, resp)
 }
 
 // List returns all projects visible to the caller.
 func (p *Projects) List(ctx context.Context) (*managementv1.ListProjectsResponse, error) {
 	out, resp, err := p.api.ListProjects(ctx).Execute()
-	return out, WrapAPIError("list projects", err, resp)
+	return entityResult("list projects", out, resp, err)
 }
 
 // Rename changes the display name of the project named by WithProject, or of
@@ -50,6 +60,11 @@ func (p *Projects) Rename(ctx context.Context, req *managementv1.RenameProjectRe
 	if req == nil {
 		return errors.New("rename project: request must not be nil")
 	}
-	resp, err := withProject(p.api.RenameProject(ctx), callOpts).RenameProjectRequest(*req).Execute()
-	return WrapAPIError("rename project", err, resp)
+	const op = "rename project"
+	call, err := withProject(op, p.api.RenameProject(ctx), callOpts)
+	if err != nil {
+		return err
+	}
+	resp, err := call.RenameProjectRequest(*req).Execute()
+	return WrapAPIError(op, err, resp)
 }

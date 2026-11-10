@@ -195,7 +195,13 @@ func MustCreateWarehouse(t *testing.T, c *client.Client, projectID string) (stri
 	req := managementv1.NewCreateWarehouseRequest(sp, name)
 	req.SetStorageCredential(sc)
 
-	wh, err := c.Warehouses.Create(t.Context(), req, client.WithProject(projectID))
+	// An empty projectID leaves the project to the server's default;
+	// WithProject("") would be rejected.
+	var callOpts []client.CallOption
+	if projectID != "" {
+		callOpts = append(callOpts, client.WithProject(projectID))
+	}
+	wh, err := c.Warehouses.Create(t.Context(), req, callOpts...)
 	if err != nil {
 		t.Fatalf("create warehouse: %v", err)
 	}

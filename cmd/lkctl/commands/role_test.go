@@ -15,6 +15,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
+	"github.com/lakekeeper/go-lakekeeper/pkg/client"
 	"github.com/lakekeeper/go-lakekeeper/pkg/testutil"
 )
 
@@ -196,6 +197,37 @@ func TestRoleListName_SearchMissFindsRoleOnLaterListPage(t *testing.T) {
 	assert.Equal(t, []string{"", "page-2"}, pageTokens, "the listing must be paged to the end")
 }
 
+// A server that hands back a page token it already gave would make the
+// fallback listing loop forever; the command must stop with an error.
+func TestRoleListName_RepeatedPageTokenStopsWithError(t *testing.T) {
+	t.Parallel()
+	mux, baseURL := testutil.NewServer(t)
+	testutil.Respond(t, mux, "POST /management/v1/search/role", http.StatusOK, `{"roles":[]}`)
+	var (
+		mu    sync.Mutex
+		calls int
+	)
+	mux.HandleFunc("GET /management/v1/role", func(w http.ResponseWriter, _ *http.Request) {
+		mu.Lock()
+		calls++
+		n := calls
+		mu.Unlock()
+		w.Header().Set("Content-Type", "application/json")
+		if n > 5 { // keeps a broken implementation from hanging the test
+			_, _ = w.Write([]byte(`{"roles":[]}`))
+			return
+		}
+		_, _ = w.Write([]byte(`{"roles":[],"next-page-token":"same"}`))
+	})
+
+	_, err := runLkctl(t, baseURL, "role", "list", "--name", "data-eng")
+
+	require.ErrorContains(t, err, `repeated page token "same"`)
+	mu.Lock()
+	defer mu.Unlock()
+	assert.Equal(t, 2, calls, "the listing must stop as soon as a token repeats")
+}
+
 func TestRoleListName_NoMatchAnywherePrintsNoRoles(t *testing.T) {
 	t.Parallel()
 	mux, baseURL := testutil.NewServer(t)
@@ -293,4 +325,17 @@ func TestPrintRolesWide(t *testing.T) {
 
 	assert.Contains(t, out, "DESCRIPTION")
 	assert.Contains(t, out, "data engineering team")
+}
+
+// An explicit but empty -p (e.g. -p "$UNSET") is rejected; only an omitted
+// -p leaves the project to the server.
+func TestRoleDelete_EmptyProjectFlagIsRejected(t *testing.T) {
+	t.Parallel()
+	mux, baseURL := testutil.NewServer(t)
+	reqs := testutil.Respond(t, mux, "/", http.StatusNoContent, nil)
+
+	_, err := runLkctl(t, baseURL, "role", "delete", roleTestID, "-p", "")
+
+	require.ErrorIs(t, err, client.ErrEmptyProjectID)
+	assert.Zero(t, reqs.Len(), "no request must be sent")
 }

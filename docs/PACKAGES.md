@@ -204,8 +204,9 @@ options, or the raw `*http.Response`, use the escape hatch.
 - **List results** are the generated list response; page with its
   `GetNextPageToken()` accessor.
 - **Project scoping** is a trailing `...client.CallOption`;
-  `client.WithProject(id)` sends `x-project-id`, and omitting it lets the
-  server apply its default project. See
+  `client.WithProject(id)` sends `x-project-id`, omitting it lets the
+  server apply its default project, and `WithProject("")` fails with
+  `client.ErrEmptyProjectID`. See
   [ARCHITECTURE.md](ARCHITECTURE.md#project-scoping).
 
 ```go
@@ -289,6 +290,9 @@ not-found from forbidden from conflict; there are no `IsNotFound`-style
 helpers. Transport failures and context cancellation are not `APIError`s;
 they come back wrapped with `%w`, so `errors.Is(err, context.Canceled)`
 works.
+
+A façade method that returns an entity never returns `(nil, nil)`: a
+success status with an empty body fails with `client.ErrEmptyResponse`.
 
 `client.WrapAPIError(op, err, resp)` is the one constructor. Callers of
 the embedded generated services use it to get the same error the façades

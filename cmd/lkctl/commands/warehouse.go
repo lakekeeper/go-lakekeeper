@@ -67,7 +67,7 @@ func newWarehouseListCmd(opts *clientOptions, project *string) *cobra.Command {
 
 			resp, err := c.Warehouses.List(ctx,
 				&client.ListWarehousesOptions{Status: toEnums[managementv1.WarehouseStatus](status)},
-				client.WithProject(*project))
+				projectOption(cmd, *project)...)
 			if err != nil {
 				return err
 			}
@@ -104,9 +104,6 @@ func newWarehouseGetCmd(opts *clientOptions) *cobra.Command {
 			wh, err := c.Warehouses.Get(ctx, args[0])
 			if err != nil {
 				return err
-			}
-			if wh == nil {
-				return errors.New("get warehouse: empty response")
 			}
 			switch output {
 			case "json":
@@ -155,23 +152,16 @@ func newWarehouseCreateCmd(opts *clientOptions, project *string) *cobra.Command 
 			if req.GetWarehouseName() != args[0] {
 				return errors.New("warehouse name in config does not match the name argument")
 			}
-			// A project-id in the config is sent the same way as --project:
-			// as the x-project-id header, never as the deprecated body field.
-			projectID := *project
-			if cfgProject := req.GetProjectId(); cfgProject != "" {
-				if projectID != "" && projectID != cfgProject {
-					return errors.New("project id in config does not match --project")
-				}
-				projectID = cfgProject
-			}
-			req.UnsetProjectId()
+			// A project-id in the config is sent as the x-project-id header,
+			// like --project; the façade rejects a config project that
+			// contradicts --project.
 
 			ctx := cmd.Context()
 			c, err := newClient(ctx, opts)
 			if err != nil {
 				return err
 			}
-			wh, err := c.Warehouses.Create(ctx, &req, client.WithProject(projectID))
+			wh, err := c.Warehouses.Create(ctx, &req, projectOption(cmd, *project)...)
 			if err != nil {
 				return err
 			}

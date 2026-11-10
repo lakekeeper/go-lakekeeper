@@ -58,17 +58,6 @@ func TestWarehouses_List_WithoutProjectSendsNoProject(t *testing.T) {
 	assert.False(t, got.Query.Has("projectId"), "no project must be sent")
 }
 
-func TestWarehouses_List_EmptyProjectSendsNoProject(t *testing.T) {
-	t.Parallel()
-	mux, c := testutil.ServerMux(t)
-	reqs := testutil.Respond(t, mux, "GET /management/v1/warehouse", http.StatusOK, emptyWarehouseList)
-
-	_, err := c.Warehouses.List(t.Context(), nil, client.WithProject(""))
-
-	require.NoError(t, err)
-	assert.NotContains(t, reqs.Last(t).Header, "X-Project-Id", "an empty project must not be sent")
-}
-
 func TestWarehouses_List_StatusFilterReachesQuery(t *testing.T) {
 	t.Parallel()
 	mux, c := testutil.ServerMux(t)

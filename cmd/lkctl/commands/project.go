@@ -195,13 +195,14 @@ func newProjectDeleteCmd(opts *clientOptions) *cobra.Command {
 // project permission commands.
 const projectArgHelp = "PROJECT-ID is optional; when omitted, the server's default project is used."
 
-// optionalProject maps the optional [PROJECT-ID] argument to the project
-// option: no argument sends no project, like an omitted -p.
-func optionalProject(args []string) client.CallOption {
+// optionalProject maps the optional [PROJECT-ID] argument to façade call
+// options: no argument sends no project, like an omitted -p. A given but
+// empty argument becomes WithProject(""), which the façade rejects.
+func optionalProject(args []string) []client.CallOption {
 	if len(args) == 0 {
-		return client.WithProject("")
+		return nil
 	}
-	return client.WithProject(args[0])
+	return []client.CallOption{client.WithProject(args[0])}
 }
 
 func newProjectAccessCmd(opts *clientOptions) *cobra.Command {
@@ -229,7 +230,7 @@ func newProjectAccessCmd(opts *clientOptions) *cobra.Command {
 			resp, err := c.Permissions.Projects.Access(ctx, &client.GetProjectAccessOptions{
 				PrincipalUser: access.user,
 				PrincipalRole: access.role,
-			}, optionalProject(args))
+			}, optionalProject(args)...)
 			if err != nil {
 				return err
 			}
@@ -270,7 +271,7 @@ func newProjectAssignmentsCmd(opts *clientOptions) *cobra.Command {
 
 			resp, err := c.Permissions.Projects.Assignments(ctx, &client.GetProjectAssignmentsOptions{
 				Relations: toEnums[managementv1.ProjectRelation](assignments.relations),
-			}, optionalProject(args))
+			}, optionalProject(args)...)
 			if err != nil {
 				return err
 			}
@@ -315,7 +316,7 @@ func newProjectGrantCmd(opts *clientOptions) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			if err := c.Permissions.Projects.Grant(ctx, set, optionalProject(args)); err != nil {
+			if err := c.Permissions.Projects.Grant(ctx, set, optionalProject(args)...); err != nil {
 				return err
 			}
 			fmt.Fprintln(cmd.OutOrStdout(), "Project permissions updated")
@@ -361,7 +362,7 @@ func newProjectRevokeCmd(opts *clientOptions) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			if err := c.Permissions.Projects.Revoke(ctx, set, optionalProject(args)); err != nil {
+			if err := c.Permissions.Projects.Revoke(ctx, set, optionalProject(args)...); err != nil {
 				return err
 			}
 			fmt.Fprintln(cmd.OutOrStdout(), "Project permissions updated")

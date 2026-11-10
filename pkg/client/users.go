@@ -18,13 +18,13 @@ func (u *Users) Create(ctx context.Context, req *managementv1.CreateUserRequest)
 		return nil, errors.New("create user: request must not be nil")
 	}
 	out, resp, err := u.api.CreateUser(ctx).CreateUserRequest(*req).Execute()
-	return out, WrapAPIError("create user", err, resp)
+	return entityResult("create user", out, resp, err)
 }
 
 // Get fetches a user by id.
 func (u *Users) Get(ctx context.Context, userID string) (*managementv1.User, error) {
 	out, resp, err := u.api.GetUser(ctx, userID).Execute()
-	return out, WrapAPIError("get user", err, resp)
+	return entityResult("get user", out, resp, err)
 }
 
 // Delete removes a user.
@@ -52,15 +52,10 @@ func (u *Users) List(ctx context.Context, opts *ListUserOptions) (*managementv1.
 		if opts.Name != "" {
 			req = req.Name(opts.Name)
 		}
-		if opts.PageSize != 0 {
-			req = req.PageSize(opts.PageSize)
-		}
-		if opts.PageToken != "" {
-			req = req.PageToken(opts.PageToken)
-		}
+		req = withPaging(req, opts.PageSize, opts.PageToken)
 	}
 	out, resp, err := req.Execute()
-	return out, WrapAPIError("list users", err, resp)
+	return entityResult("list users", out, resp, err)
 }
 
 // Update mutates a user's profile fields.
@@ -75,5 +70,5 @@ func (u *Users) Update(ctx context.Context, userID string, req *managementv1.Upd
 // Whoami returns the calling principal's user record.
 func (u *Users) Whoami(ctx context.Context) (*managementv1.WhoamiResponse, error) {
 	out, resp, err := u.api.Whoami(ctx).Execute()
-	return out, WrapAPIError("whoami", err, resp)
+	return entityResult("whoami", out, resp, err)
 }

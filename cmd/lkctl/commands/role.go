@@ -63,14 +63,14 @@ func newRoleListCmd(opts *clientOptions, project *string) *cobra.Command {
 				nextToken string
 			)
 			if listOpts.name != "" {
-				roles, err = findRolesByName(ctx, c, listOpts.name, listOpts.limit, client.WithProject(*project))
+				roles, err = findRolesByName(ctx, c, listOpts.name, listOpts.limit, projectOption(cmd, *project)...)
 				if err != nil {
 					return err
 				}
 			} else {
 				resp, err := c.Roles.List(ctx,
 					&client.ListRolesOptions{PageSize: listOpts.limit, PageToken: listOpts.token},
-					client.WithProject(*project))
+					projectOption(cmd, *project)...)
 				if err != nil {
 					return err
 				}
@@ -123,6 +123,7 @@ func findRolesByName(ctx context.Context, c *client.Client, name string, pageSiz
 
 	matches := []managementv1.Role{}
 	opts := &client.ListRolesOptions{PageSize: pageSize}
+	seen := map[string]bool{}
 	for {
 		page, err := c.Roles.List(ctx, opts, callOpts...)
 		if err != nil {
@@ -133,6 +134,11 @@ func findRolesByName(ctx context.Context, c *client.Client, name string, pageSiz
 		if opts.PageToken == "" {
 			return matches, nil
 		}
+		// A token the server already gave would page in a circle forever.
+		if seen[opts.PageToken] {
+			return nil, fmt.Errorf("list roles: server returned a repeated page token %q", opts.PageToken)
+		}
+		seen[opts.PageToken] = true
 	}
 }
 
@@ -160,7 +166,7 @@ func newRoleGetCmd(opts *clientOptions, project *string) *cobra.Command {
 				return err
 			}
 
-			role, err := c.Roles.Get(ctx, args[0], client.WithProject(*project))
+			role, err := c.Roles.Get(ctx, args[0], projectOption(cmd, *project)...)
 			if err != nil {
 				return err
 			}
@@ -207,7 +213,7 @@ func newRoleCreateCmd(opts *clientOptions, project *string) *cobra.Command {
 			if description != "" {
 				req.SetDescription(description)
 			}
-			role, err := c.Roles.Create(ctx, req, client.WithProject(*project))
+			role, err := c.Roles.Create(ctx, req, projectOption(cmd, *project)...)
 			if err != nil {
 				return err
 			}
@@ -250,7 +256,7 @@ func newRoleUpdateCmd(opts *clientOptions, project *string) *cobra.Command {
 			if description != "" {
 				req.SetDescription(description)
 			}
-			role, err := c.Roles.Update(ctx, args[0], req, client.WithProject(*project))
+			role, err := c.Roles.Update(ctx, args[0], req, projectOption(cmd, *project)...)
 			if err != nil {
 				return err
 			}
@@ -284,7 +290,7 @@ func newRoleDeleteCmd(opts *clientOptions, project *string) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			if err := c.Roles.Delete(ctx, args[0], client.WithProject(*project)); err != nil {
+			if err := c.Roles.Delete(ctx, args[0], projectOption(cmd, *project)...); err != nil {
 				return err
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "Role %s deleted\n", args[0])

@@ -15,6 +15,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
+	"github.com/lakekeeper/go-lakekeeper/pkg/client"
 	"github.com/lakekeeper/go-lakekeeper/pkg/testutil"
 )
 
@@ -88,7 +89,7 @@ func TestWarehouseCreate_ConfigProjectMismatchingFlagIsRejected(t *testing.T) {
 
 	_, err := runLkctl(t, baseURL, "warehouse", "create", "wh", "-f", config, "-p", "11111111-1111-1111-1111-111111111111")
 
-	require.ErrorContains(t, err, "project id in config does not match --project")
+	require.ErrorIs(t, err, client.ErrProjectIDConflict)
 	assert.Zero(t, reqs.Len(), "no request must be sent")
 }
 

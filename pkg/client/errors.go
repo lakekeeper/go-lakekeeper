@@ -15,6 +15,11 @@ import (
 // enough to keep an accidental HTML page from flooding a terminal.
 const apiErrorBodyLimit = 1024
 
+// ErrEmptyResponse is returned by a façade method that returns an entity when
+// the server answers with a success status but no body. A nil error from such
+// a method therefore always comes with a non-nil result.
+var ErrEmptyResponse = errors.New("empty response body")
+
 // APIError is the error every façade returns when the server answers with
 // an error status. Callers tell failures apart by StatusCode:
 //
@@ -89,4 +94,17 @@ func WrapAPIError(op string, err error, resp *http.Response) error {
 		return apiErr
 	}
 	return fmt.Errorf("%s: %w", op, err)
+}
+
+// entityResult finishes a façade method that returns an entity: err goes
+// through WrapAPIError, and a nil result without an error (the generated
+// client's decoding of an empty 2xx body) becomes ErrEmptyResponse.
+func entityResult[T any](op string, out *T, resp *http.Response, err error) (*T, error) {
+	if err != nil {
+		return out, WrapAPIError(op, err, resp)
+	}
+	if out == nil {
+		return nil, fmt.Errorf("%s: %w", op, ErrEmptyResponse)
+	}
+	return out, nil
 }

@@ -2,6 +2,8 @@ package commands
 
 import (
 	"github.com/spf13/cobra"
+
+	"github.com/lakekeeper/go-lakekeeper/pkg/client"
 )
 
 // listOpts captures the standard pagination flags shared by `list` subcommands.
@@ -25,11 +27,22 @@ type assignmentsOpts struct {
 
 // addProjectFlag registers the persistent -p/--project flag of a resource
 // command. It has no default: when omitted, no project is sent and the server
-// applies its default project. Pass the value to a façade as
-// client.WithProject(project); an empty value sends nothing.
+// applies its default project. Turn the value into façade call options with
+// projectOption.
 func addProjectFlag(cmd *cobra.Command, project *string) {
 	cmd.PersistentFlags().StringVarP(project, "project", "p", "",
 		"Project ID; when omitted, the server's default project is used")
+}
+
+// projectOption maps the -p/--project flag to façade call options. An
+// omitted -p gives none, so the server applies its default project. A given
+// -p, even an empty one, becomes WithProject, so `-p "$UNSET"` fails with
+// client.ErrEmptyProjectID instead of silently targeting the default project.
+func projectOption(cmd *cobra.Command, project string) []client.CallOption {
+	if !cmd.Flags().Changed("project") {
+		return nil
+	}
+	return []client.CallOption{client.WithProject(project)}
 }
 
 func addListFlags(cmd *cobra.Command, opts *listOpts) {

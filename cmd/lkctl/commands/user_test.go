@@ -85,6 +85,29 @@ func TestUserGet_PrintsUser(t *testing.T) {
 	assert.Contains(t, out, "create-endpoint")
 }
 
+// An empty 200 body must give an error, not a nil-pointer panic, in every
+// get command that prints the returned entity.
+func TestGetCommands_EmptySuccessBodyIsAnError(t *testing.T) {
+	t.Parallel()
+	for name, args := range map[string][]string{
+		"user":      {"user", "get", userTestID},
+		"role":      {"role", "get", "0198618c-5be8-7a82-a0b9-1076c9dd12f0"},
+		"project":   {"project", "get", "11111111-1111-1111-1111-111111111111"},
+		"warehouse": {"warehouse", "get", "9d6651da-5f19-11f1-ad69-1b7104fe3cf7"},
+	} {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			mux, baseURL := testutil.NewServer(t)
+			testutil.Respond(t, mux, "/", http.StatusOK, nil)
+
+			require.NotPanics(t, func() {
+				_, err := runLkctl(t, baseURL, args...)
+				require.ErrorIs(t, err, client.ErrEmptyResponse)
+			})
+		})
+	}
+}
+
 func TestUserGet_NotFoundKeepsStatus(t *testing.T) {
 	t.Parallel()
 	mux, baseURL := testutil.NewServer(t)

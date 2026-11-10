@@ -126,3 +126,29 @@ func TestProjectAccessUserRoleMutex(t *testing.T) {
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "mutually exclusive")
 }
+
+// An empty PROJECT-ID (e.g. an unset shell variable) must not fall back to
+// the server's default project: for delete that would delete it.
+func TestProjectCommands_EmptyProjectIDIsRejected(t *testing.T) {
+	t.Parallel()
+	for _, args := range [][]string{
+		{"project", "delete", ""},
+		{"project", "rename", "", "new-name"},
+		{"project", "get", ""},
+		{"project", "access", ""},
+		{"project", "assignments", ""},
+		{"project", "grant", "", "--users", "oidc~alice", "--assignments", "select"},
+		{"project", "revoke", "", "--users", "oidc~alice", "--assignments", "select"},
+	} {
+		t.Run(args[1], func(t *testing.T) {
+			t.Parallel()
+			mux, baseURL := testutil.NewServer(t)
+			reqs := testutil.Respond(t, mux, "/", http.StatusOK, `{}`)
+
+			_, err := runLkctl(t, baseURL, args...)
+
+			require.ErrorIs(t, err, client.ErrEmptyProjectID)
+			assert.Zero(t, reqs.Len(), "no request must be sent")
+		})
+	}
+}

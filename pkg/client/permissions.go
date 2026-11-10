@@ -100,7 +100,7 @@ type GetWarehouseAccessByIDOptions struct {
 // Access returns the allowed actions on a warehouse.
 func (p *WarehousePermissions) Access(ctx context.Context, warehouseID string, opts *GetWarehouseAccessByIDOptions) (*managementv1.GetWarehouseAccessResponse, error) {
 	out, resp, err := withPrincipal(p.api.GetWarehouseAccessById(ctx, warehouseID), opts).Execute()
-	return out, WrapAPIError("get warehouse access", err, resp)
+	return entityResult("get warehouse access", out, resp, err)
 }
 
 // GetWarehouseAssignmentsByIDOptions holds the query parameters of
@@ -114,7 +114,7 @@ type GetWarehouseAssignmentsByIDOptions struct {
 // Assignments lists the assignments on a warehouse.
 func (p *WarehousePermissions) Assignments(ctx context.Context, warehouseID string, opts *GetWarehouseAssignmentsByIDOptions) (*managementv1.GetWarehouseAssignmentsResponse, error) {
 	out, resp, err := withRelations(p.api.GetWarehouseAssignmentsById(ctx, warehouseID), opts).Execute()
-	return out, WrapAPIError("get warehouse assignments", err, resp)
+	return entityResult("get warehouse assignments", out, resp, err)
 }
 
 // Grant writes assignments on a warehouse.
@@ -153,7 +153,7 @@ type GetAuthorizerRoleActionsOptions struct {
 // Access returns the allowed authorizer actions on a role.
 func (p *RolePermissions) Access(ctx context.Context, roleID string, opts *GetAuthorizerRoleActionsOptions) (*managementv1.GetOpenFGARoleActionsResponse, error) {
 	out, resp, err := withPrincipal(p.api.GetAuthorizerRoleActions(ctx, roleID), opts).Execute()
-	return out, WrapAPIError("get role access", err, resp)
+	return entityResult("get role access", out, resp, err)
 }
 
 // GetRoleAssignmentsByIDOptions holds the query parameters of
@@ -166,7 +166,7 @@ type GetRoleAssignmentsByIDOptions struct {
 // Assignments lists the assignments on a role.
 func (p *RolePermissions) Assignments(ctx context.Context, roleID string, opts *GetRoleAssignmentsByIDOptions) (*managementv1.GetRoleAssignmentsResponse, error) {
 	out, resp, err := withRelations(p.api.GetRoleAssignmentsById(ctx, roleID), opts).Execute()
-	return out, WrapAPIError("get role assignments", err, resp)
+	return entityResult("get role assignments", out, resp, err)
 }
 
 // Grant writes assignments on a role.
@@ -204,9 +204,12 @@ type GetProjectAccessOptions struct {
 
 // Access returns the allowed actions on a project.
 func (p *ProjectPermissions) Access(ctx context.Context, opts *GetProjectAccessOptions, callOpts ...CallOption) (*managementv1.GetProjectAccessResponse, error) {
-	req := withProject(p.api.GetProjectAccess(ctx), callOpts)
+	req, err := withProject("get project access", p.api.GetProjectAccess(ctx), callOpts)
+	if err != nil {
+		return nil, err
+	}
 	out, resp, err := withPrincipal(req, opts).Execute()
-	return out, WrapAPIError("get project access", err, resp)
+	return entityResult("get project access", out, resp, err)
 }
 
 // GetProjectAssignmentsOptions holds the query parameters of
@@ -219,9 +222,12 @@ type GetProjectAssignmentsOptions struct {
 
 // Assignments lists the assignments on a project.
 func (p *ProjectPermissions) Assignments(ctx context.Context, opts *GetProjectAssignmentsOptions, callOpts ...CallOption) (*managementv1.GetProjectAssignmentsResponse, error) {
-	req := withProject(p.api.GetProjectAssignments(ctx), callOpts)
+	req, err := withProject("get project assignments", p.api.GetProjectAssignments(ctx), callOpts)
+	if err != nil {
+		return nil, err
+	}
 	out, resp, err := withRelations(req, opts).Execute()
-	return out, WrapAPIError("get project assignments", err, resp)
+	return entityResult("get project assignments", out, resp, err)
 }
 
 // Grant writes assignments on a project.
@@ -238,7 +244,11 @@ func (p *ProjectPermissions) update(ctx context.Context, op string, req manageme
 	if len(req.GetWrites()) == 0 && len(req.GetDeletes()) == 0 {
 		return errNoAssignments(op)
 	}
-	resp, err := withProject(p.api.UpdateProjectAssignments(ctx), callOpts).UpdateProjectAssignmentsRequest(req).Execute()
+	call, err := withProject(op, p.api.UpdateProjectAssignments(ctx), callOpts)
+	if err != nil {
+		return err
+	}
+	resp, err := call.UpdateProjectAssignmentsRequest(req).Execute()
 	return WrapAPIError(op, err, resp)
 }
 
@@ -261,7 +271,7 @@ type GetServerAccessOptions struct {
 // Access returns the allowed actions on the server.
 func (p *ServerPermissions) Access(ctx context.Context, opts *GetServerAccessOptions) (*managementv1.GetServerAccessResponse, error) {
 	out, resp, err := withPrincipal(p.api.GetServerAccess(ctx), opts).Execute()
-	return out, WrapAPIError("get server access", err, resp)
+	return entityResult("get server access", out, resp, err)
 }
 
 // GetServerAssignmentsOptions holds the query parameters of
@@ -275,7 +285,7 @@ type GetServerAssignmentsOptions struct {
 // Assignments lists the assignments on the server.
 func (p *ServerPermissions) Assignments(ctx context.Context, opts *GetServerAssignmentsOptions) (*managementv1.GetServerAssignmentsResponse, error) {
 	out, resp, err := withRelations(p.api.GetServerAssignments(ctx), opts).Execute()
-	return out, WrapAPIError("get server assignments", err, resp)
+	return entityResult("get server assignments", out, resp, err)
 }
 
 // Grant writes assignments on the server.

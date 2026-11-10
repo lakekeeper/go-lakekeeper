@@ -184,19 +184,29 @@ c.Warehouses.List(ctx, nil)                                // no project sent
 ```
 
 - With `WithProject`, the façade sends the `x-project-id` header.
-- Without it (or with an empty id), the façade sends no project. The
-  server then applies its **default project**: the nil UUID unless the
-  operator set `LAKEKEEPER__DEFAULT_PROJECT_ID`. If the operator disabled
-  the default project, the server answers 400 `ProjectIdMissing`.
+- Without it, the façade sends no project. The server then applies its
+  **default project**: the nil UUID unless the operator set
+  `LAKEKEEPER__DEFAULT_PROJECT_ID`. If the operator disabled the default
+  project, the server answers 400 `ProjectIdMissing`.
+- `WithProject("")` is not "no project": the call fails with
+  `client.ErrEmptyProjectID` before sending anything, so an unset variable
+  can't silently target (or, with `Projects.Delete`, delete) the default
+  project.
 - The façades never send the deprecated `projectId` query parameter or
   `project-id` body field. When both are sent, Lakekeeper lets the
-  deprecated one win over the header.
+  deprecated one win over the header. A request model that still carries
+  the body field (`CreateWarehouseRequest`, `CreateRoleRequest`,
+  `SearchRoleRequest`) has it moved to the header: alone it acts like
+  `WithProject`, equal to `WithProject` it is dropped, and a different
+  project fails with `client.ErrProjectIDConflict`. The caller's request
+  is not modified.
 
 The one place that decides how a project is sent is the unexported
 `withProject` helper in `pkg/client/call_options.go`. `lkctl`'s
 `-p/--project` flag and the optional `[PROJECT-ID]` argument of the
-`project` permission commands have no default and map straight to
-`WithProject`. There is no client-wide default project: each call names
+`project` permission commands have no default: omitted, they send no
+option; given, they map to `WithProject`, so an explicit empty value is
+rejected. There is no client-wide default project: each call names
 its project or leaves the choice to the server.
 
 Callers of the generated services (the escape hatch) set the header
