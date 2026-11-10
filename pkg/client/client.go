@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"crypto/tls"
 	"errors"
 	"fmt"
 	"net/http"
@@ -53,6 +54,10 @@ type Client struct {
 
 	baseURL    *url.URL
 	authSource core.AuthSource
+
+	// catalogTransport is the transport CatalogV1 hands to iceberg-go; nil
+	// unless WithHTTPClient was given.
+	catalogTransport http.RoundTripper
 }
 
 // New constructs a Client authenticated with a static OAuth bearer token.
@@ -118,6 +123,9 @@ func NewWithAuthSource(ctx context.Context, baseURL string, as core.AuthSource, 
 		baseURL:    parsed,
 		authSource: as,
 	}
+	if settings.httpClient != nil {
+		c.catalogTransport = settings.httpClient.Transport
+	}
 
 	if settings.bootstrap {
 		if err := c.runBootstrap(ctx, settings); err != nil {
@@ -143,7 +151,19 @@ func (c *Client) AuthSource() core.AuthSource {
 
 // CatalogV1 returns an Iceberg REST catalog client scoped to a specific
 // project + warehouse, using apache/iceberg-go for the protocol layer.
+//
+// If the Client was built with WithHTTPClient, the catalog uses the same
+// base transport, so a private CA or proxy applies to it as well. Transport
+// options in opts take precedence: rest.WithCustomTransport and
+// rest.WithTransportFactory replace it, and rest.WithTLSConfig applies to a
+// clone of it (or to a fresh transport if it is not an *http.Transport).
 func (c *Client) CatalogV1(ctx context.Context, projectID, warehouse string, opts ...rest.Option) (*rest.Catalog, error) {
+	if c.catalogTransport != nil {
+		// A factory, prepended: a transport or factory in opts overrides it,
+		// and a TLS config in opts reaches it instead of conflicting with a
+		// fixed transport.
+		opts = append([]rest.Option{rest.WithTransportFactory(c.catalogTransportFactory)}, opts...)
+	}
 	if c.authSource != nil {
 		token, err := c.authSource.GetToken(ctx)
 		if err != nil {
@@ -157,6 +177,23 @@ func (c *Client) CatalogV1(ctx context.Context, projectID, warehouse string, opt
 	catalogURL.Path = strings.TrimRight(c.baseURL.Path, "/") + "/catalog"
 
 	return rest.NewCatalog(ctx, "rest", catalogURL.String(), opts...)
+}
+
+// catalogTransportFactory is the rest.TransportFactory behind CatalogV1. It
+// returns the supplied transport, which stays caller-owned, unless the
+// catalog options set a TLS config.
+func (c *Client) catalogTransportFactory(tlsConfig *tls.Config) (http.RoundTripper, func()) {
+	if tlsConfig == nil {
+		return c.catalogTransport, nil
+	}
+	t, ok := c.catalogTransport.(*http.Transport)
+	if ok {
+		t = t.Clone()
+	} else {
+		t = &http.Transport{Proxy: http.ProxyFromEnvironment}
+	}
+	t.TLSClientConfig = tlsConfig
+	return t, t.CloseIdleConnections
 }
 
 func (c *Client) runBootstrap(ctx context.Context, s settings) error {
@@ -178,12 +215,19 @@ func (c *Client) runBootstrap(ctx context.Context, s settings) error {
 	return c.Server.Bootstrap(ctx, req)
 }
 
+// newHTTPClient builds the client the generated APIClient sends through:
+// the supplied client (or a pooled default) with its transport wrapped in
+// core.AuthRoundTripper, under the retry layer unless retries are disabled.
 func newHTTPClient(as core.AuthSource, s settings) *http.Client {
-	transport := &core.AuthRoundTripper{
-		Base:       cleanhttp.DefaultPooledTransport(),
+	base := &http.Client{Transport: cleanhttp.DefaultPooledTransport()}
+	if s.httpClient != nil {
+		copied := *s.httpClient
+		base = &copied
+	}
+	base.Transport = &core.AuthRoundTripper{
+		Base:       base.Transport,
 		AuthSource: as,
 	}
-	base := &http.Client{Transport: transport}
 	if s.disableRetries {
 		return base
 	}
