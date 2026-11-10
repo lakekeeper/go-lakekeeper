@@ -619,7 +619,8 @@ before a client regen can be passed without a code change.
 **Import path:** `github.com/lakekeeper/go-lakekeeper/pkg/storage/profile`
 
 Ergonomic builders for the `StorageProfile{S3,Gcs,Adls}` variants emitted
-by the generator. Each provider has a `New<Provider>Profile` constructor
+by the generator, and for the warehouse `TabularDeleteProfile` (see
+[Delete profiles](#delete-profiles)). Each provider has a `New<Provider>Profile` constructor
 that takes the spec-mandated fields positionally and accepts a variadic
 list of `With*` options for the optional ones.
 
@@ -664,15 +665,19 @@ values.
 
 A warehouse's `TabularDeleteProfile` decides what happens to dropped tables
 and views: a hard profile removes them immediately, a soft profile keeps
-them, undroppable, until the expiration passes. Build one with
+them until the expiration passes, and until then they can be restored
+with undrop. Build one with
 `NewHardDeleteProfile` or `NewSoftDeleteProfile`, and pass it to
 `CreateWarehouseRequest.SetDeleteProfile` or to
 `c.Warehouses.UpdateDeleteProfile`:
 
 ```go
-req := managementv1.NewUpdateWarehouseDeleteProfileRequest(
-    profile.NewSoftDeleteProfile(7 * 24 * time.Hour))
-wh, err := c.Warehouses.UpdateDeleteProfile(ctx, id, req)
+dp, err := profile.NewSoftDeleteProfile(7 * 24 * time.Hour)
+if err != nil {
+    return err
+}
+wh, err := c.Warehouses.UpdateDeleteProfile(ctx, id,
+    managementv1.NewUpdateWarehouseDeleteProfileRequest(dp))
 
 if soft, ok := profile.AsSoftDeleteProfile(wh.GetDeleteProfile()); ok {
     fmt.Println(soft.GetExpirationSeconds())
@@ -680,7 +685,9 @@ if soft, ok := profile.AsSoftDeleteProfile(wh.GetDeleteProfile()); ok {
 ```
 
 The API counts the expiration in whole seconds, so `NewSoftDeleteProfile`
-truncates its `time.Duration`. `DeleteProfileTypeHard` and
+truncates its `time.Duration`. It returns an error for an expiration under
+one second: the server does not check the value, and stores a zero or
+negative retention as given. `DeleteProfileTypeHard` and
 `DeleteProfileTypeSoft` hold the `type` discriminator values. All of these
 are re-exported from the umbrella under the same names.
 

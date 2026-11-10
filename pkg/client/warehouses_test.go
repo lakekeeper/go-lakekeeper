@@ -280,8 +280,11 @@ func TestWarehouses_UpdateDeleteProfile_SendsProfileAndReturnsWarehouse(t *testi
 	mux, c := testutil.ServerMux(t)
 	reqs := testutil.Respond(t, mux, "POST /management/v1/warehouse/{id}/delete-profile", http.StatusOK, warehouseBody)
 
+	soft, err := profile.NewSoftDeleteProfile(time.Hour)
+	require.NoError(t, err)
+
 	got, err := c.Warehouses.UpdateDeleteProfile(t.Context(), warehouseID,
-		managementv1.NewUpdateWarehouseDeleteProfileRequest(profile.NewSoftDeleteProfile(time.Hour)))
+		managementv1.NewUpdateWarehouseDeleteProfileRequest(soft))
 
 	require.NoError(t, err)
 	sent := reqs.Last(t)

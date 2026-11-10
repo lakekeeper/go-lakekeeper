@@ -198,8 +198,11 @@ func TestWarehouse_UpdateDeleteProfile(t *testing.T) {
 	project := MustCreateProject(t, c)
 	whID, _ := MustCreateWarehouse(t, c, project)
 
+	dp, err := profile.NewSoftDeleteProfile(2 * time.Hour)
+	require.NoError(t, err)
+
 	resp, err := c.Warehouses.UpdateDeleteProfile(t.Context(), whID,
-		managementv1.NewUpdateWarehouseDeleteProfileRequest(profile.NewSoftDeleteProfile(2*time.Hour)))
+		managementv1.NewUpdateWarehouseDeleteProfileRequest(dp))
 	require.NoError(t, err)
 	soft, ok := profile.AsSoftDeleteProfile(resp.GetDeleteProfile())
 	require.True(t, ok, "the response must carry the soft profile, got %+v", resp.GetDeleteProfile())

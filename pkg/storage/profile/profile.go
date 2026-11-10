@@ -1,5 +1,7 @@
 // Package profile holds ergonomic builders for the StorageProfile* variants
-// emitted by the OpenAPI generator under managementv1.
+// emitted by the OpenAPI generator under managementv1, and for the
+// TabularDeleteProfile of a warehouse (NewHardDeleteProfile,
+// NewSoftDeleteProfile).
 //
 // Each provider has a constructor (NewS3Profile, NewGCSProfile, NewADLSProfile)
 // that takes the required spec-mandated fields positionally and accepts a

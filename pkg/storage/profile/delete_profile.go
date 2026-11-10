@@ -1,6 +1,7 @@
 package profile
 
 import (
+	"fmt"
 	"time"
 
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
@@ -23,11 +24,15 @@ func NewHardDeleteProfile() managementv1.TabularDeleteProfile {
 // NewSoftDeleteProfile returns a delete profile that keeps dropped tables and
 // views for expiration before removing them; until then they can be undropped.
 //
-// The API counts whole seconds, so expiration is truncated to the second. It
-// is sent as given otherwise: the server validates the value.
-func NewSoftDeleteProfile(expiration time.Duration) managementv1.TabularDeleteProfile {
+// The API counts whole seconds, so expiration is truncated to the second. An
+// expiration under one second is rejected: the server does not check the
+// value, and would store a zero or negative retention as given.
+func NewSoftDeleteProfile(expiration time.Duration) (managementv1.TabularDeleteProfile, error) {
+	if expiration < time.Second {
+		return managementv1.TabularDeleteProfile{}, fmt.Errorf("soft delete profile: expiration must be at least 1s, got %v", expiration)
+	}
 	return managementv1.TabularDeleteProfileSoftAsTabularDeleteProfile(
-		managementv1.NewTabularDeleteProfileSoft(int64(expiration/time.Second), DeleteProfileTypeSoft))
+		managementv1.NewTabularDeleteProfileSoft(int64(expiration/time.Second), DeleteProfileTypeSoft)), nil
 }
 
 // AsHardDeleteProfile returns the hard variant of a TabularDeleteProfile

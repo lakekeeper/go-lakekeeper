@@ -76,7 +76,9 @@ func TestUmbrellaDeleteProfile(t *testing.T) {
 		return req.DeleteProfile
 	}
 
-	req := lakekeeper.NewUpdateWarehouseDeleteProfileRequest(lakekeeper.NewSoftDeleteProfile(time.Hour))
+	dp, err := lakekeeper.NewSoftDeleteProfile(time.Hour)
+	require.NoError(t, err)
+	req := lakekeeper.NewUpdateWarehouseDeleteProfileRequest(dp)
 	soft, ok := lakekeeper.AsSoftDeleteProfile(profileOf(req))
 	require.True(t, ok)
 	assert.Equal(t, lakekeeper.DeleteProfileTypeSoft, soft.GetType())

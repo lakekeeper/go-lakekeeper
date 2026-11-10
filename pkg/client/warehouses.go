@@ -108,8 +108,9 @@ func (w *Warehouses) SetProtection(ctx context.Context, id string, req *manageme
 // when they are dropped, and returns the updated warehouse. Build the profile
 // with profile.NewHardDeleteProfile or profile.NewSoftDeleteProfile:
 //
-//	req := managementv1.NewUpdateWarehouseDeleteProfileRequest(profile.NewSoftDeleteProfile(24 * time.Hour))
-//	wh, err := c.Warehouses.UpdateDeleteProfile(ctx, id, req)
+//	dp, err := profile.NewSoftDeleteProfile(24 * time.Hour)
+//	// handle err
+//	wh, err := c.Warehouses.UpdateDeleteProfile(ctx, id, managementv1.NewUpdateWarehouseDeleteProfileRequest(dp))
 func (w *Warehouses) UpdateDeleteProfile(ctx context.Context, id string, req *managementv1.UpdateWarehouseDeleteProfileRequest) (*managementv1.GetWarehouseResponse, error) {
 	const op = "update warehouse delete profile"
 	if req == nil {
