@@ -131,6 +131,7 @@ var (
 	New                  = client.New
 	NewWithAuthSource    = client.NewWithAuthSource
 	WithUserAgent        = client.WithUserAgent
+	WithHTTPClient       = client.WithHTTPClient
 	WithoutRetries       = client.WithoutRetries
 	WithRetryMax         = client.WithRetryMax
 	WithRetryWait        = client.WithRetryWait

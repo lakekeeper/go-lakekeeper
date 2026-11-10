@@ -53,12 +53,15 @@ graph TD
   commands call nothing else; see
   [PACKAGES.md](PACKAGES.md#resource-façades-one-call-ergonomic-surface).
 - **Auth wiring** through `core.AuthRoundTripper`, which injects the
-  `Authorization` header on every outbound request.
+  `Authorization` header on every outbound request. It wraps a pooled
+  transport, or the transport of the client given to `WithHTTPClient`
+  (custom TLS, proxy, timeouts).
 - **Retries** by wrapping the auth-injecting transport in
   `retryablehttp.NewClient().StandardClient()`.
 - **Optional bootstrap** at construction time via `WithInitialBootstrap`.
 - **`CatalogV1(ctx, projectID, warehouse, …)`** — a one-shot helper that
-  delegates to `apache/iceberg-go`.
+  delegates to `apache/iceberg-go`, sharing the `WithHTTPClient` transport
+  when one was supplied.
 
 `Client` also **embeds** `*managementv1.APIClient`, the escape hatch: every
 generated service stays reachable as a public field (`c.ProjectAPI`,

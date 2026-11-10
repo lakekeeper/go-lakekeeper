@@ -158,6 +158,11 @@ client, err := client.NewWithAuthSource(ctx, baseURL, authSource, options...)
 `AuthSource.Init` is invoked **once during construction** — no lazy
 initialisation on the first request.
 
+`baseURL` is the server root (`https://host`). A trailing `/management/v1`
+(with or without a trailing slash) is trimmed, because the generated client
+prepends it to every path; `BaseURL()` returns the trimmed root, and
+`CatalogV1` derives `/catalog` from it.
+
 ### Resource façades (one-call ergonomic surface)
 
 For the common case — single-body request, single-response result — reach
@@ -342,13 +347,19 @@ catalog, err := client.CatalogV1(ctx, projectID, warehouse, opts...)
 ```
 
 Returns an `*apache/iceberg-go/catalog/rest.Catalog` configured with the
-client's auth token and the warehouse-scoped catalog URL.
+client's auth token and the warehouse-scoped catalog URL. If the client was
+built with `WithHTTPClient`, the catalog uses the same base transport (only
+the transport; `Timeout`, `CheckRedirect` and `Jar` stay with the
+Management API client). Transport options in `opts` take precedence:
+`rest.WithCustomTransport` and `rest.WithTransportFactory` replace it, and
+`rest.WithTLSConfig` applies to a clone of it.
 
 ### Options
 
 | Option | Effect |
 |---|---|
 | `WithUserAgent(ua)` | Override the `User-Agent` header (default: `go-lakekeeper/<version>`) |
+| `WithHTTPClient(hc)` | Build on `hc`: its `Transport` (nil → `http.DefaultTransport`) sits under the auth and retry layers; `Timeout`, `CheckRedirect` and `Jar` carry over. `hc` is copied, never mutated. Also used by `WithInitialBootstrap`; `CatalogV1` uses its transport (see [Catalog helper](#catalog-helper)). For a private CA, `InsecureSkipVerify`, a proxy, or timeouts. `nil` fails construction |
 | `WithoutRetries()` | Disable the retry layer entirely |
 | `WithRetryMax(n)` | Override the maximum retry count |
 | `WithRetryWait(min, max)` | Override the backoff window |
