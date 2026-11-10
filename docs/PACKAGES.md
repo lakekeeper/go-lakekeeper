@@ -158,6 +158,11 @@ client, err := client.NewWithAuthSource(ctx, baseURL, authSource, options...)
 `AuthSource.Init` is invoked **once during construction** — no lazy
 initialisation on the first request.
 
+`baseURL` is the server root (`https://host`). A trailing `/management/v1`
+(with or without a trailing slash) is trimmed, because the generated client
+prepends it to every path; `BaseURL()` returns the trimmed root, and
+`CatalogV1` derives `/catalog` from it.
+
 ### Resource façades (one-call ergonomic surface)
 
 For the common case — single-body request, single-response result — reach

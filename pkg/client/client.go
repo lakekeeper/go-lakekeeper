@@ -19,6 +19,10 @@ import (
 
 var defaultUserAgent = "go-lakekeeper/" + version.GetVersion().Version
 
+// managementPathPrefix is the path the generated client prepends to every
+// Management API operation.
+const managementPathPrefix = "/management/v1"
+
 // Client is the SDK entry point for the Lakekeeper Management API.
 //
 // Use the resource façades (Warehouses, Projects, Roles, Users, Server,
@@ -58,12 +62,16 @@ func New(ctx context.Context, baseURL, token string, options ...Option) (*Client
 
 // NewWithAuthSource constructs a Client that obtains its credentials from the
 // given AuthSource. The AuthSource's Init is invoked once during construction.
+//
+// baseURL is the server root (https://host). A trailing /management/v1, with
+// or without a trailing slash, is trimmed, so BaseURL returns the root.
 func NewWithAuthSource(ctx context.Context, baseURL string, as core.AuthSource, options ...Option) (*Client, error) {
 	if as == nil {
 		return nil, errors.New("auth source must not be nil")
 	}
 
-	parsed, err := url.Parse(strings.TrimRight(baseURL, "/"))
+	root := strings.TrimSuffix(strings.TrimRight(baseURL, "/"), managementPathPrefix)
+	parsed, err := url.Parse(strings.TrimRight(root, "/"))
 	if err != nil {
 		return nil, fmt.Errorf("parse base url: %w", err)
 	}
