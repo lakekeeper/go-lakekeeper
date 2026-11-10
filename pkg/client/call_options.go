@@ -3,6 +3,7 @@ package client
 import (
 	"errors"
 	"fmt"
+	"slices"
 )
 
 // ErrEmptyProjectID is returned by a project-scoped façade method called
