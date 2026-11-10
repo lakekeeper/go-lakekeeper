@@ -112,7 +112,7 @@ func withBodyProject[R projectScoped[R], T any, PT bodyProjectModel[T]](op strin
 		o := resolveCallOptions(opts)
 		switch {
 		case !o.projectSet:
-			opts = []CallOption{WithProject(bodyProjectID)}
+			opts = append(slices.Clip(opts), WithProject(bodyProjectID))
 		case o.projectID != "" && o.projectID != bodyProjectID:
 			return req, cp, fmt.Errorf("%s: %w: body %q, WithProject %q", op, ErrProjectIDConflict, bodyProjectID, o.projectID)
 		}
