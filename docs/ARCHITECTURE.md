@@ -139,7 +139,7 @@ Key points:
   per-request.
 - **Auth is per-request.** `AuthSource.Init` runs once during
   `NewWithAuthSource`; `AuthSource.Header` is then called by
-  `AuthRoundTripper` on every request. `OAuthTokenSource` defers cache
+  `AuthRoundTripper` on every request. `OAuthClientCredentialsAuthSource` defers cache
   and renewal logic to `golang.org/x/oauth2`, so token refresh is
   transparent.
 - **Retries are decoupled from the generated client.** `retryablehttp`
