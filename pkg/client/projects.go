@@ -3,14 +3,16 @@ package client
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
 )
 
-// Projects is a one-call façade over ProjectAPIService. Get, Rename and
-// Delete act on the project named by WithProject (sent as x-project-id) and,
-// without it, on the server's default project. Create and List are not
-// project-scoped. For endpoints without a façade, reach for c.ProjectAPI.
+// Projects is a one-call façade over ProjectAPIService. Get and Rename act
+// on the project named by WithProject (sent as x-project-id) and, without
+// it, on the server's default project. Delete requires WithProject. Create
+// and List are not project-scoped. For endpoints without a façade, reach for
+// c.ProjectAPI.
 type Projects struct {
 	api *managementv1.ProjectAPIService
 }
@@ -36,10 +38,16 @@ func (p *Projects) Get(ctx context.Context, callOpts ...CallOption) (*management
 	return entityResult(op, out, resp, err)
 }
 
-// Delete removes the project named by WithProject. Without it, the server
-// deletes its default project, so name the project unless that is intended.
+// Delete removes the project named by WithProject. Unlike the other
+// project-scoped methods it has no default-project fallback: without
+// WithProject it returns ErrProjectRequired and sends nothing, so it can't
+// delete the server's default project by omission. To delete the default
+// project, name it explicitly.
 func (p *Projects) Delete(ctx context.Context, callOpts ...CallOption) error {
 	const op = "delete project"
+	if !resolveCallOptions(callOpts).projectSet {
+		return fmt.Errorf("%s: %w", op, ErrProjectRequired)
+	}
 	req, err := withProject(op, p.api.DeleteProject(ctx), callOpts)
 	if err != nil {
 		return err

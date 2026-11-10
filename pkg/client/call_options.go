@@ -9,6 +9,11 @@ import (
 // with WithProject(""), before any request is sent.
 var ErrEmptyProjectID = errors.New("project id must not be empty")
 
+// ErrProjectRequired is returned, before any request is sent, by a method
+// that must not fall back to the server's default project (Projects.Delete)
+// when it is called without WithProject.
+var ErrProjectRequired = errors.New("project must be named with WithProject")
+
 // ErrProjectIDConflict is returned, before any request is sent, when a
 // request model's deprecated project-id body field names a different
 // Project than WithProject.

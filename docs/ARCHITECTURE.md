@@ -190,8 +190,11 @@ c.Warehouses.List(ctx, nil)                                // no project sent
   project, the server answers 400 `ProjectIdMissing`.
 - `WithProject("")` is not "no project": the call fails with
   `client.ErrEmptyProjectID` before sending anything, so an unset variable
-  can't silently target (or, with `Projects.Delete`, delete) the default
-  project.
+  can't silently target the default project.
+- `Projects.Delete` is the one exception to "omitting is valid": without
+  `WithProject` it fails with `client.ErrProjectRequired` and sends
+  nothing, so a project is never deleted by omission. To delete the
+  default project, name it.
 - The façades never send the deprecated `projectId` query parameter or
   `project-id` body field. When both are sent, Lakekeeper lets the
   deprecated one win over the header. A request model that still carries
