@@ -30,7 +30,7 @@ When a change touches source listed in the [drift table](#drift-table), update t
 
 Without `DIAGRAMS`, it renders every diagram. Renders go to `.archify/` (gitignored) and are then copied here.
 
-If you rendered with the Archify skill instead, into `.archify/<type>-<slug>-<YYYYMMDD-HHMMSS>/`, run `make diagrams` to copy the newest render of each diagram here; it does not run Archify. A failed render leaves an incomplete folder that blocks the copy for that slug: delete it and render again.
+If you rendered with the Archify skill instead, into `.archify/<type>-<slug>-<YYYYMMDD-HHMMSS>/`, first export its SVGs with `node scripts/export-diagram-svg.mjs <render-folder>/<slug>.html`, then run `make diagrams` to copy the newest render of each diagram here; it does not run Archify. A failed render leaves an incomplete folder that blocks the copy for that slug: delete it and render again.
 
 A new diagram also needs a `<picture>` embed and a caption linking its HTML in its prose doc, the terms it uses defined there, and a row in the reading order and the drift table.
 
