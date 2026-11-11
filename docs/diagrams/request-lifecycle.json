@@ -1,0 +1,349 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "Request lifecycle: one façade call",
+    "output": ".archify/sequence-request-lifecycle-20261111-084246/request-lifecycle.html",
+    "quality_profile": "showcase",
+    "locale": "en",
+    "repository": {
+      "url": "git@github.com:lakekeeper/go-lakekeeper.git",
+      "provider": "github",
+      "link_mode": "local-only",
+      "revision": "2dab5b66d3b089677f0640cf9dec9422db804503"
+    },
+    "legend": {
+      "entries": {
+        "emphasis": {
+          "label": "call into the façade"
+        },
+        "security": {
+          "label": "request with the Authorization header"
+        },
+        "default": {
+          "label": "call inside the client"
+        },
+        "return": {
+          "label": "return"
+        }
+      }
+    }
+  },
+  "participants": [
+    {
+      "id": "caller",
+      "type": "external",
+      "label": "Caller",
+      "sublabel": "app code or lkctl"
+    },
+    {
+      "id": "facade",
+      "type": "backend",
+      "label": "Resource façade",
+      "sublabel": "c.Projects",
+      "sources": [
+        {
+          "path": "pkg/client/projects.go",
+          "line": 57,
+          "end_line": 60,
+          "label": "Projects.List"
+        },
+        {
+          "path": "pkg/client/errors.go",
+          "line": 65,
+          "end_line": 97,
+          "label": "WrapAPIError"
+        },
+        {
+          "path": "pkg/client/errors.go",
+          "line": 99,
+          "end_line": 110,
+          "label": "entityResult"
+        }
+      ]
+    },
+    {
+      "id": "service",
+      "type": "backend",
+      "label": "Generated service",
+      "sublabel": "c.ProjectAPI",
+      "sources": [
+        {
+          "path": "pkg/apis/management/v1/api_project.go",
+          "line": 929,
+          "end_line": 1010,
+          "label": "ListProjectsExecute"
+        },
+        {
+          "path": "pkg/client/client.go",
+          "line": 109,
+          "end_line": 113,
+          "label": "façade wraps service"
+        }
+      ]
+    },
+    {
+      "id": "apiclient",
+      "type": "backend",
+      "label": "API client",
+      "sublabel": "managementv1.APIClient",
+      "sources": [
+        {
+          "path": "pkg/apis/management/v1/client.go",
+          "line": 312,
+          "end_line": 335,
+          "label": "callAPI"
+        },
+        {
+          "path": "pkg/client/client.go",
+          "line": 101,
+          "end_line": 109,
+          "label": "base URL and HTTP client"
+        }
+      ]
+    },
+    {
+      "id": "retry",
+      "type": "backend",
+      "label": "Retrying client",
+      "sublabel": "retryablehttp",
+      "sources": [
+        {
+          "path": "pkg/client/client.go",
+          "line": 218,
+          "end_line": 258,
+          "label": "newHTTPClient"
+        },
+        {
+          "path": "pkg/client/client_options.go",
+          "line": 27,
+          "end_line": 35,
+          "label": "retry settings"
+        }
+      ]
+    },
+    {
+      "id": "auth",
+      "type": "security",
+      "label": "AuthRoundTripper",
+      "sublabel": "pkg/core",
+      "sources": [
+        {
+          "path": "pkg/core/transport.go",
+          "line": 8,
+          "end_line": 38,
+          "label": "RoundTrip"
+        },
+        {
+          "path": "pkg/client/client.go",
+          "line": 87,
+          "end_line": 89,
+          "label": "AuthSource.Init once"
+        }
+      ]
+    },
+    {
+      "id": "api",
+      "type": "external",
+      "label": "Lakekeeper API",
+      "sublabel": "Management API",
+      "sources": [
+        {
+          "path": "api/openapi/management-open-api.yaml",
+          "line": 1722,
+          "end_line": 1728,
+          "label": "GET project-list"
+        }
+      ]
+    }
+  ],
+  "segments": [
+    {
+      "from": 155,
+      "to": 275,
+      "label": "Build the request"
+    },
+    {
+      "from": 300,
+      "to": 585,
+      "label": "Send, retried per attempt"
+    },
+    {
+      "from": 605,
+      "to": 760,
+      "label": "Decode and wrap"
+    }
+  ],
+  "messages": [
+    {
+      "id": "call-facade",
+      "from": "caller",
+      "to": "facade",
+      "y": 170,
+      "label": "List(ctx)",
+      "variant": "emphasis"
+    },
+    {
+      "id": "call-service",
+      "from": "facade",
+      "to": "service",
+      "y": 200,
+      "label": "ListProjects(ctx).Execute()",
+      "variant": "emphasis"
+    },
+    {
+      "id": "prepare",
+      "from": "service",
+      "to": "apiclient",
+      "y": 230,
+      "label": "prepareRequest, callAPI",
+      "variant": "default",
+      "note": "URL: base URL + /management/v1/project-list"
+    },
+    {
+      "id": "do",
+      "from": "apiclient",
+      "to": "retry",
+      "y": 320,
+      "label": "HTTPClient.Do(req)",
+      "variant": "default"
+    },
+    {
+      "id": "round-trip",
+      "from": "retry",
+      "to": "auth",
+      "y": 350,
+      "label": "RoundTrip(req)",
+      "variant": "default",
+      "note": "Once per attempt. Retries transport errors, 429 and 5xx except 501"
+    },
+    {
+      "id": "send",
+      "from": "auth",
+      "to": "api",
+      "y": 420,
+      "label": "GET /management/v1/project-list",
+      "variant": "security",
+      "note": "Sets Authorization from AuthSource.Header unless already set"
+    },
+    {
+      "id": "api-reply",
+      "from": "api",
+      "to": "auth",
+      "y": 490,
+      "label": "status + JSON body",
+      "variant": "return"
+    },
+    {
+      "id": "auth-reply",
+      "from": "auth",
+      "to": "retry",
+      "y": 520,
+      "label": "*http.Response",
+      "variant": "return"
+    },
+    {
+      "id": "retry-reply",
+      "from": "retry",
+      "to": "apiclient",
+      "y": 550,
+      "label": "response or error",
+      "variant": "return",
+      "note": "Retries used up: error, no response"
+    },
+    {
+      "id": "client-reply",
+      "from": "apiclient",
+      "to": "service",
+      "y": 620,
+      "label": "*http.Response",
+      "variant": "return"
+    },
+    {
+      "id": "service-reply",
+      "from": "service",
+      "to": "facade",
+      "y": 650,
+      "label": "*result, resp, err",
+      "variant": "return",
+      "note": "Status >= 300 or bad body: GenericOpenAPIError"
+    },
+    {
+      "id": "facade-reply",
+      "from": "facade",
+      "to": "caller",
+      "y": 710,
+      "label": "result or error",
+      "variant": "return",
+      "note": "WrapAPIError: APIError, other errors wrapped with %w"
+    }
+  ],
+  "activations": [
+    {
+      "participant": "facade",
+      "from": 165,
+      "to": 720,
+      "type": "backend"
+    },
+    {
+      "participant": "service",
+      "from": 195,
+      "to": 660,
+      "type": "backend"
+    },
+    {
+      "participant": "apiclient",
+      "from": 225,
+      "to": 630,
+      "type": "backend"
+    },
+    {
+      "participant": "retry",
+      "from": 315,
+      "to": 560,
+      "type": "backend"
+    },
+    {
+      "participant": "auth",
+      "from": 345,
+      "to": 530,
+      "type": "security"
+    },
+    {
+      "participant": "api",
+      "from": 415,
+      "to": 500,
+      "type": "external"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "orange",
+      "title": "Retries",
+      "items": [
+        "The retrying HTTP client repeats the whole round trip, so the auth round-tripper runs, and fetches the header, on every attempt",
+        "Defaults: up to 4 retries, exponential backoff from 1 s to 30 s",
+        "WithoutRetries removes this layer; WithRetryMax, WithRetryWait, WithCheckRetry, WithBackoff and WithErrorHandler tune it"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Authorization header",
+      "items": [
+        "AuthSource.Init runs once in NewWithAuthSource",
+        "AuthSource.Header runs on every request; a header the caller already set is kept",
+        "A failing auth source fails the attempt before anything is sent"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "One error model",
+      "items": [
+        "A 2xx response decodes into the typed result",
+        "A generated error becomes one APIError with status code, raw body and decoded error model",
+        "Transport, context and retries-used-up errors are wrapped with %w, not turned into APIError",
+        "Escape-hatch callers enter at the generated service and can call WrapAPIError themselves"
+      ]
+    }
+  ]
+}

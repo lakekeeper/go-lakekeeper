@@ -95,38 +95,44 @@ the canonical reference environment for this SDK.
 ## Request Lifecycle
 
 Every SDK call follows the same path from the resource façade through the
-generated service and the embedded `APIClient` and out to the wire. Callers
-of the escape hatch enter at the generated service and get the raw triple
-back.
+generated service and the embedded `APIClient` and out to the wire. The
+diagram follows `c.Projects.List(ctx)`; every façade method takes the same
+path. Callers of the escape hatch enter at the generated service and get
+the raw triple back.
 
-```mermaid
-sequenceDiagram
-    participant Caller
-    participant Facade as c.Projects<br/>(or any façade)
-    participant Service as ProjectAPI<br/>(or any *APIService)
-    participant APIClient as managementv1.APIClient
-    participant HTTP as retryablehttp StandardClient
-    participant Auth as AuthRoundTripper
-    participant API as Lakekeeper API
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="diagrams/request-lifecycle-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="diagrams/request-lifecycle-light.svg">
+  <img alt="Request lifecycle: the caller calls a resource façade, which calls the generated service; the API client builds the request and hands it to the retrying HTTP client, which runs AuthRoundTripper once per attempt; AuthRoundTripper sets the Authorization header and sends the request to the Lakekeeper API; the response travels back, the generated service turns a status of 300 or more into a GenericOpenAPIError, and the façade returns the typed result or wraps the error into an APIError" src="diagrams/request-lifecycle-light.svg">
+</picture>
 
-    Caller->>Facade: List(ctx)
-    Facade->>Service: ListProjects(ctx).Execute()
-    Service->>APIClient: prepareRequest(ctx, ...)
-    APIClient->>HTTP: client.Do(req)
-    Note over HTTP: Retries on 429 and 5xx<br/>via retryablehttp
-    HTTP->>Auth: RoundTrip(req)
-    Auth->>Auth: AuthSource.Header(ctx)
-    Note over Auth: Sets "Authorization: Bearer …"<br/>only if not already set
-    Auth->>API: GET /management/v1/project
-    API-->>Auth: 200 OK + JSON body
-    Auth-->>HTTP: *http.Response
-    HTTP-->>APIClient: *http.Response
-    Note over APIClient: Generated decode → typed result<br/>or *GenericOpenAPIError
-    APIClient-->>Service: *result, *http.Response, err
-    Service-->>Facade: *ListProjectsResponse, *http.Response, err
-    Note over Facade: WrapAPIError(op, err, resp)
-    Facade-->>Caller: *ListProjectsResponse, error
-```
+Explorable version: [`diagrams/request-lifecycle.html`](diagrams/request-lifecycle.html)
+(GitHub shows its source: download or clone and open it locally). See the
+[diagram index](diagrams/README.md) for the other diagrams.
+
+The diagram uses the terms resource façade, escape hatch, auth source and
+Management API as defined under [System Context](#system-context), and
+these:
+
+- **Caller**: application code or `lkctl`, calling a façade method.
+- **Generated service**: one of the `*APIService` types of the generated
+  SDK, reachable on the client as `c.ProjectAPI`, `c.WarehouseAPI`, ….
+  Each operation is a request builder ending in `Execute()`, which returns
+  the typed result, the `*http.Response` and an error.
+- **API client**: the generated `managementv1.APIClient`. It builds the
+  request from the base URL (`prepareRequest`) and sends it through its
+  HTTP client (`callAPI`).
+- **Retrying HTTP client**: the `http.Client` the client hands the API
+  client, from `retryablehttp`. It repeats a failed attempt.
+- **`AuthRoundTripper`**: `core.AuthRoundTripper`, the transport below the
+  retrying HTTP client that sets the `Authorization` header from the auth
+  source.
+- **Typed result**: the decoded response model, such as
+  `*managementv1.ListProjectsResponse`.
+- **`GenericOpenAPIError`**: the generated client's error for a status of
+  300 or more, or a body it cannot decode.
+- **`APIError`**: `*client.APIError`, the one error type the façades
+  return for a failed response.
 
 Key points:
 
@@ -136,20 +142,23 @@ Key points:
   per-request.
 - **Auth is per-request.** `AuthSource.Init` runs once during
   `NewWithAuthSource`; `AuthSource.Header` is then called by
-  `AuthRoundTripper` on every request. `OAuthClientCredentialsAuthSource` defers cache
-  and renewal logic to `golang.org/x/oauth2`, so token refresh is
+  `AuthRoundTripper` on every attempt, including retries. A header the
+  caller already set is kept. `OAuthClientCredentialsAuthSource` defers
+  cache and renewal logic to `golang.org/x/oauth2`, so token refresh is
   transparent.
 - **Retries are decoupled from the generated client.** `retryablehttp`
-  retries `429` and any `>= 500` status with linear-jitter backoff
-  (defaults: 100 ms–400 ms, max 5 retries). Disable with `WithoutRetries()`
-  or tune with `WithRetryMax`, `WithRetryWait`, `WithCheckRetry`,
-  `WithBackoff`, and `WithErrorHandler`.
-- **One error model.** The generated client turns non-2xx responses into
-  `*managementv1.GenericOpenAPIError`. Façades pass it and the
-  `*http.Response` to `client.WrapAPIError`, which returns a
-  `*client.APIError` carrying the status code, the raw body, and the
-  decoded error model, and unwrapping to the generated error. Transport
-  and context errors stay wrapped with `%w`. See
+  retries transport errors, `429`, and any `>= 500` status except `501`,
+  with exponential backoff (library defaults: 1 s–30 s, at most 4
+  retries). Disable with `WithoutRetries()` or tune with `WithRetryMax`,
+  `WithRetryWait`, `WithCheckRetry`, `WithBackoff`, and
+  `WithErrorHandler`.
+- **One error model.** The generated client turns a status of 300 or more
+  into a `GenericOpenAPIError`. Façades pass it and the `*http.Response` to
+  `client.WrapAPIError`, which returns an `APIError` carrying the status
+  code, the raw body, and the decoded error model, and unwrapping to the
+  generated error. Transport and context errors stay wrapped with `%w`, and
+  so does the error `retryablehttp` returns by default once its retries
+  are used up, because it then returns no response. See
   [PACKAGES.md](PACKAGES.md#errors).
 
 ## Bootstrap Flow
