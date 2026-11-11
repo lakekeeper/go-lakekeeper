@@ -3,6 +3,7 @@
 Diagrams of how the go-lakekeeper SDK and `lkctl` are built, ordered from concepts to code. Each one is embedded in the prose doc that explains its topic, and that doc defines the terms the diagram uses. Read them in this order:
 
 1. [System context](../ARCHITECTURE.md#system-context): what the SDK and `lkctl` talk to, and what the Lakekeeper server runs on its side
+2. [Domain model](../AUTHORIZATION.md#the-lakekeeper-authorization-model): the server, projects, warehouses, users and roles, and how an assignment gives a principal a relation on a resource
 
 The [drift table](#drift-table) lists the source each diagram shows.
 
@@ -34,3 +35,4 @@ Each diagram, the source it shows, and the date it was last checked against the 
 | Diagram | Source it shows | Last checked |
 | --- | --- | --- |
 | [System context](../ARCHITECTURE.md#system-context) | `cmd/lkctl/commands/client.go`, `.golangci.yml`, `pkg/lakekeeper/lakekeeper.go`, `pkg/client/client.go`, `pkg/core/transport.go`, `pkg/core/auth.go`, `pkg/apis/management/v1/client.go`, `pkg/storage/profile/profile.go`, `go.mod`, `docker-compose.yml` | 2026-11-11 |
+| [Domain model](../AUTHORIZATION.md#the-lakekeeper-authorization-model) | `pkg/client/permissions.go`, `pkg/client/server.go`, `pkg/client/projects.go`, `pkg/client/warehouses.go`, `pkg/client/users.go`, `pkg/client/roles.go`, `pkg/permissions/assignment.go`, the generated models of these resources and their relations in `pkg/apis/management/v1/` | 2026-11-11 |
