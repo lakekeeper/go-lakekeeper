@@ -30,11 +30,12 @@ Every workflow has a `make` target; use it rather than the raw tool, because the
 
 - `make build` — builds `dist/lkctl`; runs `vet` and `test` first. It does not rewrite files; run `make mod` / `make fmt` explicitly.
 - `make test` — unit tests for `./...` with coverage; integration/e2e tests are excluded by their build tags.
+- `make cover` — runs `make test`, then writes `coverage.html` and a per-package Markdown table `coverage.md`, both without the generated SDK. CI posts `coverage.md` to the unit-tests job summary.
 - `make validate` — `vet` + `lint`. `make fmt` applies golangci-lint fixes (gofumpt, goimports). golangci-lint runs via `go run`; nothing to install.
 - `make test-integration` — starts Lakekeeper + Keycloak + MinIO + OpenFGA via compose and runs the `integration`-tagged tests.
 - `make test-e2e-compose` — runs the `e2e_cli` suite against the host-built `lkctl` on the compose stack. Run it before calling any `e2e/` change done.
 - `make test-e2e-kind` — runs the auth-only subset of `e2e_cli` against a kind cluster; other tests skip via `requireBackend`.
-- `make clean` — tears down the compose stack (`down --volumes`), removes `bin/`, `coverage.txt`, `.env`.
+- `make clean` — tears down the compose stack (`down --volumes`), removes `bin/`, the coverage files, `.env`.
 
 `KEEP_STACK=1` leaves the compose stack running after integration/e2e tests, for iterative debugging; tear down with `make clean`.
 

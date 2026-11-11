@@ -74,6 +74,19 @@ test: ## Runs unit tests.
 	@echo === go test unit-tests
 	@CGO_ENABLED=$(CGO_ENABLED_VALUE) $(GO) test -v -cover -coverprofile=coverage.txt $(GO_COMMON_FLAGS) $(GO_PACKAGES)
 
+# Generated SDK code is excluded from the coverage report: it is most of the
+# statements and is only exercised by the integration tests.
+COVERAGE_EXCLUDE := /pkg/apis/management/v1/
+
+.PHONY: cover
+cover: test ## Runs unit tests and writes coverage.html and coverage.md (generated code excluded).
+	@echo === coverage report
+	@grep -v '$(COVERAGE_EXCLUDE)' coverage.txt > coverage.filtered.txt
+	@$(GO) tool cover -html=coverage.filtered.txt -o coverage.html
+	@./scripts/coverage-summary.sh coverage.filtered.txt > coverage.md
+	@$(GO) tool cover -func=coverage.filtered.txt | tail -n 1
+	@echo "coverage.html and coverage.md written"
+
 LAKEKEEPER_VERSION ?= latest-main
 .PHONY: test-integration
 test-integration: $(ENV_FILE) ## Runs integration tests.
@@ -172,6 +185,6 @@ graph-setup: ## Register the graphify merge driver for graphify-out/graph.json i
 clean:
 	@rm -fr $(BIN_DIR)
 	@rm -fr $(DIST_DIR)
-	@rm -fr coverage.txt
+	@rm -fr coverage.txt coverage.filtered.txt coverage.html coverage.md
 	@rm -fr $(ENV_FILE)
 	@$(CONTAINER_COMPOSE_ENGINE) down --volumes

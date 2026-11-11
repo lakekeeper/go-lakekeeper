@@ -64,8 +64,11 @@ jobs:
         with:
           go-version-file: go.mod
 
-      - run: GOPATH=$(go env GOPATH) make test
+      - run: GOPATH=$(go env GOPATH) make cover
         timeout-minutes: 10
+
+      - name: coverage summary
+        run: cat coverage.md >> "$GITHUB_STEP_SUMMARY"
 
   integration-test:
     needs: lint

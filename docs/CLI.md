@@ -27,6 +27,7 @@ Other useful make targets:
 | `make build` | Vet, test, then build `dist/lkctl` |
 | `make validate` | `go vet` + `golangci-lint` (no build) |
 | `make test` | Unit tests under `./pkg/…` with coverage |
+| `make cover` | `make test`, then `coverage.html` and a per-package `coverage.md`, generated SDK excluded |
 | `make test-integration` | Spin up Lakekeeper + Keycloak + MinIO + OpenFGA via docker-compose and run integration tests |
 | `make test-e2e-compose` | E2E suite for `lkctl` itself, against the docker-compose stack (build tag `e2e_cli`). See [`e2e/`](../e2e/) |
 | `make test-e2e-kind` | E2E suite for `lkctl --auth-mode k8s` against a real kind cluster. See [`e2e/kind/`](../e2e/kind/) |
