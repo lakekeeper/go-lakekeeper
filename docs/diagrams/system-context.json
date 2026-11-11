@@ -11,6 +11,16 @@
       "provider": "github",
       "link_mode": "local-only",
       "revision": "28fea9780c7c09abdad619284c301c9d96e43e2e"
+    },
+    "legend": {
+      "entries": {
+        "frontend": { "label": "CLI" },
+        "backend": { "label": "SDK code" },
+        "external": { "label": "Your program or a library" },
+        "security": { "label": "Identity and permission checks" },
+        "cloud": { "label": "Lakekeeper server API" },
+        "database": { "label": "Server dependency" }
+      }
     }
   },
   "components": [
