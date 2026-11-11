@@ -51,12 +51,46 @@ adds or removes files produces an obvious diff.
 make generate
 ```
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="diagrams/generation-pipeline-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="diagrams/generation-pipeline-light.svg">
+  <img alt="Generation pipeline: the OpenAPI spec is copied by hand from the Lakekeeper repository; make generate wipes the output directory, copies the ignore file into it and runs openapi-generator with the spec (-i, unmodified) and the generator config (-c); the raw Go tree goes through the postprocessor, then format and tidy, and is written as the generated SDK; a hand edit of the generated SDK is wiped by the next run" src="diagrams/generation-pipeline-light.svg">
+</picture>
+
+Explorable version: [`diagrams/generation-pipeline.html`](diagrams/generation-pipeline.html)
+(GitHub shows its source: download or clone and open it locally). See the
+[diagram index](diagrams/README.md) for the other diagrams.
+
+Generated code changes only through the three inputs you edit: the OpenAPI
+spec, the postprocessor and the generator config (plus the ignore file, for
+which files are emitted at all). The diagram uses the term generated SDK as
+defined under [ARCHITECTURE.md System Context](ARCHITECTURE.md#system-context),
+and these:
+
+- **`make generate`**: the make target that runs every step below, in order.
+- **OpenAPI spec**: the committed
+  [`api/openapi/management-open-api.yaml`](../api/openapi/management-open-api.yaml),
+  copied by hand from the **Lakekeeper repository** (the upstream
+  [lakekeeper/lakekeeper](https://github.com/lakekeeper/lakekeeper)); see
+  [Updating the spec](#updating-the-spec).
+- **openapi-generator**: the `openapitools/openapi-generator-cli` container
+  image with the `go` generator, pinned by `OPENAPI_GENERATOR_VERSION` in the
+  Makefile.
+- **Generator config**: see [Generator configuration](#generator-configuration).
+- **Ignore file**: [`api/openapi/.openapi-generator-ignore`](../api/openapi/.openapi-generator-ignore),
+  the generator output files to leave out of the package.
+- **Postprocessor**: see [The postprocessor](#the-postprocessor).
+- **Format and tidy**: `goimports`, `go mod tidy` and `make fmt` over the
+  postprocessed tree.
+- **Hand edit**: any edit under `pkg/apis/management/v1/`. The next
+  `make generate` deletes it (see [What is generated](#what-is-generated)).
+
 The pipeline (see [Makefile:135-155](../Makefile#L135-L155)):
 
 1. `rm -rf pkg/apis/management/v1` and recreate the directory.
 2. Copy the top-level [`.openapi-generator-ignore`](../api/openapi/.openapi-generator-ignore)
    into the output directory.
-3. Run `openapitools/openapi-generator-cli:v7.10.0 generate` in a container.
+3. Run `openapitools/openapi-generator-cli:v7.27.0 generate` in a container.
    Input spec (`-i`): the committed
    [`api/openapi/management-open-api.yaml`](../api/openapi/management-open-api.yaml),
    unmodified. Generator config (`-c`):

@@ -1,0 +1,194 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Generation pipeline: make generate",
+    "output": ".archify/architecture-generation-pipeline-20261111-090742/generation-pipeline.html",
+    "quality_profile": "showcase",
+    "locale": "en",
+    "repository": {
+      "url": "git@github.com:lakekeeper/go-lakekeeper.git",
+      "provider": "github",
+      "link_mode": "local-only",
+      "revision": "c59ddf78d2dae12e819c6996b13f38894635035e"
+    },
+    "legend": {
+      "entries": {
+        "frontend": { "label": "Make target you run" },
+        "database": { "label": "Input you change" },
+        "external": { "label": "Outside this repo" },
+        "backend": { "label": "Step or output, never edited" },
+        "security": { "label": "Not a way to change it" }
+      }
+    }
+  },
+  "components": [
+    {
+      "id": "upstream",
+      "type": "external",
+      "label": "Lakekeeper repository",
+      "sublabel": "docs/docs/api/management-open-api.yaml",
+      "tag": "at the targeted release tag",
+      "pos": [40, 40],
+      "size": [230, 64]
+    },
+    {
+      "id": "spec",
+      "type": "database",
+      "label": "OpenAPI spec",
+      "sublabel": "api/openapi/management-open-api.yaml",
+      "tag": "committed · source of truth",
+      "pos": [380, 40],
+      "size": [230, 64],
+      "sources": [
+        { "path": "api/openapi/management-open-api.yaml", "line": 1, "end_line": 5, "label": "committed Management API spec" },
+        { "path": "Makefile", "line": 137, "end_line": 137, "label": "make generate requires it" },
+        { "path": "Makefile", "line": 145, "end_line": 145, "label": "-i: spec passed unmodified" }
+      ]
+    },
+    {
+      "id": "make",
+      "type": "frontend",
+      "label": "make generate",
+      "sublabel": "Makefile",
+      "tag": "wipes the output dir · runs each step",
+      "pos": [40, 200],
+      "size": [230, 64],
+      "sources": [
+        { "path": "Makefile", "line": 135, "end_line": 140, "label": "wipe and recreate output, copy ignore file" },
+        { "path": "Makefile", "line": 45, "end_line": 45, "label": "CONTAINER_ENGINE: docker or podman" }
+      ]
+    },
+    {
+      "id": "generator",
+      "type": "external",
+      "label": "openapi-generator",
+      "sublabel": "openapi-generator-cli · -g go",
+      "tag": "container · v7.27.0",
+      "pos": [380, 200],
+      "size": [230, 64],
+      "sources": [
+        { "path": "Makefile", "line": 49, "end_line": 50, "label": "generator image and version" },
+        { "path": "Makefile", "line": 141, "end_line": 149, "label": "generate -i spec -c config -o output" }
+      ]
+    },
+    {
+      "id": "postprocess",
+      "type": "database",
+      "label": "Postprocessor",
+      "sublabel": "api/openapi/postprocess",
+      "tag": "drops DisallowUnknownFields · relaxes enums",
+      "pos": [720, 200],
+      "size": [230, 64],
+      "sources": [
+        { "path": "Makefile", "line": 150, "end_line": 151, "label": "go run ./api/openapi/postprocess" },
+        { "path": "api/openapi/postprocess/main.go", "line": 1, "end_line": 34, "label": "the two relaxations" },
+        { "path": "api/openapi/postprocess/main.go", "line": 44, "end_line": 56, "label": "match targets" }
+      ]
+    },
+    {
+      "id": "format",
+      "type": "backend",
+      "label": "Format and tidy",
+      "sublabel": "goimports · go mod tidy · make fmt",
+      "pos": [1060, 200],
+      "size": [230, 64],
+      "sources": [
+        { "path": "Makefile", "line": 152, "end_line": 155, "label": "goimports, go mod tidy, make fmt" },
+        { "path": "Makefile", "line": 121, "end_line": 124, "label": "fmt: golangci-lint --fix" }
+      ]
+    },
+    {
+      "id": "generated",
+      "type": "backend",
+      "label": "Generated SDK",
+      "sublabel": "pkg/apis/management/v1",
+      "tag": "Code generated … DO NOT EDIT",
+      "pos": [1400, 200],
+      "size": [230, 64],
+      "sources": [
+        { "path": "pkg/apis/management/v1/client.go", "line": 10, "end_line": 12, "label": "generated header, package managementv1" },
+        { "path": "pkg/apis/management/v1/.openapi-generator/VERSION", "line": 1, "end_line": 1, "label": "generator version that wrote it" },
+        { "path": "Makefile", "line": 52, "end_line": 52, "label": "MANAGEMENT_API_OUTPUT" }
+      ]
+    },
+    {
+      "id": "ignore",
+      "type": "database",
+      "label": "Ignore file",
+      "sublabel": "api/openapi/.openapi-generator-ignore",
+      "tag": "files not to emit",
+      "pos": [40, 360],
+      "size": [230, 64],
+      "sources": [
+        { "path": "api/openapi/.openapi-generator-ignore", "line": 1, "end_line": 7, "label": "README.md, git_push.sh, …" },
+        { "path": "Makefile", "line": 140, "end_line": 140, "label": "copied into the output dir" }
+      ]
+    },
+    {
+      "id": "config",
+      "type": "database",
+      "label": "Generator config",
+      "sublabel": "api/openapi/management-config.yaml",
+      "tag": "only deviations from defaults",
+      "pos": [380, 360],
+      "size": [230, 64],
+      "sources": [
+        { "path": "api/openapi/management-config.yaml", "line": 1, "end_line": 44, "label": "options that differ from the defaults" },
+        { "path": "Makefile", "line": 147, "end_line": 147, "label": "-c config" }
+      ]
+    },
+    {
+      "id": "handedit",
+      "type": "security",
+      "label": "Hand edit",
+      "sublabel": "any file under pkg/apis/management/v1",
+      "tag": "change an input instead",
+      "pos": [1400, 360],
+      "size": [230, 64],
+      "sources": [
+        { "path": "Makefile", "line": 138, "end_line": 138, "label": "rm -rf wipes the output dir" }
+      ]
+    }
+  ],
+  "connections": [
+    { "id": "upstream-spec", "from": "upstream", "to": "spec", "label": "copied by hand" },
+    { "id": "spec-generator", "from": "spec", "to": "generator", "label": "-i, unmodified", "variant": "emphasis" },
+    { "id": "ignore-make", "from": "ignore", "to": "make", "label": "copied into output dir" },
+    { "id": "config-generator", "from": "config", "to": "generator", "label": "-c" },
+    { "id": "make-generator", "from": "make", "to": "generator", "label": "runs" },
+    { "id": "generator-postprocess", "from": "generator", "to": "postprocess", "label": "raw Go tree", "variant": "emphasis" },
+    { "id": "postprocess-format", "from": "postprocess", "to": "format", "label": "relaxed tree", "variant": "emphasis" },
+    { "id": "format-generated", "from": "format", "to": "generated", "label": "writes", "variant": "emphasis" },
+    { "id": "handedit-generated", "from": "handedit", "to": "generated", "label": "wiped by the next run", "variant": "security" }
+  ],
+  "cards": [
+    {
+      "dot": "rose",
+      "title": "To change generated code",
+      "items": [
+        "Change the spec, the postprocessor or the generator config, then run make generate",
+        "make generate deletes pkg/apis/management/v1 before each run, so hand edits are lost",
+        "Commit the spec update and the regenerated tree in the same commit"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "Generator config",
+      "items": [
+        "Lists only the options whose value differs from openapi-generator's default",
+        "Each option has an inline comment saying why it deviates",
+        "Don't add an option set to its default value"
+      ]
+    },
+    {
+      "dot": "slate",
+      "title": "Postprocessor",
+      "items": [
+        "Removes decoder.DisallowUnknownFields() from model UnmarshalJSON, so new server fields decode",
+        "Rewrites enum UnmarshalJSON to keep an unknown value instead of failing",
+        "Leaves the required-field check and discriminator dispatch alone"
+      ]
+    }
+  ]
+}
