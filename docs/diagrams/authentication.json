@@ -3,14 +3,14 @@
   "diagram_type": "architecture",
   "meta": {
     "title": "Authentication: auth sources, construction and requests",
-    "output": ".archify/architecture-authentication-20261111-085335/authentication.html",
+    "output": ".archify/architecture-authentication-20261111-085644/authentication.html",
     "quality_profile": "showcase",
     "locale": "en",
     "repository": {
       "url": "git@github.com:lakekeeper/go-lakekeeper.git",
       "provider": "github",
       "link_mode": "local-only",
-      "revision": "bb68814c1e718d191854a29bae64aea136e49084"
+      "revision": "9a4565b05b535cbfd824b1c6ce534ad601016d1c"
     },
     "legend": {
       "entries": {
