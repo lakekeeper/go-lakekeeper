@@ -168,6 +168,14 @@ graph-setup: ## Register the graphify merge driver for graphify-out/graph.json i
 	git config merge.graphify.name "graphify graph.json union merge"
 	git config merge.graphify.driver "$(GRAPHIFY) merge-driver %O %A %B"
 
+.PHONY: diagrams
+diagrams: ## Copy the newest Archify render of each diagram from .archify/ into docs/diagrams/ (does not run Archify).
+	@./scripts/copy-diagrams.sh $(DIAGRAMS)
+
+.PHONY: diagrams-render
+diagrams-render: ## Re-render diagrams from docs/diagrams/<slug>.json (DIAGRAMS="<slug> ...", default all; needs Archify, Chrome, Node).
+	@./scripts/render-diagrams.sh $(DIAGRAMS)
+
 .PHONY: clean
 clean:
 	@rm -fr $(BIN_DIR)
