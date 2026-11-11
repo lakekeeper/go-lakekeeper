@@ -42,10 +42,12 @@ target/
 # MacOS
 .DS_Store
 
-# Agent-specific configuration stays local; only agent-agnostic config
-# (AGENTS.md, .agents/) is tracked, plus the .claude/skills symlink to
-# .agents/skills so Claude Code discovers the skills
+# Agent configuration: AGENTS.md and .agents/ are tracked; under .claude/ only
+# the team-shared CLAUDE.md, settings.json and skills symlink are, everything
+# else there is per-user
 .claude/*
+!.claude/CLAUDE.md
+!.claude/settings.json
 !.claude/skills
 CLAUDE.md
 CLAUDE.local.md

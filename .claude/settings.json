@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "deny": [
+      "Edit(/pkg/apis/management/v1/**)",
+      "Edit(/CHANGELOG.md)",
+      "Edit(/.release-please-manifest.json)",
+      "Bash(git push * main)",
+      "Bash(git push * main *)",
+      "Bash(git push *:main)",
+      "Bash(git push *:main *)",
+      "Bash(git push *:refs/heads/main)",
+      "Bash(git push *:refs/heads/main *)",
+      "Bash(git push *--force*)",
+      "Bash(git push -f*)",
+      "Bash(git push * -f)",
+      "Bash(git push * -f *)",
+      "Bash(git push * +*)"
+    ]
+  }
+}
