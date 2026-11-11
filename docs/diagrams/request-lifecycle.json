@@ -145,8 +145,8 @@
     {
       "id": "api",
       "type": "external",
-      "label": "Lakekeeper API",
-      "sublabel": "Management API",
+      "label": "Management API",
+      "sublabel": "/management/v1",
       "sources": [
         {
           "path": "api/openapi/management-open-api.yaml",

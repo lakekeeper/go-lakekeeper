@@ -17,6 +17,7 @@ Please take a moment to review this guide before submitting a pull request.
     - [Submitting Changes](#submitting-changes)
   - [Coding Guidelines](#coding-guidelines)
   - [Commits and branches](#commits-and-branches)
+  - [Regenerating the API client](#regenerating-the-api-client)
   - [Development workflow](#development-workflow)
   - [Testing](#testing)
   - [Diagrams](#diagrams)

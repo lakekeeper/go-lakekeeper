@@ -209,7 +209,7 @@ options, or the raw `*http.Response`, use the escape hatch.
   parameter.
 - **List results** are the generated list response; page with its
   `GetNextPageToken()` accessor.
-- **Project scoping** is a trailing `...client.CallOption`;
+- [Project scoping](ARCHITECTURE.md#project-scoping) is a trailing `...client.CallOption`;
   `client.WithProject(id)` sends `x-project-id`, omitting it lets the
   server apply its default project, and `WithProject("")` fails with
   `client.ErrEmptyProjectID`. The destructive project-level calls
@@ -348,7 +348,8 @@ catalog, err := client.CatalogV1(ctx, projectID, warehouse, opts...)
 ```
 
 Returns an `*apache/iceberg-go/catalog/rest.Catalog` configured with the
-client's auth token and the warehouse-scoped catalog URL. If the client was
+client's auth token, the `/catalog` URL and `<projectID>/<warehouse>` as its
+warehouse location. If the client was
 built with `WithHTTPClient`, the catalog uses the same base transport (only
 the transport; `Timeout`, `CheckRedirect` and `Jar` stay with the
 Management API client). Transport options in `opts` take precedence:
@@ -409,9 +410,10 @@ first API call.
 
 #### `OAuthClientCredentialsAuthSource` — OAuth 2.0 client credentials
 
-The most common production choice. Wraps any
-`golang.org/x/oauth2.TokenSource`, which handles token caching and silent
-renewal before expiry automatically (via `oauth2.ReuseTokenSource`).
+The most common production choice. Wraps a
+`golang.org/x/oauth2.TokenSource`; the standard client credentials one
+(`clientcredentials.Config.TokenSource`, an `oauth2.ReuseTokenSource`)
+caches the token and renews it shortly before expiry.
 
 The umbrella's `lakekeeper.NewOAuthClientCredentials` is the shortest
 construction path:
@@ -442,11 +444,12 @@ as := &core.OAuthClientCredentialsAuthSource{TokenSource: cfg.TokenSource(ctx)}
 c, err := client.NewWithAuthSource(ctx, baseURL, as)
 ```
 
-`Header` asks the token source for a token. When none is cached or the
-cached one has expired, `golang.org/x/oauth2` sends a
-`grant_type=client_credentials` request with the client ID and secret to
-the identity provider's token endpoint, then caches the token until it
-expires. The [authentication diagram](AUTHENTICATION.md#overview) shows
+`Init` fetches the first token when the client is constructed. After that,
+`Header` asks the token source for a token on every request. With the
+standard client credentials token source, `golang.org/x/oauth2` returns
+the cached token until it is about 10 seconds from expiry, then sends a
+new `grant_type=client_credentials` request with the client ID and secret
+to the identity provider's token endpoint and caches the result. The [authentication diagram](AUTHENTICATION.md#overview) shows
 where this happens in a request.
 
 The struct technically accepts any `oauth2.TokenSource`, so non-client-credentials

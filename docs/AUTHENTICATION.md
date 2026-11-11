@@ -32,7 +32,8 @@ Explorable version: [`diagrams/authentication.html`](diagrams/authentication.htm
 [diagram index](diagrams/README.md) for the other diagrams.
 
 The diagram uses the terms `lkctl`, application code, umbrella package,
-auth source, identity provider and Management API as defined under
+auth source, identity provider, Lakekeeper server and Management API as
+defined under
 [ARCHITECTURE.md System Context](ARCHITECTURE.md#system-context), and
 [`AuthRoundTripper`](ARCHITECTURE.md#request-lifecycle) as defined under
 Request Lifecycle, and these:
@@ -57,8 +58,6 @@ Request Lifecycle, and these:
   below.
 - **`WithInitialBootstrap`**: the client option that bootstraps the server
   during construction; see [Bootstrap](#bootstrap).
-- **Lakekeeper server**: the server the client talks to, through its
-  Management API.
 
 The umbrella package adds two convenience constructors that hide the
 two-line `core.*AuthSource{}` + `client.NewWithAuthSource` setup for the
@@ -275,7 +274,7 @@ symmetric behaviour in your own binaries.
 
 ## See also
 
-- [AUTHORIZATION.md](AUTHORIZATION.md) — once authenticated, how grants,
+- [AUTHORIZATION.md](AUTHORIZATION.md) — once authenticated, how assignments,
   roles, and access checks work
 - [PACKAGES.md `pkg/core`](PACKAGES.md#pkgcore) — `AuthSource` interface
   and the three shipped implementations

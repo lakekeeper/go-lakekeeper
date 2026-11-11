@@ -49,10 +49,17 @@ The diagram uses these terms:
   access tokens, for example Keycloak. Only the client credentials auth
   source fetches tokens from it; the Lakekeeper server validates every
   token against it.
+- **`iceberg-go`**: `apache/iceberg-go`, the Apache Iceberg library for
+  Go. The client's `CatalogV1` helper returns its REST catalog
+  (`rest.Catalog`) for one project and warehouse.
+- **Lakekeeper server**: one Lakekeeper installation, which serves the
+  Management API and the Iceberg REST Catalog. In the domain model it is
+  the [server](AUTHORIZATION.md#the-lakekeeper-authorization-model)
+  resource.
 - **Management API**: Lakekeeper's REST API under `/management/v1` for
   servers, projects, warehouses, users, roles and permissions.
 - **Iceberg REST Catalog**: Lakekeeper's Apache Iceberg REST catalog under
-  `/catalog`, reached through `apache/iceberg-go`.
+  `/catalog`, reached through `iceberg-go`.
 - **Metadata store**, **authorization backend**, **secret storage** and
   **object storage**: the Lakekeeper server's own dependencies (PostgreSQL,
   OpenFGA, an optional secret backend, and S3, GCS or ADLS). The SDK runs
@@ -60,10 +67,8 @@ The diagram uses these terms:
 
 `pkg/client.Client` adds:
 
-- **Resource façades** (`c.Warehouses`, `c.Projects`, `c.Roles`,
-  `c.Users`, `c.Server`, `c.Permissions`): one method call per
-  operation, returning `(value, error)`. They own request construction,
-  query options and paging, **Project scoping** (see below), and the one
+- The resource façades (see above). They own request construction,
+  query options and paging, project scoping (see below), and the one
   error model. They cover every operation `lkctl` uses, and `lkctl`
   commands call nothing else; see
   [PACKAGES.md](PACKAGES.md#resource-façades-one-call-ergonomic-surface).
@@ -103,7 +108,7 @@ the raw triple back.
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="diagrams/request-lifecycle-dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="diagrams/request-lifecycle-light.svg">
-  <img alt="Request lifecycle: the caller calls a resource façade, which calls the generated service; the API client builds the request and hands it to the retrying HTTP client, which runs AuthRoundTripper once per attempt; AuthRoundTripper sets the Authorization header and sends the request to the Lakekeeper API; the response travels back, the generated service turns a status of 300 or more into a GenericOpenAPIError, and the façade returns the typed result or wraps the error into an APIError" src="diagrams/request-lifecycle-light.svg">
+  <img alt="Request lifecycle: the caller calls a resource façade, which calls the generated service; the API client builds the request and hands it to the retrying client, which runs AuthRoundTripper once per attempt; AuthRoundTripper sets the Authorization header and sends the request to the Management API; the response travels back, the generated service turns a status of 300 or more into a GenericOpenAPIError, and the façade returns the typed result or wraps the error into an APIError" src="diagrams/request-lifecycle-light.svg">
 </picture>
 
 Explorable version: [`diagrams/request-lifecycle.html`](diagrams/request-lifecycle.html)
@@ -122,10 +127,11 @@ these:
 - **API client**: the generated `managementv1.APIClient`. It builds the
   request from the base URL (`prepareRequest`) and sends it through its
   HTTP client (`callAPI`).
-- **Retrying HTTP client**: the `http.Client` the client hands the API
-  client, from `retryablehttp`. It repeats a failed attempt.
+- **Retrying client**: the retrying HTTP client, the `http.Client` the
+  client hands the API client, from `retryablehttp`. It repeats a failed
+  attempt.
 - **`AuthRoundTripper`**: `core.AuthRoundTripper`, the transport below the
-  retrying HTTP client that sets the `Authorization` header from the auth
+  retrying client that sets the `Authorization` header from the auth
   source.
 - **Typed result**: the decoded response model, such as
   `*managementv1.ListProjectsResponse`.
@@ -203,8 +209,8 @@ Explorable version: [`diagrams/project-scoping.html`](diagrams/project-scoping.h
 (GitHub shows its source: download or clone and open it locally). See the
 [diagram index](diagrams/README.md) for the other diagrams.
 
-The diagram uses the terms resource façade as defined under
-[System Context](#system-context), `APIError` as defined under
+The diagram uses the terms resource façade and Lakekeeper server as
+defined under [System Context](#system-context), `APIError` as defined under
 [Request Lifecycle](#request-lifecycle), project and default project as
 defined in [AUTHORIZATION.md](AUTHORIZATION.md#the-lakekeeper-authorization-model),
 and these:
