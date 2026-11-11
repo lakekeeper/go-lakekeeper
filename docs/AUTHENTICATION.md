@@ -21,6 +21,45 @@ misconfigured token URL, empty bearer, or unreadable service-account
 token surfaces at `client.NewWithAuthSource` rather than at the first
 request.
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="diagrams/authentication-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="diagrams/authentication-light.svg">
+  <img alt="Authentication: lkctl picks an auth source by --auth-mode, the umbrella constructors pick one by constructor, and application code can pass any AuthSource; all three reach NewWithAuthSource, which calls Init once on the OAuth2 client credentials, static access token or Kubernetes service account source; the OAuth2 source requests tokens from the identity provider; AuthRoundTripper calls Header on the auth source for every request and sends the Authorization header to the Lakekeeper server; if WithInitialBootstrap is set, construction calls Server.Info and then Bootstrap" src="diagrams/authentication-light.svg">
+</picture>
+
+Explorable version: [`diagrams/authentication.html`](diagrams/authentication.html)
+(GitHub shows its source: download or clone and open it locally). See the
+[diagram index](diagrams/README.md) for the other diagrams.
+
+The diagram uses the terms `lkctl`, application code, umbrella package,
+auth source, identity provider and Management API as defined under
+[ARCHITECTURE.md System Context](ARCHITECTURE.md#system-context), and
+[`AuthRoundTripper`](ARCHITECTURE.md#request-lifecycle) as defined under
+Request Lifecycle, and these:
+
+- **Auth mode**: `lkctl`'s `--auth-mode` flag (or `LAKEKEEPER_AUTH_MODE`):
+  `oauth2` (the default), `token` or `k8s`. It picks one of the three auth
+  sources. Before building it, `lkctl` checks the flags that mode needs and
+  rejects an unknown mode.
+- **Umbrella constructors**: `lakekeeper.NewOAuthClientCredentials`,
+  `lakekeeper.New` (static access token) and
+  `lakekeeper.NewK8sServiceAccount`, each building one auth source and
+  calling `NewWithAuthSource`.
+- **`NewWithAuthSource`**: `client.NewWithAuthSource`, the constructor every
+  path ends in. It calls `Init`, applies the options, wires
+  `AuthRoundTripper` and, if asked, runs the bootstrap.
+- **`Init`**: the auth source's one-time check during construction. An
+  error fails the constructor with `init auth source: …`.
+- **`Header`**: the auth source's method that returns the `Authorization`
+  header. `AuthRoundTripper` calls it on every request, retries included.
+- **OAuth2 client credentials**, **static access token** and **Kubernetes
+  service account**: the three auth sources, described in the sections
+  below.
+- **`WithInitialBootstrap`**: the client option that bootstraps the server
+  during construction; see [Bootstrap](#bootstrap).
+- **Lakekeeper server**: the server the client talks to, through its
+  Management API.
+
 The umbrella package adds two convenience constructors that hide the
 two-line `core.*AuthSource{}` + `client.NewWithAuthSource` setup for the
 common cases:

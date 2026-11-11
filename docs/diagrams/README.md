@@ -6,6 +6,7 @@ Diagrams of how the go-lakekeeper SDK and `lkctl` are built, ordered from concep
 2. [Domain model](../AUTHORIZATION.md#the-lakekeeper-authorization-model): the server, projects, warehouses, users and roles, and how an assignment gives a principal a relation on a resource
 3. [Request lifecycle](../ARCHITECTURE.md#request-lifecycle): one façade call through the generated service, the retrying HTTP client and `AuthRoundTripper` to the API, and back as a typed result or one `APIError`
 4. [Project scoping](../ARCHITECTURE.md#project-scoping): what a project-scoped façade call sends with `WithProject(id)`, with no option, with `WithProject("")`, on a destructive call that requires a project, and with the deprecated body field, and when the server picks the default project
+5. [Authentication](../AUTHENTICATION.md#overview): how `lkctl`'s auth mode, the umbrella constructors or your own code pick one of the three auth sources, which `NewWithAuthSource` validates once with `Init`; how `AuthRoundTripper` fetches the header on every request; and the optional bootstrap at construction
 
 The [drift table](#drift-table) lists the source each diagram shows.
 
@@ -40,3 +41,4 @@ Each diagram, the source it shows, and the date it was last checked against the 
 | [Domain model](../AUTHORIZATION.md#the-lakekeeper-authorization-model) | `pkg/client/permissions.go`, `pkg/client/server.go`, `pkg/client/projects.go`, `pkg/client/warehouses.go`, `pkg/client/users.go`, `pkg/client/roles.go`, `pkg/permissions/assignment.go`, the generated models of these resources and their relations in `pkg/apis/management/v1/` | 2026-11-11 |
 | [Request lifecycle](../ARCHITECTURE.md#request-lifecycle) | `pkg/client/projects.go`, `pkg/client/errors.go`, `pkg/client/client.go`, `pkg/client/client_options.go`, `pkg/core/transport.go`, `pkg/apis/management/v1/client.go`, `pkg/apis/management/v1/api_project.go`, `api/openapi/management-open-api.yaml` | 2026-11-11 |
 | [Project scoping](../ARCHITECTURE.md#project-scoping) | `pkg/client/call_options.go`, the façade methods that call it (`pkg/client/warehouses.go`, `pkg/client/roles.go`, `pkg/client/projects.go`, `pkg/client/permissions.go`), the `x-project-id` parameter in `api/openapi/management-open-api.yaml` | 2026-11-11 |
+| [Authentication](../AUTHENTICATION.md#overview) | `pkg/core/auth.go`, `pkg/core/transport.go`, `pkg/client/client.go`, `pkg/client/client_options.go`, `pkg/client/server.go`, `pkg/lakekeeper/lakekeeper.go`, `cmd/lkctl/commands/client.go`, `cmd/lkctl/commands/root.go` | 2026-11-11 |
