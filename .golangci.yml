@@ -21,7 +21,7 @@ linters:
     - exptostd
     - forbidigo
     - gocritic
-    - gomodguard
+    - gomodguard_v2
     - govet
     - importas
     - misspell
