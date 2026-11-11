@@ -193,9 +193,45 @@ c.Warehouses.List(ctx, nil, client.WithProject(projectID)) // x-project-id: <pro
 c.Warehouses.List(ctx, nil)                                // no project sent
 ```
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="diagrams/project-scoping-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="diagrams/project-scoping-light.svg">
+  <img alt="Project scoping: a project-scoped call first checks a deprecated body project field, which fails with ErrProjectIDConflict when it differs from WithProject and is otherwise moved to WithProject or dropped; a call that requires a project fails with ErrProjectRequired when none is given; WithProject with an empty id fails with ErrEmptyProjectID; WithProject with an id sends the x-project-id header and the server uses the named project; no option sends no project, and the server uses its default project, or answers 400 ProjectIdMissing when the default project is disabled" src="diagrams/project-scoping-light.svg">
+</picture>
+
+Explorable version: [`diagrams/project-scoping.html`](diagrams/project-scoping.html)
+(GitHub shows its source: download or clone and open it locally). See the
+[diagram index](diagrams/README.md) for the other diagrams.
+
+The diagram uses the terms resource façade as defined under
+[System Context](#system-context), `APIError` as defined under
+[Request Lifecycle](#request-lifecycle), project and default project as
+defined in [AUTHORIZATION.md](AUTHORIZATION.md#the-lakekeeper-authorization-model),
+and these:
+
+- **Project scoping**: how a façade call names the project it runs in.
+- **Project-scoped call**: a call to a façade method that takes a
+  trailing `...client.CallOption`, because its endpoint accepts the
+  `x-project-id` header.
+- **`WithProject`**: `client.WithProject(id)`, the call option that names
+  the project. The project it names is the **named project**.
+- **`x-project-id` header**: the HTTP header that carries the project.
+  It is the only way the façades send one.
+- **Deprecated body field**: the `project-id` field that
+  `CreateWarehouseRequest`, `CreateRoleRequest` and `SearchRoleRequest`
+  still carry.
+- **`ErrProjectIDConflict`, `ErrProjectRequired`, `ErrEmptyProjectID`**:
+  the client's errors for a call it rejects before sending anything;
+  match them with `errors.Is`.
+- **`ProjectIdMissing`**: the server's 400 error when a call names no
+  project and the operator disabled the default project. The façade
+  returns it as an `APIError`.
+
+What each case sends:
+
 - With `WithProject`, the façade sends the `x-project-id` header.
 - Without it, the façade sends no project. The server then applies its
-  **default project**: the nil UUID unless the operator set
+  default project: the nil UUID unless the operator set
   `LAKEKEEPER__DEFAULT_PROJECT_ID`. If the operator disabled the default
   project, the server answers 400 `ProjectIdMissing`.
 - `WithProject("")` is not "no project": the call fails with
