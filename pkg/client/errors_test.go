@@ -2,11 +2,15 @@ package client_test
 
 import (
 	"context"
+	"encoding/json"
 	"net"
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"sync/atomic"
 	"testing"
+	"time"
+	"unicode/utf8"
 
 	"github.com/stretchr/testify/require"
 
@@ -104,6 +108,23 @@ func TestFacadeError_LongBodyTruncatedInTextButKeptWhole(t *testing.T) {
 	require.Nil(t, apiErr.Model, "a non-JSON body has no error model")
 }
 
+func TestFacadeError_TruncationKeepsValidUTF8(t *testing.T) {
+	t.Parallel()
+	// Two ASCII bytes, then 3-byte runes: byte 1024 falls inside a rune.
+	long := "xx" + strings.Repeat("€", 1000)
+	mux, c := testutil.ServerMux(t)
+	mux.HandleFunc("GET /management/v1/role/{id}", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "text/plain")
+		w.WriteHeader(http.StatusBadGateway)
+		_, _ = w.Write([]byte(long))
+	})
+
+	_, err := c.Roles.Get(t.Context(), "1234", client.WithProject("p"))
+
+	require.ErrorContains(t, err, "...(truncated)")
+	require.True(t, utf8.ValidString(err.Error()), "error text must stay valid UTF-8")
+}
+
 func TestFacadeError_NoBody(t *testing.T) {
 	t.Parallel()
 	mux, c := testutil.ServerMux(t)
@@ -121,6 +142,71 @@ func TestFacadeError_NoBody(t *testing.T) {
 	require.Nil(t, apiErr.Model)
 	var genErr *managementv1.GenericOpenAPIError
 	require.ErrorAs(t, err, &genErr, "errors.As must reach the generated error")
+}
+
+func TestFacadeError_NonJSONClientErrorKeepsDecodeCause(t *testing.T) {
+	t.Parallel()
+	mux, c := testutil.ServerMux(t)
+	mux.HandleFunc("GET /management/v1/role/{id}", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusUnauthorized)
+		_, _ = w.Write([]byte("<html>proxy login</html>"))
+	})
+
+	_, err := c.Roles.Get(t.Context(), "1234", client.WithProject("p"))
+
+	var apiErr *client.APIError
+	require.ErrorAs(t, err, &apiErr)
+	require.Equal(t, http.StatusUnauthorized, apiErr.StatusCode)
+	require.ErrorContains(t, err, "get role: 401 Unauthorized (")
+	require.ErrorContains(t, err, "invalid character '<'", "the decode error must stay in the text")
+	require.ErrorContains(t, err, "<html>proxy login</html>")
+}
+
+func TestFacadeError_UndecodableSuccessIsNotAPIError(t *testing.T) {
+	t.Parallel()
+	mux, c := testutil.ServerMux(t)
+	mux.HandleFunc("GET /management/v1/role/{id}", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`{"id":42}`))
+	})
+
+	_, err := c.Roles.Get(t.Context(), "1234", client.WithProject("p"))
+
+	require.Error(t, err)
+	var apiErr *client.APIError
+	require.NotErrorAs(t, err, &apiErr, "a 2xx is not an error status")
+	require.ErrorContains(t, err, "get role: decode 200 OK response: ")
+	var genErr *managementv1.GenericOpenAPIError
+	require.ErrorAs(t, err, &genErr, "the generated error stays in the chain")
+	require.JSONEq(t, `{"id":42}`, string(genErr.Body()))
+}
+
+func TestFacadeError_RetriesExhaustedStillAPIError(t *testing.T) {
+	t.Parallel()
+	var attempts atomic.Int32
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		attempts.Add(1)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusServiceUnavailable)
+		_, _ = w.Write([]byte(`{"error":{"code":503,"message":"try later","type":"Unavailable","stack":[]}}`))
+	}))
+	t.Cleanup(srv.Close)
+
+	c, err := client.New(t.Context(), srv.URL, "tok",
+		client.WithRetryMax(1), client.WithRetryWait(time.Millisecond, time.Millisecond))
+	require.NoError(t, err)
+
+	_, err = c.Roles.Get(t.Context(), "1234", client.WithProject("p"))
+
+	require.Equal(t, int32(2), attempts.Load(), "the request must have been retried")
+	var apiErr *client.APIError
+	require.ErrorAs(t, err, &apiErr, "want *client.APIError, got %T: %v", err, err)
+	require.Equal(t, http.StatusServiceUnavailable, apiErr.StatusCode)
+	require.Contains(t, string(apiErr.Body), "try later")
+	require.NotNil(t, apiErr.Model, "a 5xx JSON body is decoded too")
+	require.Equal(t, "Unavailable", apiErr.Model.Type)
 }
 
 func TestFacadeError_CancelledContextKeepsChain(t *testing.T) {
@@ -217,4 +303,32 @@ func TestInitialBootstrapError_IsAPIError(t *testing.T) {
 	require.ErrorAs(t, err, &apiErr)
 	require.Equal(t, http.StatusUnauthorized, apiErr.StatusCode)
 	require.ErrorContains(t, err, "bad token")
+	require.True(t, strings.HasPrefix(err.Error(), "bootstrap: get server info: 401 Unauthorized"), "got %q", err)
+}
+
+func TestInitialBootstrapError_SinglePrefix(t *testing.T) {
+	t.Parallel()
+	mux := http.NewServeMux()
+	mux.HandleFunc("GET /management/v1/info", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		// Marshal through the SDK so the body has every required field.
+		_ = json.NewEncoder(w).Encode(managementv1.ServerInfo{
+			ServerId: "srv", Version: "0.15.0", LakekeeperVersion: "0.15.0",
+			AuthzBackend: "openfga", ManagedRoleProviders: []string{}, Queues: []string{},
+		})
+	})
+	mux.HandleFunc("POST /management/v1/bootstrap", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusConflict)
+		_, _ = w.Write([]byte(`{"error":{"code":409,"message":"already bootstrapped","type":"Conflict"}}`))
+	})
+	srv := httptest.NewServer(mux)
+	t.Cleanup(srv.Close)
+
+	_, err := client.New(t.Context(), srv.URL, "tok", client.WithoutRetries(),
+		client.WithInitialBootstrap(true, true, nil))
+
+	require.Error(t, err)
+	require.True(t, strings.HasPrefix(err.Error(), "bootstrap: 409 Conflict"), "got %q", err)
+	require.NotContains(t, err.Error(), "bootstrap: bootstrap:")
 }
