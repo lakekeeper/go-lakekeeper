@@ -15,6 +15,7 @@ Go client library plus `lkctl` CLI for the Lakekeeper Iceberg catalog.
 - `e2e/`, `integration/` — test suites, run through `make` (see Commands)
 - `examples/` — runnable docker-compose stack for SDK users (separate from `e2e/compose/`)
 - `tests/` — fixtures for the compose stack (Keycloak realm); not Go test code
+- `.agents/skills/` — agent skills (see Skills)
 
 Before changing an area, read its doc:
 
@@ -54,6 +55,21 @@ Import aliases are enforced by `importas`; use exactly these:
 `make generate` regenerates `pkg/apis/management/v1/` from `api/openapi/management-open-api.yaml` (`openapi-generator-cli` → postprocess). To change generated code, change the spec, the postprocessor, or the generator config, then regenerate.
 
 `api/openapi/*-config.yaml` lists only deviations from generator defaults; set an option there only when its value differs from the default.
+
+## Skills
+
+Skills live in `.agents/skills/<name>/SKILL.md`, in a format any agent can read: YAML front matter (`name`, `description`) and Markdown instructions. When a task matches a skill's `description`, read its `SKILL.md` and follow it.
+
+- `verify` — run `make validate` and `make test` before calling a task done or opening a PR.
+- `api-coverage` — compare the OpenAPI spec with the generated SDK and the `pkg/client` façades, and draft a gap report.
+
+`.claude/skills` is a symlink to `.agents/skills`, because Claude Code only discovers skills under `.claude/skills/`. Add and edit skills in `.agents/skills/` only; never replace the symlink with a copy.
+
+## Hard rules
+
+- Never edit `pkg/apis/management/v1/` by hand; regenerate it (see Generation).
+- Never edit `CHANGELOG.md` or `.release-please-manifest.json`; release-please maintains them.
+- Never push to `main` and never force-push; work on a branch and open a pull request.
 
 ## Commits and branches
 

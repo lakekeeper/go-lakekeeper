@@ -8,5 +8,5 @@ CODE_OF_CONDUCT.md
 
 # Agent instructions, not library code.
 AGENTS.md
-.claude/CLAUDE.md
-.claude/skills/verify/SKILL.md
+.agents/
+.claude/

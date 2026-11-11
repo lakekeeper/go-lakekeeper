@@ -22,12 +22,12 @@ method cannot hide a gap.
 From the repo root:
 
 ```sh
-go run .claude/skills/api-coverage/apicoverage.go -missing   # gaps only, grouped by spec tag
-go run .claude/skills/api-coverage/apicoverage.go            # full table
-go run .claude/skills/api-coverage/apicoverage.go -json      # machine-readable
+go run .agents/skills/api-coverage/apicoverage.go -missing   # gaps only, grouped by spec tag
+go run .agents/skills/api-coverage/apicoverage.go            # full table
+go run .agents/skills/api-coverage/apicoverage.go -json      # machine-readable
 ```
 
-The script has a `//go:build ignore` tag and lives under `.claude/`, so
+The script has a `//go:build ignore` tag and lives under `.agents/`, so
 `./...`, `make test` and `make validate` never pick it up. It uses
 `gopkg.in/yaml.v3`, which is already in `go.sum`.
 

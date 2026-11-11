@@ -7,9 +7,9 @@
 //
 // Run from the repo root:
 //
-//	go run .claude/skills/api-coverage/apicoverage.go            # markdown table
-//	go run .claude/skills/api-coverage/apicoverage.go -missing   # gaps only
-//	go run .claude/skills/api-coverage/apicoverage.go -json
+//	go run .agents/skills/api-coverage/apicoverage.go            # markdown table
+//	go run .agents/skills/api-coverage/apicoverage.go -missing   # gaps only
+//	go run .agents/skills/api-coverage/apicoverage.go -json
 package main
 
 import (

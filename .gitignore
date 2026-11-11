@@ -42,10 +42,12 @@ target/
 # MacOS
 .DS_Store
 
-# Claude Code — per-user artifacts (team-shared parts of .claude/ stay tracked)
-.claude/worktrees/
-.claude/settings.local.json
-.claude/.credentials.json
+# Agent-specific configuration stays local; only agent-agnostic config
+# (AGENTS.md, .agents/) is tracked, plus the .claude/skills symlink to
+# .agents/skills so Claude Code discovers the skills
+.claude/*
+!.claude/skills
+CLAUDE.md
 CLAUDE.local.md
 
 # E2E harness artefacts
