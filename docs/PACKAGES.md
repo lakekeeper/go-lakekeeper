@@ -179,7 +179,7 @@ generator's `(value, *http.Response, error)` triple.
 | `c.Warehouses` | Create and List (project-scoped); Get / Rename / Activate / Deactivate / SetProtection / UpdateDeleteProfile / Statistics / Delete (by warehouse id) |
 | `c.Projects` | Create / Get / Delete / List / Rename (Get and Rename act on the `WithProject` project, else the server's default project; Delete requires `WithProject`) |
 | `c.Roles` | Create / Get / Delete / List / Update / Search (project-scoped; `List` takes `client.ListRolesOptions` for paging) |
-| `c.Users` | Create / Get / Delete / List (paged, server-side name filter) / Update / Whoami; not project-scoped |
+| `c.Users` | Create / Get / Delete / List (paged, server-side name filter) / Update / Whoami / Search / Actions; not project-scoped. Roles / TransitiveRoles (paged, take `client.ListUserRolesOptions`) list the user's role assignments and are project-scoped |
 | `c.Server` | Info / Bootstrap (takes `*managementv1.BootstrapRequest`); not project-scoped. `WithInitialBootstrap` uses the same two calls |
 | `c.Permissions` | Access / Assignments / Grant / Revoke, per resource kind: `.Warehouses`, `.Roles`, `.Projects` (project-scoped), `.Server` |
 

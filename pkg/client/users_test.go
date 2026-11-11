@@ -1,6 +1,7 @@
 package client_test
 
 import (
+	"context"
 	"net/http"
 	"net/url"
 	"testing"
@@ -197,4 +198,146 @@ func TestUsers_List_EmptyOptionsSendNoQuery(t *testing.T) {
 			assert.Empty(t, reqs.Last(t).Query, "unset options must send no query parameters")
 		})
 	}
+}
+
+func TestUsers_Search_SendsBodyAndReturnsMatches(t *testing.T) {
+	t.Parallel()
+	mux, c := testutil.ServerMux(t)
+	reqs := testutil.Respond(t, mux, "POST /management/v1/search/user", http.StatusOK, `{"users":[{
+  "id": "oidc~d223d88c-85b6-4859-b5c5-27f3825e47f6",
+  "name": "Peter Cold",
+  "user-type": "human",
+  "email": null
+}]}`)
+
+	got, err := c.Users.Search(t.Context(), managementv1.NewSearchUserRequest("peter"))
+
+	require.NoError(t, err)
+	require.Len(t, got.GetUsers(), 1)
+	u := got.GetUsers()[0]
+	assert.Equal(t, userID, u.GetId())
+	assert.Equal(t, managementv1.USERTYPE_HUMAN, u.GetUserType())
+	assert.Empty(t, u.GetEmail(), "a null email reads as empty")
+	sent := reqs.Last(t)
+	assert.JSONEq(t, `{"search":"peter"}`, string(sent.Body))
+	assert.NotContains(t, sent.Header, "X-Project-Id", "users are not project-scoped")
+
+	_, err = c.Users.Search(t.Context(), nil)
+	require.ErrorContains(t, err, "search users: request must not be nil")
+}
+
+func TestUsers_Actions_SendsPrincipalFilter(t *testing.T) {
+	t.Parallel()
+	mux, c := testutil.ServerMux(t)
+	reqs := testutil.Respond(t, mux, "GET /management/v1/user/{id}/actions", http.StatusOK,
+		`{"allowed-actions":[{"action":"read"},{"action":"update"}]}`)
+
+	got, err := c.Users.Actions(t.Context(), userID,
+		&client.GetUserActionsOptions{PrincipalRole: roleID})
+
+	require.NoError(t, err)
+	require.Len(t, got.GetAllowedActions(), 2)
+	assert.NotNil(t, got.GetAllowedActions()[0].LakekeeperUserActionRead)
+	assert.NotNil(t, got.GetAllowedActions()[1].LakekeeperUserActionUpdate)
+	sent := reqs.Last(t)
+	assert.Equal(t, "/management/v1/user/"+userID+"/actions", sent.Path)
+	assert.Equal(t, url.Values{"principalRole": {roleID}}, sent.Query)
+}
+
+func TestUsers_Actions_NilOptionsSendNoQuery(t *testing.T) {
+	t.Parallel()
+	mux, c := testutil.ServerMux(t)
+	reqs := testutil.Respond(t, mux, "GET /management/v1/user/{id}/actions", http.StatusOK,
+		`{"allowed-actions":[]}`)
+
+	_, err := c.Users.Actions(t.Context(), userID, nil)
+
+	require.NoError(t, err)
+	assert.Empty(t, reqs.Last(t).Query)
+}
+
+const userRolesBody = `{"roles":[{
+  "id": "0198618c-5be8-7a82-a0b9-1076c9dd12f0",
+  "ident": "lakekeeper~0198618c-5be8-7a82-a0b9-1076c9dd12f0",
+  "name": "data-eng"
+}],"next-page-token":"tok-2"}`
+
+// roleListings are the two role listings of Users; they share options,
+// project handling, and response type.
+var roleListings = map[string]struct {
+	pattern string
+	path    string
+	call    func(context.Context, *client.Client, *client.ListUserRolesOptions, ...client.CallOption) (*managementv1.ListRoleMembershipsResponse, error)
+}{
+	"Roles": {
+		pattern: "GET /management/v1/user/{id}/roles",
+		path:    "/management/v1/user/" + userID + "/roles",
+		call: func(ctx context.Context, c *client.Client, o *client.ListUserRolesOptions, co ...client.CallOption) (*managementv1.ListRoleMembershipsResponse, error) {
+			return c.Users.Roles(ctx, userID, o, co...)
+		},
+	},
+	"TransitiveRoles": {
+		pattern: "GET /management/v1/user/{id}/roles/transitive",
+		path:    "/management/v1/user/" + userID + "/roles/transitive",
+		call: func(ctx context.Context, c *client.Client, o *client.ListUserRolesOptions, co ...client.CallOption) (*managementv1.ListRoleMembershipsResponse, error) {
+			return c.Users.TransitiveRoles(ctx, userID, o, co...)
+		},
+	},
+}
+
+func TestUsers_RoleListings_SendPagingAndProject(t *testing.T) {
+	t.Parallel()
+	for name, l := range roleListings {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			mux, c := testutil.ServerMux(t)
+			reqs := testutil.Respond(t, mux, l.pattern, http.StatusOK, userRolesBody)
+
+			got, err := l.call(t.Context(), c, &client.ListUserRolesOptions{PageSize: 25, PageToken: "tok-1"},
+				client.WithProject(projectA))
+
+			require.NoError(t, err)
+			assert.Equal(t, "tok-2", got.GetNextPageToken())
+			require.Len(t, got.GetRoles(), 1)
+			assert.Equal(t, roleID, got.GetRoles()[0].GetId())
+			assert.Equal(t, "data-eng", got.GetRoles()[0].GetName())
+			sent := reqs.Last(t)
+			assert.Equal(t, l.path, sent.Path)
+			assert.Equal(t, url.Values{"pageSize": {"25"}, "pageToken": {"tok-1"}}, sent.Query)
+			assert.Equal(t, projectA, sent.Header.Get("x-project-id"))
+		})
+	}
+}
+
+func TestUsers_RoleListings_WithoutOptionsSendNothing(t *testing.T) {
+	t.Parallel()
+	for name, l := range roleListings {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			mux, c := testutil.ServerMux(t)
+			reqs := testutil.Respond(t, mux, l.pattern, http.StatusOK, `{"roles":[]}`)
+
+			got, err := l.call(t.Context(), c, nil)
+
+			require.NoError(t, err)
+			assert.Empty(t, got.GetNextPageToken(), "an absent token reads as empty")
+			sent := reqs.Last(t)
+			assert.Empty(t, sent.Query)
+			assert.NotContains(t, sent.Header, "X-Project-Id", "without WithProject the server's default project applies")
+		})
+	}
+}
+
+func TestUsers_TransitiveRoles_NotImplementedIsAPIError(t *testing.T) {
+	t.Parallel()
+	mux, c := testutil.ServerMux(t)
+	testutil.Respond(t, mux, "GET /management/v1/user/{id}/roles/transitive", http.StatusNotImplemented,
+		`{"error":{"code":501,"message":"Not supported by the authorizer","type":"NotImplemented","stack":[]}}`)
+
+	_, err := c.Users.TransitiveRoles(t.Context(), userID, nil)
+
+	require.ErrorContains(t, err, "list user transitive roles: 501 Not Implemented")
+	var apiErr *client.APIError
+	require.ErrorAs(t, err, &apiErr)
+	assert.Equal(t, http.StatusNotImplemented, apiErr.StatusCode)
 }
