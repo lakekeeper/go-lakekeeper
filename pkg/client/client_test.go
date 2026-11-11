@@ -2,6 +2,7 @@ package client_test
 
 import (
 	"crypto/tls"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"sync"
@@ -131,7 +132,11 @@ func TestNew_WithHTTPClient_TimeoutCarriesOver(t *testing.T) {
 
 	_, err = c.Server.Info(t.Context())
 
-	require.ErrorContains(t, err, "Client.Timeout exceeded")
+	// The message varies ("Client.Timeout exceeded" or "context deadline
+	// exceeded"), so assert the timeout itself.
+	var netErr net.Error
+	require.ErrorAs(t, err, &netErr)
+	assert.True(t, netErr.Timeout(), "want a timeout error, got %v", err)
 }
 
 func TestNew_WithHTTPClient_PrivateCATLS(t *testing.T) {
