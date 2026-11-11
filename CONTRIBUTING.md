@@ -17,6 +17,7 @@ Please take a moment to review this guide before submitting a pull request.
     - [Submitting Changes](#submitting-changes)
   - [Coding Guidelines](#coding-guidelines)
   - [Commits and branches](#commits-and-branches)
+  - [Development workflow](#development-workflow)
   - [Testing](#testing)
   - [Diagrams](#diagrams)
   - [Knowledge graph (optional)](#knowledge-graph-optional)
@@ -83,6 +84,33 @@ postprocessor and the generated/manual file boundary, is documented in
 ```sh
 make generate
 ```
+
+## Development workflow
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/diagrams/development-workflow-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="docs/diagrams/development-workflow-light.svg">
+  <img alt="Development workflow: edit, then make validate and make build (vet, lint, unit tests) on your machine with no stack; make test-integration and make test-e2e-compose on the compose stack; the auth-only e2e subset with make test-e2e-kind on a kind cluster; a Conventional Commit and a pull request gated by the PR title check and ci-ok; after the squash merge, release-please opens the release PR and its v* tag runs GoReleaser" src="docs/diagrams/development-workflow-light.svg">
+</picture>
+
+Explorable version: [`docs/diagrams/development-workflow.html`](docs/diagrams/development-workflow.html)
+(GitHub shows its source: download or clone and open it locally). See the
+[diagram index](docs/diagrams/README.md) for the other diagrams.
+
+Only the steps marked "Needs a running stack" start one; the commands are under
+[Testing](#testing), the commit and PR title rules under
+[Commits and branches](#commits-and-branches), and the review steps under
+[Pull Request Process](#pull-request-process). The diagram uses these terms:
+
+- **Compose stack**: Lakekeeper with Keycloak, MinIO and OpenFGA, started from
+  `docker-compose.yml` by `make test-integration` and `make test-e2e-compose`
+  and torn down afterwards (`KEEP_STACK=1` leaves it running).
+- **kind cluster**: a local Kubernetes cluster with Lakekeeper installed by
+  Helm and no Keycloak. `make test-e2e-kind` creates it and runs only the
+  auth-only subset of the `lkctl` end-to-end tests there; the other tests
+  skip.
+- **`ci-ok`**: the one CI check the `main` branch requires; it passes only when
+  lint, drift, unit, integration, both end-to-end jobs and the build pass.
 
 ## Testing
 
