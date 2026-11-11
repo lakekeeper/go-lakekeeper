@@ -23,9 +23,8 @@ set -eu
 src=${ARCHIFY_DIR:-.archify}
 dst=${DIAGRAMS_DIR:-docs/diagrams}
 
-# Archify's diagram types (see `archify --help`), longest first so the longest
-# matching type wins. Keep in sync with ARCHIFY_TYPES in
-# scripts/export-diagram-svg.mjs.
+# Archify's diagram types (see `archify --help`). None is a prefix of another,
+# so at most one matches a folder name.
 types="architecture waterfall lifecycle sequence dataflow workflow timeline class tree erd"
 
 fail() {
@@ -90,7 +89,7 @@ missing=$(
 		done
 	done
 )
-[ -z "$missing" ] || fail "missing files (run Archify finalize, then node scripts/export-diagram-svg.mjs <folder>):
+[ -z "$missing" ] || fail "missing files (delete the incomplete render folder, then render again with make diagrams-render DIAGRAMS=<slug>):
 $missing"
 
 mkdir -p "$dst"

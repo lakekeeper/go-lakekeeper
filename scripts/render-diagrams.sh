@@ -102,9 +102,9 @@ for slug in "$@"; do
 		fs.writeFileSync(dst, out);
 	' "docs/diagrams/$slug.json" "$dir/candidate.json" "$dir/$slug.html" "$revision"
 	echo "$slug: rendering into $dir"
-	archify finalize "$type" "$dir/candidate.json" "$dir/$slug.html" --repo-root "$root" --quality showcase ||
+	archify finalize "$type" "$dir/candidate.json" "$dir/$slug.html" --repo-root "$root" --quality showcase --json ||
 		fail "archify finalize failed for $slug; fix docs/diagrams/$slug.json and rerun."
-	node scripts/export-diagram-svg.mjs "$dir"
+	node scripts/export-diagram-svg.mjs "$dir/$slug.html"
 done
 
 ./scripts/copy-diagrams.sh "$@"

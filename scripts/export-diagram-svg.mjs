@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 // Export the GitHub images of a finished Archify render.
 //
-// Usage: node scripts/export-diagram-svg.mjs <render-folder>
+// Usage: node scripts/export-diagram-svg.mjs <render-folder>/<slug>.html
 //
-// <render-folder> is an Archify render folder, .archify/<type>-<slug>-<YYYYMMDD-HHMMSS>/,
-// holding <slug>.html. The command opens that HTML in headless Chrome, runs the
-// viewer's own "SVG (light)" and "SVG (dark)" exports, and writes
-// <slug>-light.svg and <slug>-dark.svg into the same folder. Each SVG carries
-// its styles and font inline, so it renders on its own (e.g. on GitHub).
+// The command opens a finished Archify render's HTML in headless Chrome, runs
+// the viewer's own "SVG (light)" and "SVG (dark)" exports, and writes
+// <slug>-light.svg and <slug>-dark.svg next to it. Each SVG carries its styles
+// and font inline, so it renders on its own (e.g. on GitHub).
+// scripts/render-diagrams.sh calls it for each render.
 //
 // Needs Node 18+ and Chrome or Chromium (set ARCHIFY_CHROME to override the
 // lookup, as for Archify itself). It does not need Archify.
@@ -24,36 +24,6 @@ const TIMEOUT_MS = 60000;
 function fail(message) {
   process.stderr.write(`export-diagram-svg: ${message}\n`);
   process.exit(1);
-}
-
-// Archify's diagram types (see `archify --help`), longest first so the longest
-// matching type wins. Keep in sync with `types` in scripts/copy-diagrams.sh.
-const ARCHIFY_TYPES = ['architecture', 'waterfall', 'lifecycle', 'sequence', 'dataflow', 'workflow', 'timeline', 'class', 'tree', 'erd'];
-
-// slugOf returns the slug of a <type>-<slug>-<YYYYMMDD-HHMMSS> folder name: the
-// name without its leading Archify type and trailing timestamp, or null.
-function slugOf(name) {
-  const stamped = /^(.+)-\d{8}-\d{6}$/.exec(name);
-  if (!stamped) return null;
-  const type = ARCHIFY_TYPES.find((t) => stamped[1].startsWith(`${t}-`) && stamped[1].length > t.length + 1);
-  return type ? stamped[1].slice(type.length + 1) : null;
-}
-
-// findHtml returns the slug and the rendered HTML path of a render folder.
-function findHtml(folder) {
-  if (!fs.existsSync(folder) || !fs.statSync(folder).isDirectory()) {
-    fail(`${folder} is not a directory`);
-  }
-  const slug = slugOf(path.basename(path.resolve(folder)));
-  if (slug && fs.existsSync(path.join(folder, `${slug}.html`))) {
-    return { slug, html: path.join(folder, `${slug}.html`) };
-  }
-  const htmls = fs.readdirSync(folder).filter((f) => f.endsWith('.html'));
-  if (htmls.length === 1) {
-    return { slug: path.basename(htmls[0], '.html'), html: path.join(folder, htmls[0]) };
-  }
-  if (htmls.length === 0) fail(`no rendered HTML in ${folder}; render the diagram with Archify first`);
-  fail(`several HTML files in ${folder} and none named after the folder's slug: ${htmls.join(', ')}`);
 }
 
 function findChrome() {
@@ -204,9 +174,11 @@ async function exportSvgs(chromePath, html) {
   }
 }
 
-const folder = process.argv[2];
-if (!folder || process.argv.length > 3) fail('usage: node scripts/export-diagram-svg.mjs <render-folder>');
-const { slug, html } = findHtml(folder);
+const html = process.argv[2];
+if (!html || process.argv.length > 3 || !html.endsWith('.html')) fail('usage: node scripts/export-diagram-svg.mjs <render-folder>/<slug>.html');
+if (!fs.existsSync(html) || !fs.statSync(html).isFile()) fail(`${html} not found; render the diagram with Archify first`);
+const folder = path.dirname(html);
+const slug = path.basename(html, '.html');
 const chromePath = findChrome();
 if (!chromePath) fail('Chrome or Chromium not found; install it or set ARCHIFY_CHROME to its executable');
 
