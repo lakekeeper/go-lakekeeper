@@ -18,6 +18,7 @@ Please take a moment to review this guide before submitting a pull request.
   - [Coding Guidelines](#coding-guidelines)
   - [Commits and branches](#commits-and-branches)
   - [Testing](#testing)
+  - [Diagrams](#diagrams)
   - [Knowledge graph (optional)](#knowledge-graph-optional)
   - [Pull Request Process](#pull-request-process)
   - [License](#license)
@@ -34,6 +35,7 @@ Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md) to help create 
 2. Install [Go 1.26+](https://golang.org/dl/).
 3. Run `go mod tidy` to install dependencies.
 4. Run `make build` or use your preferred method to build the CLI/client.
+5. For a picture of how the SDK and `lkctl` are built, read the [diagrams](docs/diagrams/README.md) in their reading order.
 
 ## How to Contribute
 
@@ -103,6 +105,14 @@ make test-e2e-compose
 `make test-e2e-kind` runs the `lkctl` end-to-end tests against a kind cluster; it needs `kind`, `kubectl` and `helm` installed.
 
 If adding a feature or fixing a bug, include relevant unit and/or integration tests.
+
+## Diagrams
+
+The [diagrams](docs/diagrams/README.md) show how the SDK and `lkctl` are built. Each one is embedded in the doc under `docs/` that covers its topic, next to its JSON source in `docs/diagrams/`.
+
+- **When to update:** your change touches source listed for a diagram in the [drift table](docs/diagrams/README.md#drift-table).
+- **How:** follow [Reading and updating the diagrams](docs/diagrams/README.md#reading-and-updating-the-diagrams): edit the diagram's JSON, then run `make diagrams-render DIAGRAMS=<slug>`.
+- **What re-rendering needs:** [Archify](https://github.com/tt-a1i/archify), Chrome or Chromium, and Node. Without them you can still read and review diagrams and edit their JSON; ask a maintainer to render it.
 
 ## Knowledge graph (optional)
 

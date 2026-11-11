@@ -10,38 +10,53 @@ For the generated/manual split, regeneration workflow, and the OpenAPI
 postprocessor, see [GENERATION.md](GENERATION.md). For a per-package tour
 of types and entry points, see [PACKAGES.md](PACKAGES.md).
 
-## Component Overview
+## System Context
 
-```mermaid
-graph TD
-    APP["Application code<br/>or lkctl commands"]
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="diagrams/system-context-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="diagrams/system-context-light.svg">
+  <img alt="System context: application code and lkctl reach the client (through the umbrella package for application code); the client calls the generated SDK, which talks to the Lakekeeper Management API, and hands Iceberg catalog access to iceberg-go; the client fetches tokens from the identity provider; the Lakekeeper server and its metadata store, authorization backend, secret storage and object storage run outside the SDK" src="diagrams/system-context-light.svg">
+</picture>
 
-    subgraph "Hand-written"
-        CLIENT["pkg/client.Client<br/>(facade)"]
-        CORE["pkg/core<br/>AuthSource · AuthRoundTripper"]
-        PERM["pkg/permissions<br/>BuildAssignment · DescribeAssignment"]
-        PROFILE["pkg/storage/profile<br/>pkg/storage/credential"]
-    end
+Explorable version: [`diagrams/system-context.html`](diagrams/system-context.html)
+(GitHub shows its source: download or clone and open it locally). See the
+[diagram index](diagrams/README.md) for the other diagrams.
 
-    subgraph "Generated"
-        GEN["pkg/apis/management/v1<br/>(openapi-generator)<br/>APIClient · ProjectAPI<br/>WarehouseAPI · …"]
-    end
+The diagram uses these terms:
 
-    subgraph "External"
-        ICEBERG["apache/iceberg-go<br/>rest.Catalog"]
-        LKAPI["Lakekeeper<br/>Management API"]
-        LKCAT["Lakekeeper<br/>Iceberg REST Catalog"]
-    end
-
-    APP --> CLIENT
-    CLIENT -.->|embeds| GEN
-    CLIENT --> CORE
-    CLIENT --> ICEBERG
-    PERM --> GEN
-    PROFILE --> GEN
-    GEN -->|HTTP| LKAPI
-    ICEBERG --> LKCAT
-```
+- **Application code**: your Go program. It usually imports the umbrella
+  package only.
+- **`lkctl`**: the CLI in `cmd/`. It builds a client from its flags and
+  calls the resource façades only.
+- **Umbrella package**: `pkg/lakekeeper`. It re-exports the client, its
+  constructors, the storage and permission builders, and the common request
+  and response types, so most call sites need one import path.
+- **Client**: `pkg/client.Client`, with the auth and transport primitives
+  from `pkg/core`. It holds the resource façades, the auth wiring, the
+  retries and the `CatalogV1` helper.
+- **Resource façade**: one of the client's fields `Warehouses`, `Projects`,
+  `Roles`, `Users`, `Server` and `Permissions`: one method call per
+  operation, returning `(value, error)`.
+- **Generated SDK**: `pkg/apis/management/v1`, generated from the
+  Management API's OpenAPI spec (see [GENERATION.md](GENERATION.md)).
+  The client embeds its `APIClient`.
+- **Escape hatch**: the embedded `APIClient`, whose generated services stay
+  reachable for operations without a façade.
+- **Auth source**: a `core.AuthSource` that supplies the `Authorization`
+  header: OAuth2 client credentials, a static access token, or a Kubernetes
+  service account token.
+- **Identity provider**: the OAuth2 / OpenID Connect server that issues
+  access tokens, for example Keycloak. Only the client credentials auth
+  source fetches tokens from it; the Lakekeeper server validates every
+  token against it.
+- **Management API**: Lakekeeper's REST API under `/management/v1` for
+  servers, projects, warehouses, users, roles and permissions.
+- **Iceberg REST Catalog**: Lakekeeper's Apache Iceberg REST catalog under
+  `/catalog`, reached through `apache/iceberg-go`.
+- **Metadata store**, **authorization backend**, **secret storage** and
+  **object storage**: the Lakekeeper server's own dependencies (PostgreSQL,
+  OpenFGA, an optional secret backend, and S3, GCS or ADLS). The SDK runs
+  none of them.
 
 `pkg/client.Client` adds:
 
@@ -71,29 +86,11 @@ generated service stays reachable as a public field (`c.ProjectAPI`,
 grants, authorization checks, …) or when you need the raw
 `*http.Response`.
 
-## Server-side context
-
-`go-lakekeeper` is a **client** — it does not run any server-side
-components. The Lakekeeper server itself depends on:
-
-```mermaid
-graph LR
-    LK["Lakekeeper Server"]
-    PG["PostgreSQL<br/>(metadata store)"]
-    OPENFGA["OpenFGA<br/>(authorization)"]
-    VAULT["Vault / KMS<br/>(optional, secret storage)"]
-    S3["Object Storage<br/>(S3 / GCS / ADLS)"]
-
-    LK --> PG
-    LK --> OPENFGA
-    LK --> VAULT
-    LK -.->|"warehouse data<br/>(via credentials)"| S3
-```
-
-The integration-test stack (`make test-integration`) brings up
-Lakekeeper + **Keycloak** (OIDC IdP) + **MinIO** (S3-compatible storage) +
-**OpenFGA** via `docker-compose`, which is the canonical reference
-environment for this SDK.
+`go-lakekeeper` is a **client**: it does not run any server-side
+components. The integration-test stack (`make test-integration`) brings up
+Lakekeeper + **PostgreSQL** + **Keycloak** (identity provider) + **MinIO**
+(S3-compatible object storage) + **OpenFGA** via `docker-compose`, which is
+the canonical reference environment for this SDK.
 
 ## Request Lifecycle
 

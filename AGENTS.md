@@ -18,11 +18,14 @@ Go client library plus `lkctl` CLI for the Lakekeeper Iceberg catalog.
 
 Before changing an area, read its doc:
 
-- `docs/ARCHITECTURE.md` — request lifecycle, bootstrap, project scoping
+- `docs/ARCHITECTURE.md` — system context, request lifecycle, bootstrap, project scoping
 - `docs/PACKAGES.md` — per-package contracts and dependency graph
 - `docs/AUTHENTICATION.md` / `docs/AUTHORIZATION.md` — auth flows; assignment model
 - `docs/CLI.md` — `lkctl` command tree, flags, env vars
 - `docs/GENERATION.md` — SDK generation pipeline
+- `docs/diagrams/README.md` — diagram index, in reading order; start here to orient
+
+When a change touches source listed in the [drift table](docs/diagrams/README.md#drift-table), update that diagram as [Reading and updating the diagrams](docs/diagrams/README.md#reading-and-updating-the-diagrams) describes.
 
 ## Commands
 
