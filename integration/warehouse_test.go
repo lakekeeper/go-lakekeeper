@@ -6,6 +6,7 @@ import (
 	"context"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
@@ -188,6 +189,36 @@ func TestWarehouse_Rename(t *testing.T) {
 	got, err := c.Warehouses.Get(t.Context(), whID)
 	require.NoError(t, err)
 	assert.Equal(t, newName, got.GetName())
+}
+
+func TestWarehouse_UpdateDeleteProfile(t *testing.T) {
+	t.Parallel()
+	c := sharedClient
+
+	project := MustCreateProject(t, c)
+	whID, _ := MustCreateWarehouse(t, c, project)
+
+	dp, err := profile.NewSoftDeleteProfile(2 * time.Hour)
+	require.NoError(t, err)
+
+	resp, err := c.Warehouses.UpdateDeleteProfile(t.Context(), whID,
+		managementv1.NewUpdateWarehouseDeleteProfileRequest(dp))
+	require.NoError(t, err)
+	soft, ok := profile.AsSoftDeleteProfile(resp.GetDeleteProfile())
+	require.True(t, ok, "the response must carry the soft profile, got %+v", resp.GetDeleteProfile())
+	assert.Equal(t, int64(7200), soft.GetExpirationSeconds())
+
+	got, err := c.Warehouses.Get(t.Context(), whID)
+	require.NoError(t, err)
+	soft, ok = profile.AsSoftDeleteProfile(got.GetDeleteProfile())
+	require.True(t, ok, "the soft profile must be persisted")
+	assert.Equal(t, int64(7200), soft.GetExpirationSeconds())
+
+	resp, err = c.Warehouses.UpdateDeleteProfile(t.Context(), whID,
+		managementv1.NewUpdateWarehouseDeleteProfileRequest(profile.NewHardDeleteProfile()))
+	require.NoError(t, err)
+	_, ok = profile.AsHardDeleteProfile(resp.GetDeleteProfile())
+	assert.True(t, ok, "the response must carry the hard profile, got %+v", resp.GetDeleteProfile())
 }
 
 func TestWarehouse_DeactivateActivate(t *testing.T) {

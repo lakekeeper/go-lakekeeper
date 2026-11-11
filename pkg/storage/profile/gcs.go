@@ -14,7 +14,7 @@ type GCSOption func(*managementv1.StorageProfileGcs)
 func NewGCSProfile(bucket string, opts ...GCSOption) managementv1.StorageProfile {
 	p := &managementv1.StorageProfileGcs{
 		Bucket: bucket,
-		Type:   typeGCS,
+		Type:   StorageProfileTypeGCS,
 	}
 	for _, opt := range opts {
 		opt(p)

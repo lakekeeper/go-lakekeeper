@@ -19,7 +19,7 @@ func NewADLSProfile(accountName, filesystem string, opts ...ADLSOption) manageme
 	p := &managementv1.StorageProfileAdls{
 		AccountName: accountName,
 		Filesystem:  filesystem,
-		Type:        typeADLS,
+		Type:        StorageProfileTypeADLS,
 	}
 	for _, opt := range opts {
 		opt(p)

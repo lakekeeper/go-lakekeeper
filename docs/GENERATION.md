@@ -40,7 +40,7 @@ adds or removes files produces an obvious diff.
 | [`pkg/client/`](../pkg/client/) | Facade over the generated `managementv1.APIClient`: auth wiring, retry layering, optional bootstrap, `CatalogV1` helper, `APIError` |
 | [`pkg/core/`](../pkg/core/) | `AuthSource` interface + three implementations, `AuthRoundTripper`, `RequestOption` helpers |
 | [`pkg/permissions/`](../pkg/permissions/) | Generic `BuildAssignment[T]` / `DescribeAssignment` helpers for the generated `*Assignment` union types |
-| [`pkg/storage/profile/`](../pkg/storage/profile/) | Ergonomic builders for `StorageProfile{S3,Gcs,Adls}` |
+| [`pkg/storage/profile/`](../pkg/storage/profile/) | Ergonomic builders for `StorageProfile{S3,Gcs,Adls}` and `TabularDeleteProfile` |
 | [`pkg/storage/credential/`](../pkg/storage/credential/) | Ergonomic builders for `StorageCredential` variants |
 | [`pkg/apis/management/v1tests/`](../pkg/apis/management/v1tests/) | Wire-format round-trip tests for the generated assignment models. Kept outside `v1/` so test fixtures don't bleed into the generated package |
 | [`cmd/lkctl/`](../cmd/lkctl/), [`integration/`](../integration/), [`pkg/common`](../pkg/common/), [`pkg/version`](../pkg/version/), [`pkg/testutil`](../pkg/testutil/) | All hand-written |

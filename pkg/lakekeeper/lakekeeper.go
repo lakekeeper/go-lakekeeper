@@ -19,7 +19,8 @@
 //     from pkg/client
 //   - CallOption and WithProject, and every façade …Options type (e.g.
 //     ListWarehousesOptions, ListRolesOptions, GetServerAccessOptions)
-//   - Storage profile/credential builders from pkg/storage/{profile,credential}
+//   - Storage profile, delete profile and credential builders from
+//     pkg/storage/{profile,credential}
 //   - Permission builders from pkg/permissions
 //   - The most common Management API request/response types
 //
@@ -197,6 +198,28 @@ var (
 	WithADLSStorageLayout        = profile.WithADLSStorageLayout
 )
 
+// Discriminator values of the StorageProfile union.
+const (
+	StorageProfileTypeS3   = profile.StorageProfileTypeS3
+	StorageProfileTypeGCS  = profile.StorageProfileTypeGCS
+	StorageProfileTypeADLS = profile.StorageProfileTypeADLS
+)
+
+// Tabular delete profile builders, accessors and discriminator values.
+type TabularDeleteProfile = managementv1.TabularDeleteProfile
+
+const (
+	DeleteProfileTypeHard = profile.DeleteProfileTypeHard
+	DeleteProfileTypeSoft = profile.DeleteProfileTypeSoft
+)
+
+var (
+	NewHardDeleteProfile = profile.NewHardDeleteProfile
+	NewSoftDeleteProfile = profile.NewSoftDeleteProfile
+	AsHardDeleteProfile  = profile.AsHardDeleteProfile
+	AsSoftDeleteProfile  = profile.AsSoftDeleteProfile
+)
+
 // Storage credential builders.
 type StorageCredential = managementv1.StorageCredential
 
@@ -236,6 +259,9 @@ type (
 const (
 	PrincipalUser = permissions.PrincipalUser
 	PrincipalRole = permissions.PrincipalRole
+
+	PrincipalTypeUser = permissions.PrincipalTypeUser
+	PrincipalTypeRole = permissions.PrincipalTypeRole
 )
 
 var (
@@ -247,11 +273,12 @@ var (
 // Common Management API request and response types.
 type (
 	// Warehouse types.
-	Warehouse              = managementv1.GetWarehouseResponse
-	WarehouseStatus        = managementv1.WarehouseStatus
-	CreateWarehouseRequest = managementv1.CreateWarehouseRequest
-	RenameWarehouseRequest = managementv1.RenameWarehouseRequest
-	WarehouseAssignment    = managementv1.WarehouseAssignment
+	Warehouse                           = managementv1.GetWarehouseResponse
+	WarehouseStatus                     = managementv1.WarehouseStatus
+	CreateWarehouseRequest              = managementv1.CreateWarehouseRequest
+	RenameWarehouseRequest              = managementv1.RenameWarehouseRequest
+	UpdateWarehouseDeleteProfileRequest = managementv1.UpdateWarehouseDeleteProfileRequest
+	WarehouseAssignment                 = managementv1.WarehouseAssignment
 
 	// Project types.
 	Project              = managementv1.GetProjectResponse
@@ -284,8 +311,9 @@ type (
 
 // Constructors for the request types listed above.
 var (
-	NewCreateWarehouseRequest = managementv1.NewCreateWarehouseRequest
-	NewRenameWarehouseRequest = managementv1.NewRenameWarehouseRequest
+	NewCreateWarehouseRequest              = managementv1.NewCreateWarehouseRequest
+	NewRenameWarehouseRequest              = managementv1.NewRenameWarehouseRequest
+	NewUpdateWarehouseDeleteProfileRequest = managementv1.NewUpdateWarehouseDeleteProfileRequest
 
 	NewCreateProjectRequest = managementv1.NewCreateProjectRequest
 	NewRenameProjectRequest = managementv1.NewRenameProjectRequest

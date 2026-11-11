@@ -21,7 +21,7 @@ func NewS3Profile(bucket, region string, opts ...S3Option) managementv1.StorageP
 		Bucket:     bucket,
 		Region:     region,
 		StsEnabled: false,
-		Type:       typeS3,
+		Type:       StorageProfileTypeS3,
 	}
 	for _, opt := range opts {
 		opt(p)

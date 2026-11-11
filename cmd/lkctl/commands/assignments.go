@@ -57,9 +57,9 @@ func printAssignments[T any](w io.Writer, assignments ...T) error {
 // unchanged, since it shouldn't reach the printer.
 func displayPrincipalType(s string) string {
 	switch s {
-	case "user":
+	case permissions.PrincipalTypeUser:
 		return "User"
-	case "role":
+	case permissions.PrincipalTypeRole:
 		return "Role"
 	default:
 		return s

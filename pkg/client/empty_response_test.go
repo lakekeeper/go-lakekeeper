@@ -10,6 +10,7 @@ import (
 
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
 	"github.com/lakekeeper/go-lakekeeper/pkg/client"
+	"github.com/lakekeeper/go-lakekeeper/pkg/storage/profile"
 	"github.com/lakekeeper/go-lakekeeper/pkg/testutil"
 )
 
@@ -37,6 +38,10 @@ func TestEntityMethods_EmptySuccessBodyIsAnError(t *testing.T) {
 		},
 		"Warehouses.Statistics": func(ctx context.Context, c *client.Client) (any, error) {
 			return c.Warehouses.Statistics(ctx, warehouseID, nil)
+		},
+		"Warehouses.UpdateDeleteProfile": func(ctx context.Context, c *client.Client) (any, error) {
+			return c.Warehouses.UpdateDeleteProfile(ctx, warehouseID,
+				managementv1.NewUpdateWarehouseDeleteProfileRequest(profile.NewHardDeleteProfile()))
 		},
 		"Projects.Create": func(ctx context.Context, c *client.Client) (any, error) {
 			return c.Projects.Create(ctx, managementv1.NewCreateProjectRequest("p"))
