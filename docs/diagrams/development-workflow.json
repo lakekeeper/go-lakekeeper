@@ -24,7 +24,7 @@
   },
   "lanes": [
     { "id": "local", "label": "Your machine" },
-    { "id": "compose", "label": "Compose stack: Lakekeeper, Keycloak, MinIO, OpenFGA" },
+    { "id": "compose", "label": "Compose stack: Lakekeeper, PostgreSQL, Keycloak, MinIO, OpenFGA" },
     { "id": "kind", "label": "kind cluster (no Keycloak)" },
     { "id": "github", "label": "GitHub" }
   ],

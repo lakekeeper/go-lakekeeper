@@ -103,9 +103,10 @@ Only the steps marked "Needs a running stack" start one; the commands are under
 [Commits and branches](#commits-and-branches), and the review steps under
 [Pull Request Process](#pull-request-process). The diagram uses these terms:
 
-- **Compose stack**: Lakekeeper with Keycloak, MinIO and OpenFGA, started from
-  `docker-compose.yml` by `make test-integration` and `make test-e2e-compose`
-  and torn down afterwards (`KEEP_STACK=1` leaves it running).
+- **Compose stack**: Lakekeeper with PostgreSQL, Keycloak, MinIO and OpenFGA,
+  started from `docker-compose.yml` by `make test-integration` and
+  `make test-e2e-compose` and torn down afterwards (`KEEP_STACK=1` leaves it
+  running).
 - **kind cluster**: a local Kubernetes cluster with Lakekeeper installed by
   Helm and no Keycloak. `make test-e2e-kind` creates it and runs only the
   auth-only subset of the `lkctl` end-to-end tests there; the other tests
@@ -140,7 +141,7 @@ If adding a feature or fixing a bug, include relevant unit and/or integration te
 The [diagrams](docs/diagrams/README.md) show how the SDK and `lkctl` are built. Each one is embedded in the doc under `docs/` that covers its topic, next to its JSON source in `docs/diagrams/`.
 
 - **When to update:** your change touches source listed for a diagram in the [drift table](docs/diagrams/README.md#drift-table).
-- **How:** follow [Reading and updating the diagrams](docs/diagrams/README.md#reading-and-updating-the-diagrams): edit the diagram's JSON, then run `make diagrams-render DIAGRAMS=<slug>`.
+- **How:** follow [Reading and updating the diagrams](docs/diagrams/README.md#reading-and-updating-the-diagrams).
 - **What re-rendering needs:** [Archify](https://github.com/tt-a1i/archify), Chrome or Chromium, and Node. Without them you can still read and review diagrams and edit their JSON; ask a maintainer to render it.
 
 ## Knowledge graph (optional)

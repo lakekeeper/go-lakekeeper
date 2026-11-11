@@ -19,7 +19,7 @@ Go client library plus `lkctl` CLI for the Lakekeeper Iceberg catalog.
 Before changing an area, read its doc:
 
 - `docs/ARCHITECTURE.md` — system context, request lifecycle, bootstrap, project scoping
-- `docs/PACKAGES.md` — per-package contracts and dependency graph
+- `docs/PACKAGES.md` — per-package contracts and package layers
 - `docs/AUTHENTICATION.md` / `docs/AUTHORIZATION.md` — auth flows; assignment model
 - `docs/CLI.md` — `lkctl` command tree, flags, env vars
 - `docs/GENERATION.md` — SDK generation pipeline

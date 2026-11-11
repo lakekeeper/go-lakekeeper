@@ -92,10 +92,9 @@ grants, authorization checks, …) or when you need the raw
 `*http.Response`.
 
 `go-lakekeeper` is a **client**: it does not run any server-side
-components. The integration-test stack (`make test-integration`) brings up
-Lakekeeper + **PostgreSQL** + **Keycloak** (identity provider) + **MinIO**
-(S3-compatible object storage) + **OpenFGA** via `docker-compose`, which is
-the canonical reference environment for this SDK.
+components. The [compose stack](../CONTRIBUTING.md#development-workflow)
+that `make test-integration` starts is the canonical reference environment
+for this SDK.
 
 ## Request Lifecycle
 
