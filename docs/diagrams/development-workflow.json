@@ -1,0 +1,146 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Development workflow: from edit to release",
+    "output": ".archify/workflow-development-workflow-20261111-122407/development-workflow.html",
+    "quality_profile": "showcase",
+    "locale": "en",
+    "repository": {
+      "url": "git@github.com:lakekeeper/go-lakekeeper.git",
+      "provider": "github",
+      "link_mode": "local-only",
+      "revision": "fb689d0edce8a3b59c22af0bf856f9d14c60bbb3"
+    },
+    "legend": {
+      "entries": {
+        "external": { "label": "You" },
+        "backend": { "label": "Local step, no stack needed" },
+        "cloud": { "label": "Needs a running stack" },
+        "security": { "label": "CI gate on the pull request" },
+        "messagebus": { "label": "GitHub automation after merge" }
+      }
+    }
+  },
+  "lanes": [
+    { "id": "local", "label": "Your machine" },
+    { "id": "compose", "label": "Compose stack: Lakekeeper, PostgreSQL, Keycloak, MinIO, OpenFGA" },
+    { "id": "kind", "label": "kind cluster (no Keycloak)" },
+    { "id": "github", "label": "GitHub" }
+  ],
+  "mainPath": ["edit", "checks", "integration", "e2ecompose", "commit", "pr", "release"],
+  "nodes": [
+    {
+      "id": "edit", "lane": "local", "col": 0, "type": "external", "icon": "person",
+      "label": "Edit",
+      "sublabel": "make fmt to format",
+      "sources": [
+        { "path": "CONTRIBUTING.md", "line": 53, "end_line": 60, "label": "Submitting Changes" },
+        { "path": "Makefile", "line": 121, "end_line": 124, "label": "fmt: golangci-lint --fix" }
+      ]
+    },
+    {
+      "id": "checks", "lane": "local", "col": 1, "type": "backend",
+      "label": "make validate, make build",
+      "sublabel": "vet, lint, unit tests",
+      "tag": "build runs vet + test",
+      "sources": [
+        { "path": "Makefile", "line": 131, "end_line": 132, "label": "validate: vet lint" },
+        { "path": "Makefile", "line": 60, "end_line": 66, "label": "build: vet test, dist/lkctl" },
+        { "path": "Makefile", "line": 72, "end_line": 75, "label": "test: unit tests" }
+      ]
+    },
+    {
+      "id": "integration", "lane": "compose", "col": 2, "type": "cloud",
+      "label": "make test-integration",
+      "sublabel": "SDK against the stack",
+      "tag": "-tags integration",
+      "sources": [
+        { "path": "Makefile", "line": 78, "end_line": 81, "label": "test-integration" },
+        { "path": "run-tests.sh", "line": 22, "end_line": 29, "label": "compose up, go test integration" },
+        { "path": "docker-compose.yml", "line": 6, "end_line": 7, "label": "Lakekeeper service" }
+      ]
+    },
+    {
+      "id": "e2ecompose", "lane": "compose", "col": 3, "type": "cloud",
+      "label": "make test-e2e-compose",
+      "sublabel": "lkctl e2e, full suite",
+      "tag": "-tags e2e_cli",
+      "sources": [
+        { "path": "Makefile", "line": 83, "end_line": 86, "label": "test-e2e-compose" },
+        { "path": "e2e/compose/run.sh", "line": 46, "end_line": 60, "label": "compose up, build lkctl, go test" },
+        { "path": "CONTRIBUTING.md", "line": 87, "end_line": 105, "label": "Testing: run before a PR" }
+      ]
+    },
+    {
+      "id": "e2ekind", "lane": "kind", "col": 3, "type": "cloud",
+      "label": "make test-e2e-kind",
+      "sublabel": "auth-only e2e subset",
+      "tag": "needs kind, kubectl, helm",
+      "sources": [
+        { "path": "Makefile", "line": 88, "end_line": 91, "label": "test-e2e-kind" },
+        { "path": "e2e/kind/run.sh", "line": 111, "end_line": 119, "label": "kind backend, -run allow-list" },
+        { "path": "e2e/cli/backend_test.go", "line": 164, "end_line": 172, "label": "requireBackend skips others" }
+      ]
+    },
+    {
+      "id": "commit", "lane": "local", "col": 4, "type": "backend",
+      "label": "Conventional commit",
+      "sublabel": "type/short-description branch",
+      "tag": "feat: / fix: / docs: / feat!:",
+      "sources": [
+        { "path": "CONTRIBUTING.md", "line": 68, "end_line": 73, "label": "Commits and branches" }
+      ]
+    },
+    {
+      "id": "pr", "lane": "github", "col": 4, "type": "security",
+      "label": "Pull request",
+      "sublabel": "PR title check + ci-ok",
+      "tag": "CI reruns every suite",
+      "sources": [
+        { "path": ".github/workflows/lint-pr.yml", "line": 20, "end_line": 56, "label": "Validate PR Title" },
+        { "path": ".github/workflows/ci.yml", "line": 54, "end_line": 140, "label": "unit, integration, e2e jobs" },
+        { "path": ".github/workflows/ci.yml", "line": 171, "end_line": 184, "label": "ci-ok: the required check" }
+      ]
+    },
+    {
+      "id": "release", "lane": "github", "col": 5, "type": "messagebus",
+      "label": "release-please",
+      "sublabel": "release PR, CHANGELOG.md",
+      "tag": "v* tag runs GoReleaser",
+      "sources": [
+        { "path": ".github/workflows/release-please.yml", "line": 5, "end_line": 23, "label": "runs on push to main" },
+        { "path": "release-please-config.json", "line": 1, "end_line": 76, "label": "changelog sections, version.go" },
+        { "path": ".github/workflows/release.yml", "line": 3, "end_line": 59, "label": "v* tag runs GoReleaser" }
+      ]
+    }
+  ],
+  "edges": [
+    { "id": "edit-checks", "from": "edit", "to": "checks" },
+    { "id": "checks-integration", "from": "checks", "to": "integration", "label": "starts the stack", "fromSide": "bottom", "toSide": "top" },
+    { "id": "integration-e2ecompose", "from": "integration", "to": "e2ecompose" },
+    { "id": "e2ecompose-e2ekind", "from": "e2ecompose", "to": "e2ekind", "label": "auth tests", "role": "branch", "variant": "dashed" },
+    { "id": "e2ecompose-commit", "from": "e2ecompose", "to": "commit", "label": "change done" },
+    { "id": "commit-pr", "from": "commit", "to": "pr", "label": "open PR" },
+    { "id": "pr-release", "from": "pr", "to": "release", "label": "squash merge", "variant": "emphasis" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Which tests need the compose stack",
+      "items": [
+        "make validate, make test and make build need no stack",
+        "make test-integration and make test-e2e-compose start the compose stack and tear it down; KEEP_STACK=1 leaves it running",
+        "make test-e2e-kind runs only the auth-only subset on a kind cluster; CI runs it on every PR"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Owned by release-please",
+      "items": [
+        "The PR title becomes the squash commit that release-please reads",
+        "CHANGELOG.md and .release-please-manifest.json are written by release-please; leave them untouched"
+      ]
+    }
+  ]
+}

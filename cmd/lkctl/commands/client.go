@@ -58,8 +58,8 @@ func (o *clientOptions) validate() error {
 		}
 	case authModeK8s:
 		// k8sTokenPath always carries a value here: the cobra flag
-		// defaults to core.DefaultK8sServiceAccountTokenPath. File
-		// existence is checked lazily by the AuthSource on first use.
+		// defaults to core.DefaultK8sServiceAccountTokenPath. The
+		// AuthSource's Init reads the file when the client is constructed.
 	default:
 		return fmt.Errorf("unknown auth mode %q", o.authMode)
 	}

@@ -1,0 +1,475 @@
+{
+  "schema_version": 1,
+  "diagram_type": "class",
+  "meta": {
+    "title": "Domain model: server, projects and assignments",
+    "output": ".archify/class-domain-model-20261111-122411/domain-model.html",
+    "quality_profile": "showcase",
+    "locale": "en",
+    "repository": {
+      "url": "git@github.com:lakekeeper/go-lakekeeper.git",
+      "provider": "github",
+      "link_mode": "local-only",
+      "revision": "fb689d0edce8a3b59c22af0bf856f9d14c60bbb3"
+    }
+  },
+  "layout": {
+    "mode": "grid"
+  },
+  "types": [
+    {
+      "id": "user",
+      "label": "User",
+      "kind": "class",
+      "sublabel": "Belongs to the server, never to a project",
+      "row": 0,
+      "col": 0,
+      "attributes": [
+        {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "user-type",
+          "type": "human | application"
+        }
+      ],
+      "sources": [
+        {
+          "path": "pkg/apis/management/v1/model_user.go",
+          "line": 24,
+          "end_line": 39,
+          "label": "managementv1.User"
+        },
+        {
+          "path": "pkg/client/users.go",
+          "line": 15,
+          "end_line": 23,
+          "label": "Users.Create takes no project"
+        }
+      ]
+    },
+    {
+      "id": "server",
+      "label": "Server",
+      "kind": "class",
+      "sublabel": "One Lakekeeper installation",
+      "row": 0,
+      "col": 1,
+      "attributes": [
+        {
+          "name": "server-id",
+          "type": "string"
+        },
+        {
+          "name": "default-project-id",
+          "type": "string, optional"
+        }
+      ],
+      "sources": [
+        {
+          "path": "pkg/apis/management/v1/model_server_info.go",
+          "line": 23,
+          "end_line": 56,
+          "label": "managementv1.ServerInfo"
+        },
+        {
+          "path": "pkg/client/server.go",
+          "line": 11,
+          "end_line": 20,
+          "label": "Server.Info"
+        },
+        {
+          "path": "pkg/apis/management/v1/model_server_relation.go",
+          "line": 22,
+          "end_line": 25,
+          "label": "ServerRelation"
+        }
+      ]
+    },
+    {
+      "id": "default_project",
+      "label": "Default project",
+      "kind": "class",
+      "sublabel": "Used when a call sends no project",
+      "row": 0,
+      "col": 2,
+      "sources": [
+        {
+          "path": "pkg/apis/management/v1/model_server_info.go",
+          "line": 35,
+          "end_line": 35,
+          "label": "default-project-id"
+        },
+        {
+          "path": "pkg/client/projects.go",
+          "line": 29,
+          "end_line": 40,
+          "label": "Projects.Get falls back to it"
+        }
+      ]
+    },
+    {
+      "id": "role",
+      "label": "Role",
+      "kind": "class",
+      "sublabel": "Belongs to one project",
+      "row": 1,
+      "col": 0,
+      "attributes": [
+        {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "project-id",
+          "type": "string"
+        }
+      ],
+      "sources": [
+        {
+          "path": "pkg/apis/management/v1/model_role.go",
+          "line": 24,
+          "end_line": 43,
+          "label": "managementv1.Role"
+        },
+        {
+          "path": "pkg/client/roles.go",
+          "line": 18,
+          "end_line": 31,
+          "label": "Roles.Create in a project"
+        }
+      ]
+    },
+    {
+      "id": "project",
+      "label": "Project",
+      "kind": "class",
+      "sublabel": "Holds warehouses and roles",
+      "row": 1,
+      "col": 1,
+      "attributes": [
+        {
+          "name": "project-id",
+          "type": "string"
+        },
+        {
+          "name": "project-name",
+          "type": "string"
+        }
+      ],
+      "sources": [
+        {
+          "path": "pkg/apis/management/v1/model_get_project_response.go",
+          "line": 23,
+          "end_line": 28,
+          "label": "managementv1.GetProjectResponse"
+        },
+        {
+          "path": "pkg/client/projects.go",
+          "line": 19,
+          "end_line": 28,
+          "label": "Projects.Create"
+        }
+      ]
+    },
+    {
+      "id": "warehouse",
+      "label": "Warehouse",
+      "kind": "class",
+      "sublabel": "Iceberg storage location in a project",
+      "row": 1,
+      "col": 2,
+      "attributes": [
+        {
+          "name": "warehouse-id",
+          "type": "string"
+        },
+        {
+          "name": "project-id",
+          "type": "string"
+        }
+      ],
+      "sources": [
+        {
+          "path": "pkg/apis/management/v1/model_get_warehouse_response.go",
+          "line": 24,
+          "end_line": 52,
+          "label": "managementv1.GetWarehouseResponse"
+        },
+        {
+          "path": "pkg/client/warehouses.go",
+          "line": 18,
+          "end_line": 34,
+          "label": "Warehouses.Create in a project"
+        }
+      ]
+    },
+    {
+      "id": "principal",
+      "label": "Principal",
+      "kind": "interface",
+      "sublabel": "Who an assignment is given to",
+      "row": 2,
+      "col": 0,
+      "attributes": [
+        {
+          "name": "kind",
+          "type": "user | role"
+        },
+        {
+          "name": "id",
+          "type": "string"
+        }
+      ],
+      "sources": [
+        {
+          "path": "pkg/permissions/assignment.go",
+          "line": 18,
+          "end_line": 28,
+          "label": "PrincipalKind"
+        },
+        {
+          "path": "pkg/apis/management/v1/model_warehouse_assignment_select.go",
+          "line": 23,
+          "end_line": 29,
+          "label": "user or role id"
+        }
+      ]
+    },
+    {
+      "id": "resource",
+      "label": "Resource",
+      "kind": "interface",
+      "sublabel": "What an assignment is on",
+      "row": 2,
+      "col": 2,
+      "width": 330,
+      "attributes": [
+        {
+          "name": "kind",
+          "type": "server | project | warehouse | role"
+        }
+      ],
+      "sources": [
+        {
+          "path": "pkg/client/permissions.go",
+          "line": 10,
+          "end_line": 27,
+          "label": "one permission façade per kind"
+        }
+      ]
+    },
+    {
+      "id": "assignment",
+      "label": "Assignment",
+      "kind": "record",
+      "sublabel": "One relation for one principal on one resource",
+      "row": 3,
+      "col": 1,
+      "attributes": [
+        {
+          "name": "type",
+          "type": "Relation"
+        },
+        {
+          "name": "user | role",
+          "type": "principal id"
+        }
+      ],
+      "sources": [
+        {
+          "path": "pkg/permissions/assignment.go",
+          "line": 1,
+          "end_line": 9,
+          "label": "wire shape"
+        },
+        {
+          "path": "pkg/permissions/assignment.go",
+          "line": 51,
+          "end_line": 94,
+          "label": "BuildAssignment"
+        }
+      ]
+    },
+    {
+      "id": "relation",
+      "label": "Relation",
+      "kind": "enum",
+      "sublabel": "Allowed values depend on the resource kind",
+      "row": 4,
+      "col": 1,
+      "width": 360,
+      "attributes": [
+        {
+          "name": "server",
+          "type": "admin, operator"
+        },
+        {
+          "name": "project",
+          "type": "project_admin, security_admin, data_admin, role_creator, tag_creator, describe, select, create, write, modify"
+        },
+        {
+          "name": "warehouse",
+          "type": "ownership, pass_grants, manage_grants, manage_tags, describe, select, create, write, modify"
+        },
+        {
+          "name": "role",
+          "type": "assignee, ownership"
+        }
+      ],
+      "sources": [
+        {
+          "path": "pkg/apis/management/v1/model_project_relation.go",
+          "line": 22,
+          "end_line": 33,
+          "label": "ProjectRelation"
+        },
+        {
+          "path": "pkg/apis/management/v1/model_warehouse_relation.go",
+          "line": 22,
+          "end_line": 32,
+          "label": "WarehouseRelation"
+        },
+        {
+          "path": "pkg/apis/management/v1/model_role_relation.go",
+          "line": 22,
+          "end_line": 25,
+          "label": "RoleRelation"
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "id": "server_users",
+      "from": "server",
+      "to": "user",
+      "kind": "composition",
+      "label": "contains"
+    },
+    {
+      "id": "server_projects",
+      "from": "server",
+      "to": "project",
+      "kind": "composition",
+      "label": "contains"
+    },
+    {
+      "id": "server_default",
+      "from": "server",
+      "to": "default_project",
+      "kind": "association",
+      "label": "picks"
+    },
+    {
+      "id": "default_is_project",
+      "from": "default_project",
+      "to": "project",
+      "kind": "inheritance"
+    },
+    {
+      "id": "project_roles",
+      "from": "project",
+      "to": "role",
+      "kind": "composition",
+      "label": "contains"
+    },
+    {
+      "id": "project_warehouses",
+      "from": "project",
+      "to": "warehouse",
+      "kind": "composition",
+      "label": "contains"
+    },
+    {
+      "id": "user_is_principal",
+      "from": "user",
+      "to": "principal",
+      "kind": "realization",
+      "fromSide": "left",
+      "toSide": "left"
+    },
+    {
+      "id": "role_is_principal",
+      "from": "role",
+      "to": "principal",
+      "kind": "realization"
+    },
+    {
+      "id": "server_is_resource",
+      "from": "server",
+      "to": "resource",
+      "kind": "realization",
+      "fromSide": "top",
+      "toSide": "right"
+    },
+    {
+      "id": "project_is_resource",
+      "from": "project",
+      "to": "resource",
+      "kind": "realization"
+    },
+    {
+      "id": "warehouse_is_resource",
+      "from": "warehouse",
+      "to": "resource",
+      "kind": "realization"
+    },
+    {
+      "id": "role_is_resource",
+      "from": "role",
+      "to": "resource",
+      "kind": "realization"
+    },
+    {
+      "id": "assignment_principal",
+      "from": "assignment",
+      "to": "principal",
+      "kind": "association",
+      "label": "given to"
+    },
+    {
+      "id": "assignment_resource",
+      "from": "assignment",
+      "to": "resource",
+      "kind": "association",
+      "label": "on"
+    },
+    {
+      "id": "assignment_relation",
+      "from": "assignment",
+      "to": "relation",
+      "kind": "association",
+      "label": "gives"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Ownership",
+      "items": [
+        "A user belongs to the server, never to a project; it holds assignments there",
+        "A role and a warehouse each belong to one project",
+        "The server picks the default project when a call sends none"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Role on both sides",
+      "items": [
+        "As a principal, a role is given assignments on any resource",
+        "As a resource, a role has users and other roles assigned to it (assignee, ownership)"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Permission façades",
+      "items": [
+        "c.Permissions.Server, .Projects, .Warehouses and .Roles: one per resource kind",
+        "Each offers Access, Assignments, Grant and Revoke",
+        "Namespace, table and view have no façade yet, so they are left out"
+      ]
+    }
+  ]
+}

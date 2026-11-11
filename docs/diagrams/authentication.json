@@ -1,0 +1,220 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Authentication: auth sources, construction and requests",
+    "output": ".archify/architecture-authentication-20261111-122402/authentication.html",
+    "quality_profile": "showcase",
+    "locale": "en",
+    "repository": {
+      "url": "git@github.com:lakekeeper/go-lakekeeper.git",
+      "provider": "github",
+      "link_mode": "local-only",
+      "revision": "fb689d0edce8a3b59c22af0bf856f9d14c60bbb3"
+    },
+    "legend": {
+      "entries": {
+        "frontend": { "label": "CLI" },
+        "backend": { "label": "SDK code" },
+        "security": { "label": "auth source (pkg/core)" },
+        "cloud": { "label": "outside the SDK" },
+        "external": { "label": "your program" }
+      }
+    }
+  },
+  "components": [
+    {
+      "id": "lkctl",
+      "type": "frontend",
+      "label": "lkctl",
+      "sublabel": "--auth-mode oauth2 | token | k8s",
+      "tag": "default oauth2",
+      "pos": [40, 200],
+      "size": [200, 64],
+      "sources": [
+        { "path": "cmd/lkctl/commands/root.go", "line": 50, "end_line": 52, "label": "--auth-mode flag" },
+        { "path": "cmd/lkctl/commands/client.go", "line": 72, "end_line": 88, "label": "newClient" },
+        { "path": "cmd/lkctl/commands/client.go", "line": 90, "end_line": 111, "label": "buildAuthSource" }
+      ]
+    },
+    {
+      "id": "umbrella",
+      "type": "backend",
+      "label": "Umbrella constructors",
+      "sublabel": "pkg/lakekeeper",
+      "pos": [40, 340],
+      "size": [200, 64],
+      "sources": [
+        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 56, "end_line": 65, "label": "NewOAuthClientCredentials" },
+        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 73, "end_line": 79, "label": "NewK8sServiceAccount" },
+        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 132, "end_line": 133, "label": "New, NewWithAuthSource" }
+      ]
+    },
+    {
+      "id": "app",
+      "type": "external",
+      "label": "Application code",
+      "sublabel": "builds its own AuthSource",
+      "pos": [40, 480],
+      "size": [200, 64],
+      "sources": [
+        { "path": "pkg/core/auth.go", "line": 21, "end_line": 33, "label": "AuthSource interface" }
+      ]
+    },
+    {
+      "id": "construct",
+      "type": "backend",
+      "label": "NewWithAuthSource",
+      "sublabel": "pkg/client",
+      "tag": "Init once, then options",
+      "pos": [380, 340],
+      "size": [200, 64],
+      "sources": [
+        { "path": "pkg/client/client.go", "line": 73, "end_line": 99, "label": "Init before options" },
+        { "path": "pkg/client/client.go", "line": 222, "end_line": 233, "label": "wires AuthRoundTripper" },
+        { "path": "pkg/client/client.go", "line": 64, "end_line": 66, "label": "New: static token" }
+      ]
+    },
+    {
+      "id": "idp",
+      "type": "cloud",
+      "label": "Identity provider",
+      "sublabel": "OAuth2 token endpoint",
+      "pos": [800, 40],
+      "size": [220, 64],
+      "sources": [
+        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 57, "end_line": 63, "label": "client-credentials config" }
+      ]
+    },
+    {
+      "id": "oauth",
+      "type": "security",
+      "label": "OAuth2 client credentials",
+      "sublabel": "OAuthClientCredentialsAuthSource",
+      "tag": "oauth2 · NewOAuthClientCredentials",
+      "pos": [800, 200],
+      "size": [220, 64],
+      "sources": [
+        { "path": "pkg/core/auth.go", "line": 49, "end_line": 51, "label": "wraps an oauth2.TokenSource" },
+        { "path": "pkg/core/auth.go", "line": 88, "end_line": 96, "label": "Init fetches a token" },
+        { "path": "pkg/core/auth.go", "line": 98, "end_line": 105, "label": "Header" }
+      ]
+    },
+    {
+      "id": "token",
+      "type": "security",
+      "label": "Static access token",
+      "sublabel": "AccessTokenAuthSource",
+      "tag": "token · New",
+      "pos": [800, 340],
+      "size": [220, 64],
+      "sources": [
+        { "path": "pkg/core/auth.go", "line": 58, "end_line": 60, "label": "fixed Token" },
+        { "path": "pkg/core/auth.go", "line": 117, "end_line": 122, "label": "Init rejects empty token" },
+        { "path": "pkg/core/auth.go", "line": 124, "end_line": 126, "label": "Header" }
+      ]
+    },
+    {
+      "id": "k8s",
+      "type": "security",
+      "label": "Kubernetes service account",
+      "sublabel": "K8sServiceAccountAuthSource",
+      "tag": "k8s · NewK8sServiceAccount",
+      "pos": [800, 480],
+      "size": [220, 64],
+      "sources": [
+        { "path": "pkg/core/auth.go", "line": 13, "end_line": 17, "label": "default token path" },
+        { "path": "pkg/core/auth.go", "line": 135, "end_line": 163, "label": "Init reads the token file" },
+        { "path": "pkg/core/auth.go", "line": 165, "end_line": 171, "label": "Header re-reads the file" }
+      ]
+    },
+    {
+      "id": "art",
+      "type": "backend",
+      "label": "AuthRoundTripper",
+      "sublabel": "pkg/core",
+      "tag": "every request, every retry",
+      "pos": [1200, 340],
+      "size": [180, 64],
+      "sources": [
+        { "path": "pkg/core/transport.go", "line": 16, "end_line": 38, "label": "RoundTrip calls Header" }
+      ]
+    },
+    {
+      "id": "bootstrap",
+      "type": "backend",
+      "label": "WithInitialBootstrap",
+      "sublabel": "optional, at construction",
+      "tag": "skipped if bootstrapped",
+      "pos": [380, 640],
+      "size": [200, 64],
+      "sources": [
+        { "path": "pkg/client/client_options.go", "line": 144, "end_line": 154, "label": "no-op without terms" },
+        { "path": "pkg/client/client.go", "line": 130, "end_line": 135, "label": "runs after wiring" },
+        { "path": "pkg/client/client.go", "line": 200, "end_line": 217, "label": "runBootstrap" }
+      ]
+    },
+    {
+      "id": "server",
+      "type": "cloud",
+      "label": "Lakekeeper server",
+      "sublabel": "Management API",
+      "pos": [1200, 640],
+      "size": [180, 64],
+      "sources": [
+        { "path": "pkg/client/server.go", "line": 16, "end_line": 32, "label": "Info and Bootstrap" }
+      ]
+    }
+  ],
+  "connections": [
+    { "id": "lkctl-construct", "from": "lkctl", "to": "construct", "label": "by --auth-mode" },
+    { "id": "umbrella-construct", "from": "umbrella", "to": "construct", "label": "by constructor", "variant": "emphasis" },
+    { "id": "app-construct", "from": "app", "to": "construct", "label": "any AuthSource" },
+    { "id": "init-oauth", "from": "construct", "to": "oauth", "label": "Init: fetch first token", "variant": "security" },
+    { "id": "init-token", "from": "construct", "to": "token", "label": "Init: token not empty", "variant": "security" },
+    { "id": "init-k8s", "from": "construct", "to": "k8s", "label": "Init: file readable", "variant": "security" },
+    { "id": "oauth-idp", "from": "oauth", "to": "idp", "label": "token request" },
+    { "id": "header-oauth", "from": "art", "to": "oauth", "label": "Header: cached token" },
+    { "id": "header-token", "from": "art", "to": "token", "label": "Header: Bearer token", "variant": "emphasis" },
+    { "id": "header-k8s", "from": "art", "to": "k8s", "label": "Header: re-read file" },
+    { "id": "art-server", "from": "art", "to": "server", "label": "Authorization header", "variant": "emphasis" },
+    { "id": "construct-bootstrap", "from": "construct", "to": "bootstrap", "label": "if the option is set", "variant": "dashed" },
+    { "id": "bootstrap-server", "from": "bootstrap", "to": "server", "label": "Server.Info, then Bootstrap", "variant": "dashed" }
+  ],
+  "cards": [
+    {
+      "dot": "rose",
+      "title": "Eager validation",
+      "items": [
+        "NewWithAuthSource calls Init once, before any request, and fails with \"init auth source\" if it errors.",
+        "OAuth2 fetches a first token, the static token must not be empty, and the Kubernetes token file must be readable and non-empty."
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "lkctl auth mode",
+      "items": [
+        "--auth-mode (or LAKEKEEPER_AUTH_MODE) picks oauth2, token or k8s; oauth2 is the default.",
+        "lkctl first checks the flags the mode needs and rejects an unknown mode.",
+        "In oauth2 mode it fetches a token before building the auth source."
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Header on every request",
+      "items": [
+        "AuthRoundTripper calls Header on every attempt, retries included, and keeps a header the caller already set.",
+        "OAuth2 reuses its token until it expires, the static token never changes, and the Kubernetes token file is re-read each time."
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Bootstrap",
+      "items": [
+        "WithInitialBootstrap(false, …) does nothing.",
+        "Otherwise construction calls Server.Info and calls Server.Bootstrap only on a server that is not bootstrapped yet; both requests carry the header.",
+        "lkctl --bootstrap passes WithInitialBootstrap as an operator of user type application."
+      ]
+    }
+  ]
+}

@@ -5,47 +5,45 @@ packages depend on each other. Complements [GENERATION.md](GENERATION.md)
 (which covers the generated/manual split) and [ARCHITECTURE.md](ARCHITECTURE.md)
 (which covers the request lifecycle).
 
-## Dependency Graph
+## Package Layers
 
-```mermaid
-graph LR
-    CLI["cmd/lkctl"]
-    UMBRELLA["pkg/lakekeeper<br/>(umbrella)"]
-    CLIENT["pkg/client"]
-    GEN["pkg/apis/management/v1<br/>(generated)"]
-    PERM["pkg/permissions"]
-    PROFILE["pkg/storage/profile"]
-    CRED["pkg/storage/credential"]
-    CORE["pkg/core"]
-    COMMON["pkg/common"]
-    VERSION["pkg/version"]
-    ICEBERG["apache/iceberg-go<br/>rest.Catalog"]
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="diagrams/package-layers-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="diagrams/package-layers-light.svg">
+  <img alt="Package layers: application code imports the umbrella package, which re-exports the permissions helpers, the storage helpers and the resource façades; lkctl imports the permissions helpers, the storage helpers and the resource façades, its only way to the API, and forbidigo forbids it the escape hatch; the resource façades call the generated SDK's services and use AuthSource and AuthRoundTripper from core; the escape hatch embeds the generated SDK's APIClient; the generated SDK sends HTTPS requests to the Management API" src="diagrams/package-layers-light.svg">
+</picture>
 
-    CLI --> CLIENT
-    CLI --> COMMON
-    CLI --> PERM
-    CLI --> GEN
-    UMBRELLA --> CLIENT
-    UMBRELLA --> PERM
-    UMBRELLA --> PROFILE
-    UMBRELLA --> CRED
-    UMBRELLA --> GEN
-    CLIENT --> GEN
-    CLIENT --> CORE
-    CLIENT --> VERSION
-    CLIENT --> ICEBERG
-    PERM --> GEN
-    PROFILE --> GEN
-    CRED --> GEN
-    GEN -.->|HTTP via http.Client| CORE
-```
+Explorable version: [`diagrams/package-layers.html`](diagrams/package-layers.html)
+(GitHub shows its source: download or clone and open it locally). See the
+[diagram index](diagrams/README.md) for the other diagrams.
 
-The generated `pkg/apis/management/v1` package is the dependency root —
-nothing else in this module imports it transitively without going through
-the typed packages above. `pkg/client` wires it up with auth and retries;
-`pkg/permissions` and `pkg/storage/*` provide ergonomic builders on top of
-its types; and `pkg/lakekeeper` re-exports a curated subset of all four for
-single-import call sites.
+The diagram draws the imports that show where code belongs, not every
+import. Not drawn: the umbrella package also imports `pkg/core` and the
+generated SDK; `lkctl` also imports `pkg/core`, the generated SDK's model
+types, `pkg/common` and `pkg/version`; `pkg/client` also imports
+`pkg/version` and `apache/iceberg-go`; and the storage helpers import the
+generated SDK. The permissions helpers import nothing else from this
+module. The generated SDK and `pkg/core` import nothing from it either.
+
+The diagram uses the terms application code, `lkctl`, umbrella package,
+resource façade, generated SDK, escape hatch and Management API as defined
+under [ARCHITECTURE.md System Context](ARCHITECTURE.md#system-context),
+and these:
+
+- **Permissions helpers**: [`pkg/permissions`](#pkgpermissions), which
+  builds and reads the generated assignment types generically.
+- **Storage helpers**: [`pkg/storage/profile`](#pkgstorageprofile) and
+  [`pkg/storage/credential`](#pkgstoragecredential), builders for the
+  generated storage profile and credential types.
+- **Core**: [`pkg/core`](#pkgcore), the auth sources, `AuthRoundTripper`
+  and the per-request helpers.
+- **forbidigo rule**: the `forbidigo` linter settings in
+  [`.golangci.yml`](../.golangci.yml). For `cmd/` only, they reject
+  references to `Client.APIClient`, the `Client.<Name>API` fields,
+  `managementv1.NewAPIClient`, `managementv1.APIClient` and the
+  `*APIService` types. `lkctl` may still use the generated model types.
+  When `lkctl` needs an operation that has no façade, add the façade
+  method in `pkg/client` first.
 
 ---
 
@@ -211,7 +209,7 @@ options, or the raw `*http.Response`, use the escape hatch.
   parameter.
 - **List results** are the generated list response; page with its
   `GetNextPageToken()` accessor.
-- **Project scoping** is a trailing `...client.CallOption`;
+- [Project scoping](ARCHITECTURE.md#project-scoping) is a trailing `...client.CallOption`;
   `client.WithProject(id)` sends `x-project-id`, omitting it lets the
   server apply its default project, and `WithProject("")` fails with
   `client.ErrEmptyProjectID`. The destructive project-level calls
@@ -350,7 +348,8 @@ catalog, err := client.CatalogV1(ctx, projectID, warehouse, opts...)
 ```
 
 Returns an `*apache/iceberg-go/catalog/rest.Catalog` configured with the
-client's auth token and the warehouse-scoped catalog URL. If the client was
+client's auth token, the `/catalog` URL and `<projectID>/<warehouse>` as its
+warehouse location. If the client was
 built with `WithHTTPClient`, the catalog uses the same base transport (only
 the transport; `Timeout`, `CheckRedirect` and `Jar` stay with the
 Management API client). Transport options in `opts` take precedence:
@@ -411,9 +410,10 @@ first API call.
 
 #### `OAuthClientCredentialsAuthSource` — OAuth 2.0 client credentials
 
-The most common production choice. Wraps any
-`golang.org/x/oauth2.TokenSource`, which handles token caching and silent
-renewal before expiry automatically (via `oauth2.ReuseTokenSource`).
+The most common production choice. Wraps a
+`golang.org/x/oauth2.TokenSource`; the standard client credentials one
+(`clientcredentials.Config.TokenSource`, an `oauth2.ReuseTokenSource`)
+caches the token and renews it shortly before expiry.
 
 The umbrella's `lakekeeper.NewOAuthClientCredentials` is the shortest
 construction path:
@@ -444,23 +444,13 @@ as := &core.OAuthClientCredentialsAuthSource{TokenSource: cfg.TokenSource(ctx)}
 c, err := client.NewWithAuthSource(ctx, baseURL, as)
 ```
 
-```mermaid
-sequenceDiagram
-    participant App
-    participant OAuthAS as core.OAuthClientCredentialsAuthSource
-    participant oauth2 as golang.org/x/oauth2
-    participant Keycloak as Keycloak / OIDC IdP
-
-    App->>OAuthAS: Header(ctx)
-    OAuthAS->>oauth2: TokenSource.Token()
-    alt token not cached or expired
-        oauth2->>Keycloak: POST /token<br/>grant_type=client_credentials<br/>client_id + client_secret
-        Keycloak-->>oauth2: {"access_token": "…", "expires_in": 300}
-        Note over oauth2: Token cached until expiry
-    end
-    oauth2-->>OAuthAS: *oauth2.Token
-    OAuthAS-->>App: "Authorization", "Bearer <access_token>"
-```
+`Init` fetches the first token when the client is constructed. After that,
+`Header` asks the token source for a token on every request. With the
+standard client credentials token source, `golang.org/x/oauth2` returns
+the cached token until it is about 10 seconds from expiry, then sends a
+new `grant_type=client_credentials` request with the client ID and secret
+to the identity provider's token endpoint and caches the result. The [authentication diagram](AUTHENTICATION.md#overview) shows
+where this happens in a request.
 
 The struct technically accepts any `oauth2.TokenSource`, so non-client-credentials
 flows (auth-code, device, refresh-only) work too. The type name is

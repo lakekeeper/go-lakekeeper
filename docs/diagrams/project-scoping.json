@@ -1,0 +1,168 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Project scoping: what a façade call sends",
+    "output": ".archify/workflow-project-scoping-20261111-122423/project-scoping.html",
+    "quality_profile": "showcase",
+    "locale": "en",
+    "repository": {
+      "url": "git@github.com:lakekeeper/go-lakekeeper.git",
+      "provider": "github",
+      "link_mode": "local-only",
+      "revision": "fb689d0edce8a3b59c22af0bf856f9d14c60bbb3"
+    },
+    "legend": {
+      "entries": {
+        "external": { "label": "caller" },
+        "backend": { "label": "façade check (call_options.go)" },
+        "security": { "label": "error returned to the caller" },
+        "messagebus": { "label": "what the request carries" },
+        "cloud": { "label": "project the server uses" }
+      }
+    }
+  },
+  "lanes": [
+    { "id": "rejected", "label": "Rejected, nothing sent", "variant": "exception" },
+    { "id": "facade", "label": "Façade (pkg/client)" },
+    { "id": "sent", "label": "Request sent" },
+    { "id": "server", "label": "Lakekeeper server" }
+  ],
+  "mainPath": ["call", "body", "required", "option", "header", "named"],
+  "nodes": [
+    {
+      "id": "call", "lane": "facade", "col": 0, "type": "external",
+      "label": "Project-scoped call", "sublabel": "...CallOption",
+      "sources": [
+        { "path": "pkg/client/call_options.go", "line": 24, "end_line": 30, "label": "CallOption" },
+        { "path": "pkg/client/warehouses.go", "line": 60, "label": "Warehouses.List" }
+      ]
+    },
+    {
+      "id": "body", "lane": "facade", "col": 1, "type": "backend",
+      "label": "Body project field?", "sublabel": "withBodyProject",
+      "tag": "Create warehouse, role; Search role",
+      "sources": [
+        { "path": "pkg/client/call_options.go", "line": 110, "end_line": 125, "label": "withBodyProject" },
+        { "path": "pkg/client/warehouses.go", "line": 29, "label": "Warehouses.Create" },
+        { "path": "pkg/client/roles.go", "line": 26, "label": "Roles.Create" }
+      ]
+    },
+    {
+      "id": "required", "lane": "facade", "col": 2, "type": "backend",
+      "label": "Project required?", "sublabel": "withRequiredProject",
+      "tag": "Delete project, Grant, Revoke",
+      "sources": [
+        { "path": "pkg/client/call_options.go", "line": 88, "end_line": 93, "label": "withRequiredProject" },
+        { "path": "pkg/client/projects.go", "line": 46, "end_line": 48, "label": "Projects.Delete" },
+        { "path": "pkg/client/permissions.go", "line": 249, "end_line": 253, "label": "Grant and Revoke" }
+      ]
+    },
+    {
+      "id": "option", "lane": "facade", "col": 3, "type": "backend",
+      "label": "WithProject?", "sublabel": "withProject",
+      "sources": [
+        { "path": "pkg/client/call_options.go", "line": 45, "end_line": 50, "label": "WithProject" },
+        { "path": "pkg/client/call_options.go", "line": 73, "end_line": 83, "label": "withProject" }
+      ]
+    },
+    {
+      "id": "conflict", "lane": "rejected", "col": 1, "type": "security",
+      "label": "ErrProjectIDConflict",
+      "sources": [
+        { "path": "pkg/client/call_options.go", "line": 19, "end_line": 22, "label": "ErrProjectIDConflict" }
+      ]
+    },
+    {
+      "id": "reqerr", "lane": "rejected", "col": 2, "type": "security",
+      "label": "ErrProjectRequired",
+      "sources": [
+        { "path": "pkg/client/call_options.go", "line": 13, "end_line": 17, "label": "ErrProjectRequired" }
+      ]
+    },
+    {
+      "id": "emptyerr", "lane": "rejected", "col": 3, "type": "security",
+      "label": "ErrEmptyProjectID",
+      "sources": [
+        { "path": "pkg/client/call_options.go", "line": 9, "end_line": 11, "label": "ErrEmptyProjectID" }
+      ]
+    },
+    {
+      "id": "header", "lane": "sent", "col": 4, "type": "messagebus",
+      "label": "x-project-id header", "sublabel": "the only way a project is sent",
+      "sources": [
+        { "path": "pkg/client/call_options.go", "line": 80, "end_line": 81, "label": "XProjectId" },
+        { "path": "api/openapi/management-open-api.yaml", "line": 143, "end_line": 145, "label": "x-project-id" }
+      ]
+    },
+    {
+      "id": "noproj", "lane": "sent", "col": 3, "type": "messagebus",
+      "label": "No project", "sublabel": "no header",
+      "sources": [
+        { "path": "pkg/client/call_options.go", "line": 76, "end_line": 77, "label": "nothing set" }
+      ]
+    },
+    {
+      "id": "named", "lane": "server", "col": 4, "type": "cloud",
+      "label": "Named project",
+      "sources": [
+        { "path": "api/openapi/management-open-api.yaml", "line": 143, "end_line": 145, "label": "x-project-id" }
+      ]
+    },
+    {
+      "id": "default", "lane": "server", "col": 3, "type": "cloud",
+      "label": "Default project", "sublabel": "chosen by the server",
+      "sources": [
+        { "path": "api/openapi/management-open-api.yaml", "line": 145, "label": "default project" }
+      ]
+    },
+    {
+      "id": "missing", "lane": "server", "col": 2, "type": "security",
+      "label": "400 ProjectIdMissing", "sublabel": "returned as APIError",
+      "sources": [
+        { "path": "api/openapi/management-open-api.yaml", "line": 145, "label": "otherwise fails" }
+      ]
+    }
+  ],
+  "edges": [
+    { "id": "e-call-body", "from": "call", "to": "body", "variant": "emphasis" },
+    { "id": "e-body-required", "from": "body", "to": "required", "label": "no conflict", "variant": "emphasis" },
+    { "id": "e-body-conflict", "from": "body", "to": "conflict", "label": "differs", "variant": "security", "role": "error" },
+    { "id": "e-required-option", "from": "required", "to": "option", "variant": "emphasis" },
+    { "id": "e-required-reqerr", "from": "required", "to": "reqerr", "label": "none given", "variant": "security", "role": "error" },
+    { "id": "e-option-emptyerr", "from": "option", "to": "emptyerr", "label": "WithProject(\"\")", "variant": "security", "role": "error" },
+    { "id": "e-option-header", "from": "option", "to": "header", "label": "WithProject(id)", "variant": "emphasis" },
+    { "id": "e-option-noproj", "from": "option", "to": "noproj", "label": "no option", "variant": "default", "role": "branch" },
+    { "id": "e-header-named", "from": "header", "to": "named", "variant": "emphasis" },
+    { "id": "e-noproj-default", "from": "noproj", "to": "default", "label": "default on", "variant": "default", "role": "branch" },
+    { "id": "e-noproj-missing", "from": "noproj", "to": "missing", "label": "default off", "variant": "security", "role": "error" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Only the header is sent",
+      "items": [
+        "A façade sends the project as the x-project-id header or not at all.",
+        "It never sends the deprecated projectId query parameter or project-id body field: Lakekeeper lets those win over the header."
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Deprecated body field",
+      "items": [
+        "Alone, the body project-id acts like WithProject.",
+        "Equal to WithProject, it is dropped.",
+        "Different from WithProject, the call fails with ErrProjectIDConflict.",
+        "The caller's request model is not modified."
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Rejected before sending",
+      "items": [
+        "WithProject(\"\") fails with ErrEmptyProjectID, so an unset variable can't target the default project.",
+        "Projects.Delete and Permissions.Projects Grant and Revoke fail with ErrProjectRequired without WithProject."
+      ]
+    }
+  ]
+}

@@ -10,45 +10,65 @@ For the generated/manual split, regeneration workflow, and the OpenAPI
 postprocessor, see [GENERATION.md](GENERATION.md). For a per-package tour
 of types and entry points, see [PACKAGES.md](PACKAGES.md).
 
-## Component Overview
+## System Context
 
-```mermaid
-graph TD
-    APP["Application code<br/>or lkctl commands"]
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="diagrams/system-context-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="diagrams/system-context-light.svg">
+  <img alt="System context: application code and lkctl reach the client (through the umbrella package for application code); the client calls the generated SDK, which talks to the Lakekeeper Management API, and hands Iceberg catalog access to iceberg-go; the client fetches tokens from the identity provider; the Lakekeeper server and its metadata store, authorization backend, secret storage and object storage run outside the SDK" src="diagrams/system-context-light.svg">
+</picture>
 
-    subgraph "Hand-written"
-        CLIENT["pkg/client.Client<br/>(facade)"]
-        CORE["pkg/core<br/>AuthSource · AuthRoundTripper"]
-        PERM["pkg/permissions<br/>BuildAssignment · DescribeAssignment"]
-        PROFILE["pkg/storage/profile<br/>pkg/storage/credential"]
-    end
+Explorable version: [`diagrams/system-context.html`](diagrams/system-context.html)
+(GitHub shows its source: download or clone and open it locally). See the
+[diagram index](diagrams/README.md) for the other diagrams.
 
-    subgraph "Generated"
-        GEN["pkg/apis/management/v1<br/>(openapi-generator)<br/>APIClient · ProjectAPI<br/>WarehouseAPI · …"]
-    end
+The diagram uses these terms:
 
-    subgraph "External"
-        ICEBERG["apache/iceberg-go<br/>rest.Catalog"]
-        LKAPI["Lakekeeper<br/>Management API"]
-        LKCAT["Lakekeeper<br/>Iceberg REST Catalog"]
-    end
-
-    APP --> CLIENT
-    CLIENT -.->|embeds| GEN
-    CLIENT --> CORE
-    CLIENT --> ICEBERG
-    PERM --> GEN
-    PROFILE --> GEN
-    GEN -->|HTTP| LKAPI
-    ICEBERG --> LKCAT
-```
+- **Application code**: your Go program. It usually imports the umbrella
+  package only.
+- **`lkctl`**: the CLI in `cmd/`. It builds a client from its flags and
+  calls the resource façades only.
+- **Umbrella package**: `pkg/lakekeeper`. It re-exports the client, its
+  constructors, the storage and permission builders, and the common request
+  and response types, so most call sites need one import path.
+- **Client**: `pkg/client.Client`, with the auth and transport primitives
+  from `pkg/core`. It holds the resource façades, the auth wiring, the
+  retries and the `CatalogV1` helper.
+- **Resource façade**: one of the client's fields `Warehouses`, `Projects`,
+  `Roles`, `Users`, `Server` and `Permissions`: one method call per
+  operation, returning `(value, error)`.
+- **Generated SDK**: `pkg/apis/management/v1`, generated from the
+  Management API's OpenAPI spec (see [GENERATION.md](GENERATION.md)).
+  The client embeds its `APIClient`.
+- **Escape hatch**: the embedded `APIClient`, whose generated services stay
+  reachable for operations without a façade.
+- **Auth source**: a `core.AuthSource` that supplies the `Authorization`
+  header: OAuth2 client credentials, a static access token, or a Kubernetes
+  service account token.
+- **Identity provider**: the OAuth2 / OpenID Connect server that issues
+  access tokens, for example Keycloak. Only the client credentials auth
+  source fetches tokens from it; the Lakekeeper server validates every
+  token against it.
+- **`iceberg-go`**: `apache/iceberg-go`, the Apache Iceberg library for
+  Go. The client's `CatalogV1` helper returns its REST catalog
+  (`rest.Catalog`) for one project and warehouse.
+- **Lakekeeper server**: one Lakekeeper installation, which serves the
+  Management API and the Iceberg REST Catalog. In the domain model it is
+  the [server](AUTHORIZATION.md#the-lakekeeper-authorization-model)
+  resource.
+- **Management API**: Lakekeeper's REST API under `/management/v1` for
+  servers, projects, warehouses, users, roles and permissions.
+- **Iceberg REST Catalog**: Lakekeeper's Apache Iceberg REST catalog under
+  `/catalog`, reached through `iceberg-go`.
+- **Metadata store**, **authorization backend**, **secret storage** and
+  **object storage**: the Lakekeeper server's own dependencies (PostgreSQL,
+  OpenFGA, an optional secret backend, and S3, GCS or ADLS). The SDK runs
+  none of them.
 
 `pkg/client.Client` adds:
 
-- **Resource façades** (`c.Warehouses`, `c.Projects`, `c.Roles`,
-  `c.Users`, `c.Server`, `c.Permissions`): one method call per
-  operation, returning `(value, error)`. They own request construction,
-  query options and paging, **Project scoping** (see below), and the one
+- The resource façades (see above). They own request construction,
+  query options and paging, project scoping (see below), and the one
   error model. They cover every operation `lkctl` uses, and `lkctl`
   commands call nothing else; see
   [PACKAGES.md](PACKAGES.md#resource-façades-one-call-ergonomic-surface).
@@ -71,65 +91,53 @@ generated service stays reachable as a public field (`c.ProjectAPI`,
 grants, authorization checks, …) or when you need the raw
 `*http.Response`.
 
-## Server-side context
-
-`go-lakekeeper` is a **client** — it does not run any server-side
-components. The Lakekeeper server itself depends on:
-
-```mermaid
-graph LR
-    LK["Lakekeeper Server"]
-    PG["PostgreSQL<br/>(metadata store)"]
-    OPENFGA["OpenFGA<br/>(authorization)"]
-    VAULT["Vault / KMS<br/>(optional, secret storage)"]
-    S3["Object Storage<br/>(S3 / GCS / ADLS)"]
-
-    LK --> PG
-    LK --> OPENFGA
-    LK --> VAULT
-    LK -.->|"warehouse data<br/>(via credentials)"| S3
-```
-
-The integration-test stack (`make test-integration`) brings up
-Lakekeeper + **Keycloak** (OIDC IdP) + **MinIO** (S3-compatible storage) +
-**OpenFGA** via `docker-compose`, which is the canonical reference
-environment for this SDK.
+`go-lakekeeper` is a **client**: it does not run any server-side
+components. The [compose stack](../CONTRIBUTING.md#development-workflow)
+that `make test-integration` starts is the canonical reference environment
+for this SDK.
 
 ## Request Lifecycle
 
 Every SDK call follows the same path from the resource façade through the
-generated service and the embedded `APIClient` and out to the wire. Callers
-of the escape hatch enter at the generated service and get the raw triple
-back.
+generated service and the embedded `APIClient` and out to the wire. The
+diagram follows `c.Projects.List(ctx)`; every façade method takes the same
+path. Callers of the escape hatch enter at the generated service and get
+the raw triple back.
 
-```mermaid
-sequenceDiagram
-    participant Caller
-    participant Facade as c.Projects<br/>(or any façade)
-    participant Service as ProjectAPI<br/>(or any *APIService)
-    participant APIClient as managementv1.APIClient
-    participant HTTP as retryablehttp StandardClient
-    participant Auth as AuthRoundTripper
-    participant API as Lakekeeper API
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="diagrams/request-lifecycle-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="diagrams/request-lifecycle-light.svg">
+  <img alt="Request lifecycle: the caller calls a resource façade, which calls the generated service; the API client builds the request and hands it to the retrying client, which runs AuthRoundTripper once per attempt; AuthRoundTripper sets the Authorization header and sends the request to the Management API; the response travels back, the generated service turns a status of 300 or more into a GenericOpenAPIError, and the façade returns the typed result or wraps the error into an APIError" src="diagrams/request-lifecycle-light.svg">
+</picture>
 
-    Caller->>Facade: List(ctx)
-    Facade->>Service: ListProjects(ctx).Execute()
-    Service->>APIClient: prepareRequest(ctx, ...)
-    APIClient->>HTTP: client.Do(req)
-    Note over HTTP: Retries on 429 and 5xx<br/>via retryablehttp
-    HTTP->>Auth: RoundTrip(req)
-    Auth->>Auth: AuthSource.Header(ctx)
-    Note over Auth: Sets "Authorization: Bearer …"<br/>only if not already set
-    Auth->>API: GET /management/v1/project
-    API-->>Auth: 200 OK + JSON body
-    Auth-->>HTTP: *http.Response
-    HTTP-->>APIClient: *http.Response
-    Note over APIClient: Generated decode → typed result<br/>or *GenericOpenAPIError
-    APIClient-->>Service: *result, *http.Response, err
-    Service-->>Facade: *ListProjectsResponse, *http.Response, err
-    Note over Facade: WrapAPIError(op, err, resp)
-    Facade-->>Caller: *ListProjectsResponse, error
-```
+Explorable version: [`diagrams/request-lifecycle.html`](diagrams/request-lifecycle.html)
+(GitHub shows its source: download or clone and open it locally). See the
+[diagram index](diagrams/README.md) for the other diagrams.
+
+The diagram uses the terms resource façade, escape hatch, auth source and
+Management API as defined under [System Context](#system-context), and
+these:
+
+- **Caller**: application code or `lkctl`, calling a façade method.
+- **Generated service**: one of the `*APIService` types of the generated
+  SDK, reachable on the client as `c.ProjectAPI`, `c.WarehouseAPI`, ….
+  Each operation is a request builder ending in `Execute()`, which returns
+  the typed result, the `*http.Response` and an error.
+- **API client**: the generated `managementv1.APIClient`. It builds the
+  request from the base URL (`prepareRequest`) and sends it through its
+  HTTP client (`callAPI`).
+- **Retrying client**: the retrying HTTP client, the `http.Client` the
+  client hands the API client, from `retryablehttp`. It repeats a failed
+  attempt.
+- **`AuthRoundTripper`**: `core.AuthRoundTripper`, the transport below the
+  retrying client that sets the `Authorization` header from the auth
+  source.
+- **Typed result**: the decoded response model, such as
+  `*managementv1.ListProjectsResponse`.
+- **`GenericOpenAPIError`**: the generated client's error for a status of
+  300 or more, or a body it cannot decode.
+- **`APIError`**: `*client.APIError`, the one error type the façades
+  return for an error status.
 
 Key points:
 
@@ -139,21 +147,26 @@ Key points:
   per-request.
 - **Auth is per-request.** `AuthSource.Init` runs once during
   `NewWithAuthSource`; `AuthSource.Header` is then called by
-  `AuthRoundTripper` on every request. `OAuthClientCredentialsAuthSource` defers cache
-  and renewal logic to `golang.org/x/oauth2`, so token refresh is
+  `AuthRoundTripper` on every attempt, including retries. A header the
+  caller already set is kept. `OAuthClientCredentialsAuthSource` defers
+  cache and renewal logic to `golang.org/x/oauth2`, so token refresh is
   transparent.
 - **Retries are decoupled from the generated client.** `retryablehttp`
-  retries `429` and any `>= 500` status with linear-jitter backoff
-  (defaults: 100 ms–400 ms, max 5 retries). Disable with `WithoutRetries()`
-  or tune with `WithRetryMax`, `WithRetryWait`, `WithCheckRetry`,
-  `WithBackoff`, and `WithErrorHandler`.
-- **One error model.** The generated client turns non-2xx responses into
-  `*managementv1.GenericOpenAPIError`. Façades pass it and the
-  `*http.Response` to `client.WrapAPIError`, which returns a
-  `*client.APIError` carrying the status code, the raw body, and the
-  decoded error model, and unwrapping to the generated error. Transport
-  and context errors stay wrapped with `%w`. See
-  [PACKAGES.md](PACKAGES.md#errors).
+  retries transport errors, `429`, and any `>= 500` status except `501`,
+  with exponential backoff (library defaults: 1 s–30 s, at most 4
+  retries). Once the retries are used up, the default error handler,
+  `retryablehttp.PassthroughErrorHandler`, hands back the last response
+  or transport error. Disable with `WithoutRetries()` or tune with
+  `WithRetryMax`, `WithRetryWait`, `WithCheckRetry`, `WithBackoff`, and
+  `WithErrorHandler`.
+- **One error model.** The generated client turns a status of 300 or more
+  into a `GenericOpenAPIError`. Façades pass it and the `*http.Response` to
+  `client.WrapAPIError`, which returns an `APIError` carrying the status
+  code, the raw body, and the decoded error model, and unwrapping to the
+  generated error. A `429` or `5xx` that is still failing once the retries
+  are used up becomes an `APIError` too. Transport and context errors stay
+  wrapped with `%w`, and so does a `2xx` response whose body fails to
+  decode. See [PACKAGES.md](PACKAGES.md#errors).
 
 ## Bootstrap Flow
 
@@ -187,9 +200,45 @@ c.Warehouses.List(ctx, nil, client.WithProject(projectID)) // x-project-id: <pro
 c.Warehouses.List(ctx, nil)                                // no project sent
 ```
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="diagrams/project-scoping-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="diagrams/project-scoping-light.svg">
+  <img alt="Project scoping: a project-scoped call first checks a deprecated body project field, which fails with ErrProjectIDConflict when it differs from WithProject and is otherwise moved to WithProject or dropped; a call that requires a project fails with ErrProjectRequired when none is given; WithProject with an empty id fails with ErrEmptyProjectID; WithProject with an id sends the x-project-id header and the server uses the named project; no option sends no project, and the server uses its default project, or answers 400 ProjectIdMissing when the default project is disabled" src="diagrams/project-scoping-light.svg">
+</picture>
+
+Explorable version: [`diagrams/project-scoping.html`](diagrams/project-scoping.html)
+(GitHub shows its source: download or clone and open it locally). See the
+[diagram index](diagrams/README.md) for the other diagrams.
+
+The diagram uses the terms resource façade and Lakekeeper server as
+defined under [System Context](#system-context), `APIError` as defined under
+[Request Lifecycle](#request-lifecycle), project and default project as
+defined in [AUTHORIZATION.md](AUTHORIZATION.md#the-lakekeeper-authorization-model),
+and these:
+
+- **Project scoping**: how a façade call names the project it runs in.
+- **Project-scoped call**: a call to a façade method that takes a
+  trailing `...client.CallOption`, because its endpoint accepts the
+  `x-project-id` header.
+- **`WithProject`**: `client.WithProject(id)`, the call option that names
+  the project. The project it names is the **named project**.
+- **`x-project-id` header**: the HTTP header that carries the project.
+  It is the only way the façades send one.
+- **Deprecated body field**: the `project-id` field that
+  `CreateWarehouseRequest`, `CreateRoleRequest` and `SearchRoleRequest`
+  still carry.
+- **`ErrProjectIDConflict`, `ErrProjectRequired`, `ErrEmptyProjectID`**:
+  the client's errors for a call it rejects before sending anything;
+  match them with `errors.Is`.
+- **`ProjectIdMissing`**: the server's 400 error when a call names no
+  project and the operator disabled the default project. The façade
+  returns it as an `APIError`.
+
+What each case sends:
+
 - With `WithProject`, the façade sends the `x-project-id` header.
 - Without it, the façade sends no project. The server then applies its
-  **default project**: the nil UUID unless the operator set
+  default project: the nil UUID unless the operator set
   `LAKEKEEPER__DEFAULT_PROJECT_ID`. If the operator disabled the default
   project, the server answers 400 `ProjectIdMissing`.
 - `WithProject("")` is not "no project": the call fails with

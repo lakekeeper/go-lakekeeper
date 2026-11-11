@@ -15,44 +15,52 @@ the canonical model.
 
 ## The Lakekeeper authorization model
 
-Lakekeeper organises resources in a hierarchy. Permissions granted on a
-parent cascade to children unless overridden.
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="diagrams/domain-model-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="diagrams/domain-model-light.svg">
+  <img alt="Domain model: the server contains users and projects and picks the default project, which is a project; a project contains warehouses and roles; users and roles are principals; the server, projects, warehouses and roles are resources; an assignment gives one relation to one principal on one resource" src="diagrams/domain-model-light.svg">
+</picture>
 
-```mermaid
-graph TD
-    Server[Server]
-    Project[Project]
-    Warehouse[Warehouse]
-    Namespace[Namespace]
-    Table[Table]
-    View[View]
-    Role[Role]
+Explorable version: [`diagrams/domain-model.html`](diagrams/domain-model.html)
+(GitHub shows its source: download or clone and open it locally). See the
+[diagram index](diagrams/README.md) for the other diagrams.
 
-    Server --> Project
-    Project --> Warehouse
-    Project -.->|owns| Role
-    Warehouse --> Namespace
-    Namespace --> Namespace
-    Namespace --> Table
-    Namespace --> View
-```
+The diagram shows the four kinds of resource the permission façades
+cover. Namespaces, tables and views are resources too, below warehouses,
+but have no façade yet. The diagram uses these terms:
 
-**Principals.** Two kinds: **users** (human or application identities,
-provisioned via `lkctl user create` / `c.Users.Create`) and **roles**
-(first-class objects scoped to a project). Users can be assigned to
-roles, and roles can themselves be granted permissions on resources —
-so a single grant on a role propagates to every member.
+- **Server**: the [Lakekeeper server](ARCHITECTURE.md#system-context) as a
+  resource (`c.Server`). It holds users and
+  projects, and its `Info` names the default project.
+- **Project**: a container for warehouses and roles (`c.Projects`). A call
+  names one with `client.WithProject`.
+- **Default project**: the project the server uses when a call names no
+  project. The server picks it, not the SDK.
+- **Warehouse**: an Iceberg storage location in one project
+  (`c.Warehouses`).
+- **User**: a human or application identity (`c.Users`). A user belongs
+  to the server, never to a project; it only holds assignments there.
+- **Role**: a named group of principals in one project (`c.Roles`). A
+  role is both a principal and a resource: it is given assignments on
+  other resources, and users and other roles are assigned to it with the
+  `assignee` relation, so they get what the role was given.
+- **Principal**: who an assignment is given to, a user or a role
+  (`permissions.PrincipalUser`, `permissions.PrincipalRole`).
+- **Resource**: what an assignment is on: the server, a project, a
+  warehouse or a role. Each kind has one permission façade,
+  `c.Permissions.Server`, `.Projects`, `.Warehouses` or `.Roles`, with
+  `Access`, `Assignments`, `Grant` and `Revoke`.
+- **Relation**: what an assignment gives, for example `select` or
+  `ownership`. Each kind of resource has its own set; see
+  [Common assignment values](#common-assignment-values).
+- **Assignment**: one relation given to one principal on one resource.
+  It goes over the wire as `{"type": <relation>, "user"|"role": <id>}`;
+  the resource is the one the façade call names. Granting writes
+  assignments, revoking deletes them.
 
-**Roles.** A role is its own resource scoped to a project, with two
-relations: `ownership` (manage the role itself) and `assignee` (members
-who inherit its grants). A project can hold many independent roles.
-
-**Grants and assignments.** A grant binds a principal (user or role)
-to a relation — for example `select` — on a resource — for example a
-specific warehouse. Each grant goes over the wire as
-`{"type": <relation>, "user"|"role": <id>}` and is what
-`lkctl … grant` and the SDK's `Update*Assignments` calls produce.
-Effective access cascades through the resource hierarchy above.
+Permissions given on a parent resource cascade to its children (server,
+project, warehouse, then namespaces, tables and views) unless
+overridden.
 
 **Pluggable backend.** Lakekeeper's Authorizer is configurable on the
 server side — current options are AllowAll (dev/test), OpenFGA, and
@@ -82,46 +90,51 @@ for the canonical list.
 
 ### Server (`ServerAssignment`)
 
-| Relation | Grants |
+| Relation | Gives |
 |---|---|
 | `admin` | Full server-level administration |
 | `operator` | Bootstrap rights and project creation |
 
 ### Project (`ProjectAssignment`)
 
-| Relation | Grants |
+| Relation | Gives |
 |---|---|
 | `project_admin` | Full administration of the project |
 | `security_admin` | Manage roles and permissions inside the project |
 | `data_admin` | Manage warehouses and their contents |
 | `role_creator` | Create roles within the project |
+| `tag_creator` | Not described in the API spec |
 | `describe` | Read project metadata |
 | `select` | Read access (cascades to project resources) |
 | `create` | Create child resources |
+| `write` | Not described in the API spec |
 | `modify` | Modify project resources |
 
 ### Warehouse (`WarehouseAssignment`)
 
-| Relation | Grants |
+| Relation | Gives |
 |---|---|
 | `ownership` | Full control of the warehouse |
-| `manage_grants` | Modify warehouse-level grants |
+| `manage_grants` | Modify warehouse-level assignments |
 | `pass_grants` | Re-grant existing access to others |
 | `describe` | Read warehouse metadata |
 | `select` | Read tables/views in the warehouse |
 | `create` | Create namespaces, tables, views |
+| `write` | Not described in the API spec |
 | `modify` | Modify warehouse resources |
+| `manage_tags` | Not described in the API spec |
 
 ### Role (`RoleAssignment`)
 
-| Relation | Grants |
+| Relation | Gives |
 |---|---|
-| `ownership` | Manage the role itself (rename, delete, edit grants) |
-| `assignee` | Membership — users/roles with `assignee` inherit the role's grants |
+| `ownership` | Manage the role itself (rename, delete, edit its assignments) |
+| `assignee` | Membership — users/roles with `assignee` get what the role was given |
 
-Namespace, Table, and View assignments mirror the warehouse set
-(`ownership`, `manage_grants`, `pass_grants`, `describe`, `select`,
-`create`, `modify`) at the relevant scope; see the corresponding
+Namespace assignments use the warehouse set (`ownership`,
+`manage_grants`, `pass_grants`, `describe`, `select`, `create`, `write`,
+`modify`, `manage_tags`) on their own resource; Table and View
+assignments use the same set without `create`. See the corresponding
 `model_<resource>_assignment*.go` files.
 
 ## Granting and revoking from `lkctl`
@@ -135,7 +148,7 @@ mechanics:
 - `--assignments` — repeatable / comma-separated relations from the
   tables above. Required.
 - `--user` / `--role` (singular) — only on `access`, mutually exclusive,
-  scopes the access check to a specific principal.
+  checks that principal's access instead of your own.
 
 For per-resource syntax see [CLI.md](CLI.md#command-tree) — the
 [`server`](CLI.md#lkctl-server),
@@ -236,7 +249,7 @@ resp, err := c.Permissions.Warehouses.Assignments(ctx, warehouseID, nil)
 
 ### Role
 
-Add a user to a role (so they inherit its grants) by writing an
+Add a user to a role (so they get what the role was given) by writing an
 `assignee` assignment:
 
 ```go
@@ -259,8 +272,8 @@ To revoke instead, call `Revoke` with the same assignments.
 
 **CLI.** `<resource> access [ID]` shows the actions allowed on a
 resource. With no flag it reports the current principal; `--user` or
-`--role` (mutually exclusive) scope the check to another principal.
-`<resource> assignments [ID]` lists the raw grants on the resource.
+`--role` (mutually exclusive) check another principal instead.
+`<resource> assignments [ID]` lists the raw assignments on the resource.
 
 ```sh
 lkctl warehouse access      <WAREHOUSE-ID>
@@ -276,7 +289,7 @@ resource types.
 // Effective actions for the current principal on a warehouse.
 resp, err := c.Permissions.Warehouses.Access(ctx, warehouseID, nil)
 
-// Or scope to a specific principal:
+// Or check a specific principal:
 resp, err = c.Permissions.Warehouses.Access(ctx, warehouseID,
     &client.GetWarehouseAccessByIDOptions{PrincipalUser: userID})
 ```
@@ -330,7 +343,7 @@ func provision(ctx context.Context, c *client.Client, projectID, userID, warehou
         return err // already "create role: <status>: <body>"
     }
 
-    // 4. Add user as assignee of the role.
+    // 4. Give the user the assignee relation on the role.
     roleAssign, err := permissions.BuildAssignment[managementv1.RoleAssignment](
         "assignee", permissions.PrincipalUser, userID,
     )
@@ -368,7 +381,7 @@ func provision(ctx context.Context, c *client.Client, projectID, userID, warehou
 ## See also
 
 - [AUTHENTICATION.md](AUTHENTICATION.md) — choose an auth flow before
-  reaching for grants
+  reaching for assignments
 - [PACKAGES.md `pkg/permissions`](PACKAGES.md#pkgpermissions) —
   `BuildAssignment` / `DescribeAssignment` reference
 - [CLI.md](CLI.md#command-tree) — full per-resource `grant` / `revoke`

@@ -1,0 +1,245 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "System context: go-lakekeeper",
+    "output": ".archify/architecture-system-context-20261111-122430/system-context.html",
+    "quality_profile": "showcase",
+    "locale": "en",
+    "repository": {
+      "url": "git@github.com:lakekeeper/go-lakekeeper.git",
+      "provider": "github",
+      "link_mode": "local-only",
+      "revision": "fb689d0edce8a3b59c22af0bf856f9d14c60bbb3"
+    },
+    "legend": {
+      "entries": {
+        "frontend": { "label": "CLI" },
+        "backend": { "label": "SDK code" },
+        "external": { "label": "Your program or a library" },
+        "security": { "label": "Identity and permission checks" },
+        "cloud": { "label": "Lakekeeper server API" },
+        "database": { "label": "Server dependency" }
+      }
+    }
+  },
+  "components": [
+    {
+      "id": "lkctl",
+      "type": "frontend",
+      "label": "lkctl",
+      "sublabel": "cmd/lkctl",
+      "tag": "CLI",
+      "pos": [625, 40],
+      "size": [150, 64],
+      "sources": [
+        { "path": "cmd/lkctl/commands/client.go", "line": 69, "end_line": 88, "label": "newClient builds a *client.Client" },
+        { "path": ".golangci.yml", "line": 46, "end_line": 64, "label": "forbidigo: cmd/ calls façades only" }
+      ]
+    },
+    {
+      "id": "app",
+      "type": "external",
+      "label": "Application code",
+      "sublabel": "your Go program",
+      "pos": [40, 200],
+      "size": [150, 64],
+      "sources": [
+        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 1, "end_line": 15, "label": "single import path" }
+      ]
+    },
+    {
+      "id": "umbrella",
+      "type": "backend",
+      "label": "Umbrella package",
+      "sublabel": "pkg/lakekeeper",
+      "pos": [280, 200],
+      "size": [150, 64],
+      "sources": [
+        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 16, "end_line": 35, "label": "what it re-exports" },
+        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 50, "end_line": 87, "label": "constructors and Client alias" }
+      ]
+    },
+    {
+      "id": "client",
+      "type": "backend",
+      "label": "Client",
+      "sublabel": "pkg/client + pkg/core",
+      "tag": "resource façades · auth · retries",
+      "pos": [530, 200],
+      "size": [340, 64],
+      "sources": [
+        { "path": "pkg/client/client.go", "line": 41, "end_line": 61, "label": "Client: façades + embedded APIClient" },
+        { "path": "pkg/client/client.go", "line": 219, "end_line": 241, "label": "auth round-tripper under retries" },
+        { "path": "pkg/core/transport.go", "line": 8, "end_line": 38, "label": "AuthRoundTripper sets the header" }
+      ]
+    },
+    {
+      "id": "iceberg",
+      "type": "external",
+      "label": "iceberg-go",
+      "sublabel": "apache/iceberg-go",
+      "tag": "rest.Catalog",
+      "pos": [970, 200],
+      "size": [150, 64],
+      "sources": [
+        { "path": "pkg/client/client.go", "line": 153, "end_line": 181, "label": "CatalogV1 delegates to iceberg-go" },
+        { "path": "go.mod", "line": 8, "end_line": 8, "label": "iceberg-go dependency" }
+      ]
+    },
+    {
+      "id": "sdk",
+      "type": "backend",
+      "label": "Generated SDK",
+      "sublabel": "pkg/apis/management/v1",
+      "pos": [550, 380],
+      "size": [150, 64],
+      "sources": [
+        { "path": "pkg/client/client.go", "line": 101, "end_line": 122, "label": "façades wrap the generated services" },
+        { "path": "pkg/apis/management/v1/client.go", "line": 312, "end_line": 335, "label": "callAPI sends through the client's HTTP client" }
+      ]
+    },
+    {
+      "id": "idp",
+      "type": "security",
+      "label": "Identity provider",
+      "sublabel": "OAuth2 token endpoint",
+      "pos": [730, 380],
+      "size": [150, 64],
+      "sources": [
+        { "path": "pkg/core/auth.go", "line": 84, "end_line": 105, "label": "client credentials token source" },
+        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 50, "end_line": 65, "label": "NewOAuthClientCredentials" },
+        { "path": "docker-compose.yml", "line": 156, "end_line": 170, "label": "Keycloak in the compose stack" }
+      ]
+    },
+    {
+      "id": "mgmt",
+      "type": "cloud",
+      "label": "Management API",
+      "sublabel": "/management/v1",
+      "pos": [550, 560],
+      "size": [150, 64],
+      "sources": [
+        { "path": "pkg/client/client.go", "line": 23, "end_line": 25, "label": "management path prefix" },
+        { "path": "docker-compose.yml", "line": 6, "end_line": 25, "label": "Lakekeeper server" }
+      ]
+    },
+    {
+      "id": "catalog",
+      "type": "cloud",
+      "label": "Iceberg REST Catalog",
+      "sublabel": "/catalog",
+      "pos": [970, 560],
+      "size": [150, 64],
+      "sources": [
+        { "path": "pkg/client/client.go", "line": 175, "end_line": 180, "label": "catalog URL and warehouse" }
+      ]
+    },
+    {
+      "id": "secrets",
+      "type": "database",
+      "label": "Secret storage",
+      "sublabel": "optional",
+      "pos": [340, 740],
+      "size": [150, 64],
+      "sources": [
+        { "path": "docker-compose.yml", "line": 12, "end_line": 12, "label": "secrets encrypted in Postgres here" }
+      ]
+    },
+    {
+      "id": "metadata",
+      "type": "database",
+      "label": "Metadata store",
+      "sublabel": "PostgreSQL",
+      "pos": [550, 740],
+      "size": [150, 64],
+      "sources": [
+        { "path": "docker-compose.yml", "line": 12, "end_line": 14, "label": "PG database URLs" },
+        { "path": "docker-compose.yml", "line": 63, "end_line": 66, "label": "db service" }
+      ]
+    },
+    {
+      "id": "authz",
+      "type": "security",
+      "label": "Authorization backend",
+      "sublabel": "OpenFGA",
+      "pos": [760, 740],
+      "size": [150, 64],
+      "sources": [
+        { "path": "docker-compose.yml", "line": 15, "end_line": 16, "label": "AUTHZ_BACKEND=openfga" },
+        { "path": "docker-compose.yml", "line": 105, "end_line": 112, "label": "openfga service" }
+      ]
+    },
+    {
+      "id": "objects",
+      "type": "database",
+      "label": "Object storage",
+      "sublabel": "S3 / GCS / ADLS",
+      "pos": [970, 740],
+      "size": [150, 64],
+      "sources": [
+        { "path": "pkg/storage/profile/profile.go", "line": 1, "end_line": 29, "label": "S3, GCS and ADLS profiles" },
+        { "path": "docker-compose.yml", "line": 141, "end_line": 146, "label": "MinIO in the compose stack" }
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Lakekeeper server and its dependencies (the SDK runs none of it)",
+      "wraps": ["mgmt", "catalog", "secrets", "metadata", "authz", "objects"]
+    }
+  ],
+  "connections": [
+    { "id": "app-umbrella", "from": "app", "to": "umbrella", "label": "imports", "variant": "emphasis" },
+    { "id": "umbrella-client", "from": "umbrella", "to": "client", "label": "re-exports", "variant": "emphasis" },
+    { "id": "lkctl-client", "from": "lkctl", "to": "client", "label": "façades only" },
+    { "id": "client-iceberg", "from": "client", "to": "iceberg", "label": "CatalogV1" },
+    { "id": "client-sdk", "from": "client", "to": "sdk", "label": "façade calls", "variant": "emphasis" },
+    { "id": "client-idp", "from": "client", "to": "idp", "label": "fetch token", "variant": "security" },
+    { "id": "sdk-mgmt", "from": "sdk", "to": "mgmt", "label": "HTTPS + bearer token", "variant": "emphasis" },
+    { "id": "iceberg-catalog", "from": "iceberg", "to": "catalog", "label": "Iceberg REST" },
+    { "id": "mgmt-secrets", "from": "mgmt", "to": "secrets", "label": "secrets" },
+    { "id": "mgmt-metadata", "from": "mgmt", "to": "metadata", "label": "metadata" },
+    { "id": "mgmt-authz", "from": "mgmt", "to": "authz", "label": "permission checks" },
+    { "id": "catalog-objects", "from": "catalog", "to": "objects", "label": "table files" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Inside the client",
+      "items": [
+        "Resource façades: Warehouses, Projects, Roles, Users, Server, Permissions; one call per operation, errors as *client.APIError",
+        "The auth round-tripper sets the Authorization header on every request; retryablehttp retries 429 and 5xx above it",
+        "The generated APIClient is embedded as the escape hatch for operations without a façade"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Layer rule",
+      "items": [
+        "lkctl reaches the Management API only through the resource façades",
+        "A forbidigo rule in .golangci.yml rejects cmd/ references to the generated services",
+        "An operation without a façade gets a façade method first"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Authentication",
+      "items": [
+        "Three auth sources: OAuth2 client credentials, static access token, Kubernetes service account token",
+        "Only client credentials fetches a token from the identity provider; Lakekeeper validates tokens against it",
+        "CatalogV1 passes the same auth source's token to iceberg-go"
+      ]
+    },
+    {
+      "dot": "slate",
+      "title": "Server side",
+      "items": [
+        "The SDK is a client: it runs none of the server-side components",
+        "make test-integration brings them up with docker-compose: Lakekeeper, PostgreSQL, OpenFGA, MinIO and Keycloak",
+        "Secret storage is optional: by default Lakekeeper keeps secrets encrypted in PostgreSQL"
+      ]
+    }
+  ]
+}
