@@ -3,14 +3,14 @@
   "diagram_type": "architecture",
   "meta": {
     "title": "Package layers: go-lakekeeper",
-    "output": ".archify/architecture-package-layers-20261111-090523/package-layers.html",
+    "output": ".archify/architecture-package-layers-20261111-092410/package-layers.html",
     "quality_profile": "showcase",
     "locale": "en",
     "repository": {
       "url": "git@github.com:lakekeeper/go-lakekeeper.git",
       "provider": "github",
       "link_mode": "local-only",
-      "revision": "e15656b89fada289b5dd390e7cb2b9fdfbdbfef4"
+      "revision": "a365d62bc4b9bfbeb8eb36158c6f362d0fcc51b8"
     },
     "legend": {
       "entries": {

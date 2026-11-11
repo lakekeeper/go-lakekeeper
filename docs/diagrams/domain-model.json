@@ -3,14 +3,14 @@
   "diagram_type": "class",
   "meta": {
     "title": "Domain model: server, projects and assignments",
-    "output": ".archify/class-domain-model-20261111-084038/domain-model.html",
+    "output": ".archify/class-domain-model-20261111-092401/domain-model.html",
     "quality_profile": "showcase",
     "locale": "en",
     "repository": {
       "url": "git@github.com:lakekeeper/go-lakekeeper.git",
       "provider": "github",
       "link_mode": "local-only",
-      "revision": "e348a91678710f585dfebfc60d9446aa21752e69"
+      "revision": "a365d62bc4b9bfbeb8eb36158c6f362d0fcc51b8"
     }
   },
   "layout": {

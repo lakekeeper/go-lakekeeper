@@ -946,29 +946,29 @@ svg[data-node-ui][data-preset="editorial"] :is([data-graph-role="structural-fram
         <!-- Legend -->
         <g data-legend="">
           <text x="40" y="856" class="t-primary" font-size="12" font-weight="650">Legend</text>
-          <g data-legend-semantic-kind="frontend" data-legend-x="40" data-legend-baseline="876" data-legend-width="93">
+          <g data-legend-semantic-kind="frontend" data-legend-x="40" data-legend-baseline="876" data-legend-width="62">
             <rect x="40" y="867" width="16" height="10" rx="2.5" class="c-frontend" stroke-width="1"/>
-            <text x="62" y="876" class="t-muted" font-size="10" font-weight="500">Frontend</text>
+            <text x="62" y="876" class="t-muted" font-size="10" font-weight="500">CLI</text>
           </g>
-          <g data-legend-semantic-kind="backend" data-legend-x="155" data-legend-baseline="876" data-legend-width="87">
-            <rect x="155" y="867" width="16" height="10" rx="2.5" class="c-backend" stroke-width="1"/>
-            <text x="177" y="876" class="t-muted" font-size="10" font-weight="500">Backend</text>
+          <g data-legend-semantic-kind="backend" data-legend-x="124" data-legend-baseline="876" data-legend-width="93">
+            <rect x="124" y="867" width="16" height="10" rx="2.5" class="c-backend" stroke-width="1"/>
+            <text x="146" y="876" class="t-muted" font-size="10" font-weight="500">SDK code</text>
           </g>
-          <g data-legend-semantic-kind="database" data-legend-x="264" data-legend-baseline="876" data-legend-width="93">
-            <rect x="264" y="867" width="16" height="10" rx="2.5" class="c-database" stroke-width="1"/>
-            <text x="286" y="876" class="t-muted" font-size="10" font-weight="500">Database</text>
+          <g data-legend-semantic-kind="database" data-legend-x="239" data-legend-baseline="876" data-legend-width="149">
+            <rect x="239" y="867" width="16" height="10" rx="2.5" class="c-database" stroke-width="1"/>
+            <text x="261" y="876" class="t-muted" font-size="10" font-weight="500">Server dependency</text>
           </g>
-          <g data-legend-semantic-kind="cloud" data-legend-x="379" data-legend-baseline="876" data-legend-width="74">
-            <rect x="379" y="867" width="16" height="10" rx="2.5" class="c-cloud" stroke-width="1"/>
-            <text x="401" y="876" class="t-muted" font-size="10" font-weight="500">Cloud</text>
+          <g data-legend-semantic-kind="cloud" data-legend-x="410" data-legend-baseline="876" data-legend-width="174">
+            <rect x="410" y="867" width="16" height="10" rx="2.5" class="c-cloud" stroke-width="1"/>
+            <text x="432" y="876" class="t-muted" font-size="10" font-weight="500">Lakekeeper server API</text>
           </g>
-          <g data-legend-semantic-kind="security" data-legend-x="475" data-legend-baseline="876" data-legend-width="93">
-            <rect x="475" y="867" width="16" height="10" rx="2.5" class="c-security" stroke-width="1"/>
-            <text x="497" y="876" class="t-muted" font-size="10" font-weight="500">Security</text>
+          <g data-legend-semantic-kind="security" data-legend-x="606" data-legend-baseline="876" data-legend-width="229">
+            <rect x="606" y="867" width="16" height="10" rx="2.5" class="c-security" stroke-width="1"/>
+            <text x="628" y="876" class="t-muted" font-size="10" font-weight="500">Identity and permission checks</text>
           </g>
-          <g data-legend-semantic-kind="external" data-legend-x="590" data-legend-baseline="876" data-legend-width="93">
-            <rect x="590" y="867" width="16" height="10" rx="2.5" class="c-external" stroke-width="1"/>
-            <text x="612" y="876" class="t-muted" font-size="10" font-weight="500">External</text>
+          <g data-legend-semantic-kind="external" data-legend-x="857" data-legend-baseline="876" data-legend-width="198">
+            <rect x="857" y="867" width="16" height="10" rx="2.5" class="c-external" stroke-width="1"/>
+            <text x="879" y="876" class="t-muted" font-size="10" font-weight="500">Your program or a library</text>
           </g>
         </g>
       </svg>
