@@ -36,7 +36,7 @@ func TestNewUserCmdHasSubcommands(t *testing.T) {
 		got = append(got, sub.Name())
 	}
 	sort.Strings(got)
-	assert.Equal(t, []string{"create", "delete", "get", "list"}, got)
+	assert.Equal(t, []string{"access", "create", "delete", "get", "list", "roles", "search"}, got)
 }
 
 func TestUserList_FlagsReachQuery(t *testing.T) {
@@ -151,4 +151,110 @@ func TestUserDelete_SendsDelete(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "/management/v1/user/"+userTestID, reqs.Last(t).Path)
 	assert.Equal(t, "User "+userTestID+" deleted\n", out)
+}
+
+func TestUserSearch_SendsTextAndPrintsMatches(t *testing.T) {
+	t.Parallel()
+	mux, baseURL := testutil.NewServer(t)
+	reqs := testutil.Respond(t, mux, "POST /management/v1/search/user", http.StatusOK,
+		`{"users":[{"id":"`+userTestID+`","name":"Peter Cold","email":"peter@example.com","user-type":"human"}]}`)
+
+	out, err := runLkctl(t, baseURL, "user", "search", "peter")
+
+	require.NoError(t, err)
+	assert.JSONEq(t, `{"search":"peter"}`, string(reqs.Last(t).Body))
+	assert.Contains(t, out, "USER TYPE")
+	assert.Contains(t, out, userTestID)
+	assert.Contains(t, out, "peter@example.com")
+}
+
+const userRolesTestBody = `{"roles":[{"id":"0198618c-5be8-7a82-a0b9-1076c9dd12f0",
+  "ident":"lakekeeper~0198618c-5be8-7a82-a0b9-1076c9dd12f0","name":"data-eng"}],"next-page-token":"tok-3"}`
+
+func TestUserRoles_FlagsReachRequest(t *testing.T) {
+	t.Parallel()
+	for name, tc := range map[string]struct {
+		pattern string
+		extra   []string
+	}{
+		"direct":     {pattern: "GET /management/v1/user/{id}/roles"},
+		"transitive": {pattern: "GET /management/v1/user/{id}/roles/transitive", extra: []string{"--transitive"}},
+	} {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			mux, baseURL := testutil.NewServer(t)
+			reqs := testutil.Respond(t, mux, tc.pattern, http.StatusOK, userRolesTestBody)
+
+			args := append([]string{"user", "roles", userTestID, "-p", "proj-1", "--limit", "25", "--token", "tok-2"}, tc.extra...)
+			out, err := runLkctl(t, baseURL, args...)
+
+			require.NoError(t, err)
+			sent := reqs.Last(t)
+			assert.Equal(t, url.Values{"pageSize": {"25"}, "pageToken": {"tok-2"}}, sent.Query)
+			assert.Equal(t, "proj-1", sent.Header.Get("x-project-id"))
+			assert.Contains(t, out, "data-eng")
+			assert.Contains(t, out, "lakekeeper~0198618c-5be8-7a82-a0b9-1076c9dd12f0")
+			assert.Contains(t, out, "Next page token: tok-3")
+		})
+	}
+}
+
+func TestUserRoles_DefaultsSendNoProject(t *testing.T) {
+	t.Parallel()
+	mux, baseURL := testutil.NewServer(t)
+	reqs := testutil.Respond(t, mux, "GET /management/v1/user/{id}/roles", http.StatusOK, `{"roles":[]}`)
+
+	out, err := runLkctl(t, baseURL, "user", "roles", userTestID)
+
+	require.NoError(t, err)
+	sent := reqs.Last(t)
+	assert.Equal(t, url.Values{"pageSize": {"100"}}, sent.Query)
+	assert.NotContains(t, sent.Header, "X-Project-Id", "without -p the server's default project applies")
+	assert.NotContains(t, out, "Next page token")
+}
+
+func TestUserRoles_EmptyProjectIsRejected(t *testing.T) {
+	t.Parallel()
+	mux, baseURL := testutil.NewServer(t)
+	reqs := testutil.Respond(t, mux, "/", http.StatusOK, `{}`)
+
+	_, err := runLkctl(t, baseURL, "user", "roles", userTestID, "-p", "")
+
+	require.ErrorIs(t, err, client.ErrEmptyProjectID)
+	assert.Zero(t, reqs.Len())
+}
+
+func TestUserAccess_SendsPrincipalAndPrintsActions(t *testing.T) {
+	t.Parallel()
+	mux, baseURL := testutil.NewServer(t)
+	reqs := testutil.Respond(t, mux, "GET /management/v1/user/{id}/actions", http.StatusOK,
+		`{"allowed-actions":[{"action":"read"},{"action":"read_role_assignments"}]}`)
+
+	out, err := runLkctl(t, baseURL, "user", "access", userTestID, "--user", "oidc~bob")
+
+	require.NoError(t, err)
+	assert.Equal(t, url.Values{"principalUser": {"oidc~bob"}}, reqs.Last(t).Query)
+	assert.Contains(t, out, "ALLOWED ACTIONS")
+	assert.Contains(t, out, "read\n")
+	assert.Contains(t, out, "read_role_assignments")
+}
+
+func TestUserAccess_NoActionsPrintsNoAccess(t *testing.T) {
+	t.Parallel()
+	mux, baseURL := testutil.NewServer(t)
+	testutil.Respond(t, mux, "GET /management/v1/user/{id}/actions", http.StatusOK, `{"allowed-actions":[]}`)
+
+	out, err := runLkctl(t, baseURL, "user", "access", userTestID)
+
+	require.NoError(t, err)
+	assert.Contains(t, out, "No access")
+}
+
+func TestUserAccess_UserAndRoleAreExclusive(t *testing.T) {
+	t.Parallel()
+	_, baseURL := testutil.NewServer(t)
+
+	_, err := runLkctl(t, baseURL, "user", "access", userTestID, "--user", "u", "--role", "r")
+
+	require.ErrorContains(t, err, "--user and --role are mutually exclusive")
 }

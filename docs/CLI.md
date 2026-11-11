@@ -277,10 +277,27 @@ lkctl user create kubernetes~... "Service Account" application --email me@exampl
 
 # Delete a user
 lkctl user delete <USER-ID>
+
+# Fuzzy-search users (closest matches only)
+lkctl user search peter
+
+# Roles a user is directly assigned to; --transitive adds roles reached
+# through role membership. Project-scoped: -p, else the default project
+lkctl user roles <USER-ID>
+lkctl user roles <USER-ID> --transitive -p <PROJECT-ID>
+
+# Allowed actions on a user (current user's view, or --user / --role)
+lkctl user access <USER-ID>
+lkctl user access <USER-ID> --role <ROLE-ID>
 ```
 
 `USERTYPE` is one of `human` or `application`. Use `--update` to upsert
 when the user already exists.
+
+`user search` returns only the server's closest matches; for an exhaustive
+name filter use `user list --name`. `user roles --transitive` works only when
+role assignments are catalog-managed; with OpenFGA the server answers
+`501 Not Implemented`.
 
 ### `lkctl version` / `lkctl whoami`
 
@@ -301,6 +318,8 @@ across the whole project, see [`lkctl role`](#lkctl-role)):
 lkctl user list --limit 10
 lkctl user list --limit 10 --token <next-page-token>
 ```
+
+`user roles` takes `--limit` and `--token` the same way, without `--name`.
 
 `project list` is not paginated: the server returns every project visible
 to the caller in one response.

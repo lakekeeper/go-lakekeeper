@@ -67,6 +67,14 @@ func TestWithProject_EmptyIDIsRejectedBeforeAnyRequest(t *testing.T) {
 			_, err := c.Roles.Search(ctx, managementv1.NewSearchRoleRequest("r"), empty)
 			return err
 		},
+		"Users.Roles": func(ctx context.Context, c *client.Client) error {
+			_, err := c.Users.Roles(ctx, "id", nil, empty)
+			return err
+		},
+		"Users.TransitiveRoles": func(ctx context.Context, c *client.Client) error {
+			_, err := c.Users.TransitiveRoles(ctx, "id", nil, empty)
+			return err
+		},
 		"Permissions.Projects.Access": func(ctx context.Context, c *client.Client) error {
 			_, err := c.Permissions.Projects.Access(ctx, nil, empty)
 			return err

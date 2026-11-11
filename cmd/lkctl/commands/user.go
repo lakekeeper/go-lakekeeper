@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -23,6 +24,9 @@ func newUserCmd(opts *clientOptions) *cobra.Command {
 	cmd.AddCommand(newUserGetCmd(opts))
 	cmd.AddCommand(newUserCreateCmd(opts))
 	cmd.AddCommand(newUserDeleteCmd(opts))
+	cmd.AddCommand(newUserSearchCmd(opts))
+	cmd.AddCommand(newUserRolesCmd(opts))
+	cmd.AddCommand(newUserAccessCmd(opts))
 
 	return cmd
 }
@@ -190,5 +194,157 @@ func newUserCreateCmd(opts *clientOptions) *cobra.Command {
 	cmd.Flags().StringVarP(&output, "output", "o", "text", "Output format. One of: json|text")
 	cmd.Flags().StringVar(&email, "email", "", "Email of the user")
 	cmd.Flags().BoolVar(&update, "update", false, "Update the user if it already exists")
+	return cmd
+}
+
+func newUserSearchCmd(opts *clientOptions) *cobra.Command {
+	var output string
+
+	cmd := &cobra.Command{
+		Use:   "search TEXT",
+		Short: "Fuzzy-search users",
+		Long: `Fuzzy-search users. The server searches with
+the first 64 characters of TEXT and returns only the closest matches, so
+an exact match may be missing; use "user list --name" for an exhaustive
+name filter.`,
+		Example: `  # Find users whose name is close to "peter"
+  lkctl user search peter`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := cmd.Context()
+			c, err := newClient(ctx, opts)
+			if err != nil {
+				return err
+			}
+
+			resp, err := c.Users.Search(ctx, managementv1.NewSearchUserRequest(args[0]))
+			if err != nil {
+				return err
+			}
+
+			switch output {
+			case "json":
+				return printJSON(cmd.OutOrStdout(), resp)
+			case "text":
+				return printSearchUsers(cmd.OutOrStdout(), resp.GetUsers()...)
+			default:
+				return fmt.Errorf("unknown output format: %s", output)
+			}
+		},
+	}
+
+	cmd.Flags().StringVarP(&output, "output", "o", "text", "Output format. One of: json|text")
+	return cmd
+}
+
+func newUserRolesCmd(opts *clientOptions) *cobra.Command {
+	var (
+		project    string
+		limit      int64
+		token      string
+		transitive bool
+		output     string
+	)
+
+	cmd := &cobra.Command{
+		Use:   "roles USERID",
+		Short: "List the roles a user is assigned to",
+		Long: `List the roles a user is directly assigned to, in one project.
+
+With --transitive, list the user's effective roles instead: the direct
+assignments plus every role reachable through role membership. The server
+supports --transitive only when assignments are catalog-managed; with an
+assignment-managing authorizer such as OpenFGA it answers 501 Not
+Implemented.`,
+		Example: `  # Roles a user is directly assigned to in the default project
+  lkctl user roles oidc~d223d88c-85b6-4859-b5c5-27f3825e47f6
+
+  # Effective roles in a given project
+  lkctl user roles oidc~d223d88c-85b6-4859-b5c5-27f3825e47f6 --transitive -p <PROJECT-ID>`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := cmd.Context()
+			c, err := newClient(ctx, opts)
+			if err != nil {
+				return err
+			}
+
+			list := c.Users.Roles
+			if transitive {
+				list = c.Users.TransitiveRoles
+			}
+			resp, err := list(ctx, args[0], &client.ListUserRolesOptions{
+				PageSize:  limit,
+				PageToken: token,
+			}, projectFlagOptions(cmd, project)...)
+			if err != nil {
+				return err
+			}
+
+			switch output {
+			case "json":
+				return printJSON(cmd.OutOrStdout(), resp)
+			case "text":
+				return printRoleMemberships(cmd.OutOrStdout(), resp.GetNextPageToken(), resp.GetRoles()...)
+			default:
+				return fmt.Errorf("unknown output format: %s", output)
+			}
+		},
+	}
+
+	addProjectFlag(cmd, &project)
+	cmd.Flags().Int64Var(&limit, "limit", 100, "Upper bound on the number of results returned to the client")
+	cmd.Flags().StringVar(&token, "token", "", "Pagination token")
+	cmd.Flags().BoolVar(&transitive, "transitive", false, "List effective roles, including those reached through role membership")
+	cmd.Flags().StringVarP(&output, "output", "o", "text", "Output format. One of: json|text")
+	return cmd
+}
+
+func newUserAccessCmd(opts *clientOptions) *cobra.Command {
+	var (
+		access accessOpts
+		output string
+	)
+
+	cmd := &cobra.Command{
+		Use:   "access USERID",
+		Short: "Get the allowed actions on a user",
+		Long:  "Get the allowed actions on a user. By default, the current user's access is returned.",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if access.user != "" && access.role != "" {
+				return errors.New("--user and --role are mutually exclusive")
+			}
+			ctx := cmd.Context()
+			c, err := newClient(ctx, opts)
+			if err != nil {
+				return err
+			}
+
+			resp, err := c.Users.Actions(ctx, args[0], &client.GetUserActionsOptions{
+				PrincipalUser: access.user,
+				PrincipalRole: access.role,
+			})
+			if err != nil {
+				return err
+			}
+
+			switch output {
+			case "json":
+				return printJSON(cmd.OutOrStdout(), resp)
+			case "text":
+				actions, err := userActionNames(resp.GetAllowedActions())
+				if err != nil {
+					return err
+				}
+				return printAllowedActions(cmd.OutOrStdout(), actions)
+			default:
+				return fmt.Errorf("unknown output format: %s", output)
+			}
+		},
+	}
+
+	addAccessFlags(cmd, &access)
+	cmd.Flags().StringVarP(&output, "output", "o", "text", "Output format. One of: json|text")
 	return cmd
 }
