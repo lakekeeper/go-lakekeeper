@@ -721,8 +721,8 @@ svg[data-preset="editorial"] { --flow-halo-peak: 0.07; --flow-glow-peak: 0.28; -
           <rect x="553.5666666666667" y="530" width="124.19999999999999" height="18" rx="3" class="c-mask"/>
           <text x="615.6666666666667" y="540" class="t-muted" font-size="11" text-anchor="middle">response or error</text>
         </g>
-        <rect data-graph-role="message-note-background" x="561.5" y="557.6" width="113.2" height="27.399999999999977" rx="2" class="c-mask" pointer-events="none"/>
-        <text x="563.5" y="568" class="t-muted" font-size="7"><tspan x="563.5" dy="0">Retries used up: error, no</tspan><tspan x="563.5" dy="11">response</tspan></text>
+        <rect data-graph-role="message-note-background" x="561.5" y="557.6" width="109" height="27.399999999999977" rx="2" class="c-mask" pointer-events="none"/>
+        <text x="563.5" y="568" class="t-muted" font-size="7"><tspan x="563.5" dy="0">Retries used up: the last</tspan><tspan x="563.5" dy="11">response or error</tspan></text>
         </g>
 
         <g data-edge-from="apiclient" data-edge-to="service" data-edge-label="*http.Response" data-edge-key="9" data-edge-id="client-reply">
