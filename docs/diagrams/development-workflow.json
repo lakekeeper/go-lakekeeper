@@ -3,14 +3,14 @@
   "diagram_type": "workflow",
   "meta": {
     "title": "Development workflow: from edit to release",
-    "output": ".archify/workflow-development-workflow-20261111-092358/development-workflow.html",
+    "output": ".archify/workflow-development-workflow-20261111-093014/development-workflow.html",
     "quality_profile": "showcase",
     "locale": "en",
     "repository": {
       "url": "git@github.com:lakekeeper/go-lakekeeper.git",
       "provider": "github",
       "link_mode": "local-only",
-      "revision": "a365d62bc4b9bfbeb8eb36158c6f362d0fcc51b8"
+      "revision": "bbadd703dd8cf888b3369a764f5d06ee6168246b"
     },
     "legend": {
       "entries": {
