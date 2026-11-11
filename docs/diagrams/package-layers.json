@@ -1,0 +1,197 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Package layers: go-lakekeeper",
+    "output": ".archify/architecture-package-layers-20261111-090122/package-layers.html",
+    "quality_profile": "showcase",
+    "locale": "en",
+    "repository": {
+      "url": "git@github.com:lakekeeper/go-lakekeeper.git",
+      "provider": "github",
+      "link_mode": "local-only",
+      "revision": "023cfbe3529b9bda87a6f63751c9147111375984"
+    },
+    "legend": {
+      "entries": {
+        "frontend": { "label": "Entry point in this repo" },
+        "external": { "label": "Outside this module" },
+        "backend": { "label": "SDK package" },
+        "security": { "label": "Auth and transport" },
+        "cloud": { "label": "Lakekeeper server" }
+      }
+    }
+  },
+  "components": [
+    {
+      "id": "app",
+      "type": "external",
+      "label": "Application code",
+      "sublabel": "your Go program",
+      "pos": [40, 40],
+      "size": [200, 64],
+      "sources": [
+        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 1, "end_line": 15, "label": "single import path" }
+      ]
+    },
+    {
+      "id": "umbrella",
+      "type": "backend",
+      "label": "Umbrella package",
+      "sublabel": "pkg/lakekeeper",
+      "tag": "re-exports only",
+      "pos": [40, 200],
+      "size": [200, 324],
+      "sources": [
+        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 16, "end_line": 34, "label": "what it re-exports" },
+        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 36, "end_line": 47, "label": "imports" }
+      ]
+    },
+    {
+      "id": "perm",
+      "type": "backend",
+      "label": "Permissions helpers",
+      "sublabel": "pkg/permissions",
+      "pos": [480, 200],
+      "size": [220, 64],
+      "sources": [
+        { "path": "pkg/permissions/assignment.go", "line": 1, "end_line": 16, "label": "generic assignment helpers" }
+      ]
+    },
+    {
+      "id": "storage",
+      "type": "backend",
+      "label": "Storage helpers",
+      "sublabel": "pkg/storage/{profile,credential}",
+      "pos": [480, 330],
+      "size": [220, 64],
+      "sources": [
+        { "path": "pkg/storage/profile/profile.go", "line": 1, "end_line": 18, "label": "profile builders" },
+        { "path": "pkg/storage/credential/credential.go", "line": 1, "end_line": 20, "label": "credential builders" }
+      ]
+    },
+    {
+      "id": "facades",
+      "type": "backend",
+      "label": "Resource façades",
+      "sublabel": "pkg/client",
+      "tag": "Warehouses · Projects · Roles · …",
+      "pos": [480, 460],
+      "size": [220, 64],
+      "sources": [
+        { "path": "pkg/client/client.go", "line": 27, "end_line": 53, "label": "Client and its façades" },
+        { "path": "pkg/client/client.go", "line": 109, "end_line": 122, "label": "façades wrap generated services" },
+        { "path": "pkg/client/client.go", "line": 218, "end_line": 230, "label": "AuthRoundTripper from pkg/core" }
+      ]
+    },
+    {
+      "id": "lkctl",
+      "type": "frontend",
+      "label": "lkctl",
+      "sublabel": "cmd/lkctl",
+      "tag": "CLI · no façade yet? add its method first",
+      "pos": [940, 200],
+      "size": [220, 324],
+      "sources": [
+        { "path": "cmd/lkctl/commands/assignments.go", "line": 3, "end_line": 10, "label": "imports pkg/permissions" },
+        { "path": "cmd/lkctl/commands/warehouse.go", "line": 14, "end_line": 16, "label": "imports client and profile" },
+        { "path": ".golangci.yml", "line": 46, "end_line": 64, "label": "forbidigo: cmd/ calls façades only" }
+      ]
+    },
+    {
+      "id": "core",
+      "type": "security",
+      "label": "Core",
+      "sublabel": "pkg/core",
+      "tag": "AuthSource · AuthRoundTripper",
+      "pos": [40, 640],
+      "size": [200, 64],
+      "sources": [
+        { "path": "pkg/core/auth.go", "line": 19, "end_line": 33, "label": "AuthSource interface" },
+        { "path": "pkg/core/transport.go", "line": 11, "end_line": 16, "label": "AuthRoundTripper" }
+      ]
+    },
+    {
+      "id": "generated",
+      "type": "backend",
+      "label": "Generated SDK",
+      "sublabel": "pkg/apis/management/v1",
+      "tag": "managementv1 · never hand-edit",
+      "pos": [480, 640],
+      "size": [220, 64],
+      "sources": [
+        { "path": "pkg/apis/management/v1/client.go", "line": 45, "end_line": 60, "label": "APIClient and its services" },
+        { "path": "pkg/apis/management/v1/client.go", "line": 312, "end_line": 335, "label": "callAPI sends the request" },
+        { "path": ".golangci.yml", "line": 79, "end_line": 82, "label": "importas alias managementv1" }
+      ]
+    },
+    {
+      "id": "escape",
+      "type": "backend",
+      "label": "Escape hatch",
+      "sublabel": "pkg/client · embedded *APIClient",
+      "tag": "c.WarehouseAPI · c.TagAPI · …",
+      "pos": [940, 640],
+      "size": [220, 64],
+      "sources": [
+        { "path": "pkg/client/client.go", "line": 36, "end_line": 42, "label": "embedded *APIClient" }
+      ]
+    },
+    {
+      "id": "mgmt",
+      "type": "cloud",
+      "label": "Management API",
+      "sublabel": "/management/v1",
+      "pos": [480, 820],
+      "size": [220, 64],
+      "sources": [
+        { "path": "pkg/client/client.go", "line": 23, "end_line": 25, "label": "management path prefix" }
+      ]
+    }
+  ],
+  "connections": [
+    { "id": "app-umbrella", "from": "app", "to": "umbrella", "label": "imports", "variant": "emphasis" },
+    { "id": "umbrella-perm", "from": "umbrella", "to": "perm", "label": "re-exports" },
+    { "id": "umbrella-storage", "from": "umbrella", "to": "storage", "label": "re-exports", "route": "straight" },
+    { "id": "umbrella-facades", "from": "umbrella", "to": "facades", "label": "re-exports Client", "variant": "emphasis" },
+    { "id": "lkctl-perm", "from": "lkctl", "to": "perm", "label": "assignment helpers" },
+    { "id": "lkctl-storage", "from": "lkctl", "to": "storage", "label": "profile.AsS3 …" },
+    { "id": "lkctl-facades", "from": "lkctl", "to": "facades", "label": "only way to the API", "variant": "emphasis" },
+    { "id": "lkctl-escape", "from": "lkctl", "to": "escape", "label": "forbidden (forbidigo)", "variant": "security" },
+    { "id": "facades-generated", "from": "facades", "to": "generated", "label": "calls services", "variant": "emphasis" },
+    { "id": "facades-core", "from": "facades", "to": "core", "label": "AuthSource, AuthRoundTripper" },
+    { "id": "escape-generated", "from": "escape", "to": "generated", "label": "embeds *APIClient" },
+    { "id": "generated-mgmt", "from": "generated", "to": "mgmt", "label": "HTTPS", "variant": "emphasis" }
+  ],
+  "cards": [
+    {
+      "dot": "rose",
+      "title": "Layer rule",
+      "items": [
+        "lkctl reaches the Management API only through the resource façades",
+        "forbidigo in .golangci.yml rejects cmd/ references to Client.APIClient, Client.<X>API, NewAPIClient and *APIService",
+        "An operation without a façade gets a façade method in pkg/client first",
+        "lkctl still uses managementv1 model types for request bodies and results"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "Escape hatch",
+      "items": [
+        "Client embeds the generated *APIClient, so every generated service is a field on Client",
+        "Application code may use it for operations without a façade; lkctl may not",
+        "Wrap its errors with client.WrapAPIError to get the façades' error type"
+      ]
+    },
+    {
+      "dot": "slate",
+      "title": "Imports not drawn",
+      "items": [
+        "Umbrella → core and generated SDK (auth sources, model aliases)",
+        "lkctl → core, generated models, pkg/common, pkg/version",
+        "Client → pkg/version (User-Agent) and apache/iceberg-go (CatalogV1)",
+        "Storage helpers → generated models; pkg/permissions imports nothing from this module"
+      ]
+    }
+  ]
+}
