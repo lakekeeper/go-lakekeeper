@@ -137,7 +137,7 @@ these:
 - **`GenericOpenAPIError`**: the generated client's error for a status of
   300 or more, or a body it cannot decode.
 - **`APIError`**: `*client.APIError`, the one error type the façades
-  return for a failed response.
+  return for an error status.
 
 Key points:
 
@@ -154,17 +154,19 @@ Key points:
 - **Retries are decoupled from the generated client.** `retryablehttp`
   retries transport errors, `429`, and any `>= 500` status except `501`,
   with exponential backoff (library defaults: 1 s–30 s, at most 4
-  retries). Disable with `WithoutRetries()` or tune with `WithRetryMax`,
-  `WithRetryWait`, `WithCheckRetry`, `WithBackoff`, and
+  retries). Once the retries are used up, the default error handler,
+  `retryablehttp.PassthroughErrorHandler`, hands back the last response
+  or transport error. Disable with `WithoutRetries()` or tune with
+  `WithRetryMax`, `WithRetryWait`, `WithCheckRetry`, `WithBackoff`, and
   `WithErrorHandler`.
 - **One error model.** The generated client turns a status of 300 or more
   into a `GenericOpenAPIError`. Façades pass it and the `*http.Response` to
   `client.WrapAPIError`, which returns an `APIError` carrying the status
   code, the raw body, and the decoded error model, and unwrapping to the
-  generated error. Transport and context errors stay wrapped with `%w`, and
-  so does the error `retryablehttp` returns by default once its retries
-  are used up, because it then returns no response. See
-  [PACKAGES.md](PACKAGES.md#errors).
+  generated error. A `429` or `5xx` that is still failing once the retries
+  are used up becomes an `APIError` too. Transport and context errors stay
+  wrapped with `%w`, and so does a `2xx` response whose body fails to
+  decode. See [PACKAGES.md](PACKAGES.md#errors).
 
 ## Bootstrap Flow
 

@@ -286,8 +286,8 @@
         },
         {
           "path": "pkg/permissions/assignment.go",
-          "line": 42,
-          "end_line": 85,
+          "line": 51,
+          "end_line": 94,
           "label": "BuildAssignment"
         }
       ]

@@ -45,9 +45,9 @@
       "pos": [40, 340],
       "size": [200, 64],
       "sources": [
-        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 55, "end_line": 64, "label": "NewOAuthClientCredentials" },
-        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 72, "end_line": 78, "label": "NewK8sServiceAccount" },
-        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 131, "end_line": 132, "label": "New, NewWithAuthSource" }
+        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 56, "end_line": 65, "label": "NewOAuthClientCredentials" },
+        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 73, "end_line": 79, "label": "NewK8sServiceAccount" },
+        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 132, "end_line": 133, "label": "New, NewWithAuthSource" }
       ]
     },
     {
@@ -71,7 +71,7 @@
       "size": [200, 64],
       "sources": [
         { "path": "pkg/client/client.go", "line": 73, "end_line": 99, "label": "Init before options" },
-        { "path": "pkg/client/client.go", "line": 221, "end_line": 232, "label": "wires AuthRoundTripper" },
+        { "path": "pkg/client/client.go", "line": 222, "end_line": 233, "label": "wires AuthRoundTripper" },
         { "path": "pkg/client/client.go", "line": 64, "end_line": 66, "label": "New: static token" }
       ]
     },
@@ -83,7 +83,7 @@
       "pos": [800, 40],
       "size": [220, 64],
       "sources": [
-        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 56, "end_line": 62, "label": "client-credentials config" }
+        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 57, "end_line": 63, "label": "client-credentials config" }
       ]
     },
     {
@@ -149,9 +149,9 @@
       "pos": [380, 640],
       "size": [200, 64],
       "sources": [
-        { "path": "pkg/client/client_options.go", "line": 141, "end_line": 151, "label": "no-op without terms" },
-        { "path": "pkg/client/client.go", "line": 130, "end_line": 134, "label": "runs after wiring" },
-        { "path": "pkg/client/client.go", "line": 199, "end_line": 216, "label": "runBootstrap" }
+        { "path": "pkg/client/client_options.go", "line": 144, "end_line": 154, "label": "no-op without terms" },
+        { "path": "pkg/client/client.go", "line": 130, "end_line": 135, "label": "runs after wiring" },
+        { "path": "pkg/client/client.go", "line": 200, "end_line": 217, "label": "runBootstrap" }
       ]
     },
     {

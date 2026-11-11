@@ -50,14 +50,14 @@
         },
         {
           "path": "pkg/client/errors.go",
-          "line": 65,
-          "end_line": 97,
+          "line": 71,
+          "end_line": 116,
           "label": "WrapAPIError"
         },
         {
           "path": "pkg/client/errors.go",
-          "line": 99,
-          "end_line": 110,
+          "line": 118,
+          "end_line": 129,
           "label": "entityResult"
         }
       ]
@@ -110,8 +110,8 @@
       "sources": [
         {
           "path": "pkg/client/client.go",
-          "line": 218,
-          "end_line": 258,
+          "line": 219,
+          "end_line": 263,
           "label": "newHTTPClient"
         },
         {
@@ -249,7 +249,7 @@
       "y": 550,
       "label": "response or error",
       "variant": "return",
-      "note": "Retries used up: error, no response"
+      "note": "Retries used up: the last response or error"
     },
     {
       "id": "client-reply",
@@ -323,6 +323,7 @@
       "items": [
         "The retrying HTTP client repeats the whole round trip, so the auth round-tripper runs, and fetches the header, on every attempt",
         "Defaults: up to 4 retries, exponential backoff from 1 s to 30 s",
+        "Once retries are used up, the default error handler (PassthroughErrorHandler) hands back the last response or transport error",
         "WithoutRetries removes this layer; WithRetryMax, WithRetryWait, WithCheckRetry, WithBackoff and WithErrorHandler tune it"
       ]
     },
@@ -340,8 +341,8 @@
       "title": "One error model",
       "items": [
         "A 2xx response decodes into the typed result",
-        "A generated error becomes one APIError with status code, raw body and decoded error model",
-        "Transport, context and retries-used-up errors are wrapped with %w, not turned into APIError",
+        "An error status becomes one APIError with status code, raw body and decoded error model, also the last 429 or 5xx once retries are used up",
+        "Transport and context errors, and a 2xx body that fails to decode, are wrapped with %w, not turned into APIError",
         "Escape-hatch callers enter at the generated service and can call WrapAPIError themselves"
       ]
     }

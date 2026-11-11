@@ -43,8 +43,8 @@
       "pos": [40, 200],
       "size": [200, 324],
       "sources": [
-        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 16, "end_line": 34, "label": "what it re-exports" },
-        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 36, "end_line": 47, "label": "imports" }
+        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 16, "end_line": 35, "label": "what it re-exports" },
+        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 37, "end_line": 48, "label": "imports" }
       ]
     },
     {
@@ -66,7 +66,7 @@
       "pos": [480, 330],
       "size": [220, 64],
       "sources": [
-        { "path": "pkg/storage/profile/profile.go", "line": 1, "end_line": 18, "label": "profile builders" },
+        { "path": "pkg/storage/profile/profile.go", "line": 1, "end_line": 20, "label": "profile builders" },
         { "path": "pkg/storage/credential/credential.go", "line": 1, "end_line": 20, "label": "credential builders" }
       ]
     },
@@ -81,7 +81,7 @@
       "sources": [
         { "path": "pkg/client/client.go", "line": 27, "end_line": 53, "label": "Client and its façades" },
         { "path": "pkg/client/client.go", "line": 109, "end_line": 122, "label": "façades wrap generated services" },
-        { "path": "pkg/client/client.go", "line": 218, "end_line": 230, "label": "AuthRoundTripper from pkg/core" }
+        { "path": "pkg/client/client.go", "line": 219, "end_line": 231, "label": "AuthRoundTripper from pkg/core" }
       ]
     },
     {
