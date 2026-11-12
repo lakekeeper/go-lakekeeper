@@ -107,7 +107,7 @@ test-e2e-kind: ## Runs lkctl E2E tests against a kind cluster (real projected SA
 test-e2e: test-e2e-compose test-e2e-kind ## Runs every E2E backend sequentially.
 
 # renovate: datasource=github-releases depName=goreleaser/goreleaser
-GORELEASER_VERSION := v2.20.1
+GORELEASER_VERSION := v2.20.2
 GORELEASER := $(BIN_DIR)/goreleaser-$(GORELEASER_VERSION)/goreleaser
 $(GORELEASER): | $(BIN_DIR)
 	@echo === installing goreleaser $(GORELEASER_VERSION)
