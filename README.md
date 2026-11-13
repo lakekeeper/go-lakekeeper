@@ -5,6 +5,7 @@
 [![ci](https://github.com/lakekeeper/go-lakekeeper/actions/workflows/ci.yml/badge.svg)](https://github.com/lakekeeper/go-lakekeeper/actions/workflows/ci.yml)
 [![nightly](https://github.com/lakekeeper/go-lakekeeper/actions/workflows/nightly.yml/badge.svg)](https://github.com/lakekeeper/go-lakekeeper/actions/workflows/nightly.yml)
 
+
 Go SDK and `lkctl` CLI for the [Lakekeeper](https://docs.lakekeeper.io)
 Iceberg catalog. The Management API client is generated from Lakekeeper's
 OpenAPI spec; everything else — auth, retries, the CLI, ergonomic builders
