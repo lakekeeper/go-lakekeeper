@@ -174,7 +174,7 @@ GRAPHIFY = uvx --from 'graphifyy==$(GRAPHIFY_VERSION)' graphify
 
 .PHONY: graph
 graph: ## Rebuild the graphify knowledge graph in graphify-out/ (optional, requires uv).
-	PYTHONHASHSEED=0 $(GRAPHIFY) update .
+	PYTHONHASHSEED=0 $(GRAPHIFY) update . --force
 
 .PHONY: graph-setup
 graph-setup: ## Register the graphify merge driver for graphify-out/graph.json in this clone (requires uv).
