@@ -172,8 +172,12 @@ GRAPHIFY_VERSION ?= 0.9.113
 
 GRAPHIFY = uvx --from 'graphifyy==$(GRAPHIFY_VERSION)' graphify
 
+# Removing the local manifest makes graphify re-extract every file, which drops
+# stale nodes the union merge driver kept. Unlike --force, graphify still refuses
+# to overwrite graph.json, and exits non-zero, when the extraction of a file fails.
 .PHONY: graph
 graph: ## Rebuild the graphify knowledge graph in graphify-out/ (optional, requires uv).
+	@rm -f graphify-out/manifest.json
 	PYTHONHASHSEED=0 $(GRAPHIFY) update .
 
 .PHONY: graph-setup
