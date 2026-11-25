@@ -25,6 +25,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/joho/godotenv"
+	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
@@ -77,7 +78,8 @@ func initBackend() error {
 			mode = BackendCompose
 		}
 		switch mode {
-		case BackendCompose, BackendComposePlus, BackendComposePlusOpenFGA:
+		case BackendCompose, BackendComposePlus, BackendComposePlusOpenFGA,
+			BackendComposePreviousMinor, BackendComposeOlderMinor:
 			activeBackend, backendErr = newComposeBackend(mode)
 		case BackendKind:
 			activeBackend, backendErr = newKindBackend()
@@ -100,6 +102,9 @@ func bootstrapForCompose() error {
 		Scopes:       strings.Fields(os.Getenv("LAKEKEEPER_SCOPE")),
 	}
 	ts := cfg.TokenSource(ctx)
+	if activeBackend.Name() == BackendComposeOlderMinor {
+		return bootstrapOlderMinor(ctx, ts)
+	}
 	if _, err := client.NewWithAuthSource(ctx,
 		os.Getenv("LAKEKEEPER_BASE_URL"),
 		&core.OAuthClientCredentialsAuthSource{TokenSource: ts},
@@ -108,6 +113,22 @@ func bootstrapForCompose() error {
 		return fmt.Errorf("create client: %w", err)
 	}
 	return nil
+}
+
+// bootstrapOlderMinor bootstraps a server outside the supported range,
+// whose server info the SDK cannot decode, so WithInitialBootstrap (which
+// reads it first) fails there. The stack is fresh, so it bootstraps
+// unconditionally.
+func bootstrapOlderMinor(ctx context.Context, ts oauth2.TokenSource) error {
+	c, err := client.NewWithAuthSource(ctx, os.Getenv("LAKEKEEPER_BASE_URL"),
+		&core.OAuthClientCredentialsAuthSource{TokenSource: ts})
+	if err != nil {
+		return fmt.Errorf("create client: %w", err)
+	}
+	req := managementv1.NewBootstrapRequest(true)
+	req.SetIsOperator(true)
+	req.SetUserType(managementv1.USERTYPE_APPLICATION)
+	return c.Server.Bootstrap(ctx, req)
 }
 
 // freshKeycloakToken mints a fresh client-credentials access token. Tests

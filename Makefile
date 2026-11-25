@@ -100,6 +100,11 @@ test-e2e-compose: $(ENV_FILE) ## Runs lkctl E2E tests against the docker-compose
 	@echo === ./e2e/compose/run.sh
 	CONTAINER_ENGINE="$(CONTAINER_ENGINE)" CONTAINER_COMPOSE_ENGINE="$(CONTAINER_COMPOSE_ENGINE)" LAKEKEEPER_VERSION="$(LAKEKEEPER_VERSION)" ./e2e/compose/run.sh
 
+.PHONY: test-e2e-versions
+test-e2e-versions: $(ENV_FILE) ## Runs the supported-version lkctl E2E tests against the previous two Lakekeeper minors.
+	@echo === ./e2e/versions/run.sh
+	CONTAINER_ENGINE="$(CONTAINER_ENGINE)" CONTAINER_COMPOSE_ENGINE="$(CONTAINER_COMPOSE_ENGINE)" ./e2e/versions/run.sh
+
 # The release the Lakekeeper+ spec was copied from (api/openapi/spec-releases.yaml),
 # so make test-plus runs against the server the spec came from.
 LAKEKEEPER_PLUS_SPEC_RELEASE := $(shell sed -n 's/^lakekeeper-plus: *//p' $(OPENAPI_DIR)/spec-releases.yaml)

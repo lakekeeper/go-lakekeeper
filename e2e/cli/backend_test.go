@@ -24,6 +24,13 @@ const (
 	// BackendComposePlusOpenFGA runs it against Lakekeeper+ with the OpenFGA
 	// authorization backend (compose profile plus-openfga).
 	BackendComposePlusOpenFGA = "compose-plus-openfga"
+	// BackendComposePreviousMinor runs it against Lakekeeper pinned to the
+	// minor before the Lakekeeper spec release, the oldest supported minor
+	// (started by e2e/versions/run.sh).
+	BackendComposePreviousMinor = "compose-previous-minor"
+	// BackendComposeOlderMinor runs it against Lakekeeper pinned to the
+	// minor before that, outside the supported range.
+	BackendComposeOlderMinor = "compose-older-minor"
 )
 
 // Backend abstracts how lkctl is invoked. Compose runs the binary on the host

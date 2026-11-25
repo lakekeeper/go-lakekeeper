@@ -112,7 +112,7 @@ Only the steps marked "Needs a running stack" start one; the commands are under
   auth-only subset of the `lkctl` end-to-end tests there; the other tests
   skip.
 - **`ci-ok`**: the one CI check the `main` branch requires; it passes only when
-  lint, drift, unit, integration, both end-to-end jobs and the build pass.
+  lint, drift, unit, integration, the end-to-end jobs and the build pass.
 
 ## Testing
 
