@@ -34,7 +34,7 @@
       "id": "call", "lane": "facade", "col": 0, "type": "external",
       "label": "Project-scoped call", "sublabel": "...CallOption",
       "sources": [
-        { "path": "pkg/client/call_options.go", "line": 24, "end_line": 30, "label": "CallOption" },
+        { "path": "pkg/client/call_options.go", "line": 35, "end_line": 41, "label": "CallOption" },
         { "path": "pkg/client/warehouses.go", "line": 60, "label": "Warehouses.List" }
       ]
     },
@@ -43,7 +43,7 @@
       "label": "Body project field?", "sublabel": "withBodyProject",
       "tag": "Create warehouse, role; Search role",
       "sources": [
-        { "path": "pkg/client/call_options.go", "line": 110, "end_line": 125, "label": "withBodyProject" },
+        { "path": "pkg/client/call_options.go", "line": 145, "end_line": 160, "label": "withBodyProject" },
         { "path": "pkg/client/warehouses.go", "line": 29, "label": "Warehouses.Create" },
         { "path": "pkg/client/roles.go", "line": 26, "label": "Roles.Create" }
       ]
@@ -53,7 +53,7 @@
       "label": "Project required?", "sublabel": "withRequiredProject",
       "tag": "Delete project, Grant, Revoke",
       "sources": [
-        { "path": "pkg/client/call_options.go", "line": 88, "end_line": 93, "label": "withRequiredProject" },
+        { "path": "pkg/client/call_options.go", "line": 123, "end_line": 128, "label": "withRequiredProject" },
         { "path": "pkg/client/projects.go", "line": 46, "end_line": 48, "label": "Projects.Delete" },
         { "path": "pkg/client/permissions.go", "line": 249, "end_line": 253, "label": "Grant and Revoke" }
       ]
@@ -62,8 +62,8 @@
       "id": "option", "lane": "facade", "col": 3, "type": "backend",
       "label": "WithProject?", "sublabel": "withProject",
       "sources": [
-        { "path": "pkg/client/call_options.go", "line": 45, "end_line": 50, "label": "WithProject" },
-        { "path": "pkg/client/call_options.go", "line": 73, "end_line": 83, "label": "withProject" }
+        { "path": "pkg/client/call_options.go", "line": 59, "end_line": 78, "label": "WithProject" },
+        { "path": "pkg/client/call_options.go", "line": 101, "end_line": 118, "label": "withProject" }
       ]
     },
     {
@@ -91,7 +91,7 @@
       "id": "header", "lane": "sent", "col": 4, "type": "messagebus",
       "label": "x-project-id header", "sublabel": "the only way a project is sent",
       "sources": [
-        { "path": "pkg/client/call_options.go", "line": 80, "end_line": 81, "label": "XProjectId" },
+        { "path": "pkg/client/call_options.go", "line": 115, "end_line": 116, "label": "XProjectId" },
         { "path": "api/openapi/management-open-api.yaml", "line": 143, "end_line": 145, "label": "x-project-id" }
       ]
     },
@@ -99,7 +99,7 @@
       "id": "noproj", "lane": "sent", "col": 3, "type": "messagebus",
       "label": "No project", "sublabel": "no header",
       "sources": [
-        { "path": "pkg/client/call_options.go", "line": 76, "end_line": 77, "label": "nothing set" }
+        { "path": "pkg/client/call_options.go", "line": 111, "end_line": 112, "label": "nothing set" }
       ]
     },
     {

@@ -96,8 +96,10 @@ type projectScoped[R any] interface {
 // withProject applies the Project from opts to a generated request builder:
 // the x-project-id header when a project is named, nothing when none is, and
 // ErrEmptyProjectID (wrapped with op) when an empty one is. Every
-// project-scoped façade method routes its builder through it, so how a
-// project is sent is decided here only.
+// project-scoped façade method routes its builder through it (or, when it
+// also accepts break-glass, through withProjectAndBreakGlass), so how a
+// project is sent is decided in applyProject only. A WithBreakGlass fails
+// with ErrCallOptionNotAccepted.
 func withProject[R projectScoped[R]](op string, req R, opts []CallOption) (R, error) {
 	o := resolveCallOptions(opts)
 	if o.breakGlassSet {
