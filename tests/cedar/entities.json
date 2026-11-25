@@ -1,0 +1,14 @@
+[
+  {
+    "uid": {
+      "type": "Lakekeeper::Role",
+      "id": "00000000-0000-0000-0000-000000000000/lakekeeper~e2e-entity-source"
+    },
+    "attrs": {
+      "project": { "__entity": { "type": "Lakekeeper::Project", "id": "00000000-0000-0000-0000-000000000000" } },
+      "provider_id": "lakekeeper",
+      "source_id": "e2e-entity-source"
+    },
+    "parents": []
+  }
+]

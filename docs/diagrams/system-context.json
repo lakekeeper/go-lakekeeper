@@ -3,14 +3,14 @@
   "diagram_type": "architecture",
   "meta": {
     "title": "System context: go-lakekeeper",
-    "output": ".archify/architecture-system-context-20261125-122547/system-context.html",
+    "output": ".archify/architecture-system-context-20261125-124751/system-context.html",
     "quality_profile": "showcase",
     "locale": "en",
     "repository": {
       "url": "git@github.com:lakekeeper/go-lakekeeper.git",
       "provider": "github",
       "link_mode": "local-only",
-      "revision": "1e71a691139724274e88d45916829e1d69aad52b"
+      "revision": "9388a199d044289e692c74e51e0ac68a9f8675c2"
     },
     "legend": {
       "entries": {
@@ -109,7 +109,7 @@
       "sources": [
         { "path": "pkg/core/auth.go", "line": 84, "end_line": 105, "label": "client credentials token source" },
         { "path": "pkg/lakekeeper/lakekeeper.go", "line": 50, "end_line": 65, "label": "NewOAuthClientCredentials" },
-        { "path": "docker-compose.yml", "line": 269, "end_line": 283, "label": "Keycloak in the compose stack" }
+        { "path": "docker-compose.yml", "line": 270, "end_line": 284, "label": "Keycloak in the compose stack" }
       ]
     },
     {
@@ -155,7 +155,7 @@
       "size": [150, 64],
       "sources": [
         { "path": "docker-compose.yml", "line": 12, "end_line": 14, "label": "PG database URLs" },
-        { "path": "docker-compose.yml", "line": 176, "end_line": 179, "label": "db service" }
+        { "path": "docker-compose.yml", "line": 177, "end_line": 180, "label": "db service" }
       ]
     },
     {
@@ -167,7 +167,7 @@
       "size": [150, 64],
       "sources": [
         { "path": "docker-compose.yml", "line": 15, "end_line": 16, "label": "AUTHZ_BACKEND=openfga" },
-        { "path": "docker-compose.yml", "line": 218, "end_line": 225, "label": "openfga service" }
+        { "path": "docker-compose.yml", "line": 219, "end_line": 226, "label": "openfga service" }
       ]
     },
     {
@@ -179,7 +179,7 @@
       "size": [150, 64],
       "sources": [
         { "path": "pkg/storage/profile/profile.go", "line": 1, "end_line": 34, "label": "S3, GCS and ADLS profiles" },
-        { "path": "docker-compose.yml", "line": 254, "end_line": 259, "label": "MinIO in the compose stack" }
+        { "path": "docker-compose.yml", "line": 255, "end_line": 260, "label": "MinIO in the compose stack" }
       ]
     }
   ],
