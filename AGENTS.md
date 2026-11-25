@@ -11,7 +11,7 @@ Go client library plus `lkctl` CLI for the Lakekeeper Iceberg catalog.
 - `pkg/storage/`, `pkg/permissions/` — hand-written helpers / builders
 - `pkg/common/`, `pkg/testutil/`, `pkg/version/` — small shared helpers (defaults, test client, build-time version)
 - `cmd/` — Cobra-based CLI; entry at `cmd/main.go`, commands tree under `cmd/lkctl/commands/`
-- `api/openapi/` — spec + postprocessor + generator config
+- `api/openapi/` — Lakekeeper and Lakekeeper+ specs + prepare (patch and merge) + postprocessor + generator config
 - `e2e/`, `integration/` — test suites, run through `make` (see Commands)
 - `examples/` — runnable docker-compose stack for SDK users (separate from `e2e/compose/`)
 - `tests/` — fixtures for the compose stack (Keycloak realm); not Go test code
@@ -56,7 +56,7 @@ Import aliases are enforced by `importas`; use exactly these:
 
 ## Generation
 
-`make generate` regenerates `pkg/apis/management/v1/` from `api/openapi/management-open-api.yaml` (`openapi-generator-cli` → postprocess). To change generated code, change the spec, the postprocessor, or the generator config, then regenerate.
+`make generate` regenerates `pkg/apis/management/v1/` from the Lakekeeper spec `api/openapi/management-open-api.yaml` and the Lakekeeper+ spec `api/openapi/management-plus-open-api.yaml` (prepare → `openapi-generator-cli` → postprocess). prepare patches both specs and merges them into a git-ignored spec under `api/openapi/build/`. To change generated code, change a spec, a prepare patch, the postprocessor, or the generator config, then regenerate. Copy specs unmodified; fix their defects with a prepare patch.
 
 `api/openapi/*-config.yaml` lists only deviations from generator defaults; set an option there only when its value differs from the default.
 

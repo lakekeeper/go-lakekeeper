@@ -22,8 +22,8 @@ type patch struct {
 // lakekeeperPatches fix defects in the Lakekeeper spec. None today.
 var lakekeeperPatches = []patch{}
 
-// lakekeeperPlusPatches fix defects in the Lakekeeper+ spec. Each one has an
-// upstream fix request; see docs/GENERATION.md.
+// lakekeeperPlusPatches fix defects in the Lakekeeper+ spec, listed in
+// docs/GENERATION.md. Delete a patch once its defect is fixed upstream.
 var lakekeeperPlusPatches = []patch{
 	licenseIdentifier,
 }

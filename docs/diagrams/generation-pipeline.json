@@ -3,14 +3,14 @@
   "diagram_type": "architecture",
   "meta": {
     "title": "Generation pipeline: make generate",
-    "output": ".archify/architecture-generation-pipeline-20261111-122415/generation-pipeline.html",
+    "output": ".archify/architecture-generation-pipeline-20261125-113822/generation-pipeline.html",
     "quality_profile": "showcase",
     "locale": "en",
     "repository": {
       "url": "git@github.com:lakekeeper/go-lakekeeper.git",
       "provider": "github",
       "link_mode": "local-only",
-      "revision": "fb689d0edce8a3b59c22af0bf856f9d14c60bbb3"
+      "revision": "021445c50493f141daa0edeec16852dda1724219"
     },
     "legend": {
       "entries": {
@@ -35,15 +35,63 @@
     {
       "id": "spec",
       "type": "database",
-      "label": "OpenAPI spec",
+      "label": "Lakekeeper spec",
       "sublabel": "api/openapi/management-open-api.yaml",
-      "tag": "committed · source of truth",
+      "tag": "committed · copied unmodified",
       "pos": [380, 40],
       "size": [230, 64],
       "sources": [
-        { "path": "api/openapi/management-open-api.yaml", "line": 1, "end_line": 5, "label": "committed Management API spec" },
-        { "path": "Makefile", "line": 137, "end_line": 137, "label": "make generate requires it" },
-        { "path": "Makefile", "line": 145, "end_line": 145, "label": "-i: spec passed unmodified" }
+        { "path": "api/openapi/management-open-api.yaml", "line": 1, "end_line": 8, "label": "committed Lakekeeper Management API spec" },
+        { "path": "Makefile", "line": 153, "end_line": 153, "label": "prepare's -lakekeeper input" }
+      ]
+    },
+    {
+      "id": "plusupstream",
+      "type": "external",
+      "label": "Lakekeeper+ repository",
+      "sublabel": "lakekeeper-enterprise",
+      "tag": "api/management-open-api.yaml at the release",
+      "pos": [40, 140],
+      "size": [230, 64]
+    },
+    {
+      "id": "plusspec",
+      "type": "database",
+      "label": "Lakekeeper+ spec",
+      "sublabel": "api/openapi/management-plus-open-api.yaml",
+      "tag": "committed · copied unmodified",
+      "pos": [380, 140],
+      "size": [230, 64],
+      "sources": [
+        { "path": "api/openapi/management-plus-open-api.yaml", "line": 1, "end_line": 7, "label": "committed Lakekeeper+ Management API spec" },
+        { "path": "Makefile", "line": 154, "end_line": 154, "label": "prepare's -lakekeeper-plus input" }
+      ]
+    },
+    {
+      "id": "prepare",
+      "type": "database",
+      "label": "prepare",
+      "sublabel": "api/openapi/prepare",
+      "tag": "patches each spec · merges them",
+      "pos": [720, 90],
+      "size": [230, 64],
+      "sources": [
+        { "path": "Makefile", "line": 151, "end_line": 155, "label": "go run ./api/openapi/prepare" },
+        { "path": "api/openapi/prepare/patches.go", "line": 22, "end_line": 29, "label": "the patches of each spec" },
+        { "path": "api/openapi/prepare/merge.go", "line": 14, "end_line": 24, "label": "merge: paths, components, tags" }
+      ]
+    },
+    {
+      "id": "merged",
+      "type": "backend",
+      "label": "Merged spec",
+      "sublabel": "api/openapi/build/",
+      "tag": "git-ignored · rewritten every run",
+      "pos": [1060, 90],
+      "size": [230, 64],
+      "sources": [
+        { "path": "Makefile", "line": 52, "end_line": 53, "label": "MERGED_SPEC" },
+        { "path": ".gitignore", "line": 39, "end_line": 40, "label": "git-ignored" }
       ]
     },
     {
@@ -52,10 +100,10 @@
       "label": "make generate",
       "sublabel": "Makefile",
       "tag": "wipes the output dir · runs each step",
-      "pos": [40, 200],
+      "pos": [40, 300],
       "size": [230, 64],
       "sources": [
-        { "path": "Makefile", "line": 135, "end_line": 140, "label": "wipe and recreate output, copy ignore file" },
+        { "path": "Makefile", "line": 149, "end_line": 159, "label": "prepare, wipe output, copy ignore file" },
         { "path": "Makefile", "line": 45, "end_line": 45, "label": "CONTAINER_ENGINE: docker or podman" }
       ]
     },
@@ -64,12 +112,12 @@
       "type": "external",
       "label": "openapi-generator",
       "sublabel": "openapi-generator-cli · -g go",
-      "tag": "container · v7.27.0",
-      "pos": [380, 200],
+      "tag": "container · v7.27.0 · validation on",
+      "pos": [380, 300],
       "size": [230, 64],
       "sources": [
         { "path": "Makefile", "line": 49, "end_line": 50, "label": "generator image and version" },
-        { "path": "Makefile", "line": 141, "end_line": 149, "label": "generate -i spec -c config -o output" }
+        { "path": "Makefile", "line": 160, "end_line": 168, "label": "generate -i merged spec -c config -o output" }
       ]
     },
     {
@@ -78,10 +126,10 @@
       "label": "Postprocessor",
       "sublabel": "api/openapi/postprocess",
       "tag": "drops DisallowUnknownFields · relaxes enums",
-      "pos": [720, 200],
+      "pos": [720, 300],
       "size": [230, 64],
       "sources": [
-        { "path": "Makefile", "line": 150, "end_line": 151, "label": "go run ./api/openapi/postprocess" },
+        { "path": "Makefile", "line": 169, "end_line": 170, "label": "go run ./api/openapi/postprocess" },
         { "path": "api/openapi/postprocess/main.go", "line": 1, "end_line": 34, "label": "the two relaxations" },
         { "path": "api/openapi/postprocess/main.go", "line": 44, "end_line": 56, "label": "match targets" }
       ]
@@ -91,11 +139,11 @@
       "type": "backend",
       "label": "Format and tidy",
       "sublabel": "goimports · go mod tidy · make fmt",
-      "pos": [1060, 200],
+      "pos": [1060, 300],
       "size": [230, 64],
       "sources": [
-        { "path": "Makefile", "line": 152, "end_line": 155, "label": "goimports, go mod tidy, make fmt" },
-        { "path": "Makefile", "line": 121, "end_line": 124, "label": "fmt: golangci-lint --fix" }
+        { "path": "Makefile", "line": 171, "end_line": 174, "label": "goimports, go mod tidy, make fmt" },
+        { "path": "Makefile", "line": 136, "end_line": 139, "label": "fmt: golangci-lint --fix" }
       ]
     },
     {
@@ -104,12 +152,12 @@
       "label": "Generated SDK",
       "sublabel": "pkg/apis/management/v1",
       "tag": "Code generated … DO NOT EDIT",
-      "pos": [1400, 200],
+      "pos": [1400, 300],
       "size": [230, 64],
       "sources": [
         { "path": "pkg/apis/management/v1/client.go", "line": 10, "end_line": 12, "label": "generated header, package managementv1" },
         { "path": "pkg/apis/management/v1/.openapi-generator/VERSION", "line": 1, "end_line": 1, "label": "generator version that wrote it" },
-        { "path": "Makefile", "line": 52, "end_line": 52, "label": "MANAGEMENT_API_OUTPUT" }
+        { "path": "Makefile", "line": 54, "end_line": 54, "label": "MANAGEMENT_API_OUTPUT" }
       ]
     },
     {
@@ -118,11 +166,11 @@
       "label": "Ignore file",
       "sublabel": "api/openapi/.openapi-generator-ignore",
       "tag": "files not to emit",
-      "pos": [40, 360],
+      "pos": [40, 460],
       "size": [230, 64],
       "sources": [
         { "path": "api/openapi/.openapi-generator-ignore", "line": 1, "end_line": 7, "label": "README.md, git_push.sh, …" },
-        { "path": "Makefile", "line": 140, "end_line": 140, "label": "copied into the output dir" }
+        { "path": "Makefile", "line": 159, "end_line": 159, "label": "copied into the output dir" }
       ]
     },
     {
@@ -131,11 +179,11 @@
       "label": "Generator config",
       "sublabel": "api/openapi/management-config.yaml",
       "tag": "only deviations from defaults",
-      "pos": [380, 360],
+      "pos": [380, 460],
       "size": [230, 64],
       "sources": [
         { "path": "api/openapi/management-config.yaml", "line": 1, "end_line": 44, "label": "options that differ from the defaults" },
-        { "path": "Makefile", "line": 147, "end_line": 147, "label": "-c config" }
+        { "path": "Makefile", "line": 166, "end_line": 166, "label": "-c config" }
       ]
     },
     {
@@ -144,16 +192,20 @@
       "label": "Hand edit",
       "sublabel": "any file under pkg/apis/management/v1",
       "tag": "change an input instead",
-      "pos": [1400, 360],
+      "pos": [1400, 460],
       "size": [230, 64],
       "sources": [
-        { "path": "Makefile", "line": 138, "end_line": 138, "label": "rm -rf wipes the output dir" }
+        { "path": "Makefile", "line": 157, "end_line": 157, "label": "rm -rf wipes the output dir" }
       ]
     }
   ],
   "connections": [
     { "id": "upstream-spec", "from": "upstream", "to": "spec", "label": "copied by hand" },
-    { "id": "spec-generator", "from": "spec", "to": "generator", "label": "-i, unmodified", "variant": "emphasis" },
+    { "id": "plusupstream-plusspec", "from": "plusupstream", "to": "plusspec", "label": "copied by hand" },
+    { "id": "spec-prepare", "from": "spec", "to": "prepare", "label": "base", "variant": "emphasis" },
+    { "id": "plusspec-prepare", "from": "plusspec", "to": "prepare", "label": "additions", "variant": "emphasis" },
+    { "id": "prepare-merged", "from": "prepare", "to": "merged", "label": "writes", "variant": "emphasis" },
+    { "id": "merged-generator", "from": "merged", "to": "generator", "label": "-i", "variant": "emphasis" },
     { "id": "ignore-make", "from": "ignore", "to": "make", "label": "copied into output dir" },
     { "id": "config-generator", "from": "config", "to": "generator", "label": "-c" },
     { "id": "make-generator", "from": "make", "to": "generator", "label": "runs" },
@@ -167,9 +219,18 @@
       "dot": "rose",
       "title": "To change generated code",
       "items": [
-        "Change the spec, the postprocessor or the generator config, then run make generate",
+        "Change a spec, a prepare patch, the postprocessor or the generator config, then run make generate",
         "make generate deletes pkg/apis/management/v1 before each run, so hand edits are lost",
-        "Commit the spec update and the regenerated tree in the same commit"
+        "Commit a spec update and the regenerated tree in the same commit"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "prepare",
+      "items": [
+        "Applies each spec's named patches; a patch whose defect is gone logs 'not needed, skipped'",
+        "Lakekeeper wins on shared paths and schemas; Lakekeeper+ adds the rest and new union variants",
+        "Any other difference between the specs stops make generate, naming the item"
       ]
     },
     {
