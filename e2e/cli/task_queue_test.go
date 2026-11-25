@@ -96,3 +96,25 @@ func TestTaskQueueLakekeeperPlusQueuesRequireLakekeeperPlus(t *testing.T) {
 		})
 	}
 }
+
+func TestTaskQueueScheduleRequiresLakekeeperPlus(t *testing.T) {
+	requireBackend(t, BackendCompose)
+	t.Parallel()
+
+	id, name := MustProvisionWarehouse(t)
+	tableID := MustProvisionTable(t, name)
+
+	for cmdName, queue := range map[string]string{
+		"expire-snapshots":    "expire_snapshots",
+		"optimize":            "optimize",
+		"remove-orphan-files": "remove_orphan_files",
+	} {
+		t.Run(cmdName, func(t *testing.T) {
+			t.Parallel()
+			_, stderr, _ := runFail(t, "task-queue", cmdName, "schedule", id, tableID)
+			assert.Regexp(t,
+				`^Error: schedule `+queue+` task: requires Lakekeeper\+; server is Lakekeeper \S+\n$`,
+				string(stderr))
+		})
+	}
+}
