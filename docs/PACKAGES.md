@@ -184,6 +184,7 @@ generator's `(value, *http.Response, error)` triple.
 | `c.Server` | Info / Bootstrap (takes `*managementv1.BootstrapRequest`); not project-scoped. `WithInitialBootstrap` uses the same two calls |
 | `c.Permissions` | Access / Assignments / Grant / Revoke, per resource kind: `.Warehouses`, `.Roles`, `.Projects` (project-scoped), `.Server` |
 | `c.Cedar` | Schema; ListProjectPolicies / GetProjectPolicy / ApplyProjectPolicies (`WithProject`); ListWarehousePolicies / GetWarehousePolicy / ApplyWarehousePolicies; BreakGlassStatus (`WithProject`, sent as the `project-id` query parameter). List and Apply accept `WithBreakGlass`. Predefined policies: List / Set / Reset ProjectPredefinedPolicies (`WithProject`) and List / Set / Reset WarehousePredefinedPolicies; List and Set take `*client.PredefinedPoliciesOptions` (`IncludePolicy`) and accept `WithBreakGlass`, Set takes `[]managementv1.PredefinedPolicyChange`. Lakekeeper+ with the Cedar authorization backend; see [Capabilities and `ErrUnsupported`](#capabilities-and-errunsupported) |
+| `c.TaskQueues` | `<Queue>Config` / `Set<Queue>Config` per task queue: TabularPurge, SoftDeletion (by warehouse id), TaskLogCleanup (project-scoped); ExpireSnapshots, Optimize, RemoveOrphanFiles (by warehouse id; Lakekeeper+ running the queue). See [Task-queue configuration](#task-queue-configuration) |
 
 ```go
 wh, err := c.Warehouses.Get(ctx, id)                // façade — one call
@@ -196,7 +197,7 @@ warehouses, projects, roles, users, and the server, plus access,
 assignments, grant, and revoke for warehouse, role, project, and server
 permissions. `lkctl` commands call only the façades. Not covered, and
 reachable only through the [embedded generated
-services](#escape-hatch-embedded-generated-services): tags, tasks, grants,
+services](#escape-hatch-embedded-generated-services): tags, task listing and control, grants,
 authorization checks, namespace and tabular protections, warehouse managed
 access, and the less common warehouse operations (storage credential and
 profile updates, undrop, tabular search, …). For those, custom request
@@ -344,7 +345,7 @@ why, and the original `*APIError` otherwise:
 | Field | Meaning |
 |---|---|
 | `Feature` | What the operation belongs to, for example `"Cedar"` |
-| `Reason` | `client.ReasonNotLakekeeperPlus` (`not-lakekeeper-plus`) or `client.ReasonAuthzBackend` (`authz-backend`) |
+| `Reason` | `client.ReasonNotLakekeeperPlus` (`not-lakekeeper-plus`), `client.ReasonAuthzBackend` (`authz-backend`) or `client.ReasonQueueNotConfigured` (`queue-not-configured`) |
 | `Server` | The server's `Capabilities` |
 | `APIError` | The server's original answer; not unwrapped, so `errors.As(err, &apiErr)` does not match |
 
@@ -373,6 +374,35 @@ out, resp, err := c.api.GetCedarSchema(ctx).Execute()
 out, err = entityResult(op, out, resp, err)
 return out, c.caps.diagnose(ctx, cedarRequirement, op, err)
 ```
+
+A requirement can also name a task queue (`queue`); the Lakekeeper+ queue
+façades build theirs with `plusQueueRequirement(queue)` in
+`pkg/client/task_queues.go`.
+
+### Task-queue configuration
+
+`c.TaskQueues` reads and sets the configuration of every task queue the
+same way. Each getter returns the generated `Get…QueueConfig` (heartbeat
+setting and `QueueConfig`); each setter takes the generated
+`Set…QueueConfig` and replaces the stored configuration with it.
+
+A setter sends the request as given, and an unset field in the queue
+configuration stays unset on the server, so the warehouse keeps inheriting
+the server default. Build the configuration from its zero value and set
+only the fields you mean; the generated `New…` constructors of some queue
+configurations set defaults explicitly.
+
+```go
+cfg := managementv1.ExpireSnapshotsQueueConfig{}
+cfg.SetMaxSnapshotAgeMs(7 * 24 * time.Hour.Milliseconds())
+err := c.TaskQueues.SetExpireSnapshotsConfig(ctx, warehouseID,
+    &managementv1.SetExpireSnapshotsQueueConfig{QueueConfig: cfg})
+```
+
+The Lakekeeper+ queues (`client.QueueExpireSnapshots`, `QueueOptimize`,
+`QueueRemoveOrphanFiles`) are capability-gated: on Lakekeeper they fail
+with `not-lakekeeper-plus`, and on a Lakekeeper+ server whose `queues`
+lack the queue with `queue-not-configured`.
 
 ### Escape hatch: embedded generated services
 

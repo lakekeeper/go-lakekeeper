@@ -3,14 +3,14 @@
   "diagram_type": "architecture",
   "meta": {
     "title": "Authentication: auth sources, construction and requests",
-    "output": ".archify/architecture-authentication-20261125-123808/authentication.html",
+    "output": ".archify/architecture-authentication-20261125-122553/authentication.html",
     "quality_profile": "showcase",
     "locale": "en",
     "repository": {
       "url": "git@github.com:lakekeeper/go-lakekeeper.git",
       "provider": "github",
       "link_mode": "local-only",
-      "revision": "d6fe7c4fef85ae6fcb12e4aced72587f622cb360"
+      "revision": "1e71a691139724274e88d45916829e1d69aad52b"
     },
     "legend": {
       "entries": {
@@ -47,7 +47,7 @@
       "sources": [
         { "path": "pkg/lakekeeper/lakekeeper.go", "line": 56, "end_line": 65, "label": "NewOAuthClientCredentials" },
         { "path": "pkg/lakekeeper/lakekeeper.go", "line": 73, "end_line": 79, "label": "NewK8sServiceAccount" },
-        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 161, "end_line": 162, "label": "New, NewWithAuthSource" }
+        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 168, "end_line": 169, "label": "New, NewWithAuthSource" }
       ]
     },
     {
@@ -70,9 +70,9 @@
       "pos": [380, 340],
       "size": [200, 64],
       "sources": [
-        { "path": "pkg/client/client.go", "line": 81, "end_line": 107, "label": "Init before options" },
-        { "path": "pkg/client/client.go", "line": 234, "end_line": 245, "label": "wires AuthRoundTripper" },
-        { "path": "pkg/client/client.go", "line": 72, "end_line": 74, "label": "New: static token" }
+        { "path": "pkg/client/client.go", "line": 86, "end_line": 112, "label": "Init before options" },
+        { "path": "pkg/client/client.go", "line": 240, "end_line": 251, "label": "wires AuthRoundTripper" },
+        { "path": "pkg/client/client.go", "line": 77, "end_line": 79, "label": "New: static token" }
       ]
     },
     {
@@ -150,8 +150,8 @@
       "size": [200, 64],
       "sources": [
         { "path": "pkg/client/client_options.go", "line": 144, "end_line": 154, "label": "no-op without terms" },
-        { "path": "pkg/client/client.go", "line": 142, "end_line": 147, "label": "runs after wiring" },
-        { "path": "pkg/client/client.go", "line": 212, "end_line": 229, "label": "runBootstrap" }
+        { "path": "pkg/client/client.go", "line": 148, "end_line": 153, "label": "runs after wiring" },
+        { "path": "pkg/client/client.go", "line": 218, "end_line": 235, "label": "runBootstrap" }
       ]
     },
     {
