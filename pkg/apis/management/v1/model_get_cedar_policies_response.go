@@ -24,7 +24,7 @@ type GetCedarPoliciesResponse struct {
 	// Opaque token for retrieving the next page of results. If `None`, there are no more pages to retrieve.
 	NextPageToken NullableString `json:"next-page-token,omitempty"`
 	// List of JSON formatted Cedar policies.  For schema details, see `<https://docs.cedarpolicy.com/policies/json-format.html>`
-	Policies []interface{} `json:"policies"`
+	Policies []CedarPolicy `json:"policies"`
 }
 
 type _GetCedarPoliciesResponse GetCedarPoliciesResponse
@@ -33,7 +33,7 @@ type _GetCedarPoliciesResponse GetCedarPoliciesResponse
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewGetCedarPoliciesResponse(policies []interface{}) *GetCedarPoliciesResponse {
+func NewGetCedarPoliciesResponse(policies []CedarPolicy) *GetCedarPoliciesResponse {
 	this := GetCedarPoliciesResponse{}
 	this.Policies = policies
 	return &this
@@ -91,9 +91,9 @@ func (o *GetCedarPoliciesResponse) UnsetNextPageToken() {
 }
 
 // GetPolicies returns the Policies field value
-func (o *GetCedarPoliciesResponse) GetPolicies() []interface{} {
+func (o *GetCedarPoliciesResponse) GetPolicies() []CedarPolicy {
 	if o == nil {
-		var ret []interface{}
+		var ret []CedarPolicy
 		return ret
 	}
 
@@ -102,7 +102,7 @@ func (o *GetCedarPoliciesResponse) GetPolicies() []interface{} {
 
 // GetPoliciesOk returns a tuple with the Policies field value
 // and a boolean to check if the value has been set.
-func (o *GetCedarPoliciesResponse) GetPoliciesOk() ([]interface{}, bool) {
+func (o *GetCedarPoliciesResponse) GetPoliciesOk() ([]CedarPolicy, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -110,7 +110,7 @@ func (o *GetCedarPoliciesResponse) GetPoliciesOk() ([]interface{}, bool) {
 }
 
 // SetPolicies sets field value
-func (o *GetCedarPoliciesResponse) SetPolicies(v []interface{}) {
+func (o *GetCedarPoliciesResponse) SetPolicies(v []CedarPolicy) {
 	o.Policies = v
 }
 

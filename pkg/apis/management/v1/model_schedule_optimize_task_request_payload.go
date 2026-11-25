@@ -20,7 +20,7 @@ var _ MappedNullable = &ScheduleOptimizeTaskRequestPayload{}
 // ScheduleOptimizeTaskRequestPayload The payload a manual schedule accepts. Any other key is rejected.
 type ScheduleOptimizeTaskRequestPayload struct {
 	// The steps to run, whatever their triggers say; the switches of the warehouse and the table still apply. Default: compaction and manifest rewrite, with the position-delete rewrite and dangling-delete removal following compaction as in an automatic run. Manifest rewrite merges only the manifests below half the target size, as in an automatic run, unless `steps` names `rewrite-manifests`: then it re-packs all manifests of the current partition spec.
-	Steps []string `json:"steps,omitempty"`
+	Steps []OptimizeStep `json:"steps,omitempty"`
 }
 
 // NewScheduleOptimizeTaskRequestPayload instantiates a new ScheduleOptimizeTaskRequestPayload object
@@ -41,9 +41,9 @@ func NewScheduleOptimizeTaskRequestPayloadWithDefaults() *ScheduleOptimizeTaskRe
 }
 
 // GetSteps returns the Steps field value if set, zero value otherwise (both if not set or set to explicit null).
-func (o *ScheduleOptimizeTaskRequestPayload) GetSteps() []string {
+func (o *ScheduleOptimizeTaskRequestPayload) GetSteps() []OptimizeStep {
 	if o == nil {
-		var ret []string
+		var ret []OptimizeStep
 		return ret
 	}
 	return o.Steps
@@ -52,7 +52,7 @@ func (o *ScheduleOptimizeTaskRequestPayload) GetSteps() []string {
 // GetStepsOk returns a tuple with the Steps field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 // NOTE: If the value is an explicit nil, `nil, true` will be returned
-func (o *ScheduleOptimizeTaskRequestPayload) GetStepsOk() ([]string, bool) {
+func (o *ScheduleOptimizeTaskRequestPayload) GetStepsOk() ([]OptimizeStep, bool) {
 	if o == nil || IsNil(o.Steps) {
 		return nil, false
 	}
@@ -68,8 +68,8 @@ func (o *ScheduleOptimizeTaskRequestPayload) HasSteps() bool {
 	return false
 }
 
-// SetSteps gets a reference to the given []string and assigns it to the Steps field.
-func (o *ScheduleOptimizeTaskRequestPayload) SetSteps(v []string) {
+// SetSteps gets a reference to the given []OptimizeStep and assigns it to the Steps field.
+func (o *ScheduleOptimizeTaskRequestPayload) SetSteps(v []OptimizeStep) {
 	o.Steps = v
 }
 

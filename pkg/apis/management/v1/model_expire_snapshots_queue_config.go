@@ -41,16 +41,6 @@ func NewExpireSnapshotsQueueConfig() *ExpireSnapshotsQueueConfig {
 	this := ExpireSnapshotsQueueConfig{}
 	var disableMinAgeCheck bool = false
 	this.DisableMinAgeCheck = &disableMinAgeCheck
-	var enableExpireSnapshots bool = false
-	this.EnableExpireSnapshots = *NewNullableBool(&enableExpireSnapshots)
-	var maxRefAgeMs int64 = 9223372036854775807
-	this.MaxRefAgeMs = *NewNullableInt64(&maxRefAgeMs)
-	var maxSnapshotAgeMs int64 = 432000000
-	this.MaxSnapshotAgeMs = *NewNullableInt64(&maxSnapshotAgeMs)
-	var minSnapshotsToExpire int32 = 20
-	this.MinSnapshotsToExpire = *NewNullableInt32(&minSnapshotsToExpire)
-	var minSnapshotsToKeep int32 = 1
-	this.MinSnapshotsToKeep = *NewNullableInt32(&minSnapshotsToKeep)
 	return &this
 }
 
@@ -61,16 +51,6 @@ func NewExpireSnapshotsQueueConfigWithDefaults() *ExpireSnapshotsQueueConfig {
 	this := ExpireSnapshotsQueueConfig{}
 	var disableMinAgeCheck bool = false
 	this.DisableMinAgeCheck = &disableMinAgeCheck
-	var enableExpireSnapshots bool = false
-	this.EnableExpireSnapshots = *NewNullableBool(&enableExpireSnapshots)
-	var maxRefAgeMs int64 = 9223372036854775807
-	this.MaxRefAgeMs = *NewNullableInt64(&maxRefAgeMs)
-	var maxSnapshotAgeMs int64 = 432000000
-	this.MaxSnapshotAgeMs = *NewNullableInt64(&maxSnapshotAgeMs)
-	var minSnapshotsToExpire int32 = 20
-	this.MinSnapshotsToExpire = *NewNullableInt32(&minSnapshotsToExpire)
-	var minSnapshotsToKeep int32 = 1
-	this.MinSnapshotsToKeep = *NewNullableInt32(&minSnapshotsToKeep)
 	return &this
 }
 

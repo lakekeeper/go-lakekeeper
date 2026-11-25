@@ -22,7 +22,7 @@ var _ MappedNullable = &ResolveCedarEntitiesResponse{}
 // ResolveCedarEntitiesResponse Response from resolving Cedar entities.
 type ResolveCedarEntitiesResponse struct {
 	// Cedar entities in native JSON format. Each element represents a Cedar entity with uid, attrs, and parents.
-	Entities []interface{} `json:"entities"`
+	Entities []CedarEntity `json:"entities"`
 	// Total number of entities resolved.
 	EntityCount int32 `json:"entity-count"`
 	// For a project, warehouse or namespace: whether the principal or one of its roles holds `describe`, `select`, `write`, `create`, `manage` or `manage_tags` on a warehouse, namespace, table, view or generic table below it. Policies read it as `context.principal_has_privilege_below`.
@@ -35,7 +35,7 @@ type _ResolveCedarEntitiesResponse ResolveCedarEntitiesResponse
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewResolveCedarEntitiesResponse(entities []interface{}, entityCount int32) *ResolveCedarEntitiesResponse {
+func NewResolveCedarEntitiesResponse(entities []CedarEntity, entityCount int32) *ResolveCedarEntitiesResponse {
 	this := ResolveCedarEntitiesResponse{}
 	this.Entities = entities
 	this.EntityCount = entityCount
@@ -51,9 +51,9 @@ func NewResolveCedarEntitiesResponseWithDefaults() *ResolveCedarEntitiesResponse
 }
 
 // GetEntities returns the Entities field value
-func (o *ResolveCedarEntitiesResponse) GetEntities() []interface{} {
+func (o *ResolveCedarEntitiesResponse) GetEntities() []CedarEntity {
 	if o == nil {
-		var ret []interface{}
+		var ret []CedarEntity
 		return ret
 	}
 
@@ -62,7 +62,7 @@ func (o *ResolveCedarEntitiesResponse) GetEntities() []interface{} {
 
 // GetEntitiesOk returns a tuple with the Entities field value
 // and a boolean to check if the value has been set.
-func (o *ResolveCedarEntitiesResponse) GetEntitiesOk() ([]interface{}, bool) {
+func (o *ResolveCedarEntitiesResponse) GetEntitiesOk() ([]CedarEntity, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -70,7 +70,7 @@ func (o *ResolveCedarEntitiesResponse) GetEntitiesOk() ([]interface{}, bool) {
 }
 
 // SetEntities sets field value
-func (o *ResolveCedarEntitiesResponse) SetEntities(v []interface{}) {
+func (o *ResolveCedarEntitiesResponse) SetEntities(v []CedarEntity) {
 	o.Entities = v
 }
 
