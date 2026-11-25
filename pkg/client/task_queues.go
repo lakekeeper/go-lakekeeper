@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
@@ -111,7 +112,7 @@ func (q *TaskQueues) ExpireSnapshotsConfig(ctx context.Context, warehouseID stri
 	const op = "get expire_snapshots queue config"
 	out, resp, err := q.api.GetTaskQueueConfigExpireSnapshots(ctx, warehouseID).Execute()
 	out, err = entityResult(op, out, resp, err)
-	return out, q.caps.diagnose(ctx, plusQueueRequirement(QueueExpireSnapshots), op, err)
+	return plusQueueConfig(ctx, q.caps, QueueExpireSnapshots, op, out, err)
 }
 
 // SetExpireSnapshotsConfig sets the expire_snapshots queue configuration of
@@ -131,7 +132,7 @@ func (q *TaskQueues) OptimizeConfig(ctx context.Context, warehouseID string) (*m
 	const op = "get optimize queue config"
 	out, resp, err := q.api.GetTaskQueueConfigOptimize(ctx, warehouseID).Execute()
 	out, err = entityResult(op, out, resp, err)
-	return out, q.caps.diagnose(ctx, plusQueueRequirement(QueueOptimize), op, err)
+	return plusQueueConfig(ctx, q.caps, QueueOptimize, op, out, err)
 }
 
 // SetOptimizeConfig sets the optimize queue configuration of a warehouse
@@ -151,7 +152,7 @@ func (q *TaskQueues) RemoveOrphanFilesConfig(ctx context.Context, warehouseID st
 	const op = "get remove_orphan_files queue config"
 	out, resp, err := q.api.GetTaskQueueConfigRemoveOrphanFiles(ctx, warehouseID).Execute()
 	out, err = entityResult(op, out, resp, err)
-	return out, q.caps.diagnose(ctx, plusQueueRequirement(QueueRemoveOrphanFiles), op, err)
+	return plusQueueConfig(ctx, q.caps, QueueRemoveOrphanFiles, op, out, err)
 }
 
 // SetRemoveOrphanFilesConfig sets the remove_orphan_files queue
@@ -203,6 +204,69 @@ func (q *TaskQueues) ScheduleRemoveOrphanFiles(ctx context.Context, warehouseID 
 	out, resp, err := q.api.ScheduleTaskRemoveOrphanFiles(ctx, warehouseID).ScheduleRemoveOrphanFilesTaskRequest(*req).Execute()
 	out, err = entityResult(op, out, resp, err)
 	return out, q.caps.diagnose(ctx, plusQueueRequirement(QueueRemoveOrphanFiles), op, err)
+}
+
+// plusQueueConfig finishes reading a Lakekeeper+ queue configuration. A
+// failure goes through diagnose. A configuration with nothing set is checked
+// against the capabilities too, because Lakekeeper 0.15.0 answers a
+// configuration read for any queue name, including queues it does not run,
+// with 200 and nothing set. Only such an answer costs the (cached) server
+// info fetch; one with a field set is returned as it is.
+func plusQueueConfig[T any](ctx context.Context, caps *capabilityCache, queue, op string, out *T, err error) (*T, error) {
+	req := plusQueueRequirement(queue)
+	if err != nil {
+		return out, caps.diagnose(ctx, req, op, err)
+	}
+	if !nothingSet(out) {
+		return out, nil
+	}
+	if err := caps.confirm(ctx, req, op); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// confirm checks a successful answer the server may give although it does
+// not offer the operation. When the capabilities do not meet req it returns
+// an *UnsupportedError without an APIError; otherwise, or when the
+// capabilities cannot be fetched, nil.
+func (cc *capabilityCache) confirm(ctx context.Context, req requirement, op string) error {
+	caps, err := cc.get(ctx)
+	if err != nil {
+		return nil
+	}
+	reason, sentence := req.unmet(caps, nil)
+	if reason == "" {
+		return nil
+	}
+	return &UnsupportedError{Feature: req.feature, Reason: reason, Server: *caps, op: op, sentence: sentence}
+}
+
+// nothingSet reports whether a queue configuration read has no field set:
+// its max-seconds-since-last-heartbeat and every queue-config field other
+// than the queue-name echo are absent or null.
+func nothingSet(out any) bool {
+	data, err := json.Marshal(out)
+	if err != nil {
+		return false
+	}
+	var read map[string]json.RawMessage
+	if json.Unmarshal(data, &read) != nil {
+		return false
+	}
+	var config map[string]json.RawMessage
+	if raw, ok := read["queue-config"]; ok && json.Unmarshal(raw, &config) != nil {
+		return false
+	}
+	delete(config, "queue-name")
+	for _, fields := range []map[string]json.RawMessage{read, config} {
+		for key, value := range fields {
+			if key != "queue-config" && string(value) != "null" {
+				return false
+			}
+		}
+	}
+	return true
 }
 
 func nilRequest(op string) error {

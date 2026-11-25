@@ -50,6 +50,68 @@ func TestTaskQueues_OptimizeConfig_OnLakekeeperIsUnsupported(t *testing.T) {
 	assert.Equal(t, client.ReasonNotLakekeeperPlus, unsupported.Reason)
 }
 
+// emptyQueueConfig is what Lakekeeper 0.15.0 answers to a config GET for any
+// queue name, including queues it does not run: 200 with nothing set.
+func emptyQueueConfig(queue string) string {
+	return `{"queue-config":{"queue-name":"` + queue + `"},"max-seconds-since-last-heartbeat":null}`
+}
+
+func TestTaskQueues_ExpireSnapshotsConfig_EmptyAnswerFromLakekeeperIsUnsupported(t *testing.T) {
+	t.Parallel()
+	mux, c := testutil.ServerMux(t)
+	testutil.Respond(t, mux, "GET "+expireSnapConfig, http.StatusOK, emptyQueueConfig("expire_snapshots"))
+	testutil.Respond(t, mux, "GET /management/v1/info", http.StatusOK, lakekeeperInfo())
+
+	_, err := c.TaskQueues.ExpireSnapshotsConfig(t.Context(), "wh-1")
+
+	require.EqualError(t, err, "get expire_snapshots queue config: requires Lakekeeper+; server is Lakekeeper 0.15.1")
+	var unsupported *client.UnsupportedError
+	require.ErrorAs(t, err, &unsupported)
+	assert.Equal(t, client.ReasonNotLakekeeperPlus, unsupported.Reason)
+	assert.Nil(t, unsupported.APIError, "the server answered with success")
+}
+
+func TestTaskQueues_OptimizeConfig_EmptyAnswerWithoutTheQueueIsQueueNotConfigured(t *testing.T) {
+	t.Parallel()
+	mux, c := testutil.ServerMux(t)
+	testutil.Respond(t, mux, "GET "+optimizeConfig, http.StatusOK, emptyQueueConfig("optimize"))
+	testutil.Respond(t, mux, "GET /management/v1/info", http.StatusOK, lakekeeperPlusInfo("cedar"))
+
+	_, err := c.TaskQueues.OptimizeConfig(t.Context(), "wh-1")
+
+	var unsupported *client.UnsupportedError
+	require.ErrorAs(t, err, &unsupported)
+	assert.Equal(t, client.ReasonQueueNotConfigured, unsupported.Reason)
+}
+
+// An unset configuration on a server that runs the queue is a real answer.
+func TestTaskQueues_ExpireSnapshotsConfig_EmptyAnswerFromAServerRunningTheQueue(t *testing.T) {
+	t.Parallel()
+	mux, c := testutil.ServerMux(t)
+	testutil.Respond(t, mux, "GET "+expireSnapConfig, http.StatusOK, emptyQueueConfig("expire_snapshots"))
+	testutil.Respond(t, mux, "GET /management/v1/info", http.StatusOK, lakekeeperPlusInfo("cedar"))
+
+	got, err := c.TaskQueues.ExpireSnapshotsConfig(t.Context(), "wh-1")
+
+	require.NoError(t, err)
+	assert.False(t, got.QueueConfig.HasEnableExpireSnapshots())
+}
+
+// A configuration with a field set is an answer only a server running the
+// queue gives: no capabilities request.
+func TestTaskQueues_ExpireSnapshotsConfig_SetAnswerIsNotChecked(t *testing.T) {
+	t.Parallel()
+	mux, c := testutil.ServerMux(t)
+	testutil.Respond(t, mux, "GET "+expireSnapConfig, http.StatusOK,
+		`{"queue-config":{"enable-expire-snapshots":true},"max-seconds-since-last-heartbeat":null}`)
+	info := testutil.Respond(t, mux, "GET /management/v1/info", http.StatusOK, lakekeeperInfo())
+
+	_, err := c.TaskQueues.ExpireSnapshotsConfig(t.Context(), "wh-1")
+
+	require.NoError(t, err)
+	assert.Zero(t, info.Len(), "server info requests")
+}
+
 // The server runs expire_snapshots, so its 404 is a missing warehouse.
 func TestTaskQueues_ExpireSnapshotsConfig_MissingWarehouseStaysNotFound(t *testing.T) {
 	t.Parallel()
