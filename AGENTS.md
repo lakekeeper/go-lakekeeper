@@ -39,6 +39,7 @@ Every workflow has a `make` target; use it rather than the raw tool, because the
 - `make test-integration` — starts Lakekeeper + Keycloak + MinIO + OpenFGA via compose and runs the `integration`-tagged tests.
 - `make test-e2e-compose` — runs the `e2e_cli` suite against the host-built `lkctl` on the compose stack. Run it before calling any `e2e/` change done.
 - `make test-e2e-kind` — runs the auth-only subset of `e2e_cli` against a kind cluster; other tests skip via `requireBackend`.
+- `make test-plus` — runs the Lakekeeper+ tests (`e2e_plus`, `integration_plus`) against the public Lakekeeper+ image on the compose stack (profiles `plus` for Cedar, `plus-openfga` for OpenFGA). `LAKEKEEPER__LICENSE__KEY` is passed to the server when set; it is optional for local runs. CI runs the target on `main` with a license.
 - `make clean` — tears down the compose stack (`down --volumes`), removes `bin/`, the coverage files, `.env`.
 
 `KEEP_STACK=1` leaves the compose stack running after integration/e2e tests, for iterative debugging; tear down with `make clean`.

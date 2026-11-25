@@ -98,6 +98,14 @@ test-e2e-compose: $(ENV_FILE) ## Runs lkctl E2E tests against the docker-compose
 	@echo === ./e2e/compose/run.sh
 	CONTAINER_ENGINE="$(CONTAINER_ENGINE)" CONTAINER_COMPOSE_ENGINE="$(CONTAINER_COMPOSE_ENGINE)" LAKEKEEPER_VERSION="$(LAKEKEEPER_VERSION)" ./e2e/compose/run.sh
 
+# LAKEKEEPER__LICENSE__KEY reaches the server through the environment when
+# set; it is optional for local test runs. CI runs with a license.
+LAKEKEEPER_PLUS_VERSION ?= latest
+.PHONY: test-plus
+test-plus: $(ENV_FILE) ## Runs the Lakekeeper+ E2E and integration tests (tags e2e_plus, integration_plus) against Lakekeeper+ with Cedar, then OpenFGA.
+	@echo === ./e2e/plus/run.sh
+	CONTAINER_ENGINE="$(CONTAINER_ENGINE)" CONTAINER_COMPOSE_ENGINE="$(CONTAINER_COMPOSE_ENGINE)" LAKEKEEPER_PLUS_VERSION="$(LAKEKEEPER_PLUS_VERSION)" ./e2e/plus/run.sh
+
 .PHONY: test-e2e-kind
 test-e2e-kind: ## Runs lkctl E2E tests against a kind cluster (real projected SA token).
 	@echo === ./e2e/kind/run.sh
@@ -199,4 +207,4 @@ clean:
 	@rm -fr $(DIST_DIR)
 	@rm -fr coverage.txt coverage.filtered.txt coverage.html coverage.md
 	@rm -fr $(ENV_FILE)
-	@$(CONTAINER_COMPOSE_ENGINE) down --volumes
+	@$(CONTAINER_COMPOSE_ENGINE) --profile plus --profile plus-openfga down --volumes

@@ -60,6 +60,119 @@ services:
     networks:
       iceberg_net:
 
+  # Lakekeeper+ in place of Lakekeeper, for the Lakekeeper+ suites
+  # (`make test-plus`, e2e/plus/run.sh). Profile plus runs it with the Cedar
+  # authorization backend, profile plus-openfga with OpenFGA. Start one
+  # variant by naming its service (`up -d lakekeeper-plus`), never together
+  # with `lakekeeper`: they share port 8181 and the catalog database.
+  #
+  # LAKEKEEPER__LICENSE__KEY is passed through from the environment only when
+  # set. It is optional for local test runs; CI runs with a license. Never
+  # write a license into this file or any other committed file.
+  lakekeeper-plus:
+    profiles: [plus]
+    image: &lakekeeper-plus-image quay.io/vakamo/lakekeeper-plus:${LAKEKEEPER_PLUS_VERSION:-latest}-distroless
+    pull_policy: *lakekeeper-pull-policy
+    labels:
+      go-lakekeeper/owned: ""
+    environment: &lakekeeper-plus-cedar-env
+      - LAKEKEEPER__PG_ENCRYPTION_KEY=This-is-NOT-Secure!
+      - LAKEKEEPER__PG_DATABASE_URL_READ=postgresql://postgres:postgres@db:5432/postgres
+      - LAKEKEEPER__PG_DATABASE_URL_WRITE=postgresql://postgres:postgres@db:5432/postgres
+      - LAKEKEEPER__AUTHZ_BACKEND=cedar
+      - LAKEKEEPER__CEDAR__POLICY_SOURCES__LOCAL_FILES=[/etc/lakekeeper/cedar/policies.cedar]
+      - LAKEKEEPER__LICENSE__KEY
+      - LAKEKEEPER__OPENID_PROVIDER_URI=http://keycloak:8080/realms/iceberg
+      - LAKEKEEPER__OPENID_ADDITIONAL_ISSUERS=http://localhost:30080/realms/iceberg
+      - LAKEKEEPER__OPENID_AUDIENCE=lakekeeper
+      - LAKEKEEPER__UI__OPENID_PROVIDER_URI=http://localhost:30080/realms/iceberg
+      - LAKEKEEPER__UI__OPENID_CLIENT_ID=lakekeeper
+      - LAKEKEEPER__SKIP_STORAGE_VALIDATION=true
+      - RUST_LOG=INFO
+    volumes: &lakekeeper-plus-cedar-volumes
+      - ./tests/cedar:/etc/lakekeeper/cedar:ro
+    command: ["serve"]
+    healthcheck: &lakekeeper-plus-healthcheck
+      test: [ "CMD", "/home/nonroot/lakekeeper", "healthcheck" ]
+      interval: 1s
+      timeout: 10s
+      retries: 3
+      start_period: 3s
+    depends_on:
+      migrate-plus:
+        condition: service_completed_successfully
+      minio:
+        condition: service_healthy
+    ports:
+      - "8181:8181"
+    networks:
+      iceberg_net:
+
+  migrate-plus:
+    profiles: [plus]
+    image: *lakekeeper-plus-image
+    pull_policy: *lakekeeper-pull-policy
+    environment: *lakekeeper-plus-cedar-env
+    volumes: *lakekeeper-plus-cedar-volumes
+    restart: "no"
+    command: [ "migrate" ]
+    depends_on:
+      db:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    networks:
+      iceberg_net:
+
+  lakekeeper-plus-openfga:
+    profiles: [plus-openfga]
+    image: *lakekeeper-plus-image
+    pull_policy: *lakekeeper-pull-policy
+    labels:
+      go-lakekeeper/owned: ""
+    environment: &lakekeeper-plus-openfga-env
+      - LAKEKEEPER__PG_ENCRYPTION_KEY=This-is-NOT-Secure!
+      - LAKEKEEPER__PG_DATABASE_URL_READ=postgresql://postgres:postgres@db:5432/postgres
+      - LAKEKEEPER__PG_DATABASE_URL_WRITE=postgresql://postgres:postgres@db:5432/postgres
+      - LAKEKEEPER__AUTHZ_BACKEND=openfga
+      - LAKEKEEPER__OPENFGA__ENDPOINT=http://openfga:8081
+      - LAKEKEEPER__LICENSE__KEY
+      - LAKEKEEPER__OPENID_PROVIDER_URI=http://keycloak:8080/realms/iceberg
+      - LAKEKEEPER__OPENID_ADDITIONAL_ISSUERS=http://localhost:30080/realms/iceberg
+      - LAKEKEEPER__OPENID_AUDIENCE=lakekeeper
+      - LAKEKEEPER__UI__OPENID_PROVIDER_URI=http://localhost:30080/realms/iceberg
+      - LAKEKEEPER__UI__OPENID_CLIENT_ID=lakekeeper
+      - LAKEKEEPER__SKIP_STORAGE_VALIDATION=true
+      - RUST_LOG=INFO
+    command: ["serve"]
+    healthcheck: *lakekeeper-plus-healthcheck
+    depends_on:
+      migrate-plus-openfga:
+        condition: service_completed_successfully
+      minio:
+        condition: service_healthy
+    ports:
+      - "8181:8181"
+    networks:
+      iceberg_net:
+
+  migrate-plus-openfga:
+    profiles: [plus-openfga]
+    image: *lakekeeper-plus-image
+    pull_policy: *lakekeeper-pull-policy
+    environment: *lakekeeper-plus-openfga-env
+    restart: "no"
+    command: [ "migrate" ]
+    depends_on:
+      db:
+        condition: service_healthy
+      openfga:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    networks:
+      iceberg_net:
+
   db:
     image: postgres:19
     environment:
