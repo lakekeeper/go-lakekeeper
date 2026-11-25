@@ -643,13 +643,15 @@ The accessors return `(*<variant>, false)` when the union holds a
 different variant, replacing the
 `if wh.StorageProfile.StorageProfileS3 != nil { … }` ladder.
 
-`profile.AsS3` / `AsGCS` / `AsADLS` and `credential.AsS3AccessKey` /
-`AsS3AwsSystemIdentity` / etc. are also re-exported from the umbrella as
-`lakekeeper.AsS3Profile` etc.
+`AsMemory` (Lakekeeper+), `AsOneLake` and `AsStackit` read the other
+variants; they have no builders.
 
-The `StorageProfileTypeS3` / `StorageProfileTypeGCS` /
-`StorageProfileTypeADLS` constants hold the union's `type` discriminator
-values.
+`profile.AsS3` / `AsGCS` / `AsADLS` / `AsMemory` / `AsOneLake` / `AsStackit`
+and `credential.AsS3AccessKey` / `AsS3AwsSystemIdentity` / etc. are also
+re-exported from the umbrella as `lakekeeper.AsS3Profile` etc.
+
+The `StorageProfileTypeS3` / `GCS` / `ADLS` / `Memory` / `OneLake` /
+`Stackit` constants hold the union's `type` discriminator values.
 
 ### Delete profiles
 
