@@ -119,6 +119,21 @@ func TestUmbrellaListRolesOptions(t *testing.T) {
 	assert.Equal(t, "5", reqs.Last(t).Query.Get("pageSize"))
 }
 
+// TestUmbrellaPredefinedPoliciesOptions confirms umbrella-only callers can
+// ask for the predefined Cedar policies' rules.
+func TestUmbrellaPredefinedPoliciesOptions(t *testing.T) {
+	t.Parallel()
+
+	mux, c := testutil.ServerMux(t)
+	reqs := testutil.Respond(t, mux, "GET /management/v1/permissions/cedar/project/predefined-policies", http.StatusOK,
+		map[string]any{"curated": false, "predefined-policies-enabled": true, "policies": []any{}})
+
+	_, err := c.Cedar.ListProjectPredefinedPolicies(t.Context(), &lakekeeper.PredefinedPoliciesOptions{IncludePolicy: true})
+
+	require.NoError(t, err)
+	assert.Equal(t, "true", reqs.Last(t).Query.Get("include-policy"))
+}
+
 // TestUmbrellaErrUnsupported confirms umbrella-only callers can match an
 // unsupported operation and read why.
 func TestUmbrellaErrUnsupported(t *testing.T) {

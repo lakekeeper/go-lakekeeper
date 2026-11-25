@@ -66,7 +66,7 @@ func WithProject(projectID string) CallOption {
 // WithBreakGlass asks for emergency access (break-glass) on a Lakekeeper+
 // Cedar operation, with reason recorded by the server. The façade sends it as
 // the x-break-glass header. Only the operations whose spec accepts that
-// header take it (listing and applying Cedar scope policies); any other
+// header take it (listing, applying and setting Cedar policies); any other
 // façade method fails with ErrCallOptionNotAccepted. WithBreakGlass("")
 // fails with ErrEmptyBreakGlassReason. If several are given, the last one
 // wins.

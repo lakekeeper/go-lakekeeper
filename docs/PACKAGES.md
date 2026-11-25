@@ -183,7 +183,7 @@ generator's `(value, *http.Response, error)` triple.
 | `c.Users` | Create / Get / Delete / List (paged, server-side name filter) / Update / Whoami / Search / Actions; not project-scoped. Roles / TransitiveRoles (paged, take `client.ListUserRolesOptions`) list the user's role assignments and are project-scoped |
 | `c.Server` | Info / Bootstrap (takes `*managementv1.BootstrapRequest`); not project-scoped. `WithInitialBootstrap` uses the same two calls |
 | `c.Permissions` | Access / Assignments / Grant / Revoke, per resource kind: `.Warehouses`, `.Roles`, `.Projects` (project-scoped), `.Server` |
-| `c.Cedar` | Schema; ListProjectPolicies / GetProjectPolicy / ApplyProjectPolicies (`WithProject`); ListWarehousePolicies / GetWarehousePolicy / ApplyWarehousePolicies; BreakGlassStatus (`WithProject`, sent as the `project-id` query parameter). List and Apply accept `WithBreakGlass`. Lakekeeper+ with the Cedar authorization backend; see [Capabilities and `ErrUnsupported`](#capabilities-and-errunsupported) |
+| `c.Cedar` | Schema; ListProjectPolicies / GetProjectPolicy / ApplyProjectPolicies (`WithProject`); ListWarehousePolicies / GetWarehousePolicy / ApplyWarehousePolicies; BreakGlassStatus (`WithProject`, sent as the `project-id` query parameter). List and Apply accept `WithBreakGlass`. Predefined policies: List / Set / Reset ProjectPredefinedPolicies (`WithProject`) and List / Set / Reset WarehousePredefinedPolicies; List and Set take `*client.PredefinedPoliciesOptions` (`IncludePolicy`) and accept `WithBreakGlass`, Set takes `[]managementv1.PredefinedPolicyChange`. Lakekeeper+ with the Cedar authorization backend; see [Capabilities and `ErrUnsupported`](#capabilities-and-errunsupported) |
 
 ```go
 wh, err := c.Warehouses.Get(ctx, id)                // façade — one call
@@ -222,7 +222,8 @@ options, or the raw `*http.Response`, use the escape hatch.
   [ARCHITECTURE.md](ARCHITECTURE.md#project-scoping).
 - **Break-glass** is the call option `client.WithBreakGlass(reason)`, sent
   as `x-break-glass`. Only the operations whose spec accepts that header
-  take it (listing and applying Cedar scope policies). A call option an
+  take it (listing and applying Cedar scope policies, listing and setting
+  predefined Cedar policies). A call option an
   operation cannot send (`WithBreakGlass` elsewhere, `WithProject` on a
   warehouse-scoped Cedar operation) fails with
   `client.ErrCallOptionNotAccepted` before any request, and
