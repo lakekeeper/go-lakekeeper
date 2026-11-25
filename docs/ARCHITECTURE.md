@@ -321,12 +321,48 @@ client consult the capabilities (fetching them on first use):
 | `not-lakekeeper-plus` | the operation needs Lakekeeper+ and the server runs Lakekeeper | `requires Lakekeeper+; server is Lakekeeper 0.15.1` |
 | `authz-backend` | the operation needs another authorization backend | `requires the cedar authorization backend; server is Lakekeeper+ 0.15.1 with the openfga authorization backend` |
 | `queue-not-configured` | the operation needs a task queue the server does not run (not in its `queues`) | `requires the optimize task queue; server is Lakekeeper+ 0.15.1 without it` |
+| `server-too-old` | the server meets every other requirement, answers without an error body (an unknown route), and its version for the edition whose spec the operation came from is older than that spec's release | `requires Lakekeeper+ 0.15.1 or later; server is Lakekeeper+ 0.14.2` |
 
 The server answers 404 both for a queue it does not run and for a missing
 warehouse; the queue list tells them apart, so a missing warehouse on a
 server that runs the queue stays a not-found. Setting the configuration of
 a queue the server does not know is answered with 400 `QueueNotFound`
-instead; task-queue façades diagnose that answer too.
+instead; task-queue façades diagnose that answer too. Lakekeeper 0.15.0
+answers a configuration read for any queue name with 200 and nothing set,
+including the Lakekeeper+ queues it does not run, so a Lakekeeper+ queue
+configuration read with nothing set is checked against the capabilities as
+well (an `UnsupportedError` without an `APIError`). Only that answer costs
+the server info fetch; a configuration with a field set does not.
+
+`server-too-old` needs the 404 or 405 to come without a Lakekeeper error
+body, the answer to a route the server does not know; a not-found with an
+error body is the server answering a route it knows, which an older server
+sends for a missing resource too.
+
+The capabilities are read from the raw server info, so they are there even
+when the generated model rejects it, as it does for an older server that
+lacks a property the spec requires. `Server.Info` fills them too: after it,
+`Capabilities` and the diagnosis cost no request.
+
+### Supported versions
+
+The SDK supports, per edition, the minor of the spec it was generated from
+and the minor before it: built from the Lakekeeper 0.15.0 spec, it supports
+Lakekeeper 0.14.x and 0.15.x. Lakekeeper minors can make breaking changes to
+the Management API, and patch releases have not, so the range is by minor.
+It is derived from the spec releases recorded at generate time
+(`managementv1.LakekeeperSpecRelease`, `managementv1.LakekeeperPlusSpecRelease`;
+see [GENERATION.md](GENERATION.md#updating-the-specs)), never kept by hand.
+
+`client.SupportedVersions(edition)` returns the range as a
+`client.VersionRange`; `caps.SupportedVersions()` and
+`caps.InSupportedVersions()` judge one server by its edition's version (the
+Lakekeeper+ version on Lakekeeper+). A version that is missing or does not
+parse counts as supported. The SDK never refuses a call because of the
+range. `client.WithCapabilitiesObserver(func(client.Capabilities))` hands
+the capabilities of every server info fetch to the caller without a request
+of its own; `lkctl` uses it to warn once per run about a server outside the
+range (see [CLI.md](CLI.md#supported-server-versions)).
 
 An `UnsupportedError` does not unwrap to the server's `APIError`, so code
 that treats a 404 as "resource gone" never reads an unsupported operation

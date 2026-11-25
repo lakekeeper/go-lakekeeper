@@ -131,10 +131,38 @@ Error: get cedar schema: requires the cedar authorization backend; server is Lak
 Error: get optimize queue config: requires the optimize task queue; server is Lakekeeper+ 0.15.1 without it
 ```
 
+A server older than the release of the spec an operation came from says
+so, with its version:
+
+```text
+Error: get cedar schema: requires Lakekeeper+ 0.15.1 or later; server is Lakekeeper+ 0.14.2
+```
+
 `lkctl` reads the server info for this only after the server rejects a
 request as unknown (404 or 405); a genuine not-found is still reported as
 the server's error. See
 [ARCHITECTURE.md](ARCHITECTURE.md#editions-and-capabilities).
+
+### Supported server versions
+
+`lkctl` supports, per edition, the minor of the spec it was built from and
+the minor before it, for example Lakekeeper 0.14.x and 0.15.x, and
+Lakekeeper+ 0.14.x and 0.15.x. The range comes from the specs `lkctl` was
+generated from (see [ARCHITECTURE.md](ARCHITECTURE.md#supported-versions)).
+
+When a command reads the server info anyway (`server info`, `version`,
+`--bootstrap`, or the diagnosis of a rejected request) and the server is
+outside that range, `lkctl` prints one warning to stderr and carries on:
+
+```text
+Warning: server is Lakekeeper 0.13.9; this lkctl supports Lakekeeper 0.14.x and 0.15.x
+```
+
+It prints the warning at most once per run, adds no request of its own (a
+command that does not read the server info does not check), and leaves the
+command's output and exit code as they are. Against a server outside the
+range, commands can still fail; the warning says why that is to be
+expected.
 
 ### `lkctl server`
 

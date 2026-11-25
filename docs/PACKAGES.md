@@ -345,9 +345,9 @@ why, and the original `*APIError` otherwise:
 | Field | Meaning |
 |---|---|
 | `Feature` | What the operation belongs to, for example `"Cedar"` |
-| `Reason` | `client.ReasonNotLakekeeperPlus` (`not-lakekeeper-plus`), `client.ReasonAuthzBackend` (`authz-backend`) or `client.ReasonQueueNotConfigured` (`queue-not-configured`) |
+| `Reason` | `client.ReasonNotLakekeeperPlus` (`not-lakekeeper-plus`), `client.ReasonAuthzBackend` (`authz-backend`), `client.ReasonQueueNotConfigured` (`queue-not-configured`) or `client.ReasonServerTooOld` (`server-too-old`) |
 | `Server` | The server's `Capabilities` |
-| `APIError` | The server's original answer; not unwrapped, so `errors.As(err, &apiErr)` does not match |
+| `APIError` | The server's original answer; not unwrapped, so `errors.As(err, &apiErr)` does not match. Nil when the server answered with success: a Lakekeeper+ queue configuration read with nothing set, from a server without that queue |
 
 ```go
 schema, err := c.Cedar.Schema(ctx)
@@ -362,6 +362,17 @@ case err != nil:
 ```
 
 `errors.Is(err, client.ErrUnsupported)` matches every `UnsupportedError`.
+
+**Supported versions.** `client.SupportedVersions(edition)` returns the
+`client.VersionRange` the SDK supports for an edition: the minor of that
+edition's spec release and the minor before it (`String()`:
+`"Lakekeeper 0.14.x and 0.15.x"`). `caps.InSupportedVersions()` checks one
+server; the SDK never refuses a call because of it.
+`client.WithCapabilitiesObserver(observe)` calls `observe` with the
+capabilities of every server info fetch (`Server.Info`,
+`WithInitialBootstrap`, the first `Capabilities` call or diagnosis), so a
+tool can warn without a request of its own. See
+[ARCHITECTURE.md](ARCHITECTURE.md#supported-versions).
 
 **Adding a gated façade.** What an operation needs is declared once, as a
 `requirement` value next to the façade type (`cedarRequirement` in

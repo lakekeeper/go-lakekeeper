@@ -49,6 +49,12 @@ with an older Lakekeeper than the row below is unsupported.
 The minimum version is the lowest entry in the `lakekeeper_version` matrix
 of [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
 
+Beyond that matrix, the SDK and `lkctl` state which server versions they
+support, per edition: the minor of the spec they were generated from and
+the minor before it (`client.SupportedVersions`). `lkctl` warns once per run
+when a server is outside that range and carries on; see
+[docs/CLI.md](docs/CLI.md#supported-server-versions).
+
 ## Quick start — CLI
 
 Pre-built binaries on the [Releases page](https://github.com/lakekeeper/go-lakekeeper/releases/latest),
