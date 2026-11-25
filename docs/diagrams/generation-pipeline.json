@@ -3,14 +3,14 @@
   "diagram_type": "architecture",
   "meta": {
     "title": "Generation pipeline: make generate",
-    "output": ".archify/architecture-generation-pipeline-20261125-115302/generation-pipeline.html",
+    "output": ".archify/architecture-generation-pipeline-20261125-132035/generation-pipeline.html",
     "quality_profile": "showcase",
     "locale": "en",
     "repository": {
       "url": "git@github.com:lakekeeper/go-lakekeeper.git",
       "provider": "github",
       "link_mode": "local-only",
-      "revision": "cd77482df66361ad4270b03043e451dd12de2c71"
+      "revision": "b3fb0e39dc74aa8a6487ad81e32b147ec12098c5"
     },
     "legend": {
       "entries": {

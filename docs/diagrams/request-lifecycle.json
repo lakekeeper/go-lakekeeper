@@ -3,14 +3,14 @@
   "diagram_type": "sequence",
   "meta": {
     "title": "Request lifecycle: one façade call",
-    "output": ".archify/sequence-request-lifecycle-20261125-122603/request-lifecycle.html",
+    "output": ".archify/sequence-request-lifecycle-20261125-132049/request-lifecycle.html",
     "quality_profile": "showcase",
     "locale": "en",
     "repository": {
       "url": "git@github.com:lakekeeper/go-lakekeeper.git",
       "provider": "github",
       "link_mode": "local-only",
-      "revision": "1e71a691139724274e88d45916829e1d69aad52b"
+      "revision": "b3fb0e39dc74aa8a6487ad81e32b147ec12098c5"
     },
     "legend": {
       "entries": {

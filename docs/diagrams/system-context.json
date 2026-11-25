@@ -3,14 +3,14 @@
   "diagram_type": "architecture",
   "meta": {
     "title": "System context: go-lakekeeper",
-    "output": ".archify/architecture-system-context-20261125-124751/system-context.html",
+    "output": ".archify/architecture-system-context-20261125-132044/system-context.html",
     "quality_profile": "showcase",
     "locale": "en",
     "repository": {
       "url": "git@github.com:lakekeeper/go-lakekeeper.git",
       "provider": "github",
       "link_mode": "local-only",
-      "revision": "9388a199d044289e692c74e51e0ac68a9f8675c2"
+      "revision": "b3fb0e39dc74aa8a6487ad81e32b147ec12098c5"
     },
     "legend": {
       "entries": {
