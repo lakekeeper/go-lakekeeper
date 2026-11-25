@@ -173,6 +173,22 @@ generate: ## Regenerate Go bindings from OpenAPI specs.
 	@$(GO) mod tidy
 	@$(MAKE) fmt
 
+# renovate: datasource=go depName=github.com/oasdiff/oasdiff
+OASDIFF_VERSION ?= v1.40.0
+OASDIFF         := $(GO) run github.com/oasdiff/oasdiff@$(OASDIFF_VERSION)
+SPECS           := api/openapi/management-open-api.yaml api/openapi/management-plus-open-api.yaml
+# The ref the specs are compared against: the PR's base.
+BASE            ?= origin/main
+
+.PHONY: spec-breaking-changes
+spec-breaking-changes: ## Report the breaking changes in each spec between BASE (default origin/main) and the working tree, as Markdown.
+	@OASDIFF="$(OASDIFF)" ./scripts/spec-breaking-changes.sh $(BASE) $(SPECS)
+
+.PHONY: test-spec-breaking-changes
+test-spec-breaking-changes: ## Test the breaking-change report against fixture specs.
+	@echo === scripts/spec-breaking-changes_test.sh
+	@OASDIFF="$(OASDIFF)" ./scripts/spec-breaking-changes_test.sh
+
 # renovate: datasource=pypi depName=graphifyy
 GRAPHIFY_VERSION ?= 0.9.119
 
