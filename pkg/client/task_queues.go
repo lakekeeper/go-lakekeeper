@@ -21,7 +21,8 @@ func plusQueueRequirement(queue string) requirement {
 }
 
 // TaskQueues is a one-call façade over the task-queue operations of
-// TasksAPIService: it reads and sets the configuration of every task queue.
+// TasksAPIService: it reads and sets the configuration of every task queue,
+// and schedules tasks on the Lakekeeper+ queues.
 //
 // The Lakekeeper queues are tabular_purge and soft_deletion (per warehouse)
 // and task_log_cleanup (per project). The Lakekeeper+ queues are
@@ -162,6 +163,46 @@ func (q *TaskQueues) SetRemoveOrphanFilesConfig(ctx context.Context, warehouseID
 	}
 	resp, err := q.api.SetTaskQueueConfigRemoveOrphanFiles(ctx, warehouseID).SetRemoveOrphanFilesQueueConfig(*req).Execute()
 	return q.caps.diagnose(ctx, plusQueueRequirement(QueueRemoveOrphanFiles), op, WrapAPIError(op, err, resp))
+}
+
+// ScheduleExpireSnapshots schedules an expire_snapshots task for an entity
+// of a warehouse (Lakekeeper+) and returns the task's id. A missing
+// warehouse or entity is a not-found *APIError.
+func (q *TaskQueues) ScheduleExpireSnapshots(ctx context.Context, warehouseID string, req *managementv1.ScheduleExpireSnapshotsTaskRequest) (*managementv1.ScheduleTaskResponse, error) {
+	const op = "schedule expire_snapshots task"
+	if req == nil {
+		return nil, nilRequest(op)
+	}
+	out, resp, err := q.api.ScheduleTaskExpireSnapshots(ctx, warehouseID).ScheduleExpireSnapshotsTaskRequest(*req).Execute()
+	out, err = entityResult(op, out, resp, err)
+	return out, q.caps.diagnose(ctx, plusQueueRequirement(QueueExpireSnapshots), op, err)
+}
+
+// ScheduleOptimize schedules an optimize task for an entity of a warehouse
+// (Lakekeeper+) and returns the task's id. The payload's steps take the
+// managementv1.OptimizeStep constants; without steps the server runs its
+// default steps. A missing warehouse or entity is a not-found *APIError.
+func (q *TaskQueues) ScheduleOptimize(ctx context.Context, warehouseID string, req *managementv1.ScheduleOptimizeTaskRequest) (*managementv1.ScheduleTaskResponse, error) {
+	const op = "schedule optimize task"
+	if req == nil {
+		return nil, nilRequest(op)
+	}
+	out, resp, err := q.api.ScheduleTaskOptimize(ctx, warehouseID).ScheduleOptimizeTaskRequest(*req).Execute()
+	out, err = entityResult(op, out, resp, err)
+	return out, q.caps.diagnose(ctx, plusQueueRequirement(QueueOptimize), op, err)
+}
+
+// ScheduleRemoveOrphanFiles schedules a remove_orphan_files task for an
+// entity of a warehouse (Lakekeeper+) and returns the task's id. A missing
+// warehouse or entity is a not-found *APIError.
+func (q *TaskQueues) ScheduleRemoveOrphanFiles(ctx context.Context, warehouseID string, req *managementv1.ScheduleRemoveOrphanFilesTaskRequest) (*managementv1.ScheduleTaskResponse, error) {
+	const op = "schedule remove_orphan_files task"
+	if req == nil {
+		return nil, nilRequest(op)
+	}
+	out, resp, err := q.api.ScheduleTaskRemoveOrphanFiles(ctx, warehouseID).ScheduleRemoveOrphanFilesTaskRequest(*req).Execute()
+	out, err = entityResult(op, out, resp, err)
+	return out, q.caps.diagnose(ctx, plusQueueRequirement(QueueRemoveOrphanFiles), op, err)
 }
 
 func nilRequest(op string) error {

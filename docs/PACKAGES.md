@@ -184,7 +184,7 @@ generator's `(value, *http.Response, error)` triple.
 | `c.Server` | Info / Bootstrap (takes `*managementv1.BootstrapRequest`); not project-scoped. `WithInitialBootstrap` uses the same two calls |
 | `c.Permissions` | Access / Assignments / Grant / Revoke, per resource kind: `.Warehouses`, `.Roles`, `.Projects` (project-scoped), `.Server` |
 | `c.Cedar` | Schema; ListProjectPolicies / GetProjectPolicy / ApplyProjectPolicies (`WithProject`); ListWarehousePolicies / GetWarehousePolicy / ApplyWarehousePolicies; BreakGlassStatus (`WithProject`, sent as the `project-id` query parameter). List and Apply accept `WithBreakGlass`. Lakekeeper+ with the Cedar authorization backend; see [Capabilities and `ErrUnsupported`](#capabilities-and-errunsupported) |
-| `c.TaskQueues` | `<Queue>Config` / `Set<Queue>Config` per task queue: TabularPurge, SoftDeletion (by warehouse id), TaskLogCleanup (project-scoped); ExpireSnapshots, Optimize, RemoveOrphanFiles (by warehouse id; Lakekeeper+ running the queue). See [Task-queue configuration](#task-queue-configuration) |
+| `c.TaskQueues` | `<Queue>Config` / `Set<Queue>Config` per task queue: TabularPurge, SoftDeletion (by warehouse id), TaskLogCleanup (project-scoped); ExpireSnapshots, Optimize, RemoveOrphanFiles (by warehouse id; Lakekeeper+ running the queue). `Schedule<Queue>` for those three (by warehouse id; take the generated `Schedule…TaskRequest`, return `ScheduleTaskResponse`). See [Task-queue configuration](#task-queue-configuration) |
 
 ```go
 wh, err := c.Warehouses.Get(ctx, id)                // façade — one call
@@ -402,6 +402,22 @@ The Lakekeeper+ queues (`client.QueueExpireSnapshots`, `QueueOptimize`,
 `QueueRemoveOrphanFiles`) are capability-gated: on Lakekeeper they fail
 with `not-lakekeeper-plus`, and on a Lakekeeper+ server whose `queues`
 lack the queue with `queue-not-configured`.
+
+`ScheduleExpireSnapshots`, `ScheduleOptimize` and `ScheduleRemoveOrphanFiles`
+schedule a task of their queue for one entity of a warehouse and return
+the task id. They are gated like the queue's configuration; a missing
+warehouse or entity stays a not-found `*APIError`. Optimize steps are the
+`managementv1.OptimizeStep` constants:
+
+```go
+req := managementv1.NewScheduleOptimizeTaskRequest(
+    managementv1.WarehouseTaskEntityIdTableAsWarehouseTaskEntityId(
+        managementv1.NewWarehouseTaskEntityIdTable(tableID, "table")))
+req.SetPayload(managementv1.ScheduleOptimizeTaskRequestPayload{
+    Steps: []managementv1.OptimizeStep{managementv1.OPTIMIZESTEP_COMPACTION},
+})
+task, err := c.TaskQueues.ScheduleOptimize(ctx, warehouseID, req)
+```
 
 ### Escape hatch: embedded generated services
 

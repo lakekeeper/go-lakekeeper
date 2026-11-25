@@ -183,3 +183,94 @@ func TestTaskQueues_TaskLogCleanupConfig_IsProjectScoped(t *testing.T) {
 	assert.Equal(t, "prj-1", set.Last(t).Header.Get("X-Project-Id"))
 	assert.JSONEq(t, `{"queue-config":{"cleanup-period":"P2D"}}`, string(set.Last(t).Body))
 }
+
+func tableEntity() managementv1.WarehouseTaskEntityId {
+	return managementv1.WarehouseTaskEntityIdTableAsWarehouseTaskEntityId(
+		managementv1.NewWarehouseTaskEntityIdTable("tbl-1", "table"))
+}
+
+func TestTaskQueues_ScheduleExpireSnapshots_ReturnsTaskID(t *testing.T) {
+	t.Parallel()
+	mux, c := testutil.ServerMux(t)
+	schedule := testutil.Respond(t, mux, "POST "+whQueuePath+"expire_snapshots/schedule", http.StatusOK,
+		`{"task-id":"task-1"}`)
+	info := testutil.Respond(t, mux, "GET /management/v1/info", http.StatusOK, lakekeeperPlusInfo("cedar"))
+
+	got, err := c.TaskQueues.ScheduleExpireSnapshots(t.Context(), "wh-1",
+		managementv1.NewScheduleExpireSnapshotsTaskRequest(tableEntity()))
+
+	require.NoError(t, err)
+	assert.Equal(t, "task-1", got.TaskId)
+	assert.JSONEq(t, `{"entity":{"type":"table","table-id":"tbl-1"}}`, string(schedule.Last(t).Body))
+	assert.Zero(t, info.Len(), "server info requests")
+}
+
+func TestTaskQueues_ScheduleOptimize_SendsSteps(t *testing.T) {
+	t.Parallel()
+	mux, c := testutil.ServerMux(t)
+	schedule := testutil.Respond(t, mux, "POST "+whQueuePath+"optimize/schedule", http.StatusOK,
+		`{"task-id":"task-2"}`)
+
+	req := managementv1.NewScheduleOptimizeTaskRequest(tableEntity())
+	req.SetPayload(managementv1.ScheduleOptimizeTaskRequestPayload{
+		Steps: []managementv1.OptimizeStep{managementv1.OPTIMIZESTEP_COMPACTION, managementv1.OPTIMIZESTEP_REWRITE_MANIFESTS},
+	})
+	got, err := c.TaskQueues.ScheduleOptimize(t.Context(), "wh-1", req)
+
+	require.NoError(t, err)
+	assert.Equal(t, "task-2", got.TaskId)
+	assert.JSONEq(t,
+		`{"entity":{"type":"table","table-id":"tbl-1"},"payload":{"steps":["compaction","rewrite-manifests"]}}`,
+		string(schedule.Last(t).Body))
+}
+
+func TestTaskQueues_ScheduleOptimize_QueueNotConfigured(t *testing.T) {
+	t.Parallel()
+	mux, c := testutil.ServerMux(t)
+	testutil.Respond(t, mux, "POST "+whQueuePath+"optimize/schedule", http.StatusNotFound, nil)
+	testutil.Respond(t, mux, "GET /management/v1/info", http.StatusOK, lakekeeperPlusInfo("cedar"))
+
+	_, err := c.TaskQueues.ScheduleOptimize(t.Context(), "wh-1",
+		managementv1.NewScheduleOptimizeTaskRequest(tableEntity()))
+
+	require.EqualError(t, err, "schedule optimize task: requires the optimize task queue; "+
+		"server is Lakekeeper+ 0.15.2 without it")
+}
+
+func TestTaskQueues_ScheduleRemoveOrphanFiles_OnLakekeeperIsUnsupported(t *testing.T) {
+	t.Parallel()
+	mux, c := testutil.ServerMux(t)
+	testutil.Respond(t, mux, "POST "+whQueuePath+"remove_orphan_files/schedule", http.StatusNotFound, nil)
+	testutil.Respond(t, mux, "GET /management/v1/info", http.StatusOK, lakekeeperInfo())
+
+	_, err := c.TaskQueues.ScheduleRemoveOrphanFiles(t.Context(), "wh-1",
+		managementv1.NewScheduleRemoveOrphanFilesTaskRequest(tableEntity()))
+
+	require.ErrorIs(t, err, client.ErrUnsupported)
+	require.EqualError(t, err, "schedule remove_orphan_files task: requires Lakekeeper+; server is Lakekeeper 0.15.1")
+}
+
+// The server runs expire_snapshots, so its 404 is a missing table.
+func TestTaskQueues_ScheduleExpireSnapshots_MissingTableStaysNotFound(t *testing.T) {
+	t.Parallel()
+	mux, c := testutil.ServerMux(t)
+	testutil.Respond(t, mux, "POST "+whQueuePath+"expire_snapshots/schedule", http.StatusNotFound,
+		`{"error":{"code":404,"message":"Table not found","type":"NoSuchTableException","stack":[]}}`)
+	testutil.Respond(t, mux, "GET /management/v1/info", http.StatusOK, lakekeeperPlusInfo("cedar"))
+
+	_, err := c.TaskQueues.ScheduleExpireSnapshots(t.Context(), "wh-1",
+		managementv1.NewScheduleExpireSnapshotsTaskRequest(tableEntity()))
+
+	require.NotErrorIs(t, err, client.ErrUnsupported)
+	var apiErr *client.APIError
+	require.ErrorAs(t, err, &apiErr)
+	assert.Equal(t, http.StatusNotFound, apiErr.StatusCode)
+}
+
+func TestTaskQueues_ScheduleNilRequestFailsWithoutRequest(t *testing.T) {
+	t.Parallel()
+	_, c := testutil.ServerMux(t)
+
+	_, err := c.TaskQueues.ScheduleExpireSnapshots(t.Context(), "wh-1", nil)
+	require.EqualError(t, err, "schedule expire_snapshots task: request must not be nil")
+}
