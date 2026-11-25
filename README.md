@@ -33,27 +33,29 @@ graph LR
 
 ## Compatibility
 
-The Management API client is generated from Lakekeeper's OpenAPI spec, so
-each client release is pinned to a minimum Lakekeeper version that the
-integration suite exercises end-to-end. Newer Lakekeeper releases on the
-same major/minor line are expected to remain compatible; mixing a client
-with an older Lakekeeper than the row below is unsupported.
+The Management API client is generated from the Lakekeeper and Lakekeeper+
+OpenAPI specs. Each client release supports, per edition, the minor of the
+spec it was generated from and the minor before it
+(`client.SupportedVersions`); Lakekeeper minors can make breaking changes to
+the Management API, so the range is by minor. A server outside the range is
+unsupported: the SDK still sends every call, and `lkctl` warns once per run
+and carries on; see [docs/CLI.md](docs/CLI.md#supported-server-versions).
 
 <!-- BEGIN compatibility-matrix -->
-| Client version | Minimum Lakekeeper version |
-| -------------- | -------------------------- |
-| `0.2.x`        | `v0.15.0`                  |
-| `0.1.x`        | `v0.12.0`                  |
+| Client version | Lakekeeper            | Lakekeeper+           |
+| -------------- | --------------------- | --------------------- |
+| `0.2.x`        | `0.14.x` and `0.15.x` | `0.14.x` and `0.15.x` |
+| `0.1.x`        | `v0.12.0` minimum     | not supported         |
 <!-- END compatibility-matrix -->
 
-The minimum version is the lowest entry in the `lakekeeper_version` matrix
-of [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
-
-Beyond that matrix, the SDK and `lkctl` state which server versions they
-support, per edition: the minor of the spec they were generated from and
-the minor before it (`client.SupportedVersions`). `lkctl` warns once per run
-when a server is outside that range and carries on; see
-[docs/CLI.md](docs/CLI.md#supported-server-versions).
+The range comes from the spec releases in
+[`api/openapi/spec-releases.yaml`](api/openapi/spec-releases.yaml). CI runs
+the integration and end-to-end suites against the Lakekeeper spec release
+(the `lakekeeper_version` matrix of
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml)) and Lakekeeper
+`latest-main`, and, on `main`, the Lakekeeper+ suites against the Lakekeeper+
+spec release; `make test-e2e-versions` checks `lkctl` locally against the oldest
+supported Lakekeeper minor and the minor before it.
 
 ## Quick start — CLI
 

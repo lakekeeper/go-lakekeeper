@@ -81,10 +81,8 @@ jobs:
     runs-on: ubuntu-26.04
     strategy:
       matrix:
-        # When you raise the minimum entry below (i.e. drop the oldest
-        # supported Lakekeeper version), append a new row to the
-        # compatibility matrix in README.md and bound the previous row at
-        # the last client version that supported it.
+        # The supported range comes from api/openapi/spec-releases.yaml;
+        # when it moves, update the compatibility matrix in README.md.
         lakekeeper_version:
           - latest-main
           - v0.15.0
