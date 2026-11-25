@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg viewBox="0 0 1670 492" role="img" lang="en" aria-labelledby="archify-diagram-title archify-diagram-description" data-animation="trace" data-preset="classic" data-quality-profile="showcase" data-node-ui="" data-reader-fit="intrinsic-height" data-reader-min-text="7.5" data-reader-primary-text="14" style="--flow-cycle: 4.280s; width: 1670px; height: 492px; min-width: 0px;" width="1670" height="492" xmlns="http://www.w3.org/2000/svg" data-theme="dark"><style>
+<svg viewBox="0 0 1670 592" role="img" lang="en" aria-labelledby="archify-diagram-title archify-diagram-description" data-animation="trace" data-preset="classic" data-quality-profile="showcase" data-node-ui="" data-reader-fit="intrinsic-height" data-reader-min-text="7.5" data-reader-primary-text="14" style="--flow-cycle: 5.416s; width: 1670px; height: 592px; min-width: 0px;" width="1670" height="592" xmlns="http://www.w3.org/2000/svg" data-theme="dark"><style>
 /*
 JetBrains Mono variable WOFF2 subsets from Google Fonts service revision v24.
 These fixed bytes are shared by the viewer and its SVG/raster exports.
@@ -399,166 +399,234 @@ svg[data-preset="editorial"] { --flow-halo-peak: 0.07; --flow-glow-peak: 0.28; -
 }
 @keyframes archify-relay-ripple { 
   0% { r: 2px; opacity: var(--flow-peak, 0.6); }
-  17.523%, 100% { r: 20px; opacity: 0; }
+  13.848%, 100% { r: 20px; opacity: 0; }
 }
 @keyframes archify-relay-comet-0 { 
   0% { stroke-dashoffset: calc(var(--flow-len, 0px) + var(--flow-shift, 0px)); opacity: 0; animation-timing-function: cubic-bezier(0.45, 0.05, 0.35, 1); }
-  1.963% { opacity: var(--flow-peak, 0.9); }
-  9.813% { stroke-dashoffset: var(--flow-shift, 0px); opacity: var(--flow-peak, 0.9); }
-  13.551%, 100% { stroke-dashoffset: var(--flow-shift, 0px); opacity: 0; }
+  1.551% { opacity: var(--flow-peak, 0.9); }
+  7.755% { stroke-dashoffset: var(--flow-shift, 0px); opacity: var(--flow-peak, 0.9); }
+  10.709%, 100% { stroke-dashoffset: var(--flow-shift, 0px); opacity: 0; }
 }
 @keyframes archify-relay-wake-0 { 
   0% { stroke-dashoffset: var(--flow-len, 0px); opacity: var(--flow-peak, 0.3); animation-timing-function: cubic-bezier(0.45, 0.05, 0.35, 1); }
-  9.813% { stroke-dashoffset: 0px; opacity: var(--flow-peak, 0.3); }
-  30.841%, 100% { stroke-dashoffset: 0px; opacity: 0; }
+  7.755% { stroke-dashoffset: 0px; opacity: var(--flow-peak, 0.3); }
+  24.373%, 100% { stroke-dashoffset: 0px; opacity: 0; }
 }
 @keyframes archify-relay-comet-1 { 
   0% { stroke-dashoffset: calc(var(--flow-len, 0px) + var(--flow-shift, 0px)); opacity: 0; animation-timing-function: cubic-bezier(0.45, 0.05, 0.35, 1); }
-  1.963% { opacity: var(--flow-peak, 0.9); }
-  9.813% { stroke-dashoffset: var(--flow-shift, 0px); opacity: var(--flow-peak, 0.9); }
-  13.551%, 100% { stroke-dashoffset: var(--flow-shift, 0px); opacity: 0; }
+  1.551% { opacity: var(--flow-peak, 0.9); }
+  7.755% { stroke-dashoffset: var(--flow-shift, 0px); opacity: var(--flow-peak, 0.9); }
+  10.709%, 100% { stroke-dashoffset: var(--flow-shift, 0px); opacity: 0; }
 }
 @keyframes archify-relay-wake-1 { 
   0% { stroke-dashoffset: var(--flow-len, 0px); opacity: var(--flow-peak, 0.3); animation-timing-function: cubic-bezier(0.45, 0.05, 0.35, 1); }
-  9.813% { stroke-dashoffset: 0px; opacity: var(--flow-peak, 0.3); }
-  30.841%, 100% { stroke-dashoffset: 0px; opacity: 0; }
+  7.755% { stroke-dashoffset: 0px; opacity: var(--flow-peak, 0.3); }
+  24.373%, 100% { stroke-dashoffset: 0px; opacity: 0; }
 }
 @keyframes archify-relay-comet-2 { 
   0% { stroke-dashoffset: calc(var(--flow-len, 0px) + var(--flow-shift, 0px)); opacity: 0; animation-timing-function: cubic-bezier(0.45, 0.05, 0.35, 1); }
-  1.963% { opacity: var(--flow-peak, 0.9); }
-  9.813% { stroke-dashoffset: var(--flow-shift, 0px); opacity: var(--flow-peak, 0.9); }
-  13.551%, 100% { stroke-dashoffset: var(--flow-shift, 0px); opacity: 0; }
+  1.757% { opacity: var(--flow-peak, 0.9); }
+  8.785% { stroke-dashoffset: var(--flow-shift, 0px); opacity: var(--flow-peak, 0.9); }
+  11.74%, 100% { stroke-dashoffset: var(--flow-shift, 0px); opacity: 0; }
 }
 @keyframes archify-relay-wake-2 { 
   0% { stroke-dashoffset: var(--flow-len, 0px); opacity: var(--flow-peak, 0.3); animation-timing-function: cubic-bezier(0.45, 0.05, 0.35, 1); }
-  9.813% { stroke-dashoffset: 0px; opacity: var(--flow-peak, 0.3); }
-  30.841%, 100% { stroke-dashoffset: 0px; opacity: 0; }
+  8.785% { stroke-dashoffset: 0px; opacity: var(--flow-peak, 0.3); }
+  25.403%, 100% { stroke-dashoffset: 0px; opacity: 0; }
 }
 @keyframes archify-relay-comet-3 { 
   0% { stroke-dashoffset: calc(var(--flow-len, 0px) + var(--flow-shift, 0px)); opacity: 0; animation-timing-function: cubic-bezier(0.45, 0.05, 0.35, 1); }
-  1.963% { opacity: var(--flow-peak, 0.9); }
-  9.813% { stroke-dashoffset: var(--flow-shift, 0px); opacity: var(--flow-peak, 0.9); }
-  13.551%, 100% { stroke-dashoffset: var(--flow-shift, 0px); opacity: 0; }
+  1.78% { opacity: var(--flow-peak, 0.9); }
+  8.898% { stroke-dashoffset: var(--flow-shift, 0px); opacity: var(--flow-peak, 0.9); }
+  11.852%, 100% { stroke-dashoffset: var(--flow-shift, 0px); opacity: 0; }
 }
 @keyframes archify-relay-wake-3 { 
   0% { stroke-dashoffset: var(--flow-len, 0px); opacity: var(--flow-peak, 0.3); animation-timing-function: cubic-bezier(0.45, 0.05, 0.35, 1); }
-  9.813% { stroke-dashoffset: 0px; opacity: var(--flow-peak, 0.3); }
-  30.841%, 100% { stroke-dashoffset: 0px; opacity: 0; }
+  8.898% { stroke-dashoffset: 0px; opacity: var(--flow-peak, 0.3); }
+  25.516%, 100% { stroke-dashoffset: 0px; opacity: 0; }
 }
 @keyframes archify-relay-comet-4 { 
   0% { stroke-dashoffset: calc(var(--flow-len, 0px) + var(--flow-shift, 0px)); opacity: 0; animation-timing-function: cubic-bezier(0.45, 0.05, 0.35, 1); }
-  1.963% { opacity: var(--flow-peak, 0.9); }
-  9.813% { stroke-dashoffset: var(--flow-shift, 0px); opacity: var(--flow-peak, 0.9); }
-  13.551%, 100% { stroke-dashoffset: var(--flow-shift, 0px); opacity: 0; }
+  1.551% { opacity: var(--flow-peak, 0.9); }
+  7.755% { stroke-dashoffset: var(--flow-shift, 0px); opacity: var(--flow-peak, 0.9); }
+  10.709%, 100% { stroke-dashoffset: var(--flow-shift, 0px); opacity: 0; }
 }
 @keyframes archify-relay-wake-4 { 
   0% { stroke-dashoffset: var(--flow-len, 0px); opacity: var(--flow-peak, 0.3); animation-timing-function: cubic-bezier(0.45, 0.05, 0.35, 1); }
-  9.813% { stroke-dashoffset: 0px; opacity: var(--flow-peak, 0.3); }
-  30.841%, 100% { stroke-dashoffset: 0px; opacity: 0; }
+  7.755% { stroke-dashoffset: 0px; opacity: var(--flow-peak, 0.3); }
+  24.373%, 100% { stroke-dashoffset: 0px; opacity: 0; }
 }
 @keyframes archify-relay-comet-5 { 
   0% { stroke-dashoffset: calc(var(--flow-len, 0px) + var(--flow-shift, 0px)); opacity: 0; animation-timing-function: cubic-bezier(0.45, 0.05, 0.35, 1); }
-  1.963% { opacity: var(--flow-peak, 0.9); }
-  9.813% { stroke-dashoffset: var(--flow-shift, 0px); opacity: var(--flow-peak, 0.9); }
-  13.551%, 100% { stroke-dashoffset: var(--flow-shift, 0px); opacity: 0; }
+  2.216% { opacity: var(--flow-peak, 0.9); }
+  27.697% { stroke-dashoffset: var(--flow-shift, 0px); opacity: var(--flow-peak, 0.9); }
+  30.651%, 100% { stroke-dashoffset: var(--flow-shift, 0px); opacity: 0; }
 }
 @keyframes archify-relay-wake-5 { 
   0% { stroke-dashoffset: var(--flow-len, 0px); opacity: var(--flow-peak, 0.3); animation-timing-function: cubic-bezier(0.45, 0.05, 0.35, 1); }
-  9.813% { stroke-dashoffset: 0px; opacity: var(--flow-peak, 0.3); }
-  30.841%, 100% { stroke-dashoffset: 0px; opacity: 0; }
+  27.697% { stroke-dashoffset: 0px; opacity: var(--flow-peak, 0.3); }
+  44.315%, 100% { stroke-dashoffset: 0px; opacity: 0; }
 }
 @keyframes archify-relay-comet-6 { 
   0% { stroke-dashoffset: calc(var(--flow-len, 0px) + var(--flow-shift, 0px)); opacity: 0; animation-timing-function: cubic-bezier(0.45, 0.05, 0.35, 1); }
-  1.963% { opacity: var(--flow-peak, 0.9); }
-  9.813% { stroke-dashoffset: var(--flow-shift, 0px); opacity: var(--flow-peak, 0.9); }
-  13.551%, 100% { stroke-dashoffset: var(--flow-shift, 0px); opacity: 0; }
+  1.551% { opacity: var(--flow-peak, 0.9); }
+  7.755% { stroke-dashoffset: var(--flow-shift, 0px); opacity: var(--flow-peak, 0.9); }
+  10.709%, 100% { stroke-dashoffset: var(--flow-shift, 0px); opacity: 0; }
 }
 @keyframes archify-relay-wake-6 { 
   0% { stroke-dashoffset: var(--flow-len, 0px); opacity: var(--flow-peak, 0.3); animation-timing-function: cubic-bezier(0.45, 0.05, 0.35, 1); }
-  9.813% { stroke-dashoffset: 0px; opacity: var(--flow-peak, 0.3); }
-  30.841%, 100% { stroke-dashoffset: 0px; opacity: 0; }
+  7.755% { stroke-dashoffset: 0px; opacity: var(--flow-peak, 0.3); }
+  24.373%, 100% { stroke-dashoffset: 0px; opacity: 0; }
 }
 @keyframes archify-relay-comet-7 { 
   0% { stroke-dashoffset: calc(var(--flow-len, 0px) + var(--flow-shift, 0px)); opacity: 0; animation-timing-function: cubic-bezier(0.45, 0.05, 0.35, 1); }
-  1.963% { opacity: var(--flow-peak, 0.9); }
-  9.813% { stroke-dashoffset: var(--flow-shift, 0px); opacity: var(--flow-peak, 0.9); }
-  13.551%, 100% { stroke-dashoffset: var(--flow-shift, 0px); opacity: 0; }
+  1.551% { opacity: var(--flow-peak, 0.9); }
+  7.755% { stroke-dashoffset: var(--flow-shift, 0px); opacity: var(--flow-peak, 0.9); }
+  10.709%, 100% { stroke-dashoffset: var(--flow-shift, 0px); opacity: 0; }
 }
 @keyframes archify-relay-wake-7 { 
   0% { stroke-dashoffset: var(--flow-len, 0px); opacity: var(--flow-peak, 0.3); animation-timing-function: cubic-bezier(0.45, 0.05, 0.35, 1); }
-  9.813% { stroke-dashoffset: 0px; opacity: var(--flow-peak, 0.3); }
-  30.841%, 100% { stroke-dashoffset: 0px; opacity: 0; }
+  7.755% { stroke-dashoffset: 0px; opacity: var(--flow-peak, 0.3); }
+  24.373%, 100% { stroke-dashoffset: 0px; opacity: 0; }
 }
 @keyframes archify-relay-comet-8 { 
   0% { stroke-dashoffset: calc(var(--flow-len, 0px) + var(--flow-shift, 0px)); opacity: 0; animation-timing-function: cubic-bezier(0.45, 0.05, 0.35, 1); }
-  1.963% { opacity: var(--flow-peak, 0.9); }
-  9.813% { stroke-dashoffset: var(--flow-shift, 0px); opacity: var(--flow-peak, 0.9); }
-  13.551%, 100% { stroke-dashoffset: var(--flow-shift, 0px); opacity: 0; }
+  1.551% { opacity: var(--flow-peak, 0.9); }
+  7.755% { stroke-dashoffset: var(--flow-shift, 0px); opacity: var(--flow-peak, 0.9); }
+  10.709%, 100% { stroke-dashoffset: var(--flow-shift, 0px); opacity: 0; }
 }
 @keyframes archify-relay-wake-8 { 
-  0%, 2.944% { opacity: 0; }
-  9.813% { opacity: var(--flow-peak, 0.3); }
-  30.841%, 100% { stroke-dashoffset: 0px; opacity: 0; }
+  0% { stroke-dashoffset: var(--flow-len, 0px); opacity: var(--flow-peak, 0.3); animation-timing-function: cubic-bezier(0.45, 0.05, 0.35, 1); }
+  7.755% { stroke-dashoffset: 0px; opacity: var(--flow-peak, 0.3); }
+  24.373%, 100% { stroke-dashoffset: 0px; opacity: 0; }
+}
+@keyframes archify-relay-comet-9 { 
+  0% { stroke-dashoffset: calc(var(--flow-len, 0px) + var(--flow-shift, 0px)); opacity: 0; animation-timing-function: cubic-bezier(0.45, 0.05, 0.35, 1); }
+  1.551% { opacity: var(--flow-peak, 0.9); }
+  7.755% { stroke-dashoffset: var(--flow-shift, 0px); opacity: var(--flow-peak, 0.9); }
+  10.709%, 100% { stroke-dashoffset: var(--flow-shift, 0px); opacity: 0; }
+}
+@keyframes archify-relay-wake-9 { 
+  0% { stroke-dashoffset: var(--flow-len, 0px); opacity: var(--flow-peak, 0.3); animation-timing-function: cubic-bezier(0.45, 0.05, 0.35, 1); }
+  7.755% { stroke-dashoffset: 0px; opacity: var(--flow-peak, 0.3); }
+  24.373%, 100% { stroke-dashoffset: 0px; opacity: 0; }
+}
+@keyframes archify-relay-comet-10 { 
+  0% { stroke-dashoffset: calc(var(--flow-len, 0px) + var(--flow-shift, 0px)); opacity: 0; animation-timing-function: cubic-bezier(0.45, 0.05, 0.35, 1); }
+  1.551% { opacity: var(--flow-peak, 0.9); }
+  7.755% { stroke-dashoffset: var(--flow-shift, 0px); opacity: var(--flow-peak, 0.9); }
+  10.709%, 100% { stroke-dashoffset: var(--flow-shift, 0px); opacity: 0; }
+}
+@keyframes archify-relay-wake-10 { 
+  0% { stroke-dashoffset: var(--flow-len, 0px); opacity: var(--flow-peak, 0.3); animation-timing-function: cubic-bezier(0.45, 0.05, 0.35, 1); }
+  7.755% { stroke-dashoffset: 0px; opacity: var(--flow-peak, 0.3); }
+  24.373%, 100% { stroke-dashoffset: 0px; opacity: 0; }
+}
+@keyframes archify-relay-comet-11 { 
+  0% { stroke-dashoffset: calc(var(--flow-len, 0px) + var(--flow-shift, 0px)); opacity: 0; animation-timing-function: cubic-bezier(0.45, 0.05, 0.35, 1); }
+  1.551% { opacity: var(--flow-peak, 0.9); }
+  7.755% { stroke-dashoffset: var(--flow-shift, 0px); opacity: var(--flow-peak, 0.9); }
+  10.709%, 100% { stroke-dashoffset: var(--flow-shift, 0px); opacity: 0; }
+}
+@keyframes archify-relay-wake-11 { 
+  0% { stroke-dashoffset: var(--flow-len, 0px); opacity: var(--flow-peak, 0.3); animation-timing-function: cubic-bezier(0.45, 0.05, 0.35, 1); }
+  7.755% { stroke-dashoffset: 0px; opacity: var(--flow-peak, 0.3); }
+  24.373%, 100% { stroke-dashoffset: 0px; opacity: 0; }
+}
+@keyframes archify-relay-comet-12 { 
+  0% { stroke-dashoffset: calc(var(--flow-len, 0px) + var(--flow-shift, 0px)); opacity: 0; animation-timing-function: cubic-bezier(0.45, 0.05, 0.35, 1); }
+  1.551% { opacity: var(--flow-peak, 0.9); }
+  7.755% { stroke-dashoffset: var(--flow-shift, 0px); opacity: var(--flow-peak, 0.9); }
+  10.709%, 100% { stroke-dashoffset: var(--flow-shift, 0px); opacity: 0; }
+}
+@keyframes archify-relay-wake-12 { 
+  0%, 2.327% { opacity: 0; }
+  7.755% { opacity: var(--flow-peak, 0.3); }
+  24.373%, 100% { stroke-dashoffset: 0px; opacity: 0; }
 }
 @keyframes archify-relay-node-0 { 
   0%, 100% { filter: var(--ambient-node-base-filter, none); }
   0% { filter: var(--ambient-node-base-filter, none); }
-  2.804%, 9.813% { filter: var(--ambient-node-base-filter,) drop-shadow(0 0 10px var(--arrow-emphasis)); }
-  28.037% { filter: var(--ambient-node-base-filter, none); }
+  2.216%, 7.755% { filter: var(--ambient-node-base-filter,) drop-shadow(0 0 10px var(--arrow-emphasis)); }
+  22.157% { filter: var(--ambient-node-base-filter, none); }
 }
 @keyframes archify-relay-node-1 { 
   0%, 100% { filter: var(--ambient-node-base-filter, none); }
   0% { filter: var(--ambient-node-base-filter, none); }
-  2.804%, 9.813% { filter: var(--ambient-node-base-filter,) drop-shadow(0 0 10px var(--arrow-emphasis)); }
-  28.037% { filter: var(--ambient-node-base-filter, none); }
+  2.216%, 7.755% { filter: var(--ambient-node-base-filter,) drop-shadow(0 0 10px var(--arrow-emphasis)); }
+  22.157% { filter: var(--ambient-node-base-filter, none); }
 }
 @keyframes archify-relay-node-2 { 
   0%, 100% { filter: var(--ambient-node-base-filter, none); }
   0% { filter: var(--ambient-node-base-filter, none); }
-  2.804%, 9.813% { filter: var(--ambient-node-base-filter,) drop-shadow(0 0 10px var(--arrow-emphasis)); }
-  28.037% { filter: var(--ambient-node-base-filter, none); }
+  2.216%, 7.755% { filter: var(--ambient-node-base-filter,) drop-shadow(0 0 10px var(--arrow-emphasis)); }
+  22.157% { filter: var(--ambient-node-base-filter, none); }
 }
 @keyframes archify-relay-node-3 { 
   0%, 100% { filter: var(--ambient-node-base-filter, none); }
   0% { filter: var(--ambient-node-base-filter, none); }
-  2.804%, 9.813% { filter: var(--ambient-node-base-filter,) drop-shadow(0 0 10px var(--arrow-emphasis)); }
-  28.037% { filter: var(--ambient-node-base-filter, none); }
+  2.216%, 7.755% { filter: var(--ambient-node-base-filter,) drop-shadow(0 0 10px var(--arrow-emphasis)); }
+  22.157% { filter: var(--ambient-node-base-filter, none); }
 }
 @keyframes archify-relay-node-4 { 
   0%, 100% { filter: var(--ambient-node-base-filter, none); }
-  9.813% { filter: var(--ambient-node-base-filter, none); }
-  12.617%, 19.626% { filter: var(--ambient-node-base-filter,) drop-shadow(0 0 10px var(--arrow-emphasis)); }
-  37.85% { filter: var(--ambient-node-base-filter, none); }
+  0% { filter: var(--ambient-node-base-filter, none); }
+  2.216%, 7.755% { filter: var(--ambient-node-base-filter,) drop-shadow(0 0 10px var(--arrow-emphasis)); }
+  22.157% { filter: var(--ambient-node-base-filter, none); }
 }
 @keyframes archify-relay-node-5 { 
   0%, 100% { filter: var(--ambient-node-base-filter, none); }
-  9.813% { filter: var(--ambient-node-base-filter, none); }
-  12.617%, 19.626% { filter: var(--ambient-node-base-filter,) drop-shadow(0 0 10px var(--arrow-emphasis)); }
-  37.85% { filter: var(--ambient-node-base-filter, none); }
+  7.755% { filter: var(--ambient-node-base-filter, none); }
+  9.971%, 15.51% { filter: var(--ambient-node-base-filter,) drop-shadow(0 0 10px var(--arrow-emphasis)); }
+  29.912% { filter: var(--ambient-node-base-filter, none); }
 }
 @keyframes archify-relay-node-6 { 
   0%, 100% { filter: var(--ambient-node-base-filter, none); }
-  9.813% { filter: var(--ambient-node-base-filter, none); }
-  12.617%, 19.626% { filter: var(--ambient-node-base-filter,) drop-shadow(0 0 10px var(--arrow-emphasis)); }
-  37.85% { filter: var(--ambient-node-base-filter, none); }
+  7.755% { filter: var(--ambient-node-base-filter, none); }
+  9.971%, 15.51% { filter: var(--ambient-node-base-filter,) drop-shadow(0 0 10px var(--arrow-emphasis)); }
+  29.912% { filter: var(--ambient-node-base-filter, none); }
 }
 @keyframes archify-relay-node-7 { 
   0%, 100% { filter: var(--ambient-node-base-filter, none); }
-  9.813% { filter: var(--ambient-node-base-filter, none); }
-  12.617%, 19.626% { filter: var(--ambient-node-base-filter,) drop-shadow(0 0 10px var(--arrow-emphasis)); }
-  37.85% { filter: var(--ambient-node-base-filter, none); }
+  7.755% { filter: var(--ambient-node-base-filter, none); }
+  9.971%, 15.51% { filter: var(--ambient-node-base-filter,) drop-shadow(0 0 10px var(--arrow-emphasis)); }
+  29.912% { filter: var(--ambient-node-base-filter, none); }
 }
 @keyframes archify-relay-node-8 { 
   0%, 100% { filter: var(--ambient-node-base-filter, none); }
-  21.963% { filter: var(--ambient-node-base-filter, none); }
-  24.766%, 31.776% { filter: var(--ambient-node-base-filter,) drop-shadow(0 0 10px var(--arrow-emphasis)); }
-  50% { filter: var(--ambient-node-base-filter, none); }
+  7.755% { filter: var(--ambient-node-base-filter, none); }
+  9.971%, 15.51% { filter: var(--ambient-node-base-filter,) drop-shadow(0 0 10px var(--arrow-emphasis)); }
+  29.912% { filter: var(--ambient-node-base-filter, none); }
 }
 @keyframes archify-relay-node-9 { 
   0%, 100% { filter: var(--ambient-node-base-filter, none); }
-  34.112% { filter: var(--ambient-node-base-filter, none); }
-  36.916%, 43.925% { filter: var(--ambient-node-base-filter,) drop-shadow(0 0 10px var(--arrow-emphasis)); }
-  62.15% { filter: var(--ambient-node-base-filter, none); }
+  7.755% { filter: var(--ambient-node-base-filter, none); }
+  9.971%, 15.51% { filter: var(--ambient-node-base-filter,) drop-shadow(0 0 10px var(--arrow-emphasis)); }
+  29.912% { filter: var(--ambient-node-base-filter, none); }
+}
+@keyframes archify-relay-node-10 { 
+  0%, 100% { filter: var(--ambient-node-base-filter, none); }
+  18.387% { filter: var(--ambient-node-base-filter, none); }
+  20.603%, 26.142% { filter: var(--ambient-node-base-filter,) drop-shadow(0 0 10px var(--arrow-emphasis)); }
+  40.544% { filter: var(--ambient-node-base-filter, none); }
+}
+@keyframes archify-relay-node-11 { 
+  0%, 100% { filter: var(--ambient-node-base-filter, none); }
+  17.357% { filter: var(--ambient-node-base-filter, none); }
+  19.572%, 25.112% { filter: var(--ambient-node-base-filter,) drop-shadow(0 0 10px var(--arrow-emphasis)); }
+  39.514% { filter: var(--ambient-node-base-filter, none); }
+}
+@keyframes archify-relay-node-12 { 
+  0%, 100% { filter: var(--ambient-node-base-filter, none); }
+  26.958% { filter: var(--ambient-node-base-filter, none); }
+  29.174%, 34.713% { filter: var(--ambient-node-base-filter,) drop-shadow(0 0 10px var(--arrow-emphasis)); }
+  49.116% { filter: var(--ambient-node-base-filter, none); }
+}
+@keyframes archify-relay-node-13 { 
+  0%, 100% { filter: var(--ambient-node-base-filter, none); }
+  27.988% { filter: var(--ambient-node-base-filter, none); }
+  30.204%, 35.744% { filter: var(--ambient-node-base-filter,) drop-shadow(0 0 10px var(--arrow-emphasis)); }
+  50.146% { filter: var(--ambient-node-base-filter, none); }
 }
 svg[data-node-ui] [data-node-id] &gt; rect:not(.c-mask) { stroke-width: 1.25px; }
 :is([data-theme="dark"] svg[data-node-ui], svg[data-node-ui][data-theme="dark"]) [data-node-id] &gt; rect:not(.c-mask).c-frontend { fill: color-mix(in srgb, var(--frontend-stroke) 13%, var(--mask)); stroke: color-mix(in srgb, var(--frontend-stroke) 72%, var(--mask)); }
@@ -580,7 +648,7 @@ svg[data-node-ui] g[data-edge-from] &gt; rect.c-mask { rx: 7px; stroke: var(--la
 svg[data-node-ui][data-preset="blueprint"] :is([data-graph-role="structural-frame-label-mask"], g[data-edge-from] &gt; rect.c-mask, .phase-chip) { rx: 2px; }
 svg[data-node-ui][data-preset="editorial"] :is([data-graph-role="structural-frame-label-mask"], g[data-edge-from] &gt; rect.c-mask, .phase-chip) { rx: 3px; }
 :root, svg { --bg: #020617; --grid: #1e293b; --canvas-dot: rgba(148, 163, 184, 0.16); --text: #ffffff; --text-muted: #94a3b8; --text-dim: #475569; --text-faint: #7d8da1; --panel: rgba(15, 23, 42, 0.5); --panel-border: #1e293b; --lane-fill: rgba(15, 23, 42, 0.22); --lane-stroke: #334155; --arrow: #94a3b8; --arrow-emphasis: #34d399; --mask: #0f172a; --frontend-fill: rgba(8, 51, 68, 0.4); --frontend-stroke: #22d3ee; --backend-fill: rgba(6, 78, 59, 0.4); --backend-stroke: #34d399; --database-fill: rgba(76, 29, 149, 0.4); --database-stroke: #a78bfa; --cloud-fill: rgba(120, 53, 15, 0.3); --cloud-stroke: #fbbf24; --security-fill: rgba(136, 19, 55, 0.4); --security-stroke: #fb7185; --messagebus-fill: rgba(251, 146, 60, 0.3); --messagebus-stroke: #fb923c; --external-fill: rgba(30, 41, 59, 0.5); --external-stroke: #94a3b8; --toolbar-bg: rgba(15, 23, 42, 0.8); --toolbar-border: #334155; --toolbar-text: #e2e8f0; --toolbar-hover: rgba(15, 23, 42, 0.95); --toolbar-menu-bg: #0f172a; --flow-cycle: ; --flow-halo-peak: ; --flow-glow-peak: ; --flow-tail-peak: ; --flow-head-peak: ; --flow-wake-peak: ; --flow-ripple-peak: ; --flow-peak: ; }
-</style><rect x="0" y="0" width="1670" height="492" fill="#020617"/>
+</style><rect x="0" y="0" width="1670" height="592" fill="#020617"/>
         <title id="archify-diagram-title">Generation pipeline: make generate</title>
         <desc id="archify-diagram-description">An architecture diagram generated by Archify.</desc>
         <!-- Definitions -->
@@ -635,36 +703,52 @@ svg[data-node-ui][data-preset="editorial"] :is([data-graph-role="structural-fram
           <path data-edge-from="upstream" data-edge-to="spec" data-edge-label="copied by hand" data-edge-key="0" data-edge-id="upstream-spec" data-composition-points="270,72;380,72" data-composition-crossover="halo" data-composition-independent="true" d="M 270 72 L 380 72" class="a-default" data-animate="edge" style="--step: 0;" stroke-width="1.5" marker-end="url(#arrowhead)"/>
         </g>
         <g data-graph-role="automatic-crossover" style="--step:1">
-          <path data-graph-role="automatic-crossover-underlay" d="M 495 104 L 495 200" fill="none" stroke="var(--mask)" stroke-width="5.8" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
-          <path data-edge-from="spec" data-edge-to="generator" data-edge-label="-i, unmodified" data-edge-key="1" data-edge-id="spec-generator" data-composition-points="495,104;495,200" data-composition-crossover="halo" data-composition-independent="true" d="M 495 104 L 495 200" class="a-emphasis" data-animate="edge" style="--step: 1;" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+          <path data-graph-role="automatic-crossover-underlay" d="M 270 172 L 380 172" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
+          <path data-edge-from="plusupstream" data-edge-to="plusspec" data-edge-label="copied by hand" data-edge-key="1" data-edge-id="plusupstream-plusspec" data-composition-points="270,172;380,172" data-composition-crossover="halo" data-composition-independent="true" d="M 270 172 L 380 172" class="a-default" data-animate="edge" style="--step: 1;" stroke-width="1.5" marker-end="url(#arrowhead)"/>
         </g>
         <g data-graph-role="automatic-crossover" style="--step:2">
-          <path data-graph-role="automatic-crossover-underlay" d="M 155 360 L 155 264" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
-          <path data-edge-from="ignore" data-edge-to="make" data-edge-label="copied into output dir" data-edge-key="2" data-edge-id="ignore-make" data-composition-points="155,360;155,264" data-composition-crossover="halo" data-composition-independent="true" d="M 155 360 L 155 264" class="a-default" data-animate="edge" style="--step: 2;" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+          <path data-graph-role="automatic-crossover-underlay" d="M 594 104 L 594 108.45 Q 594 112.9 598.45 112.9 L 720 112.9" fill="none" stroke="var(--mask)" stroke-width="5.8" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
+          <path data-edge-from="spec" data-edge-to="prepare" data-edge-label="base" data-edge-key="2" data-edge-id="spec-prepare" data-composition-points="594,104;594,112.9;720,112.9" data-composition-crossover="halo" data-composition-independent="true" d="M 594 104 L 594 108.45 Q 594 112.9 598.45 112.9 L 720 112.9" class="a-emphasis" data-animate="edge" style="--step: 2;" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
         </g>
         <g data-graph-role="automatic-crossover" style="--step:3">
-          <path data-graph-role="automatic-crossover-underlay" d="M 495 360 L 495 264" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
-          <path data-edge-from="config" data-edge-to="generator" data-edge-label="-c" data-edge-key="3" data-edge-id="config-generator" data-composition-points="495,360;495,264" data-composition-crossover="halo" data-composition-independent="true" d="M 495 360 L 495 264" class="a-default" data-animate="edge" style="--step: 3;" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+          <path data-graph-role="automatic-crossover-underlay" d="M 594 140 L 594 134.5 Q 594 129 599.5 129 L 720 129" fill="none" stroke="var(--mask)" stroke-width="5.8" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
+          <path data-edge-from="plusspec" data-edge-to="prepare" data-edge-label="additions" data-edge-key="3" data-edge-id="plusspec-prepare" data-composition-points="594,140;594,129;720,129" data-composition-crossover="halo" data-composition-independent="true" d="M 594 140 L 594 134.5 Q 594 129 599.5 129 L 720 129" class="a-emphasis" data-animate="edge" style="--step: 3;" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
         </g>
         <g data-graph-role="automatic-crossover" style="--step:4">
-          <path data-graph-role="automatic-crossover-underlay" d="M 270 232 L 380 232" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
-          <path data-edge-from="make" data-edge-to="generator" data-edge-label="runs" data-edge-key="4" data-edge-id="make-generator" data-composition-points="270,232;380,232" data-composition-crossover="halo" data-composition-independent="true" d="M 270 232 L 380 232" class="a-default" data-animate="edge" style="--step: 4;" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+          <path data-graph-role="automatic-crossover-underlay" d="M 950 112.9 L 1060 112.9" fill="none" stroke="var(--mask)" stroke-width="5.8" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
+          <path data-edge-from="prepare" data-edge-to="merged" data-edge-label="writes" data-edge-key="4" data-edge-id="prepare-merged" data-composition-points="950,112.9;1060,112.9" data-composition-crossover="halo" data-composition-independent="true" d="M 950 112.9 L 1060 112.9" class="a-emphasis" data-animate="edge" style="--step: 4;" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
         </g>
         <g data-graph-role="automatic-crossover" style="--step:5">
-          <path data-graph-role="automatic-crossover-underlay" d="M 610 232 L 720 232" fill="none" stroke="var(--mask)" stroke-width="5.8" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
-          <path data-edge-from="generator" data-edge-to="postprocess" data-edge-label="raw Go tree" data-edge-key="5" data-edge-id="generator-postprocess" data-composition-points="610,232;720,232" data-composition-crossover="halo" data-composition-independent="true" d="M 610 232 L 720 232" class="a-emphasis" data-animate="edge" style="--step: 5;" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+          <path data-graph-role="automatic-crossover-underlay" d="M 1060 129 L 1044 129 Q 1036 129 1036 137 L 1036 268 Q 1036 276 1028 276 L 503 276 Q 495 276 495 284 L 495 300" fill="none" stroke="var(--mask)" stroke-width="5.8" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
+          <path data-edge-from="merged" data-edge-to="generator" data-edge-label="-i" data-edge-key="5" data-edge-id="merged-generator" data-composition-points="1060,129;1036,129;1036,276;495,276;495,300" data-composition-crossover="halo" data-composition-independent="true" d="M 1060 129 L 1044 129 Q 1036 129 1036 137 L 1036 268 Q 1036 276 1028 276 L 503 276 Q 495 276 495 284 L 495 300" class="a-emphasis" data-animate="edge" style="--step: 5;" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
         </g>
         <g data-graph-role="automatic-crossover" style="--step:6">
-          <path data-graph-role="automatic-crossover-underlay" d="M 950 232 L 1060 232" fill="none" stroke="var(--mask)" stroke-width="5.8" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
-          <path data-edge-from="postprocess" data-edge-to="format" data-edge-label="relaxed tree" data-edge-key="6" data-edge-id="postprocess-format" data-composition-points="950,232;1060,232" data-composition-crossover="halo" data-composition-independent="true" d="M 950 232 L 1060 232" class="a-emphasis" data-animate="edge" style="--step: 6;" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+          <path data-graph-role="automatic-crossover-underlay" d="M 155 460 L 155 364" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
+          <path data-edge-from="ignore" data-edge-to="make" data-edge-label="copied into output dir" data-edge-key="6" data-edge-id="ignore-make" data-composition-points="155,460;155,364" data-composition-crossover="halo" data-composition-independent="true" d="M 155 460 L 155 364" class="a-default" data-animate="edge" style="--step: 6;" stroke-width="1.5" marker-end="url(#arrowhead)"/>
         </g>
         <g data-graph-role="automatic-crossover" style="--step:7">
-          <path data-graph-role="automatic-crossover-underlay" d="M 1290 232 L 1400 232" fill="none" stroke="var(--mask)" stroke-width="5.8" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
-          <path data-edge-from="format" data-edge-to="generated" data-edge-label="writes" data-edge-key="7" data-edge-id="format-generated" data-composition-points="1290,232;1400,232" data-composition-crossover="halo" data-composition-independent="true" d="M 1290 232 L 1400 232" class="a-emphasis" data-animate="edge" style="--step: 7;" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+          <path data-graph-role="automatic-crossover-underlay" d="M 495 460 L 495 364" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
+          <path data-edge-from="config" data-edge-to="generator" data-edge-label="-c" data-edge-key="7" data-edge-id="config-generator" data-composition-points="495,460;495,364" data-composition-crossover="halo" data-composition-independent="true" d="M 495 460 L 495 364" class="a-default" data-animate="edge" style="--step: 7;" stroke-width="1.5" marker-end="url(#arrowhead)"/>
         </g>
         <g data-graph-role="automatic-crossover" style="--step:8">
-          <path data-graph-role="automatic-crossover-underlay" d="M 1515 360 L 1515 264" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
-          <path data-edge-from="handedit" data-edge-to="generated" data-edge-label="wiped by the next run" data-edge-key="8" data-edge-id="handedit-generated" data-composition-points="1515,360;1515,264" data-composition-crossover="halo" data-composition-independent="true" d="M 1515 360 L 1515 264" class="a-security" data-animate="edge" style="--step: 8;" stroke-width="1.5" marker-end="url(#arrowhead-security)"/>
+          <path data-graph-role="automatic-crossover-underlay" d="M 270 332 L 380 332" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
+          <path data-edge-from="make" data-edge-to="generator" data-edge-label="runs" data-edge-key="8" data-edge-id="make-generator" data-composition-points="270,332;380,332" data-composition-crossover="halo" data-composition-independent="true" d="M 270 332 L 380 332" class="a-default" data-animate="edge" style="--step: 8;" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        </g>
+        <g data-graph-role="automatic-crossover" style="--step:9">
+          <path data-graph-role="automatic-crossover-underlay" d="M 610 341.1 L 720 341.1" fill="none" stroke="var(--mask)" stroke-width="5.8" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
+          <path data-edge-from="generator" data-edge-to="postprocess" data-edge-label="raw Go tree" data-edge-key="9" data-edge-id="generator-postprocess" data-composition-points="610,341.1;720,341.1" data-composition-crossover="halo" data-composition-independent="true" d="M 610 341.1 L 720 341.1" class="a-emphasis" data-animate="edge" style="--step: 9;" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        </g>
+        <g data-graph-role="automatic-crossover" style="--step:10">
+          <path data-graph-role="automatic-crossover-underlay" d="M 950 332 L 1060 332" fill="none" stroke="var(--mask)" stroke-width="5.8" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
+          <path data-edge-from="postprocess" data-edge-to="format" data-edge-label="relaxed tree" data-edge-key="10" data-edge-id="postprocess-format" data-composition-points="950,332;1060,332" data-composition-crossover="halo" data-composition-independent="true" d="M 950 332 L 1060 332" class="a-emphasis" data-animate="edge" style="--step: 10;" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        </g>
+        <g data-graph-role="automatic-crossover" style="--step:11">
+          <path data-graph-role="automatic-crossover-underlay" d="M 1290 332 L 1400 332" fill="none" stroke="var(--mask)" stroke-width="5.8" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
+          <path data-edge-from="format" data-edge-to="generated" data-edge-label="writes" data-edge-key="11" data-edge-id="format-generated" data-composition-points="1290,332;1400,332" data-composition-crossover="halo" data-composition-independent="true" d="M 1290 332 L 1400 332" class="a-emphasis" data-animate="edge" style="--step: 11;" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        </g>
+        <g data-graph-role="automatic-crossover" style="--step:12">
+          <path data-graph-role="automatic-crossover-underlay" d="M 1515 460 L 1515 364" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
+          <path data-edge-from="handedit" data-edge-to="generated" data-edge-label="wiped by the next run" data-edge-key="12" data-edge-id="handedit-generated" data-composition-points="1515,460;1515,364" data-composition-crossover="halo" data-composition-independent="true" d="M 1515 460 L 1515 364" class="a-security" data-animate="edge" style="--step: 12;" stroke-width="1.5" marker-end="url(#arrowhead-security)"/>
         </g>
 
         <!-- Components -->
@@ -681,120 +765,171 @@ svg[data-node-ui][data-preset="editorial"] :is([data-graph-role="structural-fram
         <text x="155" y="96" class="t-external" font-size="7" text-anchor="middle">at the targeted release tag</text>
         </g>
 
-        <g id="node-spec" data-node-id="spec" data-node-label="OpenAPI spec" tabindex="0" role="button" aria-label="Focus OpenAPI spec, api/openapi/management-open-api.yaml, Architecture component" aria-pressed="false" data-node-kind="database" data-node-sublabel="api/openapi/management-open-api.yaml" data-node-tag="committed · source of truth" data-node-context="Architecture component">
-          <title>OpenAPI spec · api/openapi/management-open-api.yaml · Architecture component · committed · source of truth</title>
+        <g id="node-spec" data-node-id="spec" data-node-label="Lakekeeper spec" tabindex="0" role="button" aria-label="Focus Lakekeeper spec, api/openapi/management-open-api.yaml, Architecture component" aria-pressed="false" data-node-kind="database" data-node-sublabel="api/openapi/management-open-api.yaml" data-node-tag="committed · copied unmodified" data-node-context="Architecture component">
+          <title>Lakekeeper spec · api/openapi/management-open-api.yaml · Architecture component · committed · copied unmodified</title>
           <rect x="380" y="40" width="230" height="64" rx="8" class="c-mask"/>
-          <rect x="380" y="40" width="230" height="64" rx="8" class="c-database" data-animate="node" style="--step: 1; --flow-node-name: archify-relay-node-4;" stroke-width="1.5"/>
+          <rect x="380" y="40" width="230" height="64" rx="8" class="c-database" data-animate="node" style="--step: 1; --flow-node-name: archify-relay-node-5;" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(386 46) scale(0.6875)">
             <ellipse cx="8" cy="4" rx="5" ry="2"/>
             <path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/>
           </g>
-          <text data-node-label="" x="495" y="70" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">OpenAPI spec</text>
+          <text data-node-label="" x="495" y="70" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Lakekeeper spec</text>
         <text x="495" y="86" class="t-muted" font-size="9" text-anchor="middle">api/openapi/management-open-api.yaml</text>
-        <text x="495" y="96" class="t-database" font-size="7" text-anchor="middle">committed · source of truth</text>
+        <text x="495" y="96" class="t-database" font-size="7" text-anchor="middle">committed · copied unmodified</text>
+        </g>
+
+        <g id="node-plusupstream" data-node-id="plusupstream" data-node-label="Lakekeeper+ repository" tabindex="0" role="button" aria-label="Focus Lakekeeper+ repository, lakekeeper-enterprise, Architecture component" aria-pressed="false" data-node-kind="external" data-node-sublabel="lakekeeper-enterprise" data-node-tag="api/management-open-api.yaml at the release" data-node-context="Architecture component">
+          <title>Lakekeeper+ repository · lakekeeper-enterprise · Architecture component · api/management-open-api.yaml at the release</title>
+          <rect x="40" y="140" width="230" height="64" rx="8" class="c-mask"/>
+          <rect x="40" y="140" width="230" height="64" rx="8" class="c-external" data-animate="node" style="--step: 1; --flow-node-name: archify-relay-node-1;" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(46 146) scale(0.6875)">
+            <rect x="2.5" y="5" width="8.5" height="8" rx="1.5"/>
+            <path d="M8 2.5h5.5V8M13.5 2.5 7.5 8.5"/>
+          </g>
+          <text data-node-label="" x="155" y="170" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Lakekeeper+ repository</text>
+        <text x="155" y="186" class="t-muted" font-size="9" text-anchor="middle">lakekeeper-enterprise</text>
+        <text x="155" y="196" class="t-external" font-size="7" text-anchor="middle">api/management-open-api.yaml at the release</text>
+        </g>
+
+        <g id="node-plusspec" data-node-id="plusspec" data-node-label="Lakekeeper+ spec" tabindex="0" role="button" aria-label="Focus Lakekeeper+ spec, api/openapi/management-plus-open-api.yaml, Architecture component" aria-pressed="false" data-node-kind="database" data-node-sublabel="api/openapi/management-plus-open-api.yaml" data-node-tag="committed · copied unmodified" data-node-context="Architecture component">
+          <title>Lakekeeper+ spec · api/openapi/management-plus-open-api.yaml · Architecture component · committed · copied unmodified</title>
+          <rect x="380" y="140" width="230" height="64" rx="8" class="c-mask"/>
+          <rect x="380" y="140" width="230" height="64" rx="8" class="c-database" data-animate="node" style="--step: 2; --flow-node-name: archify-relay-node-6;" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(386 146) scale(0.6875)">
+            <ellipse cx="8" cy="4" rx="5" ry="2"/>
+            <path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/>
+          </g>
+          <text data-node-label="" x="495" y="170" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Lakekeeper+ spec</text>
+        <text x="495" y="186" class="t-muted" font-size="9" text-anchor="middle">api/openapi/management-plus-open-api.yaml</text>
+        <text x="495" y="196" class="t-database" font-size="7" text-anchor="middle">committed · copied unmodified</text>
+        </g>
+
+        <g id="node-prepare" data-node-id="prepare" data-node-label="prepare" tabindex="0" role="button" aria-label="Focus prepare, api/openapi/prepare, Architecture component" aria-pressed="false" data-node-kind="database" data-node-sublabel="api/openapi/prepare" data-node-tag="patches each spec · merges them" data-node-context="Architecture component">
+          <title>prepare · api/openapi/prepare · Architecture component · patches each spec · merges them</title>
+          <rect x="720" y="90" width="230" height="64" rx="8" class="c-mask"/>
+          <rect x="720" y="90" width="230" height="64" rx="8" class="c-database" data-animate="node" style="--step: 3; --flow-node-name: archify-relay-node-10;" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(726 96) scale(0.6875)">
+            <ellipse cx="8" cy="4" rx="5" ry="2"/>
+            <path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/>
+          </g>
+          <text data-node-label="" x="835" y="120" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">prepare</text>
+        <text x="835" y="136" class="t-muted" font-size="9" text-anchor="middle">api/openapi/prepare</text>
+        <text x="835" y="146" class="t-database" font-size="7" text-anchor="middle">patches each spec · merges them</text>
+        </g>
+
+        <g id="node-merged" data-node-id="merged" data-node-label="Merged spec" tabindex="0" role="button" aria-label="Focus Merged spec, api/openapi/build/, Architecture component" aria-pressed="false" data-node-kind="backend" data-node-sublabel="api/openapi/build/" data-node-tag="git-ignored · rewritten every run" data-node-context="Architecture component">
+          <title>Merged spec · api/openapi/build/ · Architecture component · git-ignored · rewritten every run</title>
+          <rect x="1060" y="90" width="230" height="64" rx="8" class="c-mask"/>
+          <rect x="1060" y="90" width="230" height="64" rx="8" class="c-backend" data-animate="node" style="--step: 5; --flow-node-name: archify-relay-node-13;" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(1066 96) scale(0.6875)">
+            <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
+          </g>
+          <text data-node-label="" x="1175" y="120" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Merged spec</text>
+        <text x="1175" y="136" class="t-muted" font-size="9" text-anchor="middle">api/openapi/build/</text>
+        <text x="1175" y="146" class="t-backend" font-size="7" text-anchor="middle">git-ignored · rewritten every run</text>
         </g>
 
         <g id="node-make" data-node-id="make" data-node-label="make generate" tabindex="0" role="button" aria-label="Focus make generate, Makefile, Architecture component" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="Makefile" data-node-tag="wipes the output dir · runs each step" data-node-context="Architecture component">
           <title>make generate · Makefile · Architecture component · wipes the output dir · runs each step</title>
-          <rect x="40" y="200" width="230" height="64" rx="8" class="c-mask"/>
-          <rect x="40" y="200" width="230" height="64" rx="8" class="c-frontend" data-animate="node" style="--step: 3; --flow-node-name: archify-relay-node-5;" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(46 206) scale(0.6875)">
+          <rect x="40" y="300" width="230" height="64" rx="8" class="c-mask"/>
+          <rect x="40" y="300" width="230" height="64" rx="8" class="c-frontend" data-animate="node" style="--step: 7; --flow-node-name: archify-relay-node-7;" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(46 306) scale(0.6875)">
             <rect x="2" y="3" width="12" height="10" rx="2"/>
             <path d="M2 6.5h12"/>
             <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
             <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
           </g>
-          <text data-node-label="" x="155" y="230" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">make generate</text>
-        <text x="155" y="246" class="t-muted" font-size="9" text-anchor="middle">Makefile</text>
-        <text x="155" y="256" class="t-frontend" font-size="7" text-anchor="middle">wipes the output dir · runs each step</text>
+          <text data-node-label="" x="155" y="330" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">make generate</text>
+        <text x="155" y="346" class="t-muted" font-size="9" text-anchor="middle">Makefile</text>
+        <text x="155" y="356" class="t-frontend" font-size="7" text-anchor="middle">wipes the output dir · runs each step</text>
         </g>
 
-        <g id="node-generator" data-node-id="generator" data-node-label="openapi-generator" tabindex="0" role="button" aria-label="Focus openapi-generator, openapi-generator-cli · -g go, Architecture component" aria-pressed="false" data-node-kind="external" data-node-sublabel="openapi-generator-cli · -g go" data-node-tag="container · v7.27.0" data-node-context="Architecture component">
-          <title>openapi-generator · openapi-generator-cli · -g go · Architecture component · container · v7.27.0</title>
-          <rect x="380" y="200" width="230" height="64" rx="8" class="c-mask"/>
-          <rect x="380" y="200" width="230" height="64" rx="8" class="c-external" data-animate="node" style="--step: 2; --flow-node-name: archify-relay-node-6;" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(386 206) scale(0.6875)">
+        <g id="node-generator" data-node-id="generator" data-node-label="openapi-generator" tabindex="0" role="button" aria-label="Focus openapi-generator, openapi-generator-cli · -g go, Architecture component" aria-pressed="false" data-node-kind="external" data-node-sublabel="openapi-generator-cli · -g go" data-node-tag="container · v7.27.0 · validation on" data-node-context="Architecture component">
+          <title>openapi-generator · openapi-generator-cli · -g go · Architecture component · container · v7.27.0 · validation on</title>
+          <rect x="380" y="300" width="230" height="64" rx="8" class="c-mask"/>
+          <rect x="380" y="300" width="230" height="64" rx="8" class="c-external" data-animate="node" style="--step: 6; --flow-node-name: archify-relay-node-8;" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(386 306) scale(0.6875)">
             <rect x="2.5" y="5" width="8.5" height="8" rx="1.5"/>
             <path d="M8 2.5h5.5V8M13.5 2.5 7.5 8.5"/>
           </g>
-          <text data-node-label="" x="495" y="230" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">openapi-generator</text>
-        <text x="495" y="246" class="t-muted" font-size="9" text-anchor="middle">openapi-generator-cli · -g go</text>
-        <text x="495" y="256" class="t-external" font-size="7" text-anchor="middle">container · v7.27.0</text>
+          <text data-node-label="" x="495" y="330" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">openapi-generator</text>
+        <text x="495" y="346" class="t-muted" font-size="9" text-anchor="middle">openapi-generator-cli · -g go</text>
+        <text x="495" y="356" class="t-external" font-size="7" text-anchor="middle">container · v7.27.0 · validation on</text>
         </g>
 
         <g id="node-postprocess" data-node-id="postprocess" data-node-label="Postprocessor" tabindex="0" role="button" aria-label="Focus Postprocessor, api/openapi/postprocess, Architecture component" aria-pressed="false" data-node-kind="database" data-node-sublabel="api/openapi/postprocess" data-node-tag="drops DisallowUnknownFields · relaxes enums" data-node-context="Architecture component">
           <title>Postprocessor · api/openapi/postprocess · Architecture component · drops DisallowUnknownFields · relaxes enums</title>
-          <rect x="720" y="200" width="230" height="64" rx="8" class="c-mask"/>
-          <rect x="720" y="200" width="230" height="64" rx="8" class="c-database" data-animate="node" style="--step: 6; --flow-node-name: archify-relay-node-8;" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(726 206) scale(0.6875)">
+          <rect x="720" y="300" width="230" height="64" rx="8" class="c-mask"/>
+          <rect x="720" y="300" width="230" height="64" rx="8" class="c-database" data-animate="node" style="--step: 10; --flow-node-name: archify-relay-node-11;" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(726 306) scale(0.6875)">
             <ellipse cx="8" cy="4" rx="5" ry="2"/>
             <path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/>
           </g>
-          <text data-node-label="" x="835" y="230" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Postprocessor</text>
-        <text x="835" y="246" class="t-muted" font-size="9" text-anchor="middle">api/openapi/postprocess</text>
-        <text x="835" y="256" class="t-database" font-size="7" text-anchor="middle">drops DisallowUnknownFields · relaxes enums</text>
+          <text data-node-label="" x="835" y="330" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Postprocessor</text>
+        <text x="835" y="346" class="t-muted" font-size="9" text-anchor="middle">api/openapi/postprocess</text>
+        <text x="835" y="356" class="t-database" font-size="7" text-anchor="middle">drops DisallowUnknownFields · relaxes enums</text>
         </g>
 
         <g id="node-format" data-node-id="format" data-node-label="Format and tidy" tabindex="0" role="button" aria-label="Focus Format and tidy, goimports · go mod tidy · make fmt, Architecture component" aria-pressed="false" data-node-kind="backend" data-node-sublabel="goimports · go mod tidy · make fmt" data-node-context="Architecture component">
           <title>Format and tidy · goimports · go mod tidy · make fmt · Architecture component</title>
-          <rect x="1060" y="200" width="230" height="64" rx="8" class="c-mask"/>
-          <rect x="1060" y="200" width="230" height="64" rx="8" class="c-backend" data-animate="node" style="--step: 7; --flow-node-name: archify-relay-node-9;" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(1066 206) scale(0.6875)">
+          <rect x="1060" y="300" width="230" height="64" rx="8" class="c-mask"/>
+          <rect x="1060" y="300" width="230" height="64" rx="8" class="c-backend" data-animate="node" style="--step: 11; --flow-node-name: archify-relay-node-12;" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(1066 306) scale(0.6875)">
             <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
           </g>
-          <text data-node-label="" x="1175" y="230" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Format and tidy</text>
-        <text x="1175" y="246" class="t-muted" font-size="9" text-anchor="middle">goimports · go mod tidy · make fmt</text>
+          <text data-node-label="" x="1175" y="330" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Format and tidy</text>
+        <text x="1175" y="346" class="t-muted" font-size="9" text-anchor="middle">goimports · go mod tidy · make fmt</text>
         </g>
 
         <g id="node-generated" data-node-id="generated" data-node-label="Generated SDK" tabindex="0" role="button" aria-label="Focus Generated SDK, pkg/apis/management/v1, Architecture component" aria-pressed="false" data-node-kind="backend" data-node-sublabel="pkg/apis/management/v1" data-node-tag="Code generated … DO NOT EDIT" data-node-context="Architecture component">
           <title>Generated SDK · pkg/apis/management/v1 · Architecture component · Code generated … DO NOT EDIT</title>
-          <rect x="1400" y="200" width="230" height="64" rx="8" class="c-mask"/>
-          <rect x="1400" y="200" width="230" height="64" rx="8" class="c-backend" data-animate="node" style="--step: 8; --flow-node-name: archify-relay-node-7;" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(1406 206) scale(0.6875)">
+          <rect x="1400" y="300" width="230" height="64" rx="8" class="c-mask"/>
+          <rect x="1400" y="300" width="230" height="64" rx="8" class="c-backend" data-animate="node" style="--step: 12; --flow-node-name: archify-relay-node-9;" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(1406 306) scale(0.6875)">
             <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
           </g>
-          <text data-node-label="" x="1515" y="230" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Generated SDK</text>
-        <text x="1515" y="246" class="t-muted" font-size="9" text-anchor="middle">pkg/apis/management/v1</text>
-        <text x="1515" y="256" class="t-backend" font-size="7" text-anchor="middle">Code generated … DO NOT EDIT</text>
+          <text data-node-label="" x="1515" y="330" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Generated SDK</text>
+        <text x="1515" y="346" class="t-muted" font-size="9" text-anchor="middle">pkg/apis/management/v1</text>
+        <text x="1515" y="356" class="t-backend" font-size="7" text-anchor="middle">Code generated … DO NOT EDIT</text>
         </g>
 
         <g id="node-ignore" data-node-id="ignore" data-node-label="Ignore file" tabindex="0" role="button" aria-label="Focus Ignore file, api/openapi/.openapi-generator-ignore, Architecture component" aria-pressed="false" data-node-kind="database" data-node-sublabel="api/openapi/.openapi-generator-ignore" data-node-tag="files not to emit" data-node-context="Architecture component">
           <title>Ignore file · api/openapi/.openapi-generator-ignore · Architecture component · files not to emit</title>
-          <rect x="40" y="360" width="230" height="64" rx="8" class="c-mask"/>
-          <rect x="40" y="360" width="230" height="64" rx="8" class="c-database" data-animate="node" style="--step: 2; --flow-node-name: archify-relay-node-1;" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(46 366) scale(0.6875)">
+          <rect x="40" y="460" width="230" height="64" rx="8" class="c-mask"/>
+          <rect x="40" y="460" width="230" height="64" rx="8" class="c-database" data-animate="node" style="--step: 6; --flow-node-name: archify-relay-node-2;" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(46 466) scale(0.6875)">
             <ellipse cx="8" cy="4" rx="5" ry="2"/>
             <path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/>
           </g>
-          <text data-node-label="" x="155" y="390" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Ignore file</text>
-        <text x="155" y="406" class="t-muted" font-size="9" text-anchor="middle">api/openapi/.openapi-generator-ignore</text>
-        <text x="155" y="416" class="t-database" font-size="7" text-anchor="middle">files not to emit</text>
+          <text data-node-label="" x="155" y="490" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Ignore file</text>
+        <text x="155" y="506" class="t-muted" font-size="9" text-anchor="middle">api/openapi/.openapi-generator-ignore</text>
+        <text x="155" y="516" class="t-database" font-size="7" text-anchor="middle">files not to emit</text>
         </g>
 
         <g id="node-config" data-node-id="config" data-node-label="Generator config" tabindex="0" role="button" aria-label="Focus Generator config, api/openapi/management-config.yaml, Architecture component" aria-pressed="false" data-node-kind="database" data-node-sublabel="api/openapi/management-config.yaml" data-node-tag="only deviations from defaults" data-node-context="Architecture component">
           <title>Generator config · api/openapi/management-config.yaml · Architecture component · only deviations from defaults</title>
-          <rect x="380" y="360" width="230" height="64" rx="8" class="c-mask"/>
-          <rect x="380" y="360" width="230" height="64" rx="8" class="c-database" data-animate="node" style="--step: 3; --flow-node-name: archify-relay-node-2;" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(386 366) scale(0.6875)">
+          <rect x="380" y="460" width="230" height="64" rx="8" class="c-mask"/>
+          <rect x="380" y="460" width="230" height="64" rx="8" class="c-database" data-animate="node" style="--step: 7; --flow-node-name: archify-relay-node-3;" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(386 466) scale(0.6875)">
             <ellipse cx="8" cy="4" rx="5" ry="2"/>
             <path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/>
           </g>
-          <text data-node-label="" x="495" y="390" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Generator config</text>
-        <text x="495" y="406" class="t-muted" font-size="9" text-anchor="middle">api/openapi/management-config.yaml</text>
-        <text x="495" y="416" class="t-database" font-size="7" text-anchor="middle">only deviations from defaults</text>
+          <text data-node-label="" x="495" y="490" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Generator config</text>
+        <text x="495" y="506" class="t-muted" font-size="9" text-anchor="middle">api/openapi/management-config.yaml</text>
+        <text x="495" y="516" class="t-database" font-size="7" text-anchor="middle">only deviations from defaults</text>
         </g>
 
         <g id="node-handedit" data-node-id="handedit" data-node-label="Hand edit" tabindex="0" role="button" aria-label="Focus Hand edit, any file under pkg/apis/management/v1, Architecture component" aria-pressed="false" data-node-kind="security" data-node-sublabel="any file under pkg/apis/management/v1" data-node-tag="change an input instead" data-node-context="Architecture component">
           <title>Hand edit · any file under pkg/apis/management/v1 · Architecture component · change an input instead</title>
-          <rect x="1400" y="360" width="230" height="64" rx="8" class="c-mask"/>
-          <rect x="1400" y="360" width="230" height="64" rx="8" class="c-security" data-animate="node" style="--step: 8; --flow-node-name: archify-relay-node-3;" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="security" class="semantic-sigil s-security" transform="translate(1406 366) scale(0.6875)">
+          <rect x="1400" y="460" width="230" height="64" rx="8" class="c-mask"/>
+          <rect x="1400" y="460" width="230" height="64" rx="8" class="c-security" data-animate="node" style="--step: 12; --flow-node-name: archify-relay-node-4;" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="security" class="semantic-sigil s-security" transform="translate(1406 466) scale(0.6875)">
             <path d="M8 2.2 13 4v3.5c0 3.1-1.8 5.4-5 6.5-3.2-1.1-5-3.4-5-6.5V4Z"/>
             <path d="m5.8 8 1.5 1.5 3-3"/>
           </g>
-          <text data-node-label="" x="1515" y="390" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Hand edit</text>
-        <text x="1515" y="406" class="t-muted" font-size="9" text-anchor="middle">any file under pkg/apis/management/v1</text>
-        <text x="1515" y="416" class="t-security" font-size="7" text-anchor="middle">change an input instead</text>
+          <text data-node-label="" x="1515" y="490" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Hand edit</text>
+        <text x="1515" y="506" class="t-muted" font-size="9" text-anchor="middle">any file under pkg/apis/management/v1</text>
+        <text x="1515" y="516" class="t-security" font-size="7" text-anchor="middle">change an input instead</text>
         </g>
 
         <!-- Connection labels -->
@@ -802,37 +937,53 @@ svg[data-node-ui][data-preset="editorial"] :is([data-graph-role="structural-fram
           <rect x="286.4" y="52" width="77.2" height="14" rx="3" class="c-mask"/>
           <text x="325" y="62" class="t-edge-default" font-size="8" text-anchor="middle">copied by hand</text>
         </g>
-        <g data-edge-from="spec" data-edge-to="generator" data-edge-label="-i, unmodified" data-edge-key="1" data-edge-id="spec-generator">
-          <rect x="411.79999999999995" y="145" width="77.2" height="14" rx="3" class="c-mask"/>
-          <text x="450.4" y="155" class="t-edge-emphasis" font-size="8" text-anchor="middle">-i, unmodified</text>
+        <g data-edge-from="plusupstream" data-edge-to="plusspec" data-edge-label="copied by hand" data-edge-key="1" data-edge-id="plusupstream-plusspec">
+          <rect x="286.4" y="152" width="77.2" height="14" rx="3" class="c-mask"/>
+          <text x="325" y="162" class="t-edge-default" font-size="8" text-anchor="middle">copied by hand</text>
         </g>
-        <g data-edge-from="ignore" data-edge-to="make" data-edge-label="copied into output dir" data-edge-key="2" data-edge-id="ignore-make">
-          <rect x="97.2" y="340" width="115.6" height="14" rx="3" class="c-mask"/>
-          <text x="155" y="350" class="t-edge-default" font-size="8" text-anchor="middle">copied into output dir</text>
+        <g data-edge-from="spec" data-edge-to="prepare" data-edge-label="base" data-edge-key="2" data-edge-id="spec-prepare">
+          <rect x="642" y="92.9" width="30" height="14" rx="3" class="c-mask"/>
+          <text x="657" y="102.9" class="t-edge-emphasis" font-size="8" text-anchor="middle">base</text>
         </g>
-        <g data-edge-from="config" data-edge-to="generator" data-edge-label="-c" data-edge-key="3" data-edge-id="config-generator">
-          <rect x="480" y="340" width="30" height="14" rx="3" class="c-mask"/>
-          <text x="495" y="350" class="t-edge-default" font-size="8" text-anchor="middle">-c</text>
+        <g data-edge-from="plusspec" data-edge-to="prepare" data-edge-label="additions" data-edge-key="3" data-edge-id="plusspec-prepare">
+          <rect x="630.4" y="139" width="53.199999999999996" height="14" rx="3" class="c-mask"/>
+          <text x="657" y="149" class="t-edge-emphasis" font-size="8" text-anchor="middle">additions</text>
         </g>
-        <g data-edge-from="make" data-edge-to="generator" data-edge-label="runs" data-edge-key="4" data-edge-id="make-generator">
-          <rect x="310" y="212" width="30" height="14" rx="3" class="c-mask"/>
-          <text x="325" y="222" class="t-edge-default" font-size="8" text-anchor="middle">runs</text>
+        <g data-edge-from="prepare" data-edge-to="merged" data-edge-label="writes" data-edge-key="4" data-edge-id="prepare-merged">
+          <rect x="985.6" y="92.9" width="38.8" height="14" rx="3" class="c-mask"/>
+          <text x="1005" y="102.9" class="t-edge-emphasis" font-size="8" text-anchor="middle">writes</text>
         </g>
-        <g data-edge-from="generator" data-edge-to="postprocess" data-edge-label="raw Go tree" data-edge-key="5" data-edge-id="generator-postprocess">
-          <rect x="633.6" y="212" width="62.8" height="14" rx="3" class="c-mask"/>
-          <text x="665" y="222" class="t-edge-emphasis" font-size="8" text-anchor="middle">raw Go tree</text>
+        <g data-edge-from="merged" data-edge-to="generator" data-edge-label="-i" data-edge-key="5" data-edge-id="merged-generator">
+          <rect x="1021" y="182.5" width="30" height="14" rx="3" class="c-mask"/>
+          <text x="1036" y="192.5" class="t-edge-emphasis" font-size="8" text-anchor="middle">-i</text>
         </g>
-        <g data-edge-from="postprocess" data-edge-to="format" data-edge-label="relaxed tree" data-edge-key="6" data-edge-id="postprocess-format">
-          <rect x="971.2" y="212" width="67.6" height="14" rx="3" class="c-mask"/>
-          <text x="1005" y="222" class="t-edge-emphasis" font-size="8" text-anchor="middle">relaxed tree</text>
+        <g data-edge-from="ignore" data-edge-to="make" data-edge-label="copied into output dir" data-edge-key="6" data-edge-id="ignore-make">
+          <rect x="97.2" y="440" width="115.6" height="14" rx="3" class="c-mask"/>
+          <text x="155" y="450" class="t-edge-default" font-size="8" text-anchor="middle">copied into output dir</text>
         </g>
-        <g data-edge-from="format" data-edge-to="generated" data-edge-label="writes" data-edge-key="7" data-edge-id="format-generated">
-          <rect x="1325.6" y="212" width="38.8" height="14" rx="3" class="c-mask"/>
-          <text x="1345" y="222" class="t-edge-emphasis" font-size="8" text-anchor="middle">writes</text>
+        <g data-edge-from="config" data-edge-to="generator" data-edge-label="-c" data-edge-key="7" data-edge-id="config-generator">
+          <rect x="480" y="440" width="30" height="14" rx="3" class="c-mask"/>
+          <text x="495" y="450" class="t-edge-default" font-size="8" text-anchor="middle">-c</text>
         </g>
-        <g data-edge-from="handedit" data-edge-to="generated" data-edge-label="wiped by the next run" data-edge-key="8" data-edge-id="handedit-generated">
-          <rect x="1459.6" y="340" width="110.8" height="14" rx="3" class="c-mask"/>
-          <text x="1515" y="350" class="t-edge-security" font-size="8" text-anchor="middle">wiped by the next run</text>
+        <g data-edge-from="make" data-edge-to="generator" data-edge-label="runs" data-edge-key="8" data-edge-id="make-generator">
+          <rect x="310" y="312" width="30" height="14" rx="3" class="c-mask"/>
+          <text x="325" y="322" class="t-edge-default" font-size="8" text-anchor="middle">runs</text>
+        </g>
+        <g data-edge-from="generator" data-edge-to="postprocess" data-edge-label="raw Go tree" data-edge-key="9" data-edge-id="generator-postprocess">
+          <rect x="633.6" y="321.1" width="62.8" height="14" rx="3" class="c-mask"/>
+          <text x="665" y="331.1" class="t-edge-emphasis" font-size="8" text-anchor="middle">raw Go tree</text>
+        </g>
+        <g data-edge-from="postprocess" data-edge-to="format" data-edge-label="relaxed tree" data-edge-key="10" data-edge-id="postprocess-format">
+          <rect x="971.2" y="312" width="67.6" height="14" rx="3" class="c-mask"/>
+          <text x="1005" y="322" class="t-edge-emphasis" font-size="8" text-anchor="middle">relaxed tree</text>
+        </g>
+        <g data-edge-from="format" data-edge-to="generated" data-edge-label="writes" data-edge-key="11" data-edge-id="format-generated">
+          <rect x="1325.6" y="312" width="38.8" height="14" rx="3" class="c-mask"/>
+          <text x="1345" y="322" class="t-edge-emphasis" font-size="8" text-anchor="middle">writes</text>
+        </g>
+        <g data-edge-from="handedit" data-edge-to="generated" data-edge-label="wiped by the next run" data-edge-key="12" data-edge-id="handedit-generated">
+          <rect x="1459.6" y="440" width="110.8" height="14" rx="3" class="c-mask"/>
+          <text x="1515" y="450" class="t-edge-security" font-size="8" text-anchor="middle">wiped by the next run</text>
         </g>
 
         <!-- Boundary labels (foreground masks keep routes out of titles) -->
@@ -840,26 +991,26 @@ svg[data-node-ui][data-preset="editorial"] :is([data-graph-role="structural-fram
 
         <!-- Legend -->
         <g data-legend="">
-          <text x="40" y="456" class="t-primary" font-size="12" font-weight="650">Legend</text>
-          <g data-legend-semantic-kind="frontend" data-legend-x="40" data-legend-baseline="476" data-legend-width="161">
-            <rect x="40" y="467" width="16" height="10" rx="2.5" class="c-frontend" stroke-width="1"/>
-            <text x="62" y="476" class="t-muted" font-size="10" font-weight="500">Make target you run</text>
+          <text x="40" y="556" class="t-primary" font-size="12" font-weight="650">Legend</text>
+          <g data-legend-semantic-kind="frontend" data-legend-x="40" data-legend-baseline="576" data-legend-width="161">
+            <rect x="40" y="567" width="16" height="10" rx="2.5" class="c-frontend" stroke-width="1"/>
+            <text x="62" y="576" class="t-muted" font-size="10" font-weight="500">Make target you run</text>
           </g>
-          <g data-legend-semantic-kind="backend" data-legend-x="223" data-legend-baseline="476" data-legend-width="217">
-            <rect x="223" y="467" width="16" height="10" rx="2.5" class="c-backend" stroke-width="1"/>
-            <text x="245" y="476" class="t-muted" font-size="10" font-weight="500">Step or output, never edited</text>
+          <g data-legend-semantic-kind="backend" data-legend-x="223" data-legend-baseline="576" data-legend-width="217">
+            <rect x="223" y="567" width="16" height="10" rx="2.5" class="c-backend" stroke-width="1"/>
+            <text x="245" y="576" class="t-muted" font-size="10" font-weight="500">Step or output, never edited</text>
           </g>
-          <g data-legend-semantic-kind="database" data-legend-x="462" data-legend-baseline="476" data-legend-width="143">
-            <rect x="462" y="467" width="16" height="10" rx="2.5" class="c-database" stroke-width="1"/>
-            <text x="484" y="476" class="t-muted" font-size="10" font-weight="500">Input you change</text>
+          <g data-legend-semantic-kind="database" data-legend-x="462" data-legend-baseline="576" data-legend-width="143">
+            <rect x="462" y="567" width="16" height="10" rx="2.5" class="c-database" stroke-width="1"/>
+            <text x="484" y="576" class="t-muted" font-size="10" font-weight="500">Input you change</text>
           </g>
-          <g data-legend-semantic-kind="security" data-legend-x="627" data-legend-baseline="476" data-legend-width="180">
-            <rect x="627" y="467" width="16" height="10" rx="2.5" class="c-security" stroke-width="1"/>
-            <text x="649" y="476" class="t-muted" font-size="10" font-weight="500">Not a way to change it</text>
+          <g data-legend-semantic-kind="security" data-legend-x="627" data-legend-baseline="576" data-legend-width="180">
+            <rect x="627" y="567" width="16" height="10" rx="2.5" class="c-security" stroke-width="1"/>
+            <text x="649" y="576" class="t-muted" font-size="10" font-weight="500">Not a way to change it</text>
           </g>
-          <g data-legend-semantic-kind="external" data-legend-x="829" data-legend-baseline="476" data-legend-width="149">
-            <rect x="829" y="467" width="16" height="10" rx="2.5" class="c-external" stroke-width="1"/>
-            <text x="851" y="476" class="t-muted" font-size="10" font-weight="500">Outside this repo</text>
+          <g data-legend-semantic-kind="external" data-legend-x="829" data-legend-baseline="576" data-legend-width="149">
+            <rect x="829" y="567" width="16" height="10" rx="2.5" class="c-external" stroke-width="1"/>
+            <text x="851" y="576" class="t-muted" font-size="10" font-weight="500">Outside this repo</text>
           </g>
         </g>
       </svg>
