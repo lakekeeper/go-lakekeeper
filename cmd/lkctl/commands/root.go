@@ -78,6 +78,7 @@ func NewCommand() *cobra.Command {
 	cmd.AddCommand(newProjectCmd(&opts))
 	cmd.AddCommand(newRoleCmd(&opts))
 	cmd.AddCommand(newServerCmd(&opts))
+	cmd.AddCommand(newTaskQueueCmd(&opts))
 	cmd.AddCommand(newUserCmd(&opts))
 	cmd.AddCommand(newVersionCmd(&opts))
 	cmd.AddCommand(newWarehouseCmd(&opts))

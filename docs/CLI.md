@@ -108,6 +108,7 @@ Top-level commands (and their aliases):
 | `version` | _(none)_ | Print version, commit, build date |
 | `catalog` | _(none)_ | Placeholder — not yet implemented; use `client.CatalogV1` from the SDK |
 | `cedar` | _(none)_ | Cedar policies (Lakekeeper+, Cedar authorization backend) |
+| `task-queue` | `tq` | Show and set task-queue configuration; some queues need Lakekeeper+ |
 
 The grant / revoke / access / assignments verbs follow the same shape
 across `server`, `project`, `warehouse`, and `role`. Read this section
@@ -127,6 +128,7 @@ non-zero with one sentence naming the requirement and what the server is:
 ```text
 Error: get cedar schema: requires Lakekeeper+; server is Lakekeeper 0.15.1
 Error: get cedar schema: requires the cedar authorization backend; server is Lakekeeper+ 0.15.1 with the openfga authorization backend
+Error: get optimize queue config: requires the optimize task queue; server is Lakekeeper+ 0.15.1 without it
 ```
 
 `lkctl` reads the server info for this only after the server rejects a
@@ -335,6 +337,36 @@ lkctl cedar schema
 
 # The fragments as JSON ({"schema-fragments": {"<file>": "<content>"}})
 lkctl cedar schema -o json
+```
+
+### `lkctl task-queue`
+
+One subcommand per task queue, each with `get` and `set`. The subcommand
+also accepts the server's queue name (`expire_snapshots`) as an alias.
+
+| Queue | Scope | Needs |
+|---|---|---|
+| `tabular-purge` | warehouse | |
+| `soft-deletion` | warehouse | |
+| `task-log-cleanup` | project (`-p`, else the server's default project) | |
+| `expire-snapshots` | warehouse | Lakekeeper+ running the queue |
+| `optimize` | warehouse | Lakekeeper+ running the queue |
+| `remove-orphan-files` | warehouse | Lakekeeper+ running the queue |
+
+`set` sends only the flags given: every other field is left unset and
+inherits the server default, and the configuration replaces the stored
+one. Each queue-config field is a flag of the same name (see
+`lkctl task-queue <queue> set --help`); `--max-seconds-since-last-heartbeat`
+applies to every queue. `get` prints every field, `unset` for one that
+inherits the default; `-o json` prints the server's response.
+
+```sh
+# Expire snapshots older than 7 days; the other fields keep the server defaults
+lkctl task-queue expire-snapshots set <warehouse-id> --max-snapshot-age-ms 604800000
+lkctl task-queue expire-snapshots get <warehouse-id>
+
+# Keep task logs for 30 days in a project
+lkctl task-queue task-log-cleanup set -p <project-id> --retention-period P30D
 ```
 
 ### `lkctl version` / `lkctl whoami`
