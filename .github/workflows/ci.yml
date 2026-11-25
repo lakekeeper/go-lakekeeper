@@ -142,6 +142,20 @@ jobs:
       - run: GOPATH=$(go env GOPATH) make test-e2e-kind
         timeout-minutes: 20
 
+  # Lakekeeper+ suites (make test-plus) with the CI test license. Runs only on
+  # pushes to main: the license lives in the `lakekeeper-plus` environment,
+  # whose deployment branches are limited to main, so pull requests (forks
+  # included) never get the secret. Not in ci-ok's needs, since it cannot run
+  # on pull requests.
+  e2e-plus:
+    needs: lint
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/plus.yml
+    secrets: inherit
+    permissions:
+      contents: read
+      issues: write
+
   build:
     needs: lint
     runs-on: ubuntu-latest

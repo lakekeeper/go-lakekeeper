@@ -73,10 +73,20 @@ jobs:
       - run: GOPATH=$(go env GOPATH) LAKEKEEPER_CHART_VERSION=latest make test-e2e-kind
         timeout-minutes: 20
 
+  # Lakekeeper+ suites with the CI test license; see plus.yml. The nightly run
+  # also keeps the license expiry check running between pushes to main.
+  plus:
+    if: github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/plus.yml
+    secrets: inherit
+    permissions:
+      contents: read
+      issues: write
+
   # Schedule-failure emails only reach whoever last edited the cron, so
   # surface failures as a GitHub issue instead.
   report-failure:
-    needs: [lint, tests]
+    needs: [lint, tests, plus]
     if: failure() && github.event_name == 'schedule'
     runs-on: ubuntu-latest
     permissions:
