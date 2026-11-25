@@ -53,7 +53,7 @@ func TestCapabilities_ReportsLakekeeper(t *testing.T) {
 	assert.NotEmpty(t, got.LakekeeperVersion)
 	assert.Empty(t, got.LakekeeperPlusVersion)
 	assert.Equal(t, client.AuthzBackendOpenFGA, got.AuthzBackend)
-	assert.Equal(t, info.GetQueues(), got.Queues)
+	assert.Equal(t, info.GetQueues(), queueNames(got.Queues))
 }
 
 func TestCedarSchema_OnLakekeeperIsUnsupported(t *testing.T) {
@@ -80,4 +80,12 @@ func TestCedarSchema_OnLakekeeperIsUnsupported(t *testing.T) {
 	assert.Equal(t, client.EditionLakekeeper, unsupported.Server.Edition)
 	assert.Regexp(t, `^get cedar schema: requires Lakekeeper\+; server is Lakekeeper \S+$`, err.Error())
 	assert.Equal(t, 1, counter.count(), "server info requests")
+}
+
+func queueNames(queues []client.Queue) []string {
+	names := make([]string, len(queues))
+	for i, q := range queues {
+		names[i] = string(q)
+	}
+	return names
 }

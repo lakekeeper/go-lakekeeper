@@ -85,7 +85,7 @@ func TestCapabilities_ReportsLakekeeperPlus(t *testing.T) {
 	assert.Equal(t, info.GetLakekeeperVersion(), got.LakekeeperVersion)
 	assert.NotEmpty(t, got.LakekeeperPlusVersion)
 	assert.Equal(t, info.GetLakekeeperEnterpriseVersion(), got.LakekeeperPlusVersion)
-	assert.Contains(t, got.Queues, "expire_snapshots")
+	assert.Contains(t, got.Queues, client.QueueExpireSnapshots)
 	assert.Equal(t, "Lakekeeper+ "+got.LakekeeperPlusVersion, got.String())
 }
 
