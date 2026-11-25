@@ -69,6 +69,10 @@ services:
   # LAKEKEEPER__LICENSE__KEY is passed through from the environment only when
   # set. It is optional for local test runs; CI runs with a license. Never
   # write a license into this file or any other committed file.
+  #
+  # make test-plus and e2e/plus/run.sh set LAKEKEEPER_PLUS_VERSION from
+  # api/openapi/spec-releases.yaml; the default below is for plain compose
+  # runs and follows that file.
   lakekeeper-plus:
     profiles: [plus]
     image: &lakekeeper-plus-image quay.io/vakamo/lakekeeper-plus:${LAKEKEEPER_PLUS_VERSION:-v0.15.1}-distroless

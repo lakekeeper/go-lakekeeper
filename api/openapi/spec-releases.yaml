@@ -1,0 +1,7 @@
+# The release each committed spec was copied from. Update an entry in the
+# same commit as its spec (see docs/GENERATION.md, "Updating the specs").
+# make generate writes them into the SDK, which derives its supported server
+# versions from them; the Makefile and e2e/plus/run.sh pin the Lakekeeper+
+# test image to the lakekeeper-plus entry.
+lakekeeper: v0.15.0
+lakekeeper-plus: v0.15.1

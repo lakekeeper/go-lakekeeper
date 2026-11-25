@@ -97,11 +97,13 @@ the term generated SDK as defined under
 
 The pipeline (see [Makefile:149-174](../Makefile#L149-L174)):
 
-1. `go run ./api/openapi/prepare`: patch both specs, merge them and write the
-   merged spec. See [The prepare step](#the-prepare-step) below.
-2. `rm -rf pkg/apis/management/v1` and recreate the directory.
-3. Copy the top-level [`.openapi-generator-ignore`](../api/openapi/.openapi-generator-ignore)
+1. `rm -rf pkg/apis/management/v1` and recreate the directory.
+2. Copy the top-level [`.openapi-generator-ignore`](../api/openapi/.openapi-generator-ignore)
    into the output directory.
+3. `go run ./api/openapi/prepare`: patch both specs, merge them and write the
+   merged spec; write `spec_releases.go` into the output directory from
+   [`spec-releases.yaml`](../api/openapi/spec-releases.yaml). See
+   [The prepare step](#the-prepare-step) below.
 4. Run `openapitools/openapi-generator-cli:v7.27.0 generate` in a container,
    with spec validation on. Input spec (`-i`): the merged spec. Generator
    config (`-c`):
@@ -129,10 +131,27 @@ own, from its own latest release:
 - **Lakekeeper+**: copy `api/management-open-api.yaml` from the
   `lakekeeper-enterprise` repository at the Lakekeeper+ release tag (or
   commit) over
-  [`management-plus-open-api.yaml`](../api/openapi/management-plus-open-api.yaml),
-  and set `LAKEKEEPER_PLUS_VERSION` in the Makefile, the default in
-  `docker-compose.yml` and in `e2e/plus/run.sh` to the same release, so
-  `make test-plus` runs against the server the spec came from.
+  [`management-plus-open-api.yaml`](../api/openapi/management-plus-open-api.yaml).
+
+Then record the release tag (`vX.Y.Z`) the spec came from under
+`lakekeeper` or `lakekeeper-plus` in
+[`spec-releases.yaml`](../api/openapi/spec-releases.yaml), the one place
+that records it. The specs themselves carry no release (`info.version` is
+`0.0.0`). From that file:
+
+- `make generate` (prepare) writes `pkg/apis/management/v1/spec_releases.go`
+  with `LakekeeperSpecRelease` and `LakekeeperPlusSpecRelease`. The SDK
+  derives its supported server versions (the release's minor and the one
+  before) and the `server-too-old` diagnosis from them; see
+  [ARCHITECTURE.md](ARCHITECTURE.md#supported-versions).
+- `make test-plus` and `e2e/plus/run.sh` pin the Lakekeeper+ test image to
+  the `lakekeeper-plus` release, so they run against the server the spec
+  came from. Also set the fallback default in `docker-compose.yml`, used by
+  plain compose runs, to the same release.
+- `make test-e2e-versions` pins Lakekeeper to the two minors before the
+  `lakekeeper` release (the oldest supported one and the one before it).
+  For a release whose minor is below 2 those minors are not on its major,
+  and `e2e/versions/run.sh` stops and asks you to pin them by hand.
 
 Copy the file unmodified; fix its defects with a patch in prepare instead (see
 [Patches](#patches)). Then run `make generate` and commit the spec and the

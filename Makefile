@@ -100,9 +100,12 @@ test-e2e-compose: $(ENV_FILE) ## Runs lkctl E2E tests against the docker-compose
 	@echo === ./e2e/compose/run.sh
 	CONTAINER_ENGINE="$(CONTAINER_ENGINE)" CONTAINER_COMPOSE_ENGINE="$(CONTAINER_COMPOSE_ENGINE)" LAKEKEEPER_VERSION="$(LAKEKEEPER_VERSION)" ./e2e/compose/run.sh
 
+# The release the Lakekeeper+ spec was copied from (api/openapi/spec-releases.yaml),
+# so make test-plus runs against the server the spec came from.
+LAKEKEEPER_PLUS_SPEC_RELEASE := $(shell sed -n 's/^lakekeeper-plus: *//p' $(OPENAPI_DIR)/spec-releases.yaml)
 # LAKEKEEPER__LICENSE__KEY reaches the server through the environment when
 # set; it is optional for local test runs. CI runs with a license.
-LAKEKEEPER_PLUS_VERSION ?= v0.15.1
+LAKEKEEPER_PLUS_VERSION ?= $(LAKEKEEPER_PLUS_SPEC_RELEASE)
 .PHONY: test-plus
 test-plus: $(ENV_FILE) ## Runs the Lakekeeper+ E2E and integration tests (tags e2e_plus, integration_plus) against Lakekeeper+ with Cedar, then OpenFGA.
 	@echo === ./e2e/plus/run.sh
@@ -156,15 +159,17 @@ validate: vet lint
 
 .PHONY: generate
 generate: ## Regenerate Go bindings from OpenAPI specs.
+	@rm -rf $(SELF_DIR)/$(MANAGEMENT_API_OUTPUT)
+	@mkdir -p $(SELF_DIR)/$(MANAGEMENT_API_OUTPUT)
+	@cp $(OPENAPI_DIR)/.openapi-generator-ignore $(SELF_DIR)/$(MANAGEMENT_API_OUTPUT)/
 	@echo === patching and merging the Lakekeeper and Lakekeeper+ specs into $(MERGED_SPEC)
 	@$(GO) run ./api/openapi/prepare \
 		-lakekeeper $(OPENAPI_DIR)/management-open-api.yaml \
 		-lakekeeper-plus $(OPENAPI_DIR)/management-plus-open-api.yaml \
-		-out $(SELF_DIR)/$(MERGED_SPEC)
+		-out $(SELF_DIR)/$(MERGED_SPEC) \
+		-releases $(OPENAPI_DIR)/spec-releases.yaml \
+		-releases-out $(SELF_DIR)/$(MANAGEMENT_API_OUTPUT)/spec_releases.go
 	@echo === regenerating management API from $(MERGED_SPEC)
-	@rm -rf $(SELF_DIR)/$(MANAGEMENT_API_OUTPUT)
-	@mkdir -p $(SELF_DIR)/$(MANAGEMENT_API_OUTPUT)
-	@cp $(OPENAPI_DIR)/.openapi-generator-ignore $(SELF_DIR)/$(MANAGEMENT_API_OUTPUT)/
 	@$(CONTAINER_ENGINE) run --rm \
 		--user $$(id -u):$$(id -g) \
 		-v $(SELF_DIR):/local \

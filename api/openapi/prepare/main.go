@@ -4,7 +4,9 @@
 // spec, each copied unmodified from its own release. prepare reads both,
 // applies each spec's patches (see patches.go), merges them, and writes the
 // merged spec for openapi-generator. It runs first in the `make generate`
-// pipeline; the merged spec is a git-ignored build artifact.
+// pipeline; the merged spec is a git-ignored build artifact. It also writes
+// spec_releases.go into the generated package from spec-releases.yaml, the
+// release each spec was copied from.
 //
 // Merge rules (see docs/GENERATION.md):
 //   - Lakekeeper is the base and wins on every path, operation and schema both
@@ -42,15 +44,41 @@ func main() {
 	lkPath := flag.String("lakekeeper", "", "path to the Lakekeeper spec")
 	plusPath := flag.String("lakekeeper-plus", "", "path to the Lakekeeper+ spec")
 	outPath := flag.String("out", "", "path to write the merged spec to")
+	releasesPath := flag.String("releases", "", "path to spec-releases.yaml, the release each spec was copied from")
+	releasesOut := flag.String("releases-out", "", "path to write the Go file with the spec releases to")
 	flag.Parse()
-	if *lkPath == "" || *plusPath == "" || *outPath == "" {
-		fmt.Fprintln(os.Stderr, "usage: prepare -lakekeeper <spec> -lakekeeper-plus <spec> -out <merged-spec>")
+	if *lkPath == "" || *plusPath == "" || *outPath == "" || *releasesPath == "" || *releasesOut == "" {
+		fmt.Fprintln(os.Stderr, "usage: prepare -lakekeeper <spec> -lakekeeper-plus <spec> -out <merged-spec> "+
+			"-releases <spec-releases.yaml> -releases-out <go-file>")
 		os.Exit(2)
 	}
 	if err := run(*lkPath, *plusPath, *outPath); err != nil {
 		fmt.Fprintf(os.Stderr, "prepare: %v\n", err)
 		os.Exit(1)
 	}
+	if err := writeReleases(*releasesPath, *releasesOut); err != nil {
+		fmt.Fprintf(os.Stderr, "prepare: %v\n", err)
+		os.Exit(1)
+	}
+}
+
+func writeReleases(releasesPath, outPath string) error {
+	in, err := os.ReadFile(releasesPath)
+	if err != nil {
+		return err
+	}
+	src, err := specReleasesGo(in)
+	if err != nil {
+		return err
+	}
+	if err := os.MkdirAll(filepath.Dir(outPath), 0o755); err != nil {
+		return err
+	}
+	if err := os.WriteFile(outPath, src, 0o644); err != nil {
+		return err
+	}
+	fmt.Fprintf(os.Stderr, "prepare: wrote %s\n", outPath)
+	return nil
 }
 
 func run(lkPath, plusPath, outPath string) error {
