@@ -640,6 +640,381 @@ func (a *TasksAPIService) GetTaskDetailsExecute(r ApiGetTaskDetailsRequest) (*Ge
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+type ApiGetTaskQueueConfigExpireSnapshotsRequest struct {
+	ctx         context.Context
+	ApiService  *TasksAPIService
+	warehouseId string
+}
+
+func (r ApiGetTaskQueueConfigExpireSnapshotsRequest) Execute() (*GetExpireSnapshotsQueueConfig, *http.Response, error) {
+	return r.ApiService.GetTaskQueueConfigExpireSnapshotsExecute(r)
+}
+
+/*
+GetTaskQueueConfigExpireSnapshots Get the configuration for a Task Queue.
+
+These configurations are global per warehouse and shared across all instances of this kind of task.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param warehouseId
+	@return ApiGetTaskQueueConfigExpireSnapshotsRequest
+*/
+func (a *TasksAPIService) GetTaskQueueConfigExpireSnapshots(ctx context.Context, warehouseId string) ApiGetTaskQueueConfigExpireSnapshotsRequest {
+	return ApiGetTaskQueueConfigExpireSnapshotsRequest{
+		ApiService:  a,
+		ctx:         ctx,
+		warehouseId: warehouseId,
+	}
+}
+
+// Execute executes the request
+//
+//	@return GetExpireSnapshotsQueueConfig
+func (a *TasksAPIService) GetTaskQueueConfigExpireSnapshotsExecute(r ApiGetTaskQueueConfigExpireSnapshotsRequest) (*GetExpireSnapshotsQueueConfig, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *GetExpireSnapshotsQueueConfig
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "TasksAPIService.GetTaskQueueConfigExpireSnapshots")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/management/v1/warehouse/{warehouse_id}/task-queue/expire_snapshots/config"
+	localVarPath = strings.Replace(localVarPath, "{"+"warehouse_id"+"}", url.PathEscape(parameterValueToString(r.warehouseId, "warehouseId")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode >= 400 && localVarHTTPResponse.StatusCode < 500 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiGetTaskQueueConfigOptimizeRequest struct {
+	ctx         context.Context
+	ApiService  *TasksAPIService
+	warehouseId string
+}
+
+func (r ApiGetTaskQueueConfigOptimizeRequest) Execute() (*GetOptimizeQueueConfig, *http.Response, error) {
+	return r.ApiService.GetTaskQueueConfigOptimizeExecute(r)
+}
+
+/*
+GetTaskQueueConfigOptimize Get the configuration for a Task Queue.
+
+These configurations are global per warehouse and shared across all instances of this kind of task.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param warehouseId
+	@return ApiGetTaskQueueConfigOptimizeRequest
+*/
+func (a *TasksAPIService) GetTaskQueueConfigOptimize(ctx context.Context, warehouseId string) ApiGetTaskQueueConfigOptimizeRequest {
+	return ApiGetTaskQueueConfigOptimizeRequest{
+		ApiService:  a,
+		ctx:         ctx,
+		warehouseId: warehouseId,
+	}
+}
+
+// Execute executes the request
+//
+//	@return GetOptimizeQueueConfig
+func (a *TasksAPIService) GetTaskQueueConfigOptimizeExecute(r ApiGetTaskQueueConfigOptimizeRequest) (*GetOptimizeQueueConfig, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *GetOptimizeQueueConfig
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "TasksAPIService.GetTaskQueueConfigOptimize")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/management/v1/warehouse/{warehouse_id}/task-queue/optimize/config"
+	localVarPath = strings.Replace(localVarPath, "{"+"warehouse_id"+"}", url.PathEscape(parameterValueToString(r.warehouseId, "warehouseId")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode >= 400 && localVarHTTPResponse.StatusCode < 500 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiGetTaskQueueConfigRemoveOrphanFilesRequest struct {
+	ctx         context.Context
+	ApiService  *TasksAPIService
+	warehouseId string
+}
+
+func (r ApiGetTaskQueueConfigRemoveOrphanFilesRequest) Execute() (*GetRemoveOrphanFilesQueueConfig, *http.Response, error) {
+	return r.ApiService.GetTaskQueueConfigRemoveOrphanFilesExecute(r)
+}
+
+/*
+GetTaskQueueConfigRemoveOrphanFiles Get the configuration for a Task Queue.
+
+These configurations are global per warehouse and shared across all instances of this kind of task.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param warehouseId
+	@return ApiGetTaskQueueConfigRemoveOrphanFilesRequest
+*/
+func (a *TasksAPIService) GetTaskQueueConfigRemoveOrphanFiles(ctx context.Context, warehouseId string) ApiGetTaskQueueConfigRemoveOrphanFilesRequest {
+	return ApiGetTaskQueueConfigRemoveOrphanFilesRequest{
+		ApiService:  a,
+		ctx:         ctx,
+		warehouseId: warehouseId,
+	}
+}
+
+// Execute executes the request
+//
+//	@return GetRemoveOrphanFilesQueueConfig
+func (a *TasksAPIService) GetTaskQueueConfigRemoveOrphanFilesExecute(r ApiGetTaskQueueConfigRemoveOrphanFilesRequest) (*GetRemoveOrphanFilesQueueConfig, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *GetRemoveOrphanFilesQueueConfig
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "TasksAPIService.GetTaskQueueConfigRemoveOrphanFiles")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/management/v1/warehouse/{warehouse_id}/task-queue/remove_orphan_files/config"
+	localVarPath = strings.Replace(localVarPath, "{"+"warehouse_id"+"}", url.PathEscape(parameterValueToString(r.warehouseId, "warehouseId")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode >= 400 && localVarHTTPResponse.StatusCode < 500 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 type ApiGetTaskQueueConfigSoftDeletionRequest struct {
 	ctx         context.Context
 	ApiService  *TasksAPIService
@@ -1120,6 +1495,507 @@ func (a *TasksAPIService) ListTasksExecute(r ApiListTasksRequest) (*ListTasksRes
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+type ApiScheduleTaskExpireSnapshotsRequest struct {
+	ctx                                context.Context
+	ApiService                         *TasksAPIService
+	warehouseId                        string
+	scheduleExpireSnapshotsTaskRequest *ScheduleExpireSnapshotsTaskRequest
+}
+
+func (r ApiScheduleTaskExpireSnapshotsRequest) ScheduleExpireSnapshotsTaskRequest(scheduleExpireSnapshotsTaskRequest ScheduleExpireSnapshotsTaskRequest) ApiScheduleTaskExpireSnapshotsRequest {
+	r.scheduleExpireSnapshotsTaskRequest = &scheduleExpireSnapshotsTaskRequest
+	return r
+}
+
+func (r ApiScheduleTaskExpireSnapshotsRequest) Execute() (*ScheduleTaskResponse, *http.Response, error) {
+	return r.ApiService.ScheduleTaskExpireSnapshotsExecute(r)
+}
+
+/*
+ScheduleTaskExpireSnapshots Schedule a task for an entity.
+
+Pre-checks run against the warehouse config and target entity
+properties before the task is enqueued. A failure surfaces as `400`
+with a specific error code (see the operator guide for the full set
+of pre-check codes).
+
+When a task is already active for the same (warehouse, entity,
+queue) triple, the call returns `409 TaskAlreadyActive` with the
+existing `task-id` in the body — chain to `POST /task/control`
+with `run-now` or `run-at` to retime it without an extra
+`task/list` round-trip.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param warehouseId
+	@return ApiScheduleTaskExpireSnapshotsRequest
+*/
+func (a *TasksAPIService) ScheduleTaskExpireSnapshots(ctx context.Context, warehouseId string) ApiScheduleTaskExpireSnapshotsRequest {
+	return ApiScheduleTaskExpireSnapshotsRequest{
+		ApiService:  a,
+		ctx:         ctx,
+		warehouseId: warehouseId,
+	}
+}
+
+// Execute executes the request
+//
+//	@return ScheduleTaskResponse
+func (a *TasksAPIService) ScheduleTaskExpireSnapshotsExecute(r ApiScheduleTaskExpireSnapshotsRequest) (*ScheduleTaskResponse, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodPost
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *ScheduleTaskResponse
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "TasksAPIService.ScheduleTaskExpireSnapshots")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/management/v1/warehouse/{warehouse_id}/task-queue/expire_snapshots/schedule"
+	localVarPath = strings.Replace(localVarPath, "{"+"warehouse_id"+"}", url.PathEscape(parameterValueToString(r.warehouseId, "warehouseId")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.scheduleExpireSnapshotsTaskRequest == nil {
+		return localVarReturnValue, nil, reportError("scheduleExpireSnapshotsTaskRequest is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.scheduleExpireSnapshotsTaskRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 400 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 409 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode >= 400 && localVarHTTPResponse.StatusCode < 500 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiScheduleTaskOptimizeRequest struct {
+	ctx                         context.Context
+	ApiService                  *TasksAPIService
+	warehouseId                 string
+	scheduleOptimizeTaskRequest *ScheduleOptimizeTaskRequest
+}
+
+func (r ApiScheduleTaskOptimizeRequest) ScheduleOptimizeTaskRequest(scheduleOptimizeTaskRequest ScheduleOptimizeTaskRequest) ApiScheduleTaskOptimizeRequest {
+	r.scheduleOptimizeTaskRequest = &scheduleOptimizeTaskRequest
+	return r
+}
+
+func (r ApiScheduleTaskOptimizeRequest) Execute() (*ScheduleTaskResponse, *http.Response, error) {
+	return r.ApiService.ScheduleTaskOptimizeExecute(r)
+}
+
+/*
+ScheduleTaskOptimize Schedule a task for an entity.
+
+Pre-checks run against the warehouse config and target entity
+properties before the task is enqueued. A failure surfaces as `400`
+with a specific error code (see the operator guide for the full set
+of pre-check codes).
+
+When a task is already active for the same (warehouse, entity,
+queue) triple, the call returns `409 TaskAlreadyActive` with the
+existing `task-id` in the body — chain to `POST /task/control`
+with `run-now` or `run-at` to retime it without an extra
+`task/list` round-trip.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param warehouseId
+	@return ApiScheduleTaskOptimizeRequest
+*/
+func (a *TasksAPIService) ScheduleTaskOptimize(ctx context.Context, warehouseId string) ApiScheduleTaskOptimizeRequest {
+	return ApiScheduleTaskOptimizeRequest{
+		ApiService:  a,
+		ctx:         ctx,
+		warehouseId: warehouseId,
+	}
+}
+
+// Execute executes the request
+//
+//	@return ScheduleTaskResponse
+func (a *TasksAPIService) ScheduleTaskOptimizeExecute(r ApiScheduleTaskOptimizeRequest) (*ScheduleTaskResponse, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodPost
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *ScheduleTaskResponse
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "TasksAPIService.ScheduleTaskOptimize")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/management/v1/warehouse/{warehouse_id}/task-queue/optimize/schedule"
+	localVarPath = strings.Replace(localVarPath, "{"+"warehouse_id"+"}", url.PathEscape(parameterValueToString(r.warehouseId, "warehouseId")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.scheduleOptimizeTaskRequest == nil {
+		return localVarReturnValue, nil, reportError("scheduleOptimizeTaskRequest is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.scheduleOptimizeTaskRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 400 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 409 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode >= 400 && localVarHTTPResponse.StatusCode < 500 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiScheduleTaskRemoveOrphanFilesRequest struct {
+	ctx                                  context.Context
+	ApiService                           *TasksAPIService
+	warehouseId                          string
+	scheduleRemoveOrphanFilesTaskRequest *ScheduleRemoveOrphanFilesTaskRequest
+}
+
+func (r ApiScheduleTaskRemoveOrphanFilesRequest) ScheduleRemoveOrphanFilesTaskRequest(scheduleRemoveOrphanFilesTaskRequest ScheduleRemoveOrphanFilesTaskRequest) ApiScheduleTaskRemoveOrphanFilesRequest {
+	r.scheduleRemoveOrphanFilesTaskRequest = &scheduleRemoveOrphanFilesTaskRequest
+	return r
+}
+
+func (r ApiScheduleTaskRemoveOrphanFilesRequest) Execute() (*ScheduleTaskResponse, *http.Response, error) {
+	return r.ApiService.ScheduleTaskRemoveOrphanFilesExecute(r)
+}
+
+/*
+ScheduleTaskRemoveOrphanFiles Schedule a task for an entity.
+
+Pre-checks run against the warehouse config and target entity
+properties before the task is enqueued. A failure surfaces as `400`
+with a specific error code (see the operator guide for the full set
+of pre-check codes).
+
+When a task is already active for the same (warehouse, entity,
+queue) triple, the call returns `409 TaskAlreadyActive` with the
+existing `task-id` in the body — chain to `POST /task/control`
+with `run-now` or `run-at` to retime it without an extra
+`task/list` round-trip.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param warehouseId
+	@return ApiScheduleTaskRemoveOrphanFilesRequest
+*/
+func (a *TasksAPIService) ScheduleTaskRemoveOrphanFiles(ctx context.Context, warehouseId string) ApiScheduleTaskRemoveOrphanFilesRequest {
+	return ApiScheduleTaskRemoveOrphanFilesRequest{
+		ApiService:  a,
+		ctx:         ctx,
+		warehouseId: warehouseId,
+	}
+}
+
+// Execute executes the request
+//
+//	@return ScheduleTaskResponse
+func (a *TasksAPIService) ScheduleTaskRemoveOrphanFilesExecute(r ApiScheduleTaskRemoveOrphanFilesRequest) (*ScheduleTaskResponse, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodPost
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *ScheduleTaskResponse
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "TasksAPIService.ScheduleTaskRemoveOrphanFiles")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/management/v1/warehouse/{warehouse_id}/task-queue/remove_orphan_files/schedule"
+	localVarPath = strings.Replace(localVarPath, "{"+"warehouse_id"+"}", url.PathEscape(parameterValueToString(r.warehouseId, "warehouseId")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.scheduleRemoveOrphanFilesTaskRequest == nil {
+		return localVarReturnValue, nil, reportError("scheduleRemoveOrphanFilesTaskRequest is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.scheduleRemoveOrphanFilesTaskRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 400 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 409 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode >= 400 && localVarHTTPResponse.StatusCode < 500 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 type ApiSetProjectTaskQueueConfigTaskLogCleanupRequest struct {
 	ctx                     context.Context
 	ApiService              *TasksAPIService
@@ -1201,6 +2077,345 @@ func (a *TasksAPIService) SetProjectTaskQueueConfigTaskLogCleanupExecute(r ApiSe
 	}
 	// body params
 	localVarPostBody = r.setTaskLogCleanupConfig
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode >= 400 && localVarHTTPResponse.StatusCode < 500 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+		}
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
+}
+
+type ApiSetTaskQueueConfigExpireSnapshotsRequest struct {
+	ctx                           context.Context
+	ApiService                    *TasksAPIService
+	warehouseId                   string
+	setExpireSnapshotsQueueConfig *SetExpireSnapshotsQueueConfig
+}
+
+func (r ApiSetTaskQueueConfigExpireSnapshotsRequest) SetExpireSnapshotsQueueConfig(setExpireSnapshotsQueueConfig SetExpireSnapshotsQueueConfig) ApiSetTaskQueueConfigExpireSnapshotsRequest {
+	r.setExpireSnapshotsQueueConfig = &setExpireSnapshotsQueueConfig
+	return r
+}
+
+func (r ApiSetTaskQueueConfigExpireSnapshotsRequest) Execute() (*http.Response, error) {
+	return r.ApiService.SetTaskQueueConfigExpireSnapshotsExecute(r)
+}
+
+/*
+SetTaskQueueConfigExpireSnapshots Set the configuration for a Task Queue.
+
+These configurations are global per warehouse and shared across all instances of this kind of task.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param warehouseId
+	@return ApiSetTaskQueueConfigExpireSnapshotsRequest
+*/
+func (a *TasksAPIService) SetTaskQueueConfigExpireSnapshots(ctx context.Context, warehouseId string) ApiSetTaskQueueConfigExpireSnapshotsRequest {
+	return ApiSetTaskQueueConfigExpireSnapshotsRequest{
+		ApiService:  a,
+		ctx:         ctx,
+		warehouseId: warehouseId,
+	}
+}
+
+// Execute executes the request
+func (a *TasksAPIService) SetTaskQueueConfigExpireSnapshotsExecute(r ApiSetTaskQueueConfigExpireSnapshotsRequest) (*http.Response, error) {
+	var (
+		localVarHTTPMethod = http.MethodPost
+		localVarPostBody   interface{}
+		formFiles          []formFile
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "TasksAPIService.SetTaskQueueConfigExpireSnapshots")
+	if err != nil {
+		return nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/management/v1/warehouse/{warehouse_id}/task-queue/expire_snapshots/config"
+	localVarPath = strings.Replace(localVarPath, "{"+"warehouse_id"+"}", url.PathEscape(parameterValueToString(r.warehouseId, "warehouseId")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.setExpireSnapshotsQueueConfig == nil {
+		return nil, reportError("setExpireSnapshotsQueueConfig is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.setExpireSnapshotsQueueConfig
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode >= 400 && localVarHTTPResponse.StatusCode < 500 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+		}
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
+}
+
+type ApiSetTaskQueueConfigOptimizeRequest struct {
+	ctx                    context.Context
+	ApiService             *TasksAPIService
+	warehouseId            string
+	setOptimizeQueueConfig *SetOptimizeQueueConfig
+}
+
+func (r ApiSetTaskQueueConfigOptimizeRequest) SetOptimizeQueueConfig(setOptimizeQueueConfig SetOptimizeQueueConfig) ApiSetTaskQueueConfigOptimizeRequest {
+	r.setOptimizeQueueConfig = &setOptimizeQueueConfig
+	return r
+}
+
+func (r ApiSetTaskQueueConfigOptimizeRequest) Execute() (*http.Response, error) {
+	return r.ApiService.SetTaskQueueConfigOptimizeExecute(r)
+}
+
+/*
+SetTaskQueueConfigOptimize Set the configuration for a Task Queue.
+
+These configurations are global per warehouse and shared across all instances of this kind of task.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param warehouseId
+	@return ApiSetTaskQueueConfigOptimizeRequest
+*/
+func (a *TasksAPIService) SetTaskQueueConfigOptimize(ctx context.Context, warehouseId string) ApiSetTaskQueueConfigOptimizeRequest {
+	return ApiSetTaskQueueConfigOptimizeRequest{
+		ApiService:  a,
+		ctx:         ctx,
+		warehouseId: warehouseId,
+	}
+}
+
+// Execute executes the request
+func (a *TasksAPIService) SetTaskQueueConfigOptimizeExecute(r ApiSetTaskQueueConfigOptimizeRequest) (*http.Response, error) {
+	var (
+		localVarHTTPMethod = http.MethodPost
+		localVarPostBody   interface{}
+		formFiles          []formFile
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "TasksAPIService.SetTaskQueueConfigOptimize")
+	if err != nil {
+		return nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/management/v1/warehouse/{warehouse_id}/task-queue/optimize/config"
+	localVarPath = strings.Replace(localVarPath, "{"+"warehouse_id"+"}", url.PathEscape(parameterValueToString(r.warehouseId, "warehouseId")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.setOptimizeQueueConfig == nil {
+		return nil, reportError("setOptimizeQueueConfig is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.setOptimizeQueueConfig
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode >= 400 && localVarHTTPResponse.StatusCode < 500 {
+			var v IcebergErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+		}
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
+}
+
+type ApiSetTaskQueueConfigRemoveOrphanFilesRequest struct {
+	ctx                             context.Context
+	ApiService                      *TasksAPIService
+	warehouseId                     string
+	setRemoveOrphanFilesQueueConfig *SetRemoveOrphanFilesQueueConfig
+}
+
+func (r ApiSetTaskQueueConfigRemoveOrphanFilesRequest) SetRemoveOrphanFilesQueueConfig(setRemoveOrphanFilesQueueConfig SetRemoveOrphanFilesQueueConfig) ApiSetTaskQueueConfigRemoveOrphanFilesRequest {
+	r.setRemoveOrphanFilesQueueConfig = &setRemoveOrphanFilesQueueConfig
+	return r
+}
+
+func (r ApiSetTaskQueueConfigRemoveOrphanFilesRequest) Execute() (*http.Response, error) {
+	return r.ApiService.SetTaskQueueConfigRemoveOrphanFilesExecute(r)
+}
+
+/*
+SetTaskQueueConfigRemoveOrphanFiles Set the configuration for a Task Queue.
+
+These configurations are global per warehouse and shared across all instances of this kind of task.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param warehouseId
+	@return ApiSetTaskQueueConfigRemoveOrphanFilesRequest
+*/
+func (a *TasksAPIService) SetTaskQueueConfigRemoveOrphanFiles(ctx context.Context, warehouseId string) ApiSetTaskQueueConfigRemoveOrphanFilesRequest {
+	return ApiSetTaskQueueConfigRemoveOrphanFilesRequest{
+		ApiService:  a,
+		ctx:         ctx,
+		warehouseId: warehouseId,
+	}
+}
+
+// Execute executes the request
+func (a *TasksAPIService) SetTaskQueueConfigRemoveOrphanFilesExecute(r ApiSetTaskQueueConfigRemoveOrphanFilesRequest) (*http.Response, error) {
+	var (
+		localVarHTTPMethod = http.MethodPost
+		localVarPostBody   interface{}
+		formFiles          []formFile
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "TasksAPIService.SetTaskQueueConfigRemoveOrphanFiles")
+	if err != nil {
+		return nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/management/v1/warehouse/{warehouse_id}/task-queue/remove_orphan_files/config"
+	localVarPath = strings.Replace(localVarPath, "{"+"warehouse_id"+"}", url.PathEscape(parameterValueToString(r.warehouseId, "warehouseId")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.setRemoveOrphanFilesQueueConfig == nil {
+		return nil, reportError("setRemoveOrphanFilesQueueConfig is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.setRemoveOrphanFilesQueueConfig
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return nil, err
