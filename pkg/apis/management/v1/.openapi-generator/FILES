@@ -48,9 +48,15 @@ model_catalog_actions_batch_check_request.go
 model_catalog_actions_batch_check_response.go
 model_catalog_actions_batch_check_result.go
 model_cedar_effect_filter.go
+model_cedar_entity.go
 model_cedar_entity_source_info.go
+model_cedar_entity_uid.go
 model_cedar_file_source_config.go
 model_cedar_kubernetes_config_map_source_config.go
+model_cedar_policy.go
+model_cedar_policy_condition.go
+model_cedar_policy_condition_kind.go
+model_cedar_policy_scope_constraint.go
 model_cedar_policy_source_info.go
 model_cedar_policy_tier.go
 model_cedar_principal_constraint_pattern.go
@@ -60,6 +66,7 @@ model_cedar_resolve_resource_generic_table.go
 model_cedar_resolve_resource_namespace.go
 model_cedar_resolve_resource_project.go
 model_cedar_resolve_resource_project_project.go
+model_cedar_resolve_resource_server.go
 model_cedar_resolve_resource_table.go
 model_cedar_resolve_resource_view.go
 model_cedar_resolve_resource_warehouse.go
@@ -494,6 +501,7 @@ model_open_fga_table_action.go
 model_open_fga_view_action.go
 model_open_fga_warehouse_action.go
 model_optimize_queue_config.go
+model_optimize_step.go
 model_policy_effect.go
 model_predefined_policies_response.go
 model_predefined_policy_change.go

@@ -20,10 +20,10 @@ type CedarResolveResource struct {
 	CedarResolveResourceGenericTable *CedarResolveResourceGenericTable
 	CedarResolveResourceNamespace    *CedarResolveResourceNamespace
 	CedarResolveResourceProject      *CedarResolveResourceProject
+	CedarResolveResourceServer       *CedarResolveResourceServer
 	CedarResolveResourceTable        *CedarResolveResourceTable
 	CedarResolveResourceView         *CedarResolveResourceView
 	CedarResolveResourceWarehouse    *CedarResolveResourceWarehouse
-	String                           *string
 }
 
 // CedarResolveResourceGenericTableAsCedarResolveResource is a convenience function that returns CedarResolveResourceGenericTable wrapped in CedarResolveResource
@@ -47,6 +47,13 @@ func CedarResolveResourceProjectAsCedarResolveResource(v *CedarResolveResourcePr
 	}
 }
 
+// CedarResolveResourceServerAsCedarResolveResource is a convenience function that returns CedarResolveResourceServer wrapped in CedarResolveResource
+func CedarResolveResourceServerAsCedarResolveResource(v *CedarResolveResourceServer) CedarResolveResource {
+	return CedarResolveResource{
+		CedarResolveResourceServer: v,
+	}
+}
+
 // CedarResolveResourceTableAsCedarResolveResource is a convenience function that returns CedarResolveResourceTable wrapped in CedarResolveResource
 func CedarResolveResourceTableAsCedarResolveResource(v *CedarResolveResourceTable) CedarResolveResource {
 	return CedarResolveResource{
@@ -65,13 +72,6 @@ func CedarResolveResourceViewAsCedarResolveResource(v *CedarResolveResourceView)
 func CedarResolveResourceWarehouseAsCedarResolveResource(v *CedarResolveResourceWarehouse) CedarResolveResource {
 	return CedarResolveResource{
 		CedarResolveResourceWarehouse: v,
-	}
-}
-
-// stringAsCedarResolveResource is a convenience function that returns string wrapped in CedarResolveResource
-func StringAsCedarResolveResource(v *string) CedarResolveResource {
-	return CedarResolveResource{
-		String: v,
 	}
 }
 
@@ -118,6 +118,19 @@ func (dst *CedarResolveResource) UnmarshalJSON(data []byte) error {
 		dst.CedarResolveResourceProject = nil
 	}
 
+	// try to unmarshal data into CedarResolveResourceServer
+	err = json.Unmarshal(data, &dst.CedarResolveResourceServer)
+	if err == nil {
+		jsonCedarResolveResourceServer, _ := json.Marshal(dst.CedarResolveResourceServer)
+		if string(jsonCedarResolveResourceServer) == "{}" { // empty struct
+			dst.CedarResolveResourceServer = nil
+		} else {
+			match++
+		}
+	} else {
+		dst.CedarResolveResourceServer = nil
+	}
+
 	// try to unmarshal data into CedarResolveResourceTable
 	err = json.Unmarshal(data, &dst.CedarResolveResourceTable)
 	if err == nil {
@@ -157,28 +170,15 @@ func (dst *CedarResolveResource) UnmarshalJSON(data []byte) error {
 		dst.CedarResolveResourceWarehouse = nil
 	}
 
-	// try to unmarshal data into String
-	err = json.Unmarshal(data, &dst.String)
-	if err == nil {
-		jsonString, _ := json.Marshal(dst.String)
-		if string(jsonString) == "{}" { // empty struct
-			dst.String = nil
-		} else {
-			match++
-		}
-	} else {
-		dst.String = nil
-	}
-
 	if match > 1 { // more than 1 match
 		// reset to nil
 		dst.CedarResolveResourceGenericTable = nil
 		dst.CedarResolveResourceNamespace = nil
 		dst.CedarResolveResourceProject = nil
+		dst.CedarResolveResourceServer = nil
 		dst.CedarResolveResourceTable = nil
 		dst.CedarResolveResourceView = nil
 		dst.CedarResolveResourceWarehouse = nil
-		dst.String = nil
 
 		return fmt.Errorf("data matches more than one schema in oneOf(CedarResolveResource)")
 	} else if match == 1 {
@@ -206,6 +206,10 @@ func (src CedarResolveResource) MarshalJSON() ([]byte, error) {
 		return json.Marshal(&src.CedarResolveResourceProject)
 	}
 
+	if src.CedarResolveResourceServer != nil {
+		return json.Marshal(&src.CedarResolveResourceServer)
+	}
+
 	if src.CedarResolveResourceTable != nil {
 		return json.Marshal(&src.CedarResolveResourceTable)
 	}
@@ -216,10 +220,6 @@ func (src CedarResolveResource) MarshalJSON() ([]byte, error) {
 
 	if src.CedarResolveResourceWarehouse != nil {
 		return json.Marshal(&src.CedarResolveResourceWarehouse)
-	}
-
-	if src.String != nil {
-		return json.Marshal(&src.String)
 	}
 
 	return nil, nil // no data in oneOf schemas
@@ -242,6 +242,10 @@ func (obj *CedarResolveResource) GetActualInstance() interface{} {
 		return obj.CedarResolveResourceProject
 	}
 
+	if obj.CedarResolveResourceServer != nil {
+		return obj.CedarResolveResourceServer
+	}
+
 	if obj.CedarResolveResourceTable != nil {
 		return obj.CedarResolveResourceTable
 	}
@@ -252,10 +256,6 @@ func (obj *CedarResolveResource) GetActualInstance() interface{} {
 
 	if obj.CedarResolveResourceWarehouse != nil {
 		return obj.CedarResolveResourceWarehouse
-	}
-
-	if obj.String != nil {
-		return obj.String
 	}
 
 	// all schemas are nil
@@ -276,6 +276,10 @@ func (obj CedarResolveResource) GetActualInstanceValue() interface{} {
 		return *obj.CedarResolveResourceProject
 	}
 
+	if obj.CedarResolveResourceServer != nil {
+		return *obj.CedarResolveResourceServer
+	}
+
 	if obj.CedarResolveResourceTable != nil {
 		return *obj.CedarResolveResourceTable
 	}
@@ -286,10 +290,6 @@ func (obj CedarResolveResource) GetActualInstanceValue() interface{} {
 
 	if obj.CedarResolveResourceWarehouse != nil {
 		return *obj.CedarResolveResourceWarehouse
-	}
-
-	if obj.String != nil {
-		return *obj.String
 	}
 
 	// all schemas are nil

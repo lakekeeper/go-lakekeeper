@@ -188,11 +188,17 @@ add one, write the value, add it to its spec's list, and test it in
 defect, a second run is skipped and leaves the spec unchanged, and it is
 skipped when the defect is absent.
 
-The Lakekeeper spec has no patches. The Lakekeeper+ spec has:
+The Lakekeeper spec has no patches. The Lakekeeper+ spec has the patches
+below, applied in this order. The table is also the list of fixes to make
+upstream in the Lakekeeper+ spec: each fix that lands there retires its patch.
 
 | Patch | Defect |
 |---|---|
 | `license-identifier` | `info.license` has a name but neither `identifier` nor `url`, so spec validation fails. Adds the SPDX `LicenseRef-Vakamo-Enterprise-License` identifier. |
+| `boolean-default` | `ExpireSnapshotsQueueConfig.enable-expire-snapshots` declares `default: 'false'`, a string on a boolean. Turns any such string default on a boolean into the boolean. |
+| `typed-cedar-lists` | `GetCedarPoliciesResponse.policies` and `ResolveCedarEntitiesResponse.entities` declare `items: {}`, so they generate as `[]interface{}`. Adds item schemas after Cedar's JSON policy and entity formats (`CedarPolicy`, `CedarEntity` and their parts), so they generate as `[]CedarPolicy` and `[]CedarEntity`. |
+| `named-inline-enums` | The `server` variant of `CedarResolveResource` and the items of `ScheduleOptimizeTaskRequest.payload.steps` are inline enums, which generate as plain strings without constants. Moves them to the named schemas `CedarResolveResourceServer` and `OptimizeStep`. |
+| `no-inherit-defaults` | Nullable fields of the `*QueueConfig` schemas, unset to inherit the server's value, declare that value as `default`, so the generated constructors set and send every one. Drops `default` from them. Runs after `boolean-default`. |
 
 ### Merge rules
 
