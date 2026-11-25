@@ -113,6 +113,9 @@ type requirement struct {
 	lakekeeperPlus bool
 	// authzBackend, when set, is the authorization backend it needs.
 	authzBackend string
+	// queue, when set, is the task queue it needs the server to run, as
+	// the server info names it in its queues.
+	queue string
 }
 
 // unmet returns why caps do not meet r, or "" when they do.
@@ -124,6 +127,10 @@ func (r requirement) unmet(caps *Capabilities) (UnsupportedReason, string) {
 		return ReasonAuthzBackend, fmt.Sprintf(
 			"requires the %s authorization backend; server is %s with the %s authorization backend",
 			r.authzBackend, caps, caps.AuthzBackend)
+	}
+	if r.queue != "" && !slices.Contains(caps.Queues, r.queue) {
+		return ReasonQueueNotConfigured, fmt.Sprintf(
+			"requires the %s task queue; server is %s without it", r.queue, caps)
 	}
 	return "", ""
 }
@@ -171,6 +178,9 @@ const (
 	// ReasonAuthzBackend: the operation needs another authorization
 	// backend than the server runs.
 	ReasonAuthzBackend UnsupportedReason = "authz-backend"
+	// ReasonQueueNotConfigured: the operation needs a task queue the
+	// server does not run.
+	ReasonQueueNotConfigured UnsupportedReason = "queue-not-configured"
 )
 
 // UnsupportedError is the error a capability-gated façade returns when the
