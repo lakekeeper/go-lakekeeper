@@ -102,7 +102,7 @@ test-e2e-compose: $(ENV_FILE) ## Runs lkctl E2E tests against the docker-compose
 
 # LAKEKEEPER__LICENSE__KEY reaches the server through the environment when
 # set; it is optional for local test runs. CI runs with a license.
-LAKEKEEPER_PLUS_VERSION ?= latest
+LAKEKEEPER_PLUS_VERSION ?= v0.15.1
 .PHONY: test-plus
 test-plus: $(ENV_FILE) ## Runs the Lakekeeper+ E2E and integration tests (tags e2e_plus, integration_plus) against Lakekeeper+ with Cedar, then OpenFGA.
 	@echo === ./e2e/plus/run.sh

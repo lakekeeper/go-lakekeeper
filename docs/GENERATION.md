@@ -129,7 +129,10 @@ own, from its own latest release:
 - **Lakekeeper+**: copy `api/management-open-api.yaml` from the
   `lakekeeper-enterprise` repository at the Lakekeeper+ release tag (or
   commit) over
-  [`management-plus-open-api.yaml`](../api/openapi/management-plus-open-api.yaml).
+  [`management-plus-open-api.yaml`](../api/openapi/management-plus-open-api.yaml),
+  and set `LAKEKEEPER_PLUS_VERSION` in the Makefile, the default in
+  `docker-compose.yml` and in `e2e/plus/run.sh` to the same release, so
+  `make test-plus` runs against the server the spec came from.
 
 Copy the file unmodified; fix its defects with a patch in prepare instead (see
 [Patches](#patches)). Then run `make generate` and commit the spec and the

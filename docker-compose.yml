@@ -71,7 +71,7 @@ services:
   # write a license into this file or any other committed file.
   lakekeeper-plus:
     profiles: [plus]
-    image: &lakekeeper-plus-image quay.io/vakamo/lakekeeper-plus:${LAKEKEEPER_PLUS_VERSION:-latest}-distroless
+    image: &lakekeeper-plus-image quay.io/vakamo/lakekeeper-plus:${LAKEKEEPER_PLUS_VERSION:-v0.15.1}-distroless
     pull_policy: *lakekeeper-pull-policy
     labels:
       go-lakekeeper/owned: ""

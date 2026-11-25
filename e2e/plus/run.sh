@@ -12,7 +12,7 @@
 #
 # Environment:
 #   LAKEKEEPER_PLUS_VARIANTS  variants to run, default "cedar openfga"
-#   LAKEKEEPER_PLUS_VERSION   image tag prefix, default "latest"
+#   LAKEKEEPER_PLUS_VERSION   image tag prefix, default "v0.15.1"
 #   LAKEKEEPER__LICENSE__KEY  Lakekeeper+ license; passed to the server when
 #                             set. Optional for local test runs; CI sets it.
 #   LICENSE_EXPIRY_NOTICE     if set, a file path: after the first variant is
@@ -42,7 +42,7 @@ for cmd in "$CONTAINER_ENGINE" go jq; do
 done
 
 VARIANTS="${LAKEKEEPER_PLUS_VARIANTS:-cedar openfga}"
-LAKEKEEPER_PLUS_VERSION="${LAKEKEEPER_PLUS_VERSION:-latest}"
+LAKEKEEPER_PLUS_VERSION="${LAKEKEEPER_PLUS_VERSION:-v0.15.1}"
 export LAKEKEEPER_PLUS_VERSION
 
 # Read-only Lakekeeper E2E tests that also run against Lakekeeper+, and the
