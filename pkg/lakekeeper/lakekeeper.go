@@ -16,13 +16,22 @@
 // What it re-exports:
 //
 //   - Client + constructors and client Options, APIError and WrapAPIError
-//     from pkg/client
-//   - CallOption, WithProject and WithBreakGlass, and every façade …Options type (e.g.
-//     ListWarehousesOptions, ListRolesOptions, GetServerAccessOptions)
+//     from pkg/client, plus two convenience constructors of its own
+//     (NewOAuthClientCredentials, NewK8sServiceAccount)
+//   - CallOption, WithProject and WithBreakGlass, and every façade
+//     …Options type (e.g. ListWarehousesOptions, ListRolesOptions,
+//     GetServerAccessOptions, PredefinedPoliciesOptions)
+//   - Capabilities, Edition, AuthzBackend and Queue with their constants
+//     (EditionLakekeeperPlus, AuthzBackendCedar, QueueOptimize, …),
+//     ErrUnsupported, UnsupportedError, UnsupportedReason and the Reason…
+//     constants, and VersionRange and SupportedVersions
 //   - Storage profile, delete profile and credential builders from
-//     pkg/storage/{profile,credential}
-//   - Permission builders from pkg/permissions
-//   - The most common Management API request/response types
+//     pkg/storage/{profile,credential}, their read-side accessors
+//     (AsS3Profile, AsSoftDeleteProfile, AsS3AccessKey, …) and the
+//     profile discriminator constants
+//   - Permission builders and principal constants from pkg/permissions
+//   - The most common Management API request/response types and their
+//     constructors
 //
 // What it does NOT re-export:
 //

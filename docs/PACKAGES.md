@@ -108,13 +108,21 @@ wh, err := c.Warehouses.Create(ctx, req, lakekeeper.WithProject(projectID))
 ```
 
 What it re-exports:
-- `Client`, `Option`, and every constructor from [`pkg/client`](#pkgclient).
-- `Capabilities`, `Edition`, `ErrUnsupported`, `UnsupportedError`,
-  `UnsupportedReason` and their constants (`EditionLakekeeperPlus`,
-  `AuthzBackendCedar`, `ReasonNotLakekeeperPlus`, …).
+- `Client`, `Option`, every constructor and client option from
+  [`pkg/client`](#pkgclient), `APIError` and `WrapAPIError`, plus two
+  convenience constructors of its own (`NewOAuthClientCredentials`,
+  `NewK8sServiceAccount`).
+- `CallOption`, `WithProject`, `WithBreakGlass`, and the façade `…Options`
+  types (`ListWarehousesOptions`, `PredefinedPoliciesOptions`, …).
+- `Capabilities`, `Edition`, `AuthzBackend`, `Queue`, `ErrUnsupported`,
+  `UnsupportedError`, `UnsupportedReason`, `VersionRange` and
+  `SupportedVersions`, and their constants (`EditionLakekeeperPlus`,
+  `AuthzBackendCedar`, `QueueOptimize`, `ReasonNotLakekeeperPlus`, …).
 - All storage profile, delete profile and credential builders from
-  `pkg/storage/{profile,credential}`, and the profiles' discriminator
-  constants (`StorageProfileTypeS3`, `DeleteProfileTypeSoft`, …).
+  `pkg/storage/{profile,credential}`, their read-side accessors
+  (`AsS3Profile`, `AsSoftDeleteProfile`, `AsS3AccessKey`, …), and the
+  profiles' discriminator constants (`StorageProfileTypeS3`,
+  `DeleteProfileTypeSoft`, …).
 - Permission helpers (`PrincipalSet`, `BuildAssignment`,
   `BuildAssignmentSet`, `DescribeAssignment`) and the principal constants
   (`PrincipalUser`, `PrincipalTypeUser`, …).
@@ -130,9 +138,11 @@ What it does **not** re-export:
   (`managementv1.WAREHOUSESTATUS_ACTIVE`, `managementv1.S3FLAVOR_AWS`);
   an alias would only add a second name for the same value.
 
-The umbrella is a thin file (~150 LoC) that runs `go vet` clean and
-provides no behaviour of its own — every symbol resolves through
-`type X = …` aliases or `var X = …` function-value references.
+The umbrella is a thin file (~400 LoC) that runs `go vet` clean. Apart
+from the two convenience constructors, which only build an `AuthSource`
+and call `NewWithAuthSource`, it provides no behaviour of its own: every
+symbol resolves through `type X = …` aliases, `const X = …` or
+`var X = …` function-value references.
 
 ---
 
