@@ -318,6 +318,21 @@ func TestStorageFamily(t *testing.T) {
 			want:    "adls",
 		},
 		{
+			name:    "memory",
+			profile: managementv1.StorageProfileMemoryAsStorageProfile(managementv1.NewStorageProfileMemory("memory://wh", "memory")),
+			want:    "memory",
+		},
+		{
+			name:    "onelake",
+			profile: managementv1.StorageProfileOneLakeAsStorageProfile(managementv1.NewStorageProfileOneLake("lh", "ws", "onelake")),
+			want:    "onelake",
+		},
+		{
+			name:    "stackit",
+			profile: managementv1.StorageProfileStackitAsStorageProfile(managementv1.NewStorageProfileStackit("b", "eu01", "stackit")),
+			want:    "stackit",
+		},
+		{
 			name:    "empty union",
 			profile: managementv1.StorageProfile{},
 			want:    "unknown",
