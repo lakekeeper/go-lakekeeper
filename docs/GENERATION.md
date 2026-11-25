@@ -136,6 +136,18 @@ Copy the file unmodified; fix its defects with a patch in prepare instead (see
 regenerated tree in the **same commit** so the diff stays reviewable. Name the
 tag or commit of the spec you updated in the commit message.
 
+Lakekeeper releases, minors included, can make breaking changes to the
+Management API, so report them: `make spec-breaking-changes` runs
+[oasdiff](https://github.com/oasdiff/oasdiff) `breaking` (pinned by
+`OASDIFF_VERSION` in the Makefile, run with `go run`) on each spec, comparing
+the version on `BASE` (default `origin/main`, the PR's base) with the working
+tree, and prints a Markdown section per spec: its breaking changes, "no
+breaking changes", or "new" when the spec is not on `BASE`. Paste the report
+into the PR body, so the breaking changes reach the release notes. On a PR
+that changes a spec, the `spec breaking changes` CI job writes the same report
+to its job summary; breaking changes never fail the job.
+`make test-spec-breaking-changes` tests the report against fixture specs.
+
 If prepare stops with a merge conflict, the two specs disagree on a shared
 path or schema beyond what the [merge rules](#merge-rules) accept; see there.
 
