@@ -91,7 +91,7 @@ make generate
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/diagrams/development-workflow-dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="docs/diagrams/development-workflow-light.svg">
-  <img alt="Development workflow: edit, then make validate and make build (vet, lint, unit tests) on your machine with no stack; make test-integration and make test-e2e-compose on the compose stack; the auth-only e2e subset with make test-e2e-kind on a kind cluster; a Conventional Commit and a pull request gated by the PR title check and ci-ok; after the squash merge, release-please opens the release PR and its v* tag runs GoReleaser" src="docs/diagrams/development-workflow-light.svg">
+  <img alt="Development workflow: edit, then make validate and make build (vet, lint, unit tests) on your machine with no stack; make test-integration and make test-e2e-compose on the compose stack; the auth-only e2e subset with make test-e2e-kind on a kind cluster; for Lakekeeper+ or supported-version changes, make test-plus and make test-e2e-versions on compose stack variants; a Conventional Commit and a pull request gated by the PR title check and ci-ok, with the spec breaking-change report outside ci-ok; after the squash merge, release-please opens the release PR and its v* tag runs GoReleaser, and the Lakekeeper+ suites run on main" src="docs/diagrams/development-workflow-light.svg">
 </picture>
 
 Explorable version: [`docs/diagrams/development-workflow.html`](docs/diagrams/development-workflow.html)
@@ -111,8 +111,14 @@ Only the steps marked "Needs a running stack" start one; the commands are under
   Helm and no Keycloak. `make test-e2e-kind` creates it and runs only the
   auth-only subset of the `lkctl` end-to-end tests there; the other tests
   skip.
+- **Compose stack variants**: the same compose stack with another server:
+  the Lakekeeper+ image (`make test-plus`, profiles `plus` and
+  `plus-openfga`), or Lakekeeper pinned to the oldest supported minor and the
+  minor before it (`make test-e2e-versions`).
 - **`ci-ok`**: the one CI check the `main` branch requires; it passes only when
-  lint, drift, unit, integration, the end-to-end jobs and the build pass.
+  lint, drift, unit, integration, the end-to-end jobs and the build pass. The
+  spec breaking-change report on pull requests and the Lakekeeper+ suites on
+  `main` are not part of it.
 
 ## Testing
 
@@ -140,6 +146,10 @@ once with the Cedar and once with the OpenFGA authorization backend. A license
 is optional for local runs: when `LAKEKEEPER__LICENSE__KEY` is set in your
 environment, the target passes it to the server. Never commit a license. CI
 runs these tests on `main` with a license.
+
+`make test-e2e-versions` runs the supported-version `lkctl` tests against
+Lakekeeper pinned to the oldest supported minor and the minor before it. Run it
+when you change the supported range or the version warning; CI does not run it.
 
 If adding a feature or fixing a bug, include relevant unit and/or integration tests.
 
