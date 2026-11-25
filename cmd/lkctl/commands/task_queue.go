@@ -20,12 +20,26 @@ import (
 // queue-config.
 const heartbeatField = "max-seconds-since-last-heartbeat"
 
-type queueFieldKind int
+// queueFieldKind is the type of a queue-config field: how its `set` flag is
+// defined, and how the flag's value is read back.
+type queueFieldKind struct {
+	define func(cmd *cobra.Command, name, usage string)
+	read   func(cmd *cobra.Command, name string) (any, error)
+}
 
-const (
-	boolField queueFieldKind = iota
-	int64Field
-	stringField
+var (
+	boolField = queueFieldKind{
+		define: func(cmd *cobra.Command, name, usage string) { cmd.Flags().Bool(name, false, usage) },
+		read:   func(cmd *cobra.Command, name string) (any, error) { return cmd.Flags().GetBool(name) },
+	}
+	int64Field = queueFieldKind{
+		define: func(cmd *cobra.Command, name, usage string) { cmd.Flags().Int64(name, 0, usage) },
+		read:   func(cmd *cobra.Command, name string) (any, error) { return cmd.Flags().GetInt64(name) },
+	}
+	stringField = queueFieldKind{
+		define: func(cmd *cobra.Command, name, usage string) { cmd.Flags().String(name, "", usage) },
+		read:   func(cmd *cobra.Command, name string) (any, error) { return cmd.Flags().GetString(name) },
+	}
 )
 
 // queueField is one field of a queue-config. Its name is the JSON name, and
@@ -36,21 +50,30 @@ type queueField struct {
 	usage string
 }
 
+// queueTarget is what a queue command acts on: the client, and the
+// warehouse of a warehouse queue or the call options (-p) of a project
+// queue.
+type queueTarget struct {
+	c           *client.Client
+	warehouseID string
+	callOpts    []client.CallOption
+}
+
 // taskQueue describes one task queue for the `task-queue` commands.
 type taskQueue struct {
-	use   string // command name
-	queue string // the server's name for the queue
+	use   string       // command name
+	queue client.Queue // the server's name for the queue
 	short string
 	plus  bool // a Lakekeeper+ queue
 	// project: the queue is configured per project (-p), not per warehouse.
 	project bool
 	fields  []queueField
-	get     func(ctx context.Context, c *client.Client, warehouseID string, callOpts []client.CallOption) (any, error)
+	get     func(ctx context.Context, t queueTarget) (any, error)
 	// set decodes body, the JSON of the queue's Set… request, and sends it.
-	set func(ctx context.Context, c *client.Client, warehouseID string, body []byte, callOpts []client.CallOption) error
+	set func(ctx context.Context, t queueTarget, body []byte) error
 	// schedule schedules a task on the queue; nil for a queue without
 	// scheduling.
-	schedule func(ctx context.Context, c *client.Client, warehouseID string, s queueSchedule) (*managementv1.ScheduleTaskResponse, error)
+	schedule func(ctx context.Context, t queueTarget, s queueSchedule) (*managementv1.ScheduleTaskResponse, error)
 	// steps: schedule takes optimize steps (--step).
 	steps bool
 }
@@ -65,53 +88,29 @@ type queueSchedule struct {
 
 var taskQueues = []taskQueue{
 	{
-		use: "tabular-purge", queue: "tabular_purge",
+		use: "tabular-purge", queue: client.QueueTabularPurge,
 		short: "Configure the tabular_purge queue of a warehouse",
-		get: func(ctx context.Context, c *client.Client, wh string, _ []client.CallOption) (any, error) {
-			return c.TaskQueues.TabularPurgeConfig(ctx, wh)
-		},
-		set: func(ctx context.Context, c *client.Client, wh string, body []byte, _ []client.CallOption) error {
-			var req managementv1.SetPurgeQueueConfig
-			if err := json.Unmarshal(body, &req); err != nil {
-				return err
-			}
-			return c.TaskQueues.SetTabularPurgeConfig(ctx, wh, &req)
-		},
+		get:   warehouseGet((*client.TaskQueues).TabularPurgeConfig),
+		set:   warehouseSet((*client.TaskQueues).SetTabularPurgeConfig),
 	},
 	{
-		use: "soft-deletion", queue: "soft_deletion",
+		use: "soft-deletion", queue: client.QueueSoftDeletion,
 		short: "Configure the soft_deletion queue of a warehouse",
-		get: func(ctx context.Context, c *client.Client, wh string, _ []client.CallOption) (any, error) {
-			return c.TaskQueues.SoftDeletionConfig(ctx, wh)
-		},
-		set: func(ctx context.Context, c *client.Client, wh string, body []byte, _ []client.CallOption) error {
-			var req managementv1.SetSoftDeletionQueueConfig
-			if err := json.Unmarshal(body, &req); err != nil {
-				return err
-			}
-			return c.TaskQueues.SetSoftDeletionConfig(ctx, wh, &req)
-		},
+		get:   warehouseGet((*client.TaskQueues).SoftDeletionConfig),
+		set:   warehouseSet((*client.TaskQueues).SetSoftDeletionConfig),
 	},
 	{
-		use: "task-log-cleanup", queue: "task_log_cleanup", project: true,
+		use: "task-log-cleanup", queue: client.QueueTaskLogCleanup, project: true,
 		short: "Configure the task_log_cleanup queue of a project",
 		fields: []queueField{
 			{"cleanup-period", stringField, "How often the cleanup runs, as an ISO 8601 duration (e.g. P1D)"},
 			{"retention-period", stringField, "How long task logs are kept, as an ISO 8601 duration (e.g. P90D)"},
 		},
-		get: func(ctx context.Context, c *client.Client, _ string, callOpts []client.CallOption) (any, error) {
-			return c.TaskQueues.TaskLogCleanupConfig(ctx, callOpts...)
-		},
-		set: func(ctx context.Context, c *client.Client, _ string, body []byte, callOpts []client.CallOption) error {
-			var req managementv1.SetTaskLogCleanupConfig
-			if err := json.Unmarshal(body, &req); err != nil {
-				return err
-			}
-			return c.TaskQueues.SetTaskLogCleanupConfig(ctx, &req, callOpts...)
-		},
+		get: projectGet((*client.TaskQueues).TaskLogCleanupConfig),
+		set: projectSet((*client.TaskQueues).SetTaskLogCleanupConfig),
 	},
 	{
-		use: "expire-snapshots", queue: string(client.QueueExpireSnapshots), plus: true,
+		use: "expire-snapshots", queue: client.QueueExpireSnapshots, plus: true,
 		short: "Configure the expire_snapshots queue of a warehouse",
 		fields: []queueField{
 			{"enable-expire-snapshots", boolField, "Expire snapshots of all tables in the warehouse"},
@@ -121,26 +120,13 @@ var taskQueues = []taskQueue{
 			{"min-snapshots-to-keep", int64Field, "Minimum number of snapshots to keep per table and branch"},
 			{"disable-min-age-check", boolField, "Allow ages below 24 hours"},
 		},
-		get: func(ctx context.Context, c *client.Client, wh string, _ []client.CallOption) (any, error) {
-			return c.TaskQueues.ExpireSnapshotsConfig(ctx, wh)
-		},
-		set: func(ctx context.Context, c *client.Client, wh string, body []byte, _ []client.CallOption) error {
-			var req managementv1.SetExpireSnapshotsQueueConfig
-			if err := json.Unmarshal(body, &req); err != nil {
-				return err
-			}
-			return c.TaskQueues.SetExpireSnapshotsConfig(ctx, wh, &req)
-		},
-		schedule: func(ctx context.Context, c *client.Client, wh string, s queueSchedule) (*managementv1.ScheduleTaskResponse, error) {
-			req := managementv1.NewScheduleExpireSnapshotsTaskRequest(s.entity)
-			if s.scheduledFor != nil {
-				req.SetScheduledFor(*s.scheduledFor)
-			}
-			return c.TaskQueues.ScheduleExpireSnapshots(ctx, wh, req)
-		},
+		get: warehouseGet((*client.TaskQueues).ExpireSnapshotsConfig),
+		set: warehouseSet((*client.TaskQueues).SetExpireSnapshotsConfig),
+		schedule: warehouseSchedule(managementv1.NewScheduleExpireSnapshotsTaskRequest,
+			(*client.TaskQueues).ScheduleExpireSnapshots),
 	},
 	{
-		use: "optimize", queue: string(client.QueueOptimize), plus: true,
+		use: "optimize", queue: client.QueueOptimize, plus: true,
 		short: "Configure the optimize queue of a warehouse",
 		fields: []queueField{
 			{"enable-optimize", boolField, "Optimize all tables in the warehouse"},
@@ -149,30 +135,14 @@ var taskQueues = []taskQueue{
 			{"target-file-size-bytes", int64Field, "Size of the data and delete files written"},
 			{"target-manifest-size-bytes", int64Field, "Size of the manifests written"},
 		},
-		get: func(ctx context.Context, c *client.Client, wh string, _ []client.CallOption) (any, error) {
-			return c.TaskQueues.OptimizeConfig(ctx, wh)
-		},
-		set: func(ctx context.Context, c *client.Client, wh string, body []byte, _ []client.CallOption) error {
-			var req managementv1.SetOptimizeQueueConfig
-			if err := json.Unmarshal(body, &req); err != nil {
-				return err
-			}
-			return c.TaskQueues.SetOptimizeConfig(ctx, wh, &req)
-		},
+		get:   warehouseGet((*client.TaskQueues).OptimizeConfig),
+		set:   warehouseSet((*client.TaskQueues).SetOptimizeConfig),
 		steps: true,
-		schedule: func(ctx context.Context, c *client.Client, wh string, s queueSchedule) (*managementv1.ScheduleTaskResponse, error) {
-			req := managementv1.NewScheduleOptimizeTaskRequest(s.entity)
-			if s.scheduledFor != nil {
-				req.SetScheduledFor(*s.scheduledFor)
-			}
-			if len(s.steps) > 0 {
-				req.SetPayload(managementv1.ScheduleOptimizeTaskRequestPayload{Steps: s.steps})
-			}
-			return c.TaskQueues.ScheduleOptimize(ctx, wh, req)
-		},
+		schedule: warehouseSchedule(managementv1.NewScheduleOptimizeTaskRequest,
+			(*client.TaskQueues).ScheduleOptimize),
 	},
 	{
-		use: "remove-orphan-files", queue: string(client.QueueRemoveOrphanFiles), plus: true,
+		use: "remove-orphan-files", queue: client.QueueRemoveOrphanFiles, plus: true,
 		short: "Configure the remove_orphan_files queue of a warehouse",
 		fields: []queueField{
 			{"enable-remove-orphan-files", boolField, "Schedule orphan-file removal for all tables in the warehouse"},
@@ -183,24 +153,75 @@ var taskQueues = []taskQueue{
 			{"maximum-interval-seconds", int64Field, "Upper bound on the interval between runs, in seconds"},
 			{"target-reclaim-bytes", int64Field, "Orphan bytes a run should find; sets the interval between runs"},
 		},
-		get: func(ctx context.Context, c *client.Client, wh string, _ []client.CallOption) (any, error) {
-			return c.TaskQueues.RemoveOrphanFilesConfig(ctx, wh)
-		},
-		set: func(ctx context.Context, c *client.Client, wh string, body []byte, _ []client.CallOption) error {
-			var req managementv1.SetRemoveOrphanFilesQueueConfig
-			if err := json.Unmarshal(body, &req); err != nil {
-				return err
-			}
-			return c.TaskQueues.SetRemoveOrphanFilesConfig(ctx, wh, &req)
-		},
-		schedule: func(ctx context.Context, c *client.Client, wh string, s queueSchedule) (*managementv1.ScheduleTaskResponse, error) {
-			req := managementv1.NewScheduleRemoveOrphanFilesTaskRequest(s.entity)
-			if s.scheduledFor != nil {
-				req.SetScheduledFor(*s.scheduledFor)
-			}
-			return c.TaskQueues.ScheduleRemoveOrphanFiles(ctx, wh, req)
-		},
+		get: warehouseGet((*client.TaskQueues).RemoveOrphanFilesConfig),
+		set: warehouseSet((*client.TaskQueues).SetRemoveOrphanFilesConfig),
+		schedule: warehouseSchedule(managementv1.NewScheduleRemoveOrphanFilesTaskRequest,
+			(*client.TaskQueues).ScheduleRemoveOrphanFiles),
 	},
+}
+
+// warehouseGet adapts the read of a warehouse queue's configuration.
+func warehouseGet[T any](get func(*client.TaskQueues, context.Context, string) (*T, error)) func(context.Context, queueTarget) (any, error) {
+	return func(ctx context.Context, t queueTarget) (any, error) {
+		return get(t.c.TaskQueues, ctx, t.warehouseID)
+	}
+}
+
+// projectGet adapts the read of a project queue's configuration.
+func projectGet[T any](get func(*client.TaskQueues, context.Context, ...client.CallOption) (*T, error)) func(context.Context, queueTarget) (any, error) {
+	return func(ctx context.Context, t queueTarget) (any, error) {
+		return get(t.c.TaskQueues, ctx, t.callOpts...)
+	}
+}
+
+// warehouseSet adapts the set of a warehouse queue's configuration: it
+// decodes the request from the body built from the flags.
+func warehouseSet[T any](set func(*client.TaskQueues, context.Context, string, *T) error) func(context.Context, queueTarget, []byte) error {
+	return func(ctx context.Context, t queueTarget, body []byte) error {
+		var req T
+		if err := json.Unmarshal(body, &req); err != nil {
+			return err
+		}
+		return set(t.c.TaskQueues, ctx, t.warehouseID, &req)
+	}
+}
+
+// projectSet adapts the set of a project queue's configuration, as
+// warehouseSet does.
+func projectSet[T any](set func(*client.TaskQueues, context.Context, *T, ...client.CallOption) error) func(context.Context, queueTarget, []byte) error {
+	return func(ctx context.Context, t queueTarget, body []byte) error {
+		var req T
+		if err := json.Unmarshal(body, &req); err != nil {
+			return err
+		}
+		return set(t.c.TaskQueues, ctx, &req, t.callOpts...)
+	}
+}
+
+// scheduleRequest is what every Schedule…TaskRequest has.
+type scheduleRequest interface {
+	SetScheduledFor(v time.Time)
+}
+
+// warehouseSchedule adapts scheduling a task on a Lakekeeper+ queue: it
+// builds the request with newRequest, sets --scheduled-for, and the steps
+// when the request takes them (optimize).
+func warehouseSchedule[R scheduleRequest](
+	newRequest func(managementv1.WarehouseTaskEntityId) R,
+	schedule func(*client.TaskQueues, context.Context, string, R) (*managementv1.ScheduleTaskResponse, error),
+) func(context.Context, queueTarget, queueSchedule) (*managementv1.ScheduleTaskResponse, error) {
+	return func(ctx context.Context, t queueTarget, s queueSchedule) (*managementv1.ScheduleTaskResponse, error) {
+		req := newRequest(s.entity)
+		if s.scheduledFor != nil {
+			req.SetScheduledFor(*s.scheduledFor)
+		}
+		if withSteps, ok := any(req).(interface {
+			SetPayload(v managementv1.ScheduleOptimizeTaskRequestPayload)
+		}); ok && len(s.steps) > 0 {
+			withSteps.SetPayload(managementv1.ScheduleOptimizeTaskRequestPayload{Steps: s.steps})
+		}
+		return schedule(t.c.TaskQueues, ctx, t.warehouseID, req)
+	}
 }
 
 func newTaskQueueCmd(opts *clientOptions) *cobra.Command {
@@ -229,7 +250,7 @@ func newQueueCmd(opts *clientOptions, q taskQueue) *cobra.Command {
 	}
 	cmd := &cobra.Command{
 		Use:     q.use,
-		Aliases: []string{q.queue},
+		Aliases: []string{string(q.queue)},
 		Short:   short,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			return cmd.Help()
@@ -243,9 +264,9 @@ func newQueueCmd(opts *clientOptions, q taskQueue) *cobra.Command {
 	return cmd
 }
 
-// queueTarget returns the positional arguments of a queue's get and set:
+// queueArgs returns the positional arguments of a queue's get and set:
 // a warehouse id, or none for a project queue.
-func queueTarget(q taskQueue) (string, cobra.PositionalArgs) {
+func queueArgs(q taskQueue) (string, cobra.PositionalArgs) {
 	if q.project {
 		return "", cobra.NoArgs
 	}
@@ -257,8 +278,8 @@ func newQueueGetCmd(opts *clientOptions, q taskQueue) *cobra.Command {
 		output  string
 		project string
 	)
-	use, args := queueTarget(q)
-	short := "Print the " + q.queue + " queue configuration"
+	use, args := queueArgs(q)
+	short := "Print the " + string(q.queue) + " queue configuration"
 	if q.plus {
 		short = lakekeeperPlus(short)
 	}
@@ -275,7 +296,7 @@ func newQueueGetCmd(opts *clientOptions, q taskQueue) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			cfg, err := q.get(ctx, c, firstArg(args), projectFlagOptions(cmd, project))
+			cfg, err := q.get(ctx, queueTarget{c, firstArg(args), projectFlagOptions(cmd, project)})
 			if err != nil {
 				return err
 			}
@@ -300,8 +321,8 @@ func newQueueGetCmd(opts *clientOptions, q taskQueue) *cobra.Command {
 
 func newQueueSetCmd(opts *clientOptions, q taskQueue) *cobra.Command {
 	var project string
-	use, args := queueTarget(q)
-	short := "Set the " + q.queue + " queue configuration"
+	use, args := queueArgs(q)
+	short := "Set the " + string(q.queue) + " queue configuration"
 	if q.plus {
 		short = lakekeeperPlus(short)
 	}
@@ -323,7 +344,7 @@ func newQueueSetCmd(opts *clientOptions, q taskQueue) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			if err := q.set(ctx, c, firstArg(args), body, projectFlagOptions(cmd, project)); err != nil {
+			if err := q.set(ctx, queueTarget{c, firstArg(args), projectFlagOptions(cmd, project)}, body); err != nil {
 				return err
 			}
 			if q.project {
@@ -338,14 +359,7 @@ func newQueueSetCmd(opts *clientOptions, q taskQueue) *cobra.Command {
 	cmd.Flags().Int64(heartbeatField, 0,
 		"Seconds without a heartbeat after which a running task counts as lost")
 	for _, f := range q.fields {
-		switch f.kind {
-		case boolField:
-			cmd.Flags().Bool(f.name, false, f.usage)
-		case int64Field:
-			cmd.Flags().Int64(f.name, 0, f.usage)
-		case stringField:
-			cmd.Flags().String(f.name, "", f.usage)
-		}
+		f.kind.define(cmd, f.name, f.usage)
 	}
 	if q.project {
 		addProjectFlag(cmd, &project)
@@ -359,7 +373,7 @@ func newQueueScheduleCmd(opts *clientOptions, q taskQueue) *cobra.Command {
 		scheduledFor string
 		steps        []string
 	)
-	short := lakekeeperPlus("Schedule a " + q.queue + " task for a table")
+	short := lakekeeperPlus("Schedule a " + string(q.queue) + " task for a table")
 	long := short + "\n\n" +
 		"The task runs on the next worker poll, or at --scheduled-for (RFC 3339, within about a year). " +
 		"The warehouse and table configuration still apply; the server rejects the task when they disable it."
@@ -400,7 +414,7 @@ func newQueueScheduleCmd(opts *clientOptions, q taskQueue) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			resp, err := q.schedule(ctx, c, args[0], s)
+			resp, err := q.schedule(ctx, queueTarget{c: c, warehouseID: args[0]}, s)
 			if err != nil {
 				return err
 			}
@@ -437,18 +451,7 @@ func queueSetBody(cmd *cobra.Command, q taskQueue) ([]byte, error) {
 		if !flags.Changed(f.name) {
 			continue
 		}
-		var (
-			v   any
-			err error
-		)
-		switch f.kind {
-		case boolField:
-			v, err = flags.GetBool(f.name)
-		case int64Field:
-			v, err = flags.GetInt64(f.name)
-		case stringField:
-			v, err = flags.GetString(f.name)
-		}
+		v, err := f.kind.read(cmd, f.name)
 		if err != nil {
 			return nil, err
 		}
