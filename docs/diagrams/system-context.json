@@ -3,14 +3,14 @@
   "diagram_type": "architecture",
   "meta": {
     "title": "System context: go-lakekeeper",
-    "output": ".archify/architecture-system-context-20261111-122430/system-context.html",
+    "output": ".archify/architecture-system-context-20261125-121352/system-context.html",
     "quality_profile": "showcase",
     "locale": "en",
     "repository": {
       "url": "git@github.com:lakekeeper/go-lakekeeper.git",
       "provider": "github",
       "link_mode": "local-only",
-      "revision": "fb689d0edce8a3b59c22af0bf856f9d14c60bbb3"
+      "revision": "21184cae680fdd98d707d36a0e8a8fe31db0cb55"
     },
     "legend": {
       "entries": {
@@ -69,8 +69,8 @@
       "pos": [530, 200],
       "size": [340, 64],
       "sources": [
-        { "path": "pkg/client/client.go", "line": 41, "end_line": 61, "label": "Client: façades + embedded APIClient" },
-        { "path": "pkg/client/client.go", "line": 219, "end_line": 241, "label": "auth round-tripper under retries" },
+        { "path": "pkg/client/client.go", "line": 43, "end_line": 69, "label": "Client: façades + embedded APIClient" },
+        { "path": "pkg/client/client.go", "line": 231, "end_line": 253, "label": "auth round-tripper under retries" },
         { "path": "pkg/core/transport.go", "line": 8, "end_line": 38, "label": "AuthRoundTripper sets the header" }
       ]
     },
@@ -83,7 +83,7 @@
       "pos": [970, 200],
       "size": [150, 64],
       "sources": [
-        { "path": "pkg/client/client.go", "line": 153, "end_line": 181, "label": "CatalogV1 delegates to iceberg-go" },
+        { "path": "pkg/client/client.go", "line": 165, "end_line": 193, "label": "CatalogV1 delegates to iceberg-go" },
         { "path": "go.mod", "line": 8, "end_line": 8, "label": "iceberg-go dependency" }
       ]
     },
@@ -95,8 +95,8 @@
       "pos": [550, 380],
       "size": [150, 64],
       "sources": [
-        { "path": "pkg/client/client.go", "line": 101, "end_line": 122, "label": "façades wrap the generated services" },
-        { "path": "pkg/apis/management/v1/client.go", "line": 312, "end_line": 335, "label": "callAPI sends through the client's HTTP client" }
+        { "path": "pkg/client/client.go", "line": 109, "end_line": 137, "label": "façades wrap the generated services" },
+        { "path": "pkg/apis/management/v1/client.go", "line": 315, "end_line": 338, "label": "callAPI sends through the client's HTTP client" }
       ]
     },
     {
@@ -109,7 +109,7 @@
       "sources": [
         { "path": "pkg/core/auth.go", "line": 84, "end_line": 105, "label": "client credentials token source" },
         { "path": "pkg/lakekeeper/lakekeeper.go", "line": 50, "end_line": 65, "label": "NewOAuthClientCredentials" },
-        { "path": "docker-compose.yml", "line": 156, "end_line": 170, "label": "Keycloak in the compose stack" }
+        { "path": "docker-compose.yml", "line": 269, "end_line": 283, "label": "Keycloak in the compose stack" }
       ]
     },
     {
@@ -132,7 +132,7 @@
       "pos": [970, 560],
       "size": [150, 64],
       "sources": [
-        { "path": "pkg/client/client.go", "line": 175, "end_line": 180, "label": "catalog URL and warehouse" }
+        { "path": "pkg/client/client.go", "line": 187, "end_line": 192, "label": "catalog URL and warehouse" }
       ]
     },
     {
@@ -155,7 +155,7 @@
       "size": [150, 64],
       "sources": [
         { "path": "docker-compose.yml", "line": 12, "end_line": 14, "label": "PG database URLs" },
-        { "path": "docker-compose.yml", "line": 63, "end_line": 66, "label": "db service" }
+        { "path": "docker-compose.yml", "line": 176, "end_line": 179, "label": "db service" }
       ]
     },
     {
@@ -167,7 +167,7 @@
       "size": [150, 64],
       "sources": [
         { "path": "docker-compose.yml", "line": 15, "end_line": 16, "label": "AUTHZ_BACKEND=openfga" },
-        { "path": "docker-compose.yml", "line": 105, "end_line": 112, "label": "openfga service" }
+        { "path": "docker-compose.yml", "line": 218, "end_line": 225, "label": "openfga service" }
       ]
     },
     {
@@ -178,8 +178,8 @@
       "pos": [970, 740],
       "size": [150, 64],
       "sources": [
-        { "path": "pkg/storage/profile/profile.go", "line": 1, "end_line": 29, "label": "S3, GCS and ADLS profiles" },
-        { "path": "docker-compose.yml", "line": 141, "end_line": 146, "label": "MinIO in the compose stack" }
+        { "path": "pkg/storage/profile/profile.go", "line": 1, "end_line": 34, "label": "S3, GCS and ADLS profiles" },
+        { "path": "docker-compose.yml", "line": 254, "end_line": 259, "label": "MinIO in the compose stack" }
       ]
     }
   ],

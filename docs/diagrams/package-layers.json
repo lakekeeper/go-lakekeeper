@@ -3,14 +3,14 @@
   "diagram_type": "architecture",
   "meta": {
     "title": "Package layers: go-lakekeeper",
-    "output": ".archify/architecture-package-layers-20261111-122419/package-layers.html",
+    "output": ".archify/architecture-package-layers-20261125-121404/package-layers.html",
     "quality_profile": "showcase",
     "locale": "en",
     "repository": {
       "url": "git@github.com:lakekeeper/go-lakekeeper.git",
       "provider": "github",
       "link_mode": "local-only",
-      "revision": "fb689d0edce8a3b59c22af0bf856f9d14c60bbb3"
+      "revision": "21184cae680fdd98d707d36a0e8a8fe31db0cb55"
     },
     "legend": {
       "entries": {
@@ -79,9 +79,9 @@
       "pos": [480, 460],
       "size": [220, 64],
       "sources": [
-        { "path": "pkg/client/client.go", "line": 27, "end_line": 53, "label": "Client and its façades" },
-        { "path": "pkg/client/client.go", "line": 109, "end_line": 122, "label": "façades wrap generated services" },
-        { "path": "pkg/client/client.go", "line": 219, "end_line": 231, "label": "AuthRoundTripper from pkg/core" }
+        { "path": "pkg/client/client.go", "line": 27, "end_line": 59, "label": "Client and its façades" },
+        { "path": "pkg/client/client.go", "line": 117, "end_line": 137, "label": "façades wrap generated services" },
+        { "path": "pkg/client/client.go", "line": 231, "end_line": 243, "label": "AuthRoundTripper from pkg/core" }
       ]
     },
     {
@@ -120,8 +120,8 @@
       "pos": [480, 640],
       "size": [220, 64],
       "sources": [
-        { "path": "pkg/apis/management/v1/client.go", "line": 45, "end_line": 60, "label": "APIClient and its services" },
-        { "path": "pkg/apis/management/v1/client.go", "line": 312, "end_line": 335, "label": "callAPI sends the request" },
+        { "path": "pkg/apis/management/v1/client.go", "line": 45, "end_line": 62, "label": "APIClient and its services" },
+        { "path": "pkg/apis/management/v1/client.go", "line": 315, "end_line": 338, "label": "callAPI sends the request" },
         { "path": ".golangci.yml", "line": 79, "end_line": 82, "label": "importas alias managementv1" }
       ]
     },
@@ -134,7 +134,7 @@
       "pos": [940, 640],
       "size": [220, 64],
       "sources": [
-        { "path": "pkg/client/client.go", "line": 36, "end_line": 42, "label": "embedded *APIClient" }
+        { "path": "pkg/client/client.go", "line": 38, "end_line": 44, "label": "embedded *APIClient" }
       ]
     },
     {
