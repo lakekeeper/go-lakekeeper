@@ -410,8 +410,10 @@ err := c.TaskQueues.SetExpireSnapshotsConfig(ctx, warehouseID,
     &managementv1.SetExpireSnapshotsQueueConfig{QueueConfig: cfg})
 ```
 
-The Lakekeeper+ queues (`client.QueueExpireSnapshots`, `QueueOptimize`,
-`QueueRemoveOrphanFiles`) are capability-gated: on Lakekeeper they fail
+Each queue has a `client.Queue` constant (`QueueTabularPurge`,
+`QueueSoftDeletion`, `QueueTaskLogCleanup`, `QueueExpireSnapshots`,
+`QueueOptimize`, `QueueRemoveOrphanFiles`), its name in the server info's
+`queues`. The Lakekeeper+ queues are capability-gated: on Lakekeeper they fail
 with `not-lakekeeper-plus`, and on a Lakekeeper+ server whose `queues`
 lack the queue with `queue-not-configured`.
 

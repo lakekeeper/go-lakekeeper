@@ -76,19 +76,11 @@ func (c *Capabilities) SupportedVersions() VersionRange {
 // server whose version is missing or does not parse counts as supported:
 // there is nothing to warn about.
 func (c *Capabilities) InSupportedVersions() bool {
-	v := c.editionVersion()
+	v := c.version(c.Edition)
 	if _, ok := parseVersion(v); !ok {
 		return true
 	}
 	return c.SupportedVersions().Contains(v)
-}
-
-// editionVersion is the version of the server's edition.
-func (c *Capabilities) editionVersion() string {
-	if c.Edition == EditionLakekeeperPlus {
-		return c.LakekeeperPlusVersion
-	}
-	return c.LakekeeperVersion
 }
 
 type serverVersion struct{ major, minor, patch int }

@@ -297,8 +297,8 @@ authorization backend. `client.Capabilities` describes one server:
 | `Edition` | `EditionLakekeeperPlus` when `lakekeeper-enterprise-version` is set, else `EditionLakekeeper` |
 | `LakekeeperVersion` | `lakekeeper-version` |
 | `LakekeeperPlusVersion` | `lakekeeper-enterprise-version`; empty on Lakekeeper |
-| `AuthzBackend` | `authz-backend` (`cedar`, `openfga`, …) |
-| `Queues` | `queues` |
+| `AuthzBackend` | `authz-backend`, a `client.AuthzBackend` (`AuthzBackendCedar`, `AuthzBackendOpenFGA`, …) |
+| `Queues` | `queues`, as `client.Queue` values (`QueueTabularPurge`, `QueueExpireSnapshots`, …) |
 
 `c.Capabilities(ctx)` returns it. The client fetches the server info for
 it once and keeps it for its lifetime; a failed fetch is not kept.

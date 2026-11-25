@@ -31,14 +31,14 @@ var sharedClient *client.Client
 
 // authzBackend is the authorization backend of the running variant:
 // "cedar" or "openfga".
-var authzBackend string
+var authzBackend client.AuthzBackend
 
 func TestMain(m *testing.M) {
 	if err := godotenv.Load("../../.env"); err != nil {
 		fmt.Fprintf(os.Stderr, "load .env: %v\n", err)
 		os.Exit(1)
 	}
-	authzBackend = os.Getenv("LAKEKEEPER_PLUS_AUTHZ_BACKEND")
+	authzBackend = client.AuthzBackend(os.Getenv("LAKEKEEPER_PLUS_AUTHZ_BACKEND"))
 	if authzBackend == "" {
 		fmt.Fprintln(os.Stderr, "LAKEKEEPER_PLUS_AUTHZ_BACKEND is not set; run through make test-plus")
 		os.Exit(1)
@@ -70,6 +70,6 @@ func TestServerInfo_ReportsLakekeeperPlus(t *testing.T) {
 	require.NoError(t, err)
 
 	assert.True(t, info.GetBootstrapped())
-	assert.Equal(t, authzBackend, info.GetAuthzBackend())
+	assert.Equal(t, string(authzBackend), info.GetAuthzBackend())
 	assert.NotEmpty(t, info.GetLakekeeperEnterpriseVersion(), "lakekeeper-enterprise-version")
 }

@@ -24,10 +24,14 @@ const (
 	EditionLakekeeperPlus Edition = "Lakekeeper+"
 )
 
-// Authorization backends a server reports as its authz-backend.
+// AuthzBackend is the authorization backend a server reports as its
+// authz-backend.
+type AuthzBackend string
+
+// Authorization backends.
 const (
-	AuthzBackendCedar   = "cedar"
-	AuthzBackendOpenFGA = "openfga"
+	AuthzBackendCedar   AuthzBackend = "cedar"
+	AuthzBackendOpenFGA AuthzBackend = "openfga"
 )
 
 // Capabilities describes what one server can do: its edition, versions,
@@ -42,33 +46,47 @@ type Capabilities struct {
 	LakekeeperPlusVersion string
 	// AuthzBackend is the authorization backend, for example
 	// AuthzBackendCedar or AuthzBackendOpenFGA.
-	AuthzBackend string
+	AuthzBackend AuthzBackend
 	// Queues are the task queues the server runs.
-	Queues []string
+	Queues []Queue
 }
 
 // String names the server by edition and that edition's version, for
 // example "Lakekeeper 0.15.1" or "Lakekeeper+ 0.15.1".
 func (c *Capabilities) String() string {
-	if c.Edition == EditionLakekeeperPlus {
-		return string(c.Edition) + " " + c.LakekeeperPlusVersion
+	return string(c.Edition) + " " + c.version(c.Edition)
+}
+
+// version is the server's version for edition: the Lakekeeper+ version for
+// Lakekeeper+, the Lakekeeper version it is built on otherwise.
+func (c *Capabilities) version(edition Edition) string {
+	if edition == EditionLakekeeperPlus {
+		return c.LakekeeperPlusVersion
 	}
-	return string(c.Edition) + " " + c.LakekeeperVersion
+	return c.LakekeeperVersion
+}
+
+// newCapabilities builds the capabilities from the server info's fields.
+// lakekeeper-enterprise-version, null on Lakekeeper, decides the edition.
+func newCapabilities(lakekeeperVersion, enterpriseVersion, authzBackend string, queues []string) *Capabilities {
+	caps := &Capabilities{
+		Edition:           EditionLakekeeper,
+		LakekeeperVersion: lakekeeperVersion,
+		AuthzBackend:      AuthzBackend(authzBackend),
+	}
+	for _, q := range queues {
+		caps.Queues = append(caps.Queues, Queue(q))
+	}
+	if enterpriseVersion != "" {
+		caps.Edition = EditionLakekeeperPlus
+		caps.LakekeeperPlusVersion = enterpriseVersion
+	}
+	return caps
 }
 
 func capabilitiesFromServerInfo(info *managementv1.ServerInfo) *Capabilities {
-	caps := &Capabilities{
-		Edition:           EditionLakekeeper,
-		LakekeeperVersion: info.GetLakekeeperVersion(),
-		AuthzBackend:      info.GetAuthzBackend(),
-		Queues:            slices.Clone(info.GetQueues()),
-	}
-	// lakekeeper-enterprise-version is null on Lakekeeper.
-	if v := info.GetLakekeeperEnterpriseVersion(); v != "" {
-		caps.Edition = EditionLakekeeperPlus
-		caps.LakekeeperPlusVersion = v
-	}
-	return caps
+	return newCapabilities(info.GetLakekeeperVersion(), info.GetLakekeeperEnterpriseVersion(),
+		info.GetAuthzBackend(), info.GetQueues())
 }
 
 // capabilitiesFromBody reads the capabilities from a server info body the
@@ -77,7 +95,7 @@ func capabilitiesFromServerInfo(info *managementv1.ServerInfo) *Capabilities {
 func capabilitiesFromBody(body []byte) *Capabilities {
 	var info struct {
 		LakekeeperVersion           string   `json:"lakekeeper-version"`
-		LakekeeperEnterpriseVersion *string  `json:"lakekeeper-enterprise-version"`
+		LakekeeperEnterpriseVersion string   `json:"lakekeeper-enterprise-version"`
 		AuthzBackend                string   `json:"authz-backend"`
 		Queues                      []string `json:"queues"`
 	}
@@ -87,17 +105,7 @@ func capabilitiesFromBody(body []byte) *Capabilities {
 	if info.LakekeeperVersion == "" {
 		return nil
 	}
-	caps := &Capabilities{
-		Edition:           EditionLakekeeper,
-		LakekeeperVersion: info.LakekeeperVersion,
-		AuthzBackend:      info.AuthzBackend,
-		Queues:            info.Queues,
-	}
-	if v := info.LakekeeperEnterpriseVersion; v != nil && *v != "" {
-		caps.Edition = EditionLakekeeperPlus
-		caps.LakekeeperPlusVersion = *v
-	}
-	return caps
+	return newCapabilities(info.LakekeeperVersion, info.LakekeeperEnterpriseVersion, info.AuthzBackend, info.Queues)
 }
 
 // Capabilities returns what the server can do. The server info behind it is
@@ -173,10 +181,9 @@ type requirement struct {
 	// lakekeeperPlus is set when the operation exists on Lakekeeper+ only.
 	lakekeeperPlus bool
 	// authzBackend, when set, is the authorization backend it needs.
-	authzBackend string
-	// queue, when set, is the task queue it needs the server to run, as
-	// the server info names it in its queues.
-	queue string
+	authzBackend AuthzBackend
+	// queue, when set, is the task queue it needs the server to run.
+	queue Queue
 }
 
 // unmet returns why caps do not meet r, or "" when they do. apiErr is the
@@ -219,12 +226,8 @@ func (r requirement) newerThan(caps *Capabilities, apiErr *APIError) (string, bo
 	if apiErr == nil || apiErr.Model != nil {
 		return "", false
 	}
-	serverVersion := caps.LakekeeperVersion
-	if r.specEdition() == EditionLakekeeperPlus {
-		serverVersion = caps.LakekeeperPlusVersion
-	}
 	release := specRelease(r.specEdition())
-	have, ok := parseVersion(serverVersion)
+	have, ok := parseVersion(caps.version(r.specEdition()))
 	want, wantOK := parseVersion(release)
 	if !ok || !wantOK || !have.less(want) {
 		return "", false

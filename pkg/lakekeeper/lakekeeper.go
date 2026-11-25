@@ -135,6 +135,10 @@ type (
 	Capabilities = client.Capabilities
 	// Edition is Lakekeeper or Lakekeeper+.
 	Edition = client.Edition
+	// AuthzBackend is a server's authorization backend.
+	AuthzBackend = client.AuthzBackend
+	// Queue is a task queue, by its server name.
+	Queue = client.Queue
 	// UnsupportedError is the error a capability-gated façade returns when
 	// the server's capabilities explain why it rejected the operation.
 	UnsupportedError = client.UnsupportedError
@@ -161,7 +165,10 @@ const (
 	// the operation came from.
 	ReasonServerTooOld = client.ReasonServerTooOld
 
-	// Lakekeeper+ task queues, as the server info names them.
+	// Task queues, as the server info names them.
+	QueueTabularPurge      = client.QueueTabularPurge
+	QueueSoftDeletion      = client.QueueSoftDeletion
+	QueueTaskLogCleanup    = client.QueueTaskLogCleanup
 	QueueExpireSnapshots   = client.QueueExpireSnapshots
 	QueueOptimize          = client.QueueOptimize
 	QueueRemoveOrphanFiles = client.QueueRemoveOrphanFiles

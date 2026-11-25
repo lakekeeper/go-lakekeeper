@@ -8,17 +8,28 @@ import (
 	managementv1 "github.com/lakekeeper/go-lakekeeper/pkg/apis/management/v1"
 )
 
-// Lakekeeper+ task queues, as the server info names them in its queues.
+// Queue is a task queue, by the name the server info lists it under in its
+// queues.
+type Queue string
+
+// Lakekeeper task queues.
 const (
-	QueueExpireSnapshots   = "expire_snapshots"
-	QueueOptimize          = "optimize"
-	QueueRemoveOrphanFiles = "remove_orphan_files"
+	QueueTabularPurge   Queue = "tabular_purge"
+	QueueSoftDeletion   Queue = "soft_deletion"
+	QueueTaskLogCleanup Queue = "task_log_cleanup"
+)
+
+// Lakekeeper+ task queues.
+const (
+	QueueExpireSnapshots   Queue = "expire_snapshots"
+	QueueOptimize          Queue = "optimize"
+	QueueRemoveOrphanFiles Queue = "remove_orphan_files"
 )
 
 // plusQueueRequirement is what the operations of a Lakekeeper+ task queue
 // need: Lakekeeper+ running that queue.
-func plusQueueRequirement(queue string) requirement {
-	return requirement{feature: "task queue " + queue, lakekeeperPlus: true, queue: queue}
+func plusQueueRequirement(queue Queue) requirement {
+	return requirement{feature: "task queue " + string(queue), lakekeeperPlus: true, queue: queue}
 }
 
 // TaskQueues is a one-call façade over the task-queue operations of
@@ -212,7 +223,7 @@ func (q *TaskQueues) ScheduleRemoveOrphanFiles(ctx context.Context, warehouseID 
 // configuration read for any queue name, including queues it does not run,
 // with 200 and nothing set. Only such an answer costs the (cached) server
 // info fetch; one with a field set is returned as it is.
-func plusQueueConfig[T any](ctx context.Context, caps *capabilityCache, queue, op string, out *T, err error) (*T, error) {
+func plusQueueConfig[T any](ctx context.Context, caps *capabilityCache, queue Queue, op string, out *T, err error) (*T, error) {
 	req := plusQueueRequirement(queue)
 	if err != nil {
 		return out, caps.diagnose(ctx, req, op, err)

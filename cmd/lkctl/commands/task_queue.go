@@ -111,7 +111,7 @@ var taskQueues = []taskQueue{
 		},
 	},
 	{
-		use: "expire-snapshots", queue: client.QueueExpireSnapshots, plus: true,
+		use: "expire-snapshots", queue: string(client.QueueExpireSnapshots), plus: true,
 		short: "Configure the expire_snapshots queue of a warehouse",
 		fields: []queueField{
 			{"enable-expire-snapshots", boolField, "Expire snapshots of all tables in the warehouse"},
@@ -140,7 +140,7 @@ var taskQueues = []taskQueue{
 		},
 	},
 	{
-		use: "optimize", queue: client.QueueOptimize, plus: true,
+		use: "optimize", queue: string(client.QueueOptimize), plus: true,
 		short: "Configure the optimize queue of a warehouse",
 		fields: []queueField{
 			{"enable-optimize", boolField, "Optimize all tables in the warehouse"},
@@ -172,7 +172,7 @@ var taskQueues = []taskQueue{
 		},
 	},
 	{
-		use: "remove-orphan-files", queue: client.QueueRemoveOrphanFiles, plus: true,
+		use: "remove-orphan-files", queue: string(client.QueueRemoveOrphanFiles), plus: true,
 		short: "Configure the remove_orphan_files queue of a warehouse",
 		fields: []queueField{
 			{"enable-remove-orphan-files", boolField, "Schedule orphan-file removal for all tables in the warehouse"},

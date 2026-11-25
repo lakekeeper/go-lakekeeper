@@ -18,7 +18,7 @@ import (
 
 func skipWithoutCedarBackend(t *testing.T) {
 	t.Helper()
-	if authzBackend != "cedar" {
+	if authzBackend != client.AuthzBackendCedar {
 		t.Skipf("needs the cedar authorization backend, running %s", authzBackend)
 	}
 }
@@ -86,7 +86,7 @@ func TestCedarResolveEntities_DecodeIntoTypedEntities(t *testing.T) {
 }
 
 func TestCedarSources_OnOpenFGAIsUnsupported(t *testing.T) {
-	if authzBackend != "openfga" {
+	if authzBackend != client.AuthzBackendOpenFGA {
 		t.Skipf("needs the openfga authorization backend, running %s", authzBackend)
 	}
 

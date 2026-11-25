@@ -24,7 +24,7 @@ func lakekeeperInfo() map[string]any {
 
 // lakekeeperPlusInfo is the server info of a Lakekeeper+ 0.15.2 server, on
 // Lakekeeper 0.15.1, running the given authorization backend.
-func lakekeeperPlusInfo(authzBackend string) map[string]any {
+func lakekeeperPlusInfo(authzBackend client.AuthzBackend) map[string]any {
 	info := serverInfoBody(true)
 	info["version"] = "0.15.1"
 	info["lakekeeper-version"] = "0.15.1"
@@ -46,7 +46,7 @@ func TestCapabilities_Lakekeeper(t *testing.T) {
 		Edition:           client.EditionLakekeeper,
 		LakekeeperVersion: "0.15.1",
 		AuthzBackend:      "openfga",
-		Queues:            []string{"tabular_expiration"},
+		Queues:            []client.Queue{"tabular_expiration"},
 	}, got)
 	assert.Equal(t, "Lakekeeper 0.15.1", got.String())
 }
@@ -64,7 +64,7 @@ func TestCapabilities_LakekeeperPlus(t *testing.T) {
 		LakekeeperVersion:     "0.15.1",
 		LakekeeperPlusVersion: "0.15.2",
 		AuthzBackend:          client.AuthzBackendCedar,
-		Queues:                []string{"expire_snapshots", "tabular_expiration"},
+		Queues:                []client.Queue{"expire_snapshots", "tabular_expiration"},
 	}, got)
 	assert.Equal(t, "Lakekeeper+ 0.15.2", got.String())
 }
@@ -81,7 +81,7 @@ func TestCapabilities_FetchedOncePerClient(t *testing.T) {
 	require.NoError(t, err)
 
 	assert.Equal(t, 1, info.Len(), "server info requests")
-	assert.Equal(t, []string{"tabular_expiration"}, second.Queues, "the cached value is not shared")
+	assert.Equal(t, []client.Queue{"tabular_expiration"}, second.Queues, "the cached value is not shared")
 }
 
 func TestCapabilities_FailedFetchIsNotCached(t *testing.T) {
@@ -123,7 +123,7 @@ func TestCapabilities_FromServerInfoTheModelCannotDecode(t *testing.T) {
 		Edition:           client.EditionLakekeeper,
 		LakekeeperVersion: "0.13.9",
 		AuthzBackend:      "openfga",
-		Queues:            []string{"tabular_purge"},
+		Queues:            []client.Queue{"tabular_purge"},
 	}, got)
 	assert.Equal(t, 1, info.Len(), "Server.Info fills the capabilities; no second request")
 }
