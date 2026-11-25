@@ -74,6 +74,7 @@ func NewCommand() *cobra.Command {
 	cmd.PersistentFlags().BoolVar(&opts.debug, "debug", false, "Enable debug logging")
 
 	cmd.AddCommand(newCatalogCmd())
+	cmd.AddCommand(newCedarCmd(&opts))
 	cmd.AddCommand(newProjectCmd(&opts))
 	cmd.AddCommand(newRoleCmd(&opts))
 	cmd.AddCommand(newServerCmd(&opts))

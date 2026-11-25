@@ -107,12 +107,32 @@ Top-level commands (and their aliases):
 | `whoami` | _(none)_ | Print the authenticated principal |
 | `version` | _(none)_ | Print version, commit, build date |
 | `catalog` | _(none)_ | Placeholder — not yet implemented; use `client.CatalogV1` from the SDK |
+| `cedar` | _(none)_ | Cedar policies (Lakekeeper+, Cedar authorization backend) |
 
 The grant / revoke / access / assignments verbs follow the same shape
 across `server`, `project`, `warehouse`, and `role`. Read this section
 once for `project` and the others should feel familiar. For the
 underlying authorization model, the assignment-value reference, and an
 end-to-end CLI ↔ SDK workflow, see [AUTHORIZATION.md](AUTHORIZATION.md).
+
+### Lakekeeper+ commands
+
+One `lkctl` binary works against both editions, Lakekeeper and
+Lakekeeper+. Commands that need Lakekeeper+ are always listed, and their
+help says "(Lakekeeper+)"; `--help` never contacts a server.
+
+Run against a server that lacks what a command needs, the command exits
+non-zero with one sentence naming the requirement and what the server is:
+
+```text
+Error: get cedar schema: requires Lakekeeper+; server is Lakekeeper 0.15.1
+Error: get cedar schema: requires the cedar authorization backend; server is Lakekeeper+ 0.15.1 with the openfga authorization backend
+```
+
+`lkctl` reads the server info for this only after the server rejects a
+request as unknown (404 or 405); a genuine not-found is still reported as
+the server's error. See
+[ARCHITECTURE.md](ARCHITECTURE.md#editions-and-capabilities).
 
 ### `lkctl server`
 
@@ -304,6 +324,18 @@ when the user already exists.
 name filter use `user list --name`. `user roles --transitive` works only when
 role assignments are catalog-managed; with OpenFGA the server answers
 `501 Not Implemented`.
+
+### `lkctl cedar` (Lakekeeper+)
+
+Needs Lakekeeper+ with the Cedar authorization backend.
+
+```sh
+# Print the active Cedar schema: each fragment under a "// <file>" comment
+lkctl cedar schema
+
+# The fragments as JSON ({"schema-fragments": {"<file>": "<content>"}})
+lkctl cedar schema -o json
+```
 
 ### `lkctl version` / `lkctl whoami`
 
