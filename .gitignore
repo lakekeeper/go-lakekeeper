@@ -36,6 +36,9 @@ bin/
 dist/
 target/
 
+# merged OpenAPI spec written by api/openapi/prepare in `make generate`
+api/openapi/build/
+
 # test outputs
 .output/
 

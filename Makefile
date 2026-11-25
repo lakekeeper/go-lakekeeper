@@ -49,6 +49,8 @@ CONTAINER_COMPOSE_ENGINE ?= $(shell $(CONTAINER_ENGINE) compose version >/dev/nu
 OPENAPI_GENERATOR_VERSION ?= v7.27.0
 OPENAPI_GENERATOR_IMAGE   ?= openapitools/openapi-generator-cli:$(OPENAPI_GENERATOR_VERSION)
 OPENAPI_DIR               := $(SELF_DIR)/api/openapi
+# The merged spec prepare writes and the generator reads; git-ignored.
+MERGED_SPEC               := api/openapi/build/management-merged-open-api.yaml
 MANAGEMENT_API_OUTPUT     := pkg/apis/management/v1
 
 ENV_FILE := $(SELF_DIR)/.env
@@ -154,8 +156,12 @@ validate: vet lint
 
 .PHONY: generate
 generate: ## Regenerate Go bindings from OpenAPI specs.
-	@echo === regenerating management API from $(OPENAPI_DIR)/management-open-api.yaml
-	@test -f $(OPENAPI_DIR)/management-open-api.yaml || { echo "missing $(OPENAPI_DIR)/management-open-api.yaml"; exit 1; }
+	@echo === patching and merging the Lakekeeper and Lakekeeper+ specs into $(MERGED_SPEC)
+	@$(GO) run ./api/openapi/prepare \
+		-lakekeeper $(OPENAPI_DIR)/management-open-api.yaml \
+		-lakekeeper-plus $(OPENAPI_DIR)/management-plus-open-api.yaml \
+		-out $(SELF_DIR)/$(MERGED_SPEC)
+	@echo === regenerating management API from $(MERGED_SPEC)
 	@rm -rf $(SELF_DIR)/$(MANAGEMENT_API_OUTPUT)
 	@mkdir -p $(SELF_DIR)/$(MANAGEMENT_API_OUTPUT)
 	@cp $(OPENAPI_DIR)/.openapi-generator-ignore $(SELF_DIR)/$(MANAGEMENT_API_OUTPUT)/
@@ -163,7 +169,7 @@ generate: ## Regenerate Go bindings from OpenAPI specs.
 		--user $$(id -u):$$(id -g) \
 		-v $(SELF_DIR):/local \
 		$(OPENAPI_GENERATOR_IMAGE) generate \
-		-i /local/api/openapi/management-open-api.yaml \
+		-i /local/$(MERGED_SPEC) \
 		-g go \
 		-c /local/api/openapi/management-config.yaml \
 		-o /local/$(MANAGEMENT_API_OUTPUT) \
@@ -174,6 +180,22 @@ generate: ## Regenerate Go bindings from OpenAPI specs.
 	@$(GO) run golang.org/x/tools/cmd/goimports -w $(SELF_DIR)/$(MANAGEMENT_API_OUTPUT)
 	@$(GO) mod tidy
 	@$(MAKE) fmt
+
+# renovate: datasource=go depName=github.com/oasdiff/oasdiff
+OASDIFF_VERSION ?= v1.40.0
+OASDIFF         := $(GO) run github.com/oasdiff/oasdiff@$(OASDIFF_VERSION)
+SPECS           := api/openapi/management-open-api.yaml api/openapi/management-plus-open-api.yaml
+# The ref the specs are compared against: the PR's base.
+BASE            ?= origin/main
+
+.PHONY: spec-breaking-changes
+spec-breaking-changes: ## Report the breaking changes in each spec between BASE (default origin/main) and the working tree, as Markdown.
+	@OASDIFF="$(OASDIFF)" ./scripts/spec-breaking-changes.sh $(BASE) $(SPECS)
+
+.PHONY: test-spec-breaking-changes
+test-spec-breaking-changes: ## Test the breaking-change report against fixture specs.
+	@echo === scripts/spec-breaking-changes_test.sh
+	@OASDIFF="$(OASDIFF)" ./scripts/spec-breaking-changes_test.sh
 
 # renovate: datasource=pypi depName=graphifyy
 GRAPHIFY_VERSION ?= 0.9.119

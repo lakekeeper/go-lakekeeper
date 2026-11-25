@@ -26,6 +26,11 @@ const (
 	StorageProfileTypeS3   = "s3"
 	StorageProfileTypeGCS  = "gcs"
 	StorageProfileTypeADLS = "adls"
+
+	// StorageProfileTypeMemory is the in-memory storage of Lakekeeper+.
+	StorageProfileTypeMemory  = "memory"
+	StorageProfileTypeOneLake = "onelake"
+	StorageProfileTypeStackit = "stackit"
 )
 
 // ptrTo is a small helper used internally to take the address of a literal.
@@ -67,4 +72,31 @@ func AsADLS(sp managementv1.StorageProfile) (*managementv1.StorageProfileAdls, b
 		return nil, false
 	}
 	return sp.StorageProfileAdls, true
+}
+
+// AsMemory returns the in-memory variant (Lakekeeper+) of a StorageProfile
+// union, or (nil, false) if the union holds a different variant.
+func AsMemory(sp managementv1.StorageProfile) (*managementv1.StorageProfileMemory, bool) {
+	if sp.StorageProfileMemory == nil {
+		return nil, false
+	}
+	return sp.StorageProfileMemory, true
+}
+
+// AsOneLake returns the Microsoft OneLake variant of a StorageProfile union,
+// or (nil, false) if the union holds a different variant.
+func AsOneLake(sp managementv1.StorageProfile) (*managementv1.StorageProfileOneLake, bool) {
+	if sp.StorageProfileOneLake == nil {
+		return nil, false
+	}
+	return sp.StorageProfileOneLake, true
+}
+
+// AsStackit returns the STACKIT variant of a StorageProfile union, or
+// (nil, false) if the union holds a different variant.
+func AsStackit(sp managementv1.StorageProfile) (*managementv1.StorageProfileStackit, bool) {
+	if sp.StorageProfileStackit == nil {
+		return nil, false
+	}
+	return sp.StorageProfileStackit, true
 }

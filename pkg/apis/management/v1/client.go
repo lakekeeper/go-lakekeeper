@@ -52,6 +52,8 @@ type APIClient struct {
 
 	GrantAPI *GrantAPIService
 
+	PermissionsCedarAPI *PermissionsCedarAPIService
+
 	PermissionsOpenfgaAPI *PermissionsOpenfgaAPIService
 
 	ProjectAPI *ProjectAPIService
@@ -87,6 +89,7 @@ func NewAPIClient(cfg *Configuration) *APIClient {
 	// API Services
 	c.AuthorizationAPI = (*AuthorizationAPIService)(&c.common)
 	c.GrantAPI = (*GrantAPIService)(&c.common)
+	c.PermissionsCedarAPI = (*PermissionsCedarAPIService)(&c.common)
 	c.PermissionsOpenfgaAPI = (*PermissionsOpenfgaAPIService)(&c.common)
 	c.ProjectAPI = (*ProjectAPIService)(&c.common)
 	c.RoleAPI = (*RoleAPIService)(&c.common)

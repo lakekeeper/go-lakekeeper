@@ -163,9 +163,12 @@ var (
 	// Read-side oneOf accessors — symmetric with the New*Profile
 	// builders, so calling code does not have to navigate the union
 	// struct (`if sp.StorageProfileS3 != nil { … }`).
-	AsS3Profile   = profile.AsS3
-	AsGCSProfile  = profile.AsGCS
-	AsADLSProfile = profile.AsADLS
+	AsS3Profile      = profile.AsS3
+	AsGCSProfile     = profile.AsGCS
+	AsADLSProfile    = profile.AsADLS
+	AsMemoryProfile  = profile.AsMemory
+	AsOneLakeProfile = profile.AsOneLake
+	AsStackitProfile = profile.AsStackit
 
 	WithS3Endpoint              = profile.WithS3Endpoint
 	WithS3KeyPrefix             = profile.WithS3KeyPrefix
@@ -203,6 +206,10 @@ const (
 	StorageProfileTypeS3   = profile.StorageProfileTypeS3
 	StorageProfileTypeGCS  = profile.StorageProfileTypeGCS
 	StorageProfileTypeADLS = profile.StorageProfileTypeADLS
+
+	StorageProfileTypeMemory  = profile.StorageProfileTypeMemory
+	StorageProfileTypeOneLake = profile.StorageProfileTypeOneLake
+	StorageProfileTypeStackit = profile.StorageProfileTypeStackit
 )
 
 // Tabular delete profile builders, accessors and discriminator values.

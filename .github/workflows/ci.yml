@@ -188,7 +188,7 @@ jobs:
   # The single check the main ruleset requires; add every new job to `needs`.
   ci-ok:
     if: always()
-    needs: [lint, drift, unit-tests, integration-test, e2e-compose, e2e-kind, build]
+    needs: [lint, drift, spec-breaking-changes, unit-tests, integration-test, e2e-compose, e2e-kind, build]
     runs-on: ubuntu-latest
     steps:
       - name: all jobs succeeded
@@ -235,3 +235,43 @@ jobs:
           tags: |
             quay.io/lakekeeper/lkctl:latest-main
             quay.io/lakekeeper/lkctl:sha-${{ steps.meta.outputs.short_sha }}
+
+  # Reports the breaking changes a PR makes to either spec in the job summary,
+  # for the PR body and the release notes. It reports; breaking changes never
+  # fail the job.
+  spec-breaking-changes:
+    name: spec breaking changes
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@d8cbb8045d7f43706b9177cceb36c1f91a6644d5 # v7.1.0
+        with:
+          go-version-file: go.mod
+      - name: test the report
+        run: make test-spec-breaking-changes
+      - name: report
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          specs="api/openapi/management-open-api.yaml api/openapi/management-plus-open-api.yaml"
+          # shellcheck disable=SC2086
+          if git diff --quiet "$BASE" HEAD -- $specs; then
+            echo "No spec changed; nothing to report."
+            exit 0
+          fi
+          {
+            echo "## Breaking changes in the specs"
+            echo
+            echo "Paste this report into the PR body."
+            echo
+          } >> "$GITHUB_STEP_SUMMARY"
+          if ! make --no-print-directory spec-breaking-changes BASE="$BASE" > report.md; then
+            echo "The breaking-change report failed; see the job log." >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          cat report.md
+          cat report.md >> "$GITHUB_STEP_SUMMARY"

@@ -182,6 +182,11 @@ server's default project is used (the nil UUID unless the operator
 configured another; an error if the operator disabled it). The other
 subcommands address a warehouse by its id and ignore `-p`.
 
+`list` and `get` print each warehouse's storage family in the `STORAGE`
+column: the `type` of its storage profile, one of `s3`, `gcs`, `adls`,
+`onelake`, `stackit` or `memory` (Lakekeeper+ only), and `unknown` for any
+other.
+
 ```sh
 # List warehouses in a project (filter with --status active|inactive, repeatable)
 lkctl warehouse list --project <PROJECT-ID>
