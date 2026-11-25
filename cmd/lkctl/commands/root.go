@@ -4,6 +4,7 @@ package commands
 
 import (
 	"os"
+	"sync"
 
 	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
@@ -24,7 +25,7 @@ func init() {
 
 // NewCommand returns the lkctl root command with all subcommands registered.
 func NewCommand() *cobra.Command {
-	var opts clientOptions
+	opts := clientOptions{versionChecked: &sync.Once{}}
 
 	cmd := &cobra.Command{
 		Use:               cliName,
@@ -33,7 +34,8 @@ func NewCommand() *cobra.Command {
 		SilenceErrors:     true,
 		SilenceUsage:      true,
 		DisableAutoGenTag: true,
-		PersistentPreRun: func(*cobra.Command, []string) {
+		PersistentPreRun: func(cmd *cobra.Command, _ []string) {
+			opts.stderr = cmd.ErrOrStderr()
 			log.SetFormatter(&log.TextFormatter{DisableColors: true, FullTimestamp: true})
 			if opts.debug {
 				log.SetLevel(log.DebugLevel)

@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
+	"sync"
 
 	"golang.org/x/oauth2/clientcredentials"
 
@@ -32,6 +34,30 @@ type clientOptions struct {
 	k8sTokenPath string
 	bootstrap    bool
 	debug        bool
+
+	// stderr receives the supported-version warning; the root command sets
+	// it to its own stderr.
+	stderr io.Writer
+	// versionChecked makes the supported-version check run once per run;
+	// NewCommand sets it, and without it there is no check.
+	versionChecked *sync.Once
+}
+
+// checkSupportedVersions warns on stderr, once per run, when the server is
+// outside the versions this lkctl supports. It runs on the capabilities of
+// a server info the command fetched anyway, so it adds no request, and it
+// never fails the command.
+func (o *clientOptions) checkSupportedVersions(caps client.Capabilities) {
+	if o.versionChecked == nil {
+		return
+	}
+	o.versionChecked.Do(func() {
+		if caps.InSupportedVersions() || o.stderr == nil {
+			return
+		}
+		fmt.Fprintf(o.stderr, "Warning: server is %s; this %s supports %s\n",
+			caps.String(), cliName, caps.SupportedVersions())
+	})
 }
 
 // validate returns an error if any of the required connection fields are
@@ -79,7 +105,7 @@ func newClient(ctx context.Context, opts *clientOptions) (*client.Client, error)
 		return nil, err
 	}
 
-	var clientOpts []client.Option
+	clientOpts := []client.Option{client.WithCapabilitiesObserver(opts.checkSupportedVersions)}
 	if opts.bootstrap {
 		clientOpts = append(clientOpts, client.WithInitialBootstrap(true, true, core.Ptr(managementv1.USERTYPE_APPLICATION)))
 	}
