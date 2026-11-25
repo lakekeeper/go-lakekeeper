@@ -51,20 +51,22 @@ func TestTaskQueueWarehouseQueuesGetAndSet(t *testing.T) {
 
 // task_log_cleanup is configured per project; the test uses the server's
 // default project and is the only test that touches its configuration.
+// Lakekeeper 0.15 requires cleanup-period in a set, although the spec marks
+// it nullable.
 func TestTaskQueueTaskLogCleanupGetAndSet(t *testing.T) {
 	requireBackend(t, BackendCompose)
 	t.Parallel()
 
-	runOK(t, "task-queue", "task-log-cleanup", "set", "--retention-period", "P30D")
+	runOK(t, "task-queue", "task-log-cleanup", "set", "--cleanup-period", "P2D", "--retention-period", "P30D")
 
 	got := getQueueConfig(t, "task-queue", "task-log-cleanup", "get")
 	assert.Equal(t, "P30D", got.QueueConfig["retention-period"])
-	assert.Nil(t, got.QueueConfig["cleanup-period"], "cleanup-period was not set, so it stays unset")
+	assert.Equal(t, "P2D", got.QueueConfig["cleanup-period"])
 	assert.Nil(t, got.MaxSecondsSinceLastHeartbeat)
 
 	text := string(runOK(t, "task-queue", "task-log-cleanup", "get"))
 	assert.Contains(t, text, "retention-period: P30D\n")
-	assert.Contains(t, text, "cleanup-period: unset\n")
+	assert.Contains(t, text, "max-seconds-since-last-heartbeat: unset\n")
 }
 
 func TestTaskQueueLakekeeperPlusQueuesRequireLakekeeperPlus(t *testing.T) {

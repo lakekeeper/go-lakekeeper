@@ -324,7 +324,9 @@ client consult the capabilities (fetching them on first use):
 
 The server answers 404 both for a queue it does not run and for a missing
 warehouse; the queue list tells them apart, so a missing warehouse on a
-server that runs the queue stays a not-found.
+server that runs the queue stays a not-found. Setting the configuration of
+a queue the server does not know is answered with 400 `QueueNotFound`
+instead; task-queue façades diagnose that answer too.
 
 An `UnsupportedError` does not unwrap to the server's `APIError`, so code
 that treats a 404 as "resource gone" never reads an unsupported operation

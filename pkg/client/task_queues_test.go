@@ -95,6 +95,37 @@ func TestTaskQueues_SetRemoveOrphanFilesConfig_QueueNotConfigured(t *testing.T) 
 		"server is Lakekeeper+ 0.15.2 without it")
 }
 
+// Lakekeeper answers a set for a queue it does not know with 400
+// QueueNotFound rather than 404.
+func TestTaskQueues_SetOptimizeConfig_QueueNotFoundOnLakekeeperIsUnsupported(t *testing.T) {
+	t.Parallel()
+	mux, c := testutil.ServerMux(t)
+	testutil.Respond(t, mux, "POST "+optimizeConfig, http.StatusBadRequest,
+		`{"error":{"message":"Queue 'optimize' not found! Configurable queues: [soft_deletion, tabular_purge, task_log_cleanup]",`+
+			`"type":"QueueNotFound","code":400,"stack":[]}}`)
+	testutil.Respond(t, mux, "GET /management/v1/info", http.StatusOK, lakekeeperInfo())
+
+	err := c.TaskQueues.SetOptimizeConfig(t.Context(), "wh-1", &managementv1.SetOptimizeQueueConfig{})
+
+	require.EqualError(t, err, "set optimize queue config: requires Lakekeeper+; server is Lakekeeper 0.15.1")
+}
+
+// Other 400s are the caller's error, not an unsupported operation.
+func TestTaskQueues_SetOptimizeConfig_OtherBadRequestIsNotDiagnosed(t *testing.T) {
+	t.Parallel()
+	mux, c := testutil.ServerMux(t)
+	testutil.Respond(t, mux, "POST "+optimizeConfig, http.StatusBadRequest,
+		`{"error":{"message":"bad config","type":"InvalidQueueConfig","code":400,"stack":[]}}`)
+	info := testutil.Respond(t, mux, "GET /management/v1/info", http.StatusOK, lakekeeperInfo())
+
+	err := c.TaskQueues.SetOptimizeConfig(t.Context(), "wh-1", &managementv1.SetOptimizeQueueConfig{})
+
+	var apiErr *client.APIError
+	require.ErrorAs(t, err, &apiErr)
+	assert.Equal(t, http.StatusBadRequest, apiErr.StatusCode)
+	assert.Zero(t, info.Len(), "server info requests")
+}
+
 func TestTaskQueues_SetNilRequestFailsWithoutRequest(t *testing.T) {
 	t.Parallel()
 	_, c := testutil.ServerMux(t)

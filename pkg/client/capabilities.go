@@ -135,15 +135,29 @@ func (r requirement) unmet(caps *Capabilities) (UnsupportedReason, string) {
 	return "", ""
 }
 
+// mayExplain reports whether the server's answer is one the capabilities
+// may explain: 404 or 405, the answers to an unknown operation, and, for a
+// task-queue operation, a 400 QueueNotFound, which Lakekeeper sends for a
+// queue it does not know when setting a queue configuration.
+func (r requirement) mayExplain(apiErr *APIError) bool {
+	switch apiErr.StatusCode {
+	case http.StatusNotFound, http.StatusMethodNotAllowed:
+		return true
+	case http.StatusBadRequest:
+		return r.queue != "" && apiErr.Model != nil && apiErr.Model.GetType() == "QueueNotFound"
+	}
+	return false
+}
+
 // diagnose finishes a gated façade call. Successful calls (err == nil) and
-// failures other than 404 and 405 pass through without a request. For a 404
-// or 405 it consults the cached capabilities: when they explain the failure
+// failures the capabilities cannot explain (see mayExplain) pass through
+// without a request. For the others (404, 405, and a task queue's 400
+// QueueNotFound) it consults the cached capabilities: when they explain the failure
 // it returns an *UnsupportedError, otherwise (a genuine not-found, or the
 // capabilities cannot be fetched) the original error unchanged.
 func (cc *capabilityCache) diagnose(ctx context.Context, req requirement, op string, err error) error {
 	var apiErr *APIError
-	if !errors.As(err, &apiErr) ||
-		(apiErr.StatusCode != http.StatusNotFound && apiErr.StatusCode != http.StatusMethodNotAllowed) {
+	if !errors.As(err, &apiErr) || !req.mayExplain(apiErr) {
 		return err
 	}
 	caps, capsErr := cc.get(ctx)
