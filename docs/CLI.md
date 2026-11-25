@@ -357,7 +357,31 @@ lkctl cedar break-glass-status -p <project-id>
 
 # Emergency access, with the reason the server records
 lkctl cedar project-policies apply -f fix.json --break-glass "INC-42: locked out"
+
+# Where the server loads its Cedar policies and entities from (files, ConfigMaps)
+lkctl cedar policy-sources
+lkctl cedar entity-sources
+
+# The server's active policies (EFFECT PRINCIPAL ACTION RESOURCE); -o json
+# prints them in Cedar's JSON policy format, conditions included
+lkctl cedar server-policies list
+lkctl cedar server-policies list --source <source-id> --effect forbid
+lkctl cedar server-policies list --page-size 50 --page-token <token>
+
+# The Cedar entities the server derives for a resource, for you or another principal
+lkctl cedar resolve-entities server
+lkctl cedar resolve-entities project <project-id>
+lkctl cedar resolve-entities warehouse <warehouse-id> --user <user-id>
 ```
+
+`server-policies list` without `--source` includes the predefined
+policies; it never includes the policies stored for projects and
+warehouses. When more policies follow, text output ends with
+`Next page token`. `resolve-entities` text output (`TYPE ID PARENTS`)
+leaves out the action entities that every result carries; `-o wide`
+shows them, `-o json` adds the attributes. It takes no `-p`: the API
+gives the operation no project header, so `project` without an id
+leaves the choice of project to the server.
 
 The apply file is the Management API's apply request: `writes` (each a
 `name`, optional `description`, and a `policy` in Cedar's JSON policy
@@ -369,6 +393,37 @@ warehouse, and whether you can change the policies (`Can write`).
 `--break-glass REASON` sends the `x-break-glass` header. Only `list` and
 `apply` of `project-policies` and `warehouse-policies` have it: those are
 the operations that accept the header.
+
+#### Predefined policies
+
+Lakekeeper+ provides predefined Cedar policies that a project or a warehouse
+switches on or off; they are never edited.
+
+```sh
+# The predefined policies with their enablement (-p as elsewhere)
+lkctl cedar project-predefined-policies list -p <project-id>
+lkctl cedar project-predefined-policies list -o json --include-policy   # with each rule
+
+# Switch policies in one request; prints the listing as of the write
+lkctl cedar project-predefined-policies set --disable predefined-grants-table-select
+lkctl cedar project-predefined-policies set --enable predefined-a,predefined-b --break-glass "INC-42"
+
+# Drop every decision: the project follows the provided defaults again
+lkctl cedar project-predefined-policies reset
+
+# The same for a warehouse; reset makes it follow its project again
+lkctl cedar warehouse-predefined-policies list <warehouse-id>
+lkctl cedar warehouse-predefined-policies set <warehouse-id> --disable predefined-grants-table-select
+lkctl cedar warehouse-predefined-policies reset <warehouse-id>
+```
+
+`list` and `set` print `ID ENABLED DISABLED BY CAN TOGGLE` (`-o wide` adds
+`UPDATED AT`, `UPDATED BY` and `DESCRIPTION`), then whether the scope has
+decided anything itself (`Curated`) and whether the server evaluates
+predefined policies at all. `DISABLED BY` is `project`, `warehouse` or
+`new-since-curated`, `(retired)` for a policy the server no longer provides,
+and `-` for a policy in force. `list` and `set` take `--break-glass`;
+`reset` does not, as its operation does not accept the header.
 
 ### `lkctl task-queue`
 

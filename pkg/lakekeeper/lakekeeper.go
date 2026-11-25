@@ -127,6 +127,10 @@ type (
 	// ListRolesOptions holds the query parameters of Roles.List.
 	ListRolesOptions = client.ListRolesOptions
 
+	// PredefinedPoliciesOptions holds the query parameters of listing and
+	// setting predefined Cedar policies (Cedar.List…/Set…PredefinedPolicies).
+	PredefinedPoliciesOptions = client.PredefinedPoliciesOptions
+
 	// Capabilities describes what one server can do (Client.Capabilities).
 	Capabilities = client.Capabilities
 	// Edition is Lakekeeper or Lakekeeper+.
