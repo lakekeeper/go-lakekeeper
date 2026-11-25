@@ -34,3 +34,16 @@ func TestCedarProjectPoliciesRequiresLakekeeperPlus(t *testing.T) {
 		`^Error: list project cedar policies: requires Lakekeeper\+; server is Lakekeeper \S+\n$`,
 		string(stderr))
 }
+
+// TestCedarPredefinedPoliciesRequiresLakekeeperPlus: its Lakekeeper+
+// counterparts are in plus_cedar_predefined_test.go.
+func TestCedarPredefinedPoliciesRequiresLakekeeperPlus(t *testing.T) {
+	requireBackend(t, BackendCompose)
+	t.Parallel()
+
+	_, stderr, _ := runFail(t, "cedar", "project-predefined-policies", "list")
+
+	assert.Regexp(t,
+		`^Error: list project predefined cedar policies: requires Lakekeeper\+; server is Lakekeeper \S+\n$`,
+		string(stderr))
+}

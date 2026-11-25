@@ -368,6 +368,37 @@ warehouse, and whether you can change the policies (`Can write`).
 `apply` of `project-policies` and `warehouse-policies` have it: those are
 the operations that accept the header.
 
+#### Predefined policies
+
+Lakekeeper+ provides predefined Cedar policies that a project or a warehouse
+switches on or off; they are never edited.
+
+```sh
+# The predefined policies with their enablement (-p as elsewhere)
+lkctl cedar project-predefined-policies list -p <project-id>
+lkctl cedar project-predefined-policies list -o json --include-policy   # with each rule
+
+# Switch policies in one request; prints the listing as of the write
+lkctl cedar project-predefined-policies set --disable predefined-grants-table-select
+lkctl cedar project-predefined-policies set --enable predefined-a,predefined-b --break-glass "INC-42"
+
+# Drop every decision: the project follows the provided defaults again
+lkctl cedar project-predefined-policies reset
+
+# The same for a warehouse; reset makes it follow its project again
+lkctl cedar warehouse-predefined-policies list <warehouse-id>
+lkctl cedar warehouse-predefined-policies set <warehouse-id> --disable predefined-grants-table-select
+lkctl cedar warehouse-predefined-policies reset <warehouse-id>
+```
+
+`list` and `set` print `ID ENABLED DISABLED BY CAN TOGGLE` (`-o wide` adds
+`UPDATED AT`, `UPDATED BY` and `DESCRIPTION`), then whether the scope has
+decided anything itself (`Curated`) and whether the server evaluates
+predefined policies at all. `DISABLED BY` is `project`, `warehouse` or
+`new-since-curated`, `(retired)` for a policy the server no longer provides,
+and `-` for a policy in force. `list` and `set` take `--break-glass`;
+`reset` does not, as its operation does not accept the header.
+
 ### `lkctl version` / `lkctl whoami`
 
 ```sh
