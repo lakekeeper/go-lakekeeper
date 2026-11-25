@@ -3,14 +3,14 @@
   "diagram_type": "architecture",
   "meta": {
     "title": "Authentication: auth sources, construction and requests",
-    "output": ".archify/architecture-authentication-20261125-121400/authentication.html",
+    "output": ".archify/architecture-authentication-20261125-123808/authentication.html",
     "quality_profile": "showcase",
     "locale": "en",
     "repository": {
       "url": "git@github.com:lakekeeper/go-lakekeeper.git",
       "provider": "github",
       "link_mode": "local-only",
-      "revision": "21184cae680fdd98d707d36a0e8a8fe31db0cb55"
+      "revision": "d6fe7c4fef85ae6fcb12e4aced72587f622cb360"
     },
     "legend": {
       "entries": {
@@ -47,7 +47,7 @@
       "sources": [
         { "path": "pkg/lakekeeper/lakekeeper.go", "line": 56, "end_line": 65, "label": "NewOAuthClientCredentials" },
         { "path": "pkg/lakekeeper/lakekeeper.go", "line": 73, "end_line": 79, "label": "NewK8sServiceAccount" },
-        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 157, "end_line": 158, "label": "New, NewWithAuthSource" }
+        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 161, "end_line": 162, "label": "New, NewWithAuthSource" }
       ]
     },
     {
