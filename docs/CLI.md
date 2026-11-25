@@ -31,6 +31,7 @@ Other useful make targets:
 | `make test-integration` | Spin up Lakekeeper + Keycloak + MinIO + OpenFGA via docker-compose and run integration tests |
 | `make test-e2e-compose` | E2E suite for `lkctl` itself, against the docker-compose stack (build tag `e2e_cli`). See [`e2e/`](../e2e/) |
 | `make test-e2e-kind` | E2E suite for `lkctl --auth-mode k8s` against a real kind cluster. See [`e2e/kind/`](../e2e/kind/) |
+| `make test-plus` | Lakekeeper+ E2E and integration tests (build tags `e2e_plus`, `integration_plus`) against the public Lakekeeper+ image, with Cedar and with OpenFGA. `LAKEKEEPER__LICENSE__KEY` is passed through when set; optional for local runs, CI uses one. See [`e2e/plus/run.sh`](../e2e/plus/run.sh) |
 | `make generate` | Regenerate the Management API client from the OpenAPI spec — see [GENERATION.md](GENERATION.md) |
 | `make snapshot` | goreleaser snapshot (multi-arch, no publish) |
 | `make clean` | Tear down compose stack and remove build artefacts |

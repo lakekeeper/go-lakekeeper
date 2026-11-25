@@ -134,6 +134,13 @@ make test-e2e-compose
 
 `make test-e2e-kind` runs the `lkctl` end-to-end tests against a kind cluster; it needs `kind`, `kubectl` and `helm` installed.
 
+`make test-plus` runs the Lakekeeper+ end-to-end and integration tests (build
+tags `e2e_plus` and `integration_plus`) against the public Lakekeeper+ image,
+once with the Cedar and once with the OpenFGA authorization backend. A license
+is optional for local runs: when `LAKEKEEPER__LICENSE__KEY` is set in your
+environment, the target passes it to the server. Never commit a license. CI
+runs these tests on `main` with a license.
+
 If adding a feature or fixing a bug, include relevant unit and/or integration tests.
 
 ## Diagrams

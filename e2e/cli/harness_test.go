@@ -52,7 +52,7 @@ func TestMain(m *testing.M) {
 		os.Exit(1)
 	}
 
-	if activeBackend.Name() == BackendCompose {
+	if activeBackend.Name() != BackendKind {
 		if err := bootstrapForCompose(); err != nil {
 			fmt.Fprintf(os.Stderr, "bootstrap: %v\n", err)
 			os.Exit(1)
@@ -77,8 +77,8 @@ func initBackend() error {
 			mode = BackendCompose
 		}
 		switch mode {
-		case BackendCompose:
-			activeBackend, backendErr = newComposeBackend()
+		case BackendCompose, BackendComposePlus, BackendComposePlusOpenFGA:
+			activeBackend, backendErr = newComposeBackend(mode)
 		case BackendKind:
 			activeBackend, backendErr = newKindBackend()
 		default:
