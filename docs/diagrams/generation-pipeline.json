@@ -77,7 +77,7 @@
       "size": [230, 64],
       "sources": [
         { "path": "Makefile", "line": 151, "end_line": 155, "label": "go run ./api/openapi/prepare" },
-        { "path": "api/openapi/prepare/patches.go", "line": 22, "end_line": 29, "label": "the patches of each spec" },
+        { "path": "api/openapi/prepare/patches.go", "line": 23, "end_line": 34, "label": "the patches of each spec" },
         { "path": "api/openapi/prepare/merge.go", "line": 14, "end_line": 24, "label": "merge: paths, components, tags" }
       ]
     },
