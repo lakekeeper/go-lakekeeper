@@ -74,8 +74,11 @@ func newCapabilities(lakekeeperVersion, enterpriseVersion, authzBackend string, 
 		LakekeeperVersion: lakekeeperVersion,
 		AuthzBackend:      AuthzBackend(authzBackend),
 	}
-	for _, q := range queues {
-		caps.Queues = append(caps.Queues, Queue(q))
+	if queues != nil {
+		caps.Queues = make([]Queue, len(queues))
+		for i, q := range queues {
+			caps.Queues[i] = Queue(q)
+		}
 	}
 	if enterpriseVersion != "" {
 		caps.Edition = EditionLakekeeperPlus
