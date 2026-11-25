@@ -76,7 +76,7 @@
         {
           "path": "pkg/client/server.go",
           "line": 11,
-          "end_line": 20,
+          "end_line": 28,
           "label": "Server.Info"
         },
         {

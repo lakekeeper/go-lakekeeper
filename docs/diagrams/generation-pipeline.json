@@ -42,7 +42,7 @@
       "size": [230, 64],
       "sources": [
         { "path": "api/openapi/management-open-api.yaml", "line": 1, "end_line": 8, "label": "committed Lakekeeper Management API spec" },
-        { "path": "Makefile", "line": 153, "end_line": 153, "label": "prepare's -lakekeeper input" }
+        { "path": "Makefile", "line": 172, "end_line": 172, "label": "prepare's -lakekeeper input" }
       ]
     },
     {
@@ -64,7 +64,7 @@
       "size": [230, 64],
       "sources": [
         { "path": "api/openapi/management-plus-open-api.yaml", "line": 1, "end_line": 7, "label": "committed Lakekeeper+ Management API spec" },
-        { "path": "Makefile", "line": 154, "end_line": 154, "label": "prepare's -lakekeeper-plus input" }
+        { "path": "Makefile", "line": 173, "end_line": 173, "label": "prepare's -lakekeeper-plus input" }
       ]
     },
     {
@@ -76,9 +76,23 @@
       "pos": [720, 90],
       "size": [230, 64],
       "sources": [
-        { "path": "Makefile", "line": 151, "end_line": 155, "label": "go run ./api/openapi/prepare" },
+        { "path": "Makefile", "line": 171, "end_line": 176, "label": "go run ./api/openapi/prepare" },
         { "path": "api/openapi/prepare/patches.go", "line": 23, "end_line": 34, "label": "the patches of each spec" },
         { "path": "api/openapi/prepare/merge.go", "line": 14, "end_line": 24, "label": "merge: paths, components, tags" }
+      ]
+    },
+    {
+      "id": "releases",
+      "type": "database",
+      "label": "Spec releases",
+      "sublabel": "api/openapi/spec-releases.yaml",
+      "tag": "release of each spec · update with it",
+      "pos": [720, 190],
+      "size": [230, 64],
+      "sources": [
+        { "path": "api/openapi/spec-releases.yaml", "line": 1, "end_line": 7, "label": "the release tag each spec was copied from" },
+        { "path": "Makefile", "line": 175, "end_line": 176, "label": "prepare's -releases input and -releases-out" },
+        { "path": "api/openapi/prepare/releases.go", "line": 15, "end_line": 19, "label": "specReleasesGo writes the constants" }
       ]
     },
     {
@@ -103,7 +117,7 @@
       "pos": [40, 300],
       "size": [230, 64],
       "sources": [
-        { "path": "Makefile", "line": 149, "end_line": 159, "label": "prepare, wipe output, copy ignore file" },
+        { "path": "Makefile", "line": 166, "end_line": 176, "label": "wipe output, copy ignore file, prepare" },
         { "path": "Makefile", "line": 45, "end_line": 45, "label": "CONTAINER_ENGINE: docker or podman" }
       ]
     },
@@ -117,7 +131,7 @@
       "size": [230, 64],
       "sources": [
         { "path": "Makefile", "line": 49, "end_line": 50, "label": "generator image and version" },
-        { "path": "Makefile", "line": 160, "end_line": 168, "label": "generate -i merged spec -c config -o output" }
+        { "path": "Makefile", "line": 178, "end_line": 186, "label": "generate -i merged spec -c config -o output" }
       ]
     },
     {
@@ -129,7 +143,7 @@
       "pos": [720, 300],
       "size": [230, 64],
       "sources": [
-        { "path": "Makefile", "line": 169, "end_line": 170, "label": "go run ./api/openapi/postprocess" },
+        { "path": "Makefile", "line": 187, "end_line": 188, "label": "go run ./api/openapi/postprocess" },
         { "path": "api/openapi/postprocess/main.go", "line": 1, "end_line": 34, "label": "the two relaxations" },
         { "path": "api/openapi/postprocess/main.go", "line": 44, "end_line": 56, "label": "match targets" }
       ]
@@ -142,8 +156,8 @@
       "pos": [1060, 300],
       "size": [230, 64],
       "sources": [
-        { "path": "Makefile", "line": 171, "end_line": 174, "label": "goimports, go mod tidy, make fmt" },
-        { "path": "Makefile", "line": 136, "end_line": 139, "label": "fmt: golangci-lint --fix" }
+        { "path": "Makefile", "line": 189, "end_line": 192, "label": "goimports, go mod tidy, make fmt" },
+        { "path": "Makefile", "line": 152, "end_line": 155, "label": "fmt: golangci-lint --fix" }
       ]
     },
     {
@@ -170,7 +184,7 @@
       "size": [230, 64],
       "sources": [
         { "path": "api/openapi/.openapi-generator-ignore", "line": 1, "end_line": 7, "label": "README.md, git_push.sh, …" },
-        { "path": "Makefile", "line": 159, "end_line": 159, "label": "copied into the output dir" }
+        { "path": "Makefile", "line": 169, "end_line": 169, "label": "copied into the output dir" }
       ]
     },
     {
@@ -183,7 +197,7 @@
       "size": [230, 64],
       "sources": [
         { "path": "api/openapi/management-config.yaml", "line": 1, "end_line": 44, "label": "options that differ from the defaults" },
-        { "path": "Makefile", "line": 166, "end_line": 166, "label": "-c config" }
+        { "path": "Makefile", "line": 184, "end_line": 184, "label": "-c config" }
       ]
     },
     {
@@ -195,7 +209,7 @@
       "pos": [1400, 460],
       "size": [230, 64],
       "sources": [
-        { "path": "Makefile", "line": 157, "end_line": 157, "label": "rm -rf wipes the output dir" }
+        { "path": "Makefile", "line": 167, "end_line": 167, "label": "rm -rf wipes the output dir" }
       ]
     }
   ],
@@ -204,7 +218,9 @@
     { "id": "plusupstream-plusspec", "from": "plusupstream", "to": "plusspec", "label": "copied by hand" },
     { "id": "spec-prepare", "from": "spec", "to": "prepare", "label": "base", "variant": "emphasis" },
     { "id": "plusspec-prepare", "from": "plusspec", "to": "prepare", "label": "additions", "variant": "emphasis" },
+    { "id": "releases-prepare", "from": "releases", "to": "prepare", "label": "releases" },
     { "id": "prepare-merged", "from": "prepare", "to": "merged", "label": "writes", "variant": "emphasis" },
+    { "id": "prepare-generated", "from": "prepare", "to": "generated", "label": "writes spec_releases.go" },
     { "id": "merged-generator", "from": "merged", "to": "generator", "label": "-i", "variant": "emphasis" },
     { "id": "ignore-make", "from": "ignore", "to": "make", "label": "copied into output dir" },
     { "id": "config-generator", "from": "config", "to": "generator", "label": "-c" },
@@ -230,7 +246,8 @@
       "items": [
         "Applies each spec's named patches; a patch whose defect is gone logs 'not needed, skipped'",
         "Lakekeeper wins on shared paths and schemas; Lakekeeper+ adds the rest and new union variants",
-        "Any other difference between the specs stops make generate, naming the item"
+        "Any other difference between the specs stops make generate, naming the item",
+        "Writes spec_releases.go from spec-releases.yaml; the SDK derives its supported server versions from it"
       ]
     },
     {

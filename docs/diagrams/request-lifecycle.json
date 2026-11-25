@@ -77,7 +77,7 @@
         {
           "path": "pkg/client/client.go",
           "line": 122,
-          "end_line": 128,
+          "end_line": 129,
           "label": "façade wraps service"
         }
       ]
@@ -110,8 +110,8 @@
       "sources": [
         {
           "path": "pkg/client/client.go",
-          "line": 237,
-          "end_line": 281,
+          "line": 238,
+          "end_line": 282,
           "label": "newHTTPClient"
         },
         {

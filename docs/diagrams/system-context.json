@@ -33,7 +33,7 @@
       "pos": [625, 40],
       "size": [150, 64],
       "sources": [
-        { "path": "cmd/lkctl/commands/client.go", "line": 69, "end_line": 88, "label": "newClient builds a *client.Client" },
+        { "path": "cmd/lkctl/commands/client.go", "line": 95, "end_line": 114, "label": "newClient builds a *client.Client" },
         { "path": ".golangci.yml", "line": 46, "end_line": 64, "label": "forbidigo: cmd/ calls façades only" }
       ]
     },
@@ -70,7 +70,7 @@
       "size": [340, 64],
       "sources": [
         { "path": "pkg/client/client.go", "line": 44, "end_line": 74, "label": "Client: façades + embedded APIClient" },
-        { "path": "pkg/client/client.go", "line": 237, "end_line": 259, "label": "auth round-tripper under retries" },
+        { "path": "pkg/client/client.go", "line": 238, "end_line": 260, "label": "auth round-tripper under retries" },
         { "path": "pkg/core/transport.go", "line": 8, "end_line": 38, "label": "AuthRoundTripper sets the header" }
       ]
     },
@@ -83,7 +83,7 @@
       "pos": [970, 200],
       "size": [150, 64],
       "sources": [
-        { "path": "pkg/client/client.go", "line": 171, "end_line": 199, "label": "CatalogV1 delegates to iceberg-go" },
+        { "path": "pkg/client/client.go", "line": 172, "end_line": 200, "label": "CatalogV1 delegates to iceberg-go" },
         { "path": "go.mod", "line": 8, "end_line": 8, "label": "iceberg-go dependency" }
       ]
     },
@@ -95,7 +95,7 @@
       "pos": [550, 380],
       "size": [150, 64],
       "sources": [
-        { "path": "pkg/client/client.go", "line": 114, "end_line": 143, "label": "façades wrap the generated services" },
+        { "path": "pkg/client/client.go", "line": 114, "end_line": 144, "label": "façades wrap the generated services" },
         { "path": "pkg/apis/management/v1/client.go", "line": 315, "end_line": 338, "label": "callAPI sends through the client's HTTP client" }
       ]
     },
@@ -109,7 +109,7 @@
       "sources": [
         { "path": "pkg/core/auth.go", "line": 84, "end_line": 105, "label": "client credentials token source" },
         { "path": "pkg/lakekeeper/lakekeeper.go", "line": 50, "end_line": 65, "label": "NewOAuthClientCredentials" },
-        { "path": "docker-compose.yml", "line": 270, "end_line": 284, "label": "Keycloak in the compose stack" }
+        { "path": "docker-compose.yml", "line": 274, "end_line": 288, "label": "Keycloak in the compose stack" }
       ]
     },
     {
@@ -132,7 +132,7 @@
       "pos": [970, 560],
       "size": [150, 64],
       "sources": [
-        { "path": "pkg/client/client.go", "line": 193, "end_line": 198, "label": "catalog URL and warehouse" }
+        { "path": "pkg/client/client.go", "line": 194, "end_line": 199, "label": "catalog URL and warehouse" }
       ]
     },
     {
@@ -155,7 +155,7 @@
       "size": [150, 64],
       "sources": [
         { "path": "docker-compose.yml", "line": 12, "end_line": 14, "label": "PG database URLs" },
-        { "path": "docker-compose.yml", "line": 177, "end_line": 180, "label": "db service" }
+        { "path": "docker-compose.yml", "line": 181, "end_line": 184, "label": "db service" }
       ]
     },
     {
@@ -167,7 +167,7 @@
       "size": [150, 64],
       "sources": [
         { "path": "docker-compose.yml", "line": 15, "end_line": 16, "label": "AUTHZ_BACKEND=openfga" },
-        { "path": "docker-compose.yml", "line": 219, "end_line": 226, "label": "openfga service" }
+        { "path": "docker-compose.yml", "line": 223, "end_line": 230, "label": "openfga service" }
       ]
     },
     {
@@ -179,7 +179,7 @@
       "size": [150, 64],
       "sources": [
         { "path": "pkg/storage/profile/profile.go", "line": 1, "end_line": 34, "label": "S3, GCS and ADLS profiles" },
-        { "path": "docker-compose.yml", "line": 255, "end_line": 260, "label": "MinIO in the compose stack" }
+        { "path": "docker-compose.yml", "line": 259, "end_line": 264, "label": "MinIO in the compose stack" }
       ]
     }
   ],

@@ -80,8 +80,8 @@
       "size": [220, 64],
       "sources": [
         { "path": "pkg/client/client.go", "line": 27, "end_line": 60, "label": "Client and its façades" },
-        { "path": "pkg/client/client.go", "line": 122, "end_line": 143, "label": "façades wrap generated services" },
-        { "path": "pkg/client/client.go", "line": 237, "end_line": 249, "label": "AuthRoundTripper from pkg/core" }
+        { "path": "pkg/client/client.go", "line": 122, "end_line": 144, "label": "façades wrap generated services" },
+        { "path": "pkg/client/client.go", "line": 238, "end_line": 250, "label": "AuthRoundTripper from pkg/core" }
       ]
     },
     {

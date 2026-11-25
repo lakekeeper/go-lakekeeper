@@ -14,7 +14,7 @@ postprocessor is involved**.
 Everything under [`pkg/apis/management/v1/`](../pkg/apis/management/v1/) is
 regenerated wholesale on every `make generate` run. The Makefile `rm -rf`s
 the directory before invoking the generator (see
-[Makefile:157](../Makefile#L157)), so any hand-edits there are silently
+[Makefile:167](../Makefile#L167)), so any hand-edits there are silently
 discarded the next time someone regenerates.
 
 Files carrying this header are generator output and **must not be
@@ -80,6 +80,10 @@ the term generated SDK as defined under
   see [Updating the specs](#updating-the-specs).
 - **prepare**: [`api/openapi/prepare/`](../api/openapi/prepare/), which patches
   both specs and merges them; see [The prepare step](#the-prepare-step).
+- **Spec releases**: [`api/openapi/spec-releases.yaml`](../api/openapi/spec-releases.yaml),
+  the release tag each spec was copied from. prepare writes it into the
+  generated package as `spec_releases.go`; see
+  [Updating the specs](#updating-the-specs).
 - **Merged spec**: `api/openapi/build/management-merged-open-api.yaml`, written
   by prepare on every run and git-ignored. It is the only spec the generator
   reads.
@@ -95,7 +99,7 @@ the term generated SDK as defined under
 - **Hand edit**: any edit under `pkg/apis/management/v1/`. The next
   `make generate` deletes it (see [What is generated](#what-is-generated)).
 
-The pipeline (see [Makefile:149-174](../Makefile#L149-L174)):
+The pipeline (see [Makefile:165-192](../Makefile#L165-L192)):
 
 1. `rm -rf pkg/apis/management/v1` and recreate the directory.
 2. Copy the top-level [`.openapi-generator-ignore`](../api/openapi/.openapi-generator-ignore)
