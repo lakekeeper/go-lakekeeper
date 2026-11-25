@@ -355,7 +355,31 @@ lkctl cedar break-glass-status -p <project-id>
 
 # Emergency access, with the reason the server records
 lkctl cedar project-policies apply -f fix.json --break-glass "INC-42: locked out"
+
+# Where the server loads its Cedar policies and entities from (files, ConfigMaps)
+lkctl cedar policy-sources
+lkctl cedar entity-sources
+
+# The server's active policies (EFFECT PRINCIPAL ACTION RESOURCE); -o json
+# prints them in Cedar's JSON policy format, conditions included
+lkctl cedar server-policies list
+lkctl cedar server-policies list --source <source-id> --effect forbid
+lkctl cedar server-policies list --page-size 50 --page-token <token>
+
+# The Cedar entities the server derives for a resource, for you or another principal
+lkctl cedar resolve-entities server
+lkctl cedar resolve-entities project <project-id>
+lkctl cedar resolve-entities warehouse <warehouse-id> --user <user-id>
 ```
+
+`server-policies list` without `--source` includes the predefined
+policies; it never includes the policies stored for projects and
+warehouses. When more policies follow, text output ends with
+`Next page token`. `resolve-entities` text output (`TYPE ID PARENTS`)
+leaves out the action entities that every result carries; `-o wide`
+shows them, `-o json` adds the attributes. It takes no `-p`: the API
+gives the operation no project header, so `project` without an id
+leaves the choice of project to the server.
 
 The apply file is the Management API's apply request: `writes` (each a
 `name`, optional `description`, and a `policy` in Cedar's JSON policy
