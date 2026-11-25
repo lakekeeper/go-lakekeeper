@@ -148,7 +148,7 @@ func TestCedarServerPoliciesList_RejectsUnknownEffect(t *testing.T) {
 
 const resolveEntitiesPath = "POST /management/v1/permissions/cedar/resolve-entities"
 
-const resolvedBody = `{"entity-count":4,"principal-has-privilege-below":true,"entities":[
+const resolvedBody = `{"entity-count":4,"entities":[
 	{"uid":{"type":"Lakekeeper::User","id":"oidc~a"},"attrs":{},"parents":[{"type":"Lakekeeper::Role","id":"p/r"}]},
 	{"uid":{"type":"Lakekeeper::Warehouse","id":"w"},"attrs":{},
 	 "parents":[{"type":"Lakekeeper::Project","id":"p"},{"type":"Lakekeeper::Server","id":"s"}]},
@@ -167,8 +167,7 @@ func TestCedarResolveEntities_PrintsEntitiesWithoutActions(t *testing.T) {
 		"TYPE                   ID      PARENTS\n"+
 		"Lakekeeper::User       oidc~a  Lakekeeper::Role::\"p/r\"\n"+
 		"Lakekeeper::Warehouse  w       Lakekeeper::Project::\"p\", Lakekeeper::Server::\"s\"\n"+
-		"\nEntities: 4 (2 Lakekeeper::Action entities not shown; -o wide shows them)\n"+
-		"Principal has privilege below: true\n", out)
+		"\nEntities: 4 (2 Lakekeeper::Action entities not shown; -o wide shows them)\n", out)
 	assert.JSONEq(t, `{"resource":{"warehouse":{"warehouse-id":"w"}}}`, string(resolve.Last(t).Body))
 }
 

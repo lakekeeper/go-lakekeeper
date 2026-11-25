@@ -17133,15 +17133,6 @@ components:
           type: integer
           description: Total number of entities resolved.
           minimum: 0
-        principal-has-privilege-below:
-          type:
-            - boolean
-            - 'null'
-          description: |-
-            For a project, warehouse or namespace: whether the principal or one of its roles holds
-            `describe`, `select`, `write`, `create`, `manage` or `manage_tags` on a warehouse,
-            namespace, table, view or generic table below it. Policies read it as
-            `context.principal_has_privilege_below`.
     ResourceGrantablePrivilegesResponse:
       type: object
       description: |-
@@ -18153,8 +18144,10 @@ components:
       properties:
         search:
           type: string
-          description: Name, UUID, or storage path of a table or view. A name is cut to 64 characters.
-          maxLength: 4096
+          description: |-
+            Search string for fuzzy search.
+            Length is truncated to 64 characters.
+          maxLength: 64
     SearchTabularResponse:
       type: object
       description: Search result for tabulars

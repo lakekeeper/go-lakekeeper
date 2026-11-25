@@ -25,8 +25,6 @@ type ResolveCedarEntitiesResponse struct {
 	Entities []CedarEntity `json:"entities"`
 	// Total number of entities resolved.
 	EntityCount int32 `json:"entity-count"`
-	// For a project, warehouse or namespace: whether the principal or one of its roles holds `describe`, `select`, `write`, `create`, `manage` or `manage_tags` on a warehouse, namespace, table, view or generic table below it. Policies read it as `context.principal_has_privilege_below`.
-	PrincipalHasPrivilegeBelow NullableBool `json:"principal-has-privilege-below,omitempty"`
 }
 
 type _ResolveCedarEntitiesResponse ResolveCedarEntitiesResponse
@@ -98,49 +96,6 @@ func (o *ResolveCedarEntitiesResponse) SetEntityCount(v int32) {
 	o.EntityCount = v
 }
 
-// GetPrincipalHasPrivilegeBelow returns the PrincipalHasPrivilegeBelow field value if set, zero value otherwise (both if not set or set to explicit null).
-func (o *ResolveCedarEntitiesResponse) GetPrincipalHasPrivilegeBelow() bool {
-	if o == nil || IsNil(o.PrincipalHasPrivilegeBelow.Get()) {
-		var ret bool
-		return ret
-	}
-	return *o.PrincipalHasPrivilegeBelow.Get()
-}
-
-// GetPrincipalHasPrivilegeBelowOk returns a tuple with the PrincipalHasPrivilegeBelow field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-// NOTE: If the value is an explicit nil, `nil, true` will be returned
-func (o *ResolveCedarEntitiesResponse) GetPrincipalHasPrivilegeBelowOk() (*bool, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return o.PrincipalHasPrivilegeBelow.Get(), o.PrincipalHasPrivilegeBelow.IsSet()
-}
-
-// HasPrincipalHasPrivilegeBelow returns a boolean if a field has been set.
-func (o *ResolveCedarEntitiesResponse) HasPrincipalHasPrivilegeBelow() bool {
-	if o != nil && o.PrincipalHasPrivilegeBelow.IsSet() {
-		return true
-	}
-
-	return false
-}
-
-// SetPrincipalHasPrivilegeBelow gets a reference to the given NullableBool and assigns it to the PrincipalHasPrivilegeBelow field.
-func (o *ResolveCedarEntitiesResponse) SetPrincipalHasPrivilegeBelow(v bool) {
-	o.PrincipalHasPrivilegeBelow.Set(&v)
-}
-
-// SetPrincipalHasPrivilegeBelowNil sets the value for PrincipalHasPrivilegeBelow to be an explicit nil
-func (o *ResolveCedarEntitiesResponse) SetPrincipalHasPrivilegeBelowNil() {
-	o.PrincipalHasPrivilegeBelow.Set(nil)
-}
-
-// UnsetPrincipalHasPrivilegeBelow ensures that no value is present for PrincipalHasPrivilegeBelow, not even an explicit nil
-func (o *ResolveCedarEntitiesResponse) UnsetPrincipalHasPrivilegeBelow() {
-	o.PrincipalHasPrivilegeBelow.Unset()
-}
-
 func (o ResolveCedarEntitiesResponse) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -153,9 +108,6 @@ func (o ResolveCedarEntitiesResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["entities"] = o.Entities
 	toSerialize["entity-count"] = o.EntityCount
-	if o.PrincipalHasPrivilegeBelow.IsSet() {
-		toSerialize["principal-has-privilege-below"] = o.PrincipalHasPrivilegeBelow.Get()
-	}
 	return toSerialize, nil
 }
 

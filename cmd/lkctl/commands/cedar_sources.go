@@ -391,8 +391,5 @@ func printCedarEntities(w io.Writer, wide bool, resp *managementv1.ResolveCedarE
 		fmt.Fprintf(w, " (%d %s entities not shown; -o wide shows them)", hidden, cedarActionType)
 	}
 	fmt.Fprintln(w)
-	if below, ok := resp.GetPrincipalHasPrivilegeBelowOk(); ok && below != nil {
-		fmt.Fprintf(w, "Principal has privilege below: %t\n", *below)
-	}
 	return nil
 }
