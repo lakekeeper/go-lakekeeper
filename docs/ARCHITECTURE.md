@@ -35,9 +35,9 @@ The diagram uses these terms:
   from `pkg/core`. It holds the resource façades, the auth wiring, the
   retries and the `CatalogV1` helper.
 - **Resource façade**: one of the client's fields `Warehouses`, `Projects`,
-  `Roles`, `Users`, `Server`, `Permissions` and `Cedar`: one method call
-  per operation, returning `(value, error)`. `Cedar` needs Lakekeeper+
-  (see [Editions and Capabilities](#editions-and-capabilities)).
+  `Roles`, `Users`, `Server`, `Permissions`, `Cedar` and `TaskQueues`:
+  one method call per operation, returning `(value, error)`. `Cedar` and
+  the Lakekeeper+ queues of `TaskQueues` need Lakekeeper+ (see [Editions and Capabilities](#editions-and-capabilities)).
 - **Generated SDK**: `pkg/apis/management/v1`, generated from the
   Management API's OpenAPI spec (see [GENERATION.md](GENERATION.md)).
   The client embeds its `APIClient`.
@@ -320,6 +320,13 @@ client consult the capabilities (fetching them on first use):
 |---|---|---|
 | `not-lakekeeper-plus` | the operation needs Lakekeeper+ and the server runs Lakekeeper | `requires Lakekeeper+; server is Lakekeeper 0.15.1` |
 | `authz-backend` | the operation needs another authorization backend | `requires the cedar authorization backend; server is Lakekeeper+ 0.15.1 with the openfga authorization backend` |
+| `queue-not-configured` | the operation needs a task queue the server does not run (not in its `queues`) | `requires the optimize task queue; server is Lakekeeper+ 0.15.1 without it` |
+
+The server answers 404 both for a queue it does not run and for a missing
+warehouse; the queue list tells them apart, so a missing warehouse on a
+server that runs the queue stays a not-found. Setting the configuration of
+a queue the server does not know is answered with 400 `QueueNotFound`
+instead; task-queue façades diagnose that answer too.
 
 An `UnsupportedError` does not unwrap to the server's `APIError`, so code
 that treats a 404 as "resource gone" never reads an unsupported operation

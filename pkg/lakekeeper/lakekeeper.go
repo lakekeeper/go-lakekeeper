@@ -148,6 +148,13 @@ const (
 
 	ReasonNotLakekeeperPlus = client.ReasonNotLakekeeperPlus
 	ReasonAuthzBackend      = client.ReasonAuthzBackend
+	// ReasonQueueNotConfigured: the server does not run the task queue.
+	ReasonQueueNotConfigured = client.ReasonQueueNotConfigured
+
+	// Lakekeeper+ task queues, as the server info names them.
+	QueueExpireSnapshots   = client.QueueExpireSnapshots
+	QueueOptimize          = client.QueueOptimize
+	QueueRemoveOrphanFiles = client.QueueRemoveOrphanFiles
 )
 
 // ErrUnsupported matches every *UnsupportedError with errors.Is.

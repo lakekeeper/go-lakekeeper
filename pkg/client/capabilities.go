@@ -113,6 +113,9 @@ type requirement struct {
 	lakekeeperPlus bool
 	// authzBackend, when set, is the authorization backend it needs.
 	authzBackend string
+	// queue, when set, is the task queue it needs the server to run, as
+	// the server info names it in its queues.
+	queue string
 }
 
 // unmet returns why caps do not meet r, or "" when they do.
@@ -125,18 +128,36 @@ func (r requirement) unmet(caps *Capabilities) (UnsupportedReason, string) {
 			"requires the %s authorization backend; server is %s with the %s authorization backend",
 			r.authzBackend, caps, caps.AuthzBackend)
 	}
+	if r.queue != "" && !slices.Contains(caps.Queues, r.queue) {
+		return ReasonQueueNotConfigured, fmt.Sprintf(
+			"requires the %s task queue; server is %s without it", r.queue, caps)
+	}
 	return "", ""
 }
 
+// mayExplain reports whether the server's answer is one the capabilities
+// may explain: 404 or 405, the answers to an unknown operation, and, for a
+// task-queue operation, a 400 QueueNotFound, which Lakekeeper sends for a
+// queue it does not know when setting a queue configuration.
+func (r requirement) mayExplain(apiErr *APIError) bool {
+	switch apiErr.StatusCode {
+	case http.StatusNotFound, http.StatusMethodNotAllowed:
+		return true
+	case http.StatusBadRequest:
+		return r.queue != "" && apiErr.Model != nil && apiErr.Model.GetType() == "QueueNotFound"
+	}
+	return false
+}
+
 // diagnose finishes a gated façade call. Successful calls (err == nil) and
-// failures other than 404 and 405 pass through without a request. For a 404
-// or 405 it consults the cached capabilities: when they explain the failure
+// failures the capabilities cannot explain (see mayExplain) pass through
+// without a request. For the others (404, 405, and a task queue's 400
+// QueueNotFound) it consults the cached capabilities: when they explain the failure
 // it returns an *UnsupportedError, otherwise (a genuine not-found, or the
 // capabilities cannot be fetched) the original error unchanged.
 func (cc *capabilityCache) diagnose(ctx context.Context, req requirement, op string, err error) error {
 	var apiErr *APIError
-	if !errors.As(err, &apiErr) ||
-		(apiErr.StatusCode != http.StatusNotFound && apiErr.StatusCode != http.StatusMethodNotAllowed) {
+	if !errors.As(err, &apiErr) || !req.mayExplain(apiErr) {
 		return err
 	}
 	caps, capsErr := cc.get(ctx)
@@ -171,6 +192,9 @@ const (
 	// ReasonAuthzBackend: the operation needs another authorization
 	// backend than the server runs.
 	ReasonAuthzBackend UnsupportedReason = "authz-backend"
+	// ReasonQueueNotConfigured: the operation needs a task queue the
+	// server does not run.
+	ReasonQueueNotConfigured UnsupportedReason = "queue-not-configured"
 )
 
 // UnsupportedError is the error a capability-gated façade returns when the
