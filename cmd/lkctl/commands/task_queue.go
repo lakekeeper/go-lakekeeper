@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"io"
 	"slices"
+	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 
@@ -46,6 +48,19 @@ type taskQueue struct {
 	get     func(ctx context.Context, c *client.Client, warehouseID string, callOpts []client.CallOption) (any, error)
 	// set decodes body, the JSON of the queue's Set… request, and sends it.
 	set func(ctx context.Context, c *client.Client, warehouseID string, body []byte, callOpts []client.CallOption) error
+	// schedule schedules a task on the queue; nil for a queue without
+	// scheduling.
+	schedule func(ctx context.Context, c *client.Client, warehouseID string, s queueSchedule) (*managementv1.ScheduleTaskResponse, error)
+	// steps: schedule takes optimize steps (--step).
+	steps bool
+}
+
+// queueSchedule is what `schedule` sends: the entity, and optionally when
+// the task runs and which optimize steps it runs.
+type queueSchedule struct {
+	entity       managementv1.WarehouseTaskEntityId
+	scheduledFor *time.Time
+	steps        []managementv1.OptimizeStep
 }
 
 var taskQueues = []taskQueue{
@@ -116,6 +131,13 @@ var taskQueues = []taskQueue{
 			}
 			return c.TaskQueues.SetExpireSnapshotsConfig(ctx, wh, &req)
 		},
+		schedule: func(ctx context.Context, c *client.Client, wh string, s queueSchedule) (*managementv1.ScheduleTaskResponse, error) {
+			req := managementv1.NewScheduleExpireSnapshotsTaskRequest(s.entity)
+			if s.scheduledFor != nil {
+				req.SetScheduledFor(*s.scheduledFor)
+			}
+			return c.TaskQueues.ScheduleExpireSnapshots(ctx, wh, req)
+		},
 	},
 	{
 		use: "optimize", queue: client.QueueOptimize, plus: true,
@@ -136,6 +158,17 @@ var taskQueues = []taskQueue{
 				return err
 			}
 			return c.TaskQueues.SetOptimizeConfig(ctx, wh, &req)
+		},
+		steps: true,
+		schedule: func(ctx context.Context, c *client.Client, wh string, s queueSchedule) (*managementv1.ScheduleTaskResponse, error) {
+			req := managementv1.NewScheduleOptimizeTaskRequest(s.entity)
+			if s.scheduledFor != nil {
+				req.SetScheduledFor(*s.scheduledFor)
+			}
+			if len(s.steps) > 0 {
+				req.SetPayload(managementv1.ScheduleOptimizeTaskRequestPayload{Steps: s.steps})
+			}
+			return c.TaskQueues.ScheduleOptimize(ctx, wh, req)
 		},
 	},
 	{
@@ -160,6 +193,13 @@ var taskQueues = []taskQueue{
 			}
 			return c.TaskQueues.SetRemoveOrphanFilesConfig(ctx, wh, &req)
 		},
+		schedule: func(ctx context.Context, c *client.Client, wh string, s queueSchedule) (*managementv1.ScheduleTaskResponse, error) {
+			req := managementv1.NewScheduleRemoveOrphanFilesTaskRequest(s.entity)
+			if s.scheduledFor != nil {
+				req.SetScheduledFor(*s.scheduledFor)
+			}
+			return c.TaskQueues.ScheduleRemoveOrphanFiles(ctx, wh, req)
+		},
 	},
 }
 
@@ -169,7 +209,8 @@ func newTaskQueueCmd(opts *clientOptions) *cobra.Command {
 		Aliases: []string{"tq"},
 		Short:   "Manage task queues",
 		Long: "Manage task queues.\n\n" +
-			"Each queue has get and set. Queues marked (Lakekeeper+) need a Lakekeeper+ server running the queue.",
+			"Each queue has get and set; the Lakekeeper+ queues also have schedule. " +
+			"Queues marked (Lakekeeper+) need a Lakekeeper+ server running the queue.",
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			return cmd.Help()
 		},
@@ -196,6 +237,9 @@ func newQueueCmd(opts *clientOptions, q taskQueue) *cobra.Command {
 	}
 	cmd.AddCommand(newQueueGetCmd(opts, q))
 	cmd.AddCommand(newQueueSetCmd(opts, q))
+	if q.schedule != nil {
+		cmd.AddCommand(newQueueScheduleCmd(opts, q))
+	}
 	return cmd
 }
 
@@ -307,6 +351,81 @@ func newQueueSetCmd(opts *clientOptions, q taskQueue) *cobra.Command {
 		addProjectFlag(cmd, &project)
 	}
 	return cmd
+}
+
+func newQueueScheduleCmd(opts *clientOptions, q taskQueue) *cobra.Command {
+	var (
+		output       string
+		scheduledFor string
+		steps        []string
+	)
+	short := lakekeeperPlus("Schedule a " + q.queue + " task for a table")
+	long := short + "\n\n" +
+		"The task runs on the next worker poll, or at --scheduled-for (RFC 3339, within about a year). " +
+		"The warehouse and table configuration still apply; the server rejects the task when they disable it."
+	if q.steps {
+		long += "\n\nWithout --step the server runs its default steps. Steps: " + optimizeStepNames() + "."
+	}
+
+	cmd := &cobra.Command{
+		Use:   "schedule <warehouse-id> <table-id>",
+		Short: short,
+		Long:  long,
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			s := queueSchedule{
+				entity: managementv1.WarehouseTaskEntityIdTableAsWarehouseTaskEntityId(
+					managementv1.NewWarehouseTaskEntityIdTable(args[1], "table")),
+			}
+			if scheduledFor != "" {
+				at, err := time.Parse(time.RFC3339, scheduledFor)
+				if err != nil {
+					return fmt.Errorf("invalid --scheduled-for %q: want RFC 3339, e.g. 2030-01-02T03:04:05Z", scheduledFor)
+				}
+				s.scheduledFor = &at
+			}
+			for _, name := range steps {
+				step, err := managementv1.NewOptimizeStepFromValue(name)
+				if err != nil {
+					return fmt.Errorf("invalid --step %q: want one of %s", name, optimizeStepNames())
+				}
+				s.steps = append(s.steps, *step)
+			}
+			if output != "json" && output != "text" {
+				return fmt.Errorf("unknown output format: %s", output)
+			}
+
+			ctx := cmd.Context()
+			c, err := newClient(ctx, opts)
+			if err != nil {
+				return err
+			}
+			resp, err := q.schedule(ctx, c, args[0], s)
+			if err != nil {
+				return err
+			}
+			if output == "json" {
+				return printJSON(cmd.OutOrStdout(), resp)
+			}
+			fmt.Fprintf(cmd.OutOrStdout(), "Task %s scheduled on queue %s for table %s\n", resp.TaskId, q.queue, args[1])
+			return nil
+		},
+	}
+
+	cmd.Flags().StringVarP(&output, "output", "o", "text", "Output format. One of: json|text")
+	cmd.Flags().StringVar(&scheduledFor, "scheduled-for", "", "When the task runs, in RFC 3339; default: the next worker poll")
+	if q.steps {
+		cmd.Flags().StringArrayVar(&steps, "step", nil, "Optimize step to run; repeat for several. One of: "+optimizeStepNames())
+	}
+	return cmd
+}
+
+func optimizeStepNames() string {
+	names := make([]string, 0, len(managementv1.AllowedOptimizeStepEnumValues))
+	for _, s := range managementv1.AllowedOptimizeStepEnumValues {
+		names = append(names, string(s))
+	}
+	return strings.Join(names, ", ")
 }
 
 // queueSetBody builds the JSON of a queue's Set… request from the flags the

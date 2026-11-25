@@ -100,3 +100,84 @@ func TestTaskQueueOnLakekeeper_LakekeeperPlusQueueIsUnsupported(t *testing.T) {
 
 	require.EqualError(t, err, "get remove_orphan_files queue config: requires Lakekeeper+; server is Lakekeeper 0.15.0")
 }
+
+func TestTaskQueueHelp_ScheduleOnlyOnLakekeeperPlusQueues(t *testing.T) {
+	t.Parallel()
+	baseURL := noServer(t)
+
+	for _, plus := range []string{"expire-snapshots", "optimize", "remove-orphan-files"} {
+		help, err := runLkctl(t, baseURL, "task-queue", plus, "--help")
+		require.NoError(t, err)
+		assert.Regexp(t, `schedule\s+.*\(Lakekeeper\+\)`, help)
+	}
+	help, err := runLkctl(t, baseURL, "task-queue", "tabular-purge", "--help")
+	require.NoError(t, err)
+	assert.NotContains(t, help, "schedule")
+}
+
+func TestTaskQueueSchedule_SchedulesTableTask(t *testing.T) {
+	t.Parallel()
+	mux, baseURL := testutil.NewServer(t)
+	schedule := testutil.Respond(t, mux, "POST "+whQueue+"expire_snapshots/schedule", http.StatusOK,
+		`{"task-id":"task-1"}`)
+
+	out, err := runLkctl(t, baseURL, "task-queue", "expire-snapshots", "schedule", "wh-1", "tbl-1",
+		"--scheduled-for", "2030-01-02T03:04:05Z")
+
+	require.NoError(t, err)
+	assert.JSONEq(t,
+		`{"entity":{"type":"table","table-id":"tbl-1"},"scheduled-for":"2030-01-02T03:04:05Z"}`,
+		string(schedule.Last(t).Body))
+	assert.Equal(t, "Task task-1 scheduled on queue expire_snapshots for table tbl-1\n", out)
+}
+
+func TestTaskQueueSchedule_JSONPrintsResponse(t *testing.T) {
+	t.Parallel()
+	mux, baseURL := testutil.NewServer(t)
+	testutil.Respond(t, mux, "POST "+whQueue+"remove_orphan_files/schedule", http.StatusOK, `{"task-id":"task-3"}`)
+
+	out, err := runLkctl(t, baseURL, "task-queue", "remove-orphan-files", "schedule", "wh-1", "tbl-1", "-o", "json")
+
+	require.NoError(t, err)
+	assert.JSONEq(t, `{"task-id":"task-3"}`, out)
+}
+
+func TestTaskQueueSchedule_OptimizeSteps(t *testing.T) {
+	t.Parallel()
+	mux, baseURL := testutil.NewServer(t)
+	schedule := testutil.Respond(t, mux, "POST "+whQueue+"optimize/schedule", http.StatusOK, `{"task-id":"task-2"}`)
+
+	_, err := runLkctl(t, baseURL, "task-queue", "optimize", "schedule", "wh-1", "tbl-1",
+		"--step", "compaction", "--step", "rewrite-manifests")
+
+	require.NoError(t, err)
+	assert.JSONEq(t,
+		`{"entity":{"type":"table","table-id":"tbl-1"},"payload":{"steps":["compaction","rewrite-manifests"]}}`,
+		string(schedule.Last(t).Body))
+}
+
+func TestTaskQueueSchedule_RejectsBadInputWithoutRequest(t *testing.T) {
+	t.Parallel()
+	baseURL := noServer(t)
+
+	_, err := runLkctl(t, baseURL, "task-queue", "optimize", "schedule", "wh-1", "tbl-1", "--step", "vacuum")
+	require.ErrorContains(t, err, `invalid --step "vacuum"`)
+
+	_, err = runLkctl(t, baseURL, "task-queue", "expire-snapshots", "schedule", "wh-1", "tbl-1",
+		"--scheduled-for", "tomorrow")
+	require.ErrorContains(t, err, "invalid --scheduled-for")
+
+	_, err = runLkctl(t, baseURL, "task-queue", "expire-snapshots", "schedule", "wh-1", "tbl-1", "--step", "compaction")
+	require.ErrorContains(t, err, "unknown flag: --step")
+}
+
+func TestTaskQueueScheduleOnLakekeeper_IsUnsupported(t *testing.T) {
+	t.Parallel()
+	mux, baseURL := testutil.NewServer(t)
+	testutil.Respond(t, mux, "POST "+whQueue+"optimize/schedule", http.StatusNotFound, nil)
+	testutil.Respond(t, mux, "GET /management/v1/info", http.StatusOK, serverTestInfoBody)
+
+	_, err := runLkctl(t, baseURL, "task-queue", "optimize", "schedule", "wh-1", "tbl-1")
+
+	require.EqualError(t, err, "schedule optimize task: requires Lakekeeper+; server is Lakekeeper 0.15.0")
+}

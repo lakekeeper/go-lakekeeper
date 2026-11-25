@@ -108,7 +108,7 @@ Top-level commands (and their aliases):
 | `version` | _(none)_ | Print version, commit, build date |
 | `catalog` | _(none)_ | Placeholder — not yet implemented; use `client.CatalogV1` from the SDK |
 | `cedar` | _(none)_ | Cedar policies (Lakekeeper+, Cedar authorization backend) |
-| `task-queue` | `tq` | Show and set task-queue configuration; some queues need Lakekeeper+ |
+| `task-queue` | `tq` | Show and set task-queue configuration, schedule maintenance tasks; some queues need Lakekeeper+ |
 
 The grant / revoke / access / assignments verbs follow the same shape
 across `server`, `project`, `warehouse`, and `role`. Read this section
@@ -372,8 +372,8 @@ the operations that accept the header.
 
 ### `lkctl task-queue`
 
-One subcommand per task queue, each with `get` and `set`. The subcommand
-also accepts the server's queue name (`expire_snapshots`) as an alias.
+One subcommand per task queue, each with `get` and `set`; the Lakekeeper+
+queues also have `schedule`. The subcommand also accepts the server's queue name (`expire_snapshots`) as an alias.
 
 | Queue | Scope | Needs |
 |---|---|---|
@@ -401,6 +401,20 @@ lkctl task-queue task-log-cleanup set -p <project-id> --cleanup-period P1D --ret
 ```
 
 Lakekeeper 0.15 rejects a `task-log-cleanup set` without `--cleanup-period`.
+
+`schedule <warehouse-id> <table-id>` (Lakekeeper+) schedules a task of the
+queue for one table and prints its task id; `-o json` prints the server's
+response. The task runs on the next worker poll, or at `--scheduled-for`
+(RFC 3339). `optimize schedule` takes `--step` once per step to run
+(`compaction`, `rewrite-position-deletes`, `remove-dangling-deletes`,
+`rewrite-manifests`); without it the server runs its default steps. A
+missing warehouse or table is reported as not found.
+
+```sh
+lkctl task-queue expire-snapshots schedule <warehouse-id> <table-id>
+lkctl task-queue optimize schedule <warehouse-id> <table-id> --step compaction --step rewrite-manifests
+lkctl task-queue remove-orphan-files schedule <warehouse-id> <table-id> --scheduled-for 2030-01-02T03:00:00Z
+```
 
 ### `lkctl version` / `lkctl whoami`
 
