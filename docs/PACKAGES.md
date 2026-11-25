@@ -183,7 +183,7 @@ generator's `(value, *http.Response, error)` triple.
 | `c.Users` | Create / Get / Delete / List (paged, server-side name filter) / Update / Whoami / Search / Actions; not project-scoped. Roles / TransitiveRoles (paged, take `client.ListUserRolesOptions`) list the user's role assignments and are project-scoped |
 | `c.Server` | Info / Bootstrap (takes `*managementv1.BootstrapRequest`); not project-scoped. `WithInitialBootstrap` uses the same two calls |
 | `c.Permissions` | Access / Assignments / Grant / Revoke, per resource kind: `.Warehouses`, `.Roles`, `.Projects` (project-scoped), `.Server` |
-| `c.Cedar` | Schema; ListProjectPolicies / GetProjectPolicy / ApplyProjectPolicies (`WithProject`); ListWarehousePolicies / GetWarehousePolicy / ApplyWarehousePolicies; BreakGlassStatus (`WithProject`, sent as the `project-id` query parameter). List and Apply accept `WithBreakGlass`. Lakekeeper+ with the Cedar authorization backend; see [Capabilities and `ErrUnsupported`](#capabilities-and-errunsupported) |
+| `c.Cedar` | Schema; ListProjectPolicies / GetProjectPolicy / ApplyProjectPolicies (`WithProject`); ListWarehousePolicies / GetWarehousePolicy / ApplyWarehousePolicies; BreakGlassStatus (`WithProject`, sent as the `project-id` query parameter); PolicySources / EntitySources; ListServerPolicies (takes the generated `ListCedarPoliciesQuery`, paged); ResolveEntities (no `WithProject`: the spec gives it no `x-project-id` header). List and Apply accept `WithBreakGlass`. Lakekeeper+ with the Cedar authorization backend; see [Capabilities and `ErrUnsupported`](#capabilities-and-errunsupported) |
 
 ```go
 wh, err := c.Warehouses.Get(ctx, id)                // façade — one call

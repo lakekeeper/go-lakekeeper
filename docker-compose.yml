@@ -81,6 +81,7 @@ services:
       - LAKEKEEPER__PG_DATABASE_URL_WRITE=postgresql://postgres:postgres@db:5432/postgres
       - LAKEKEEPER__AUTHZ_BACKEND=cedar
       - LAKEKEEPER__CEDAR__POLICY_SOURCES__LOCAL_FILES=[/etc/lakekeeper/cedar/policies.cedar]
+      - LAKEKEEPER__CEDAR__ENTITY_JSON_SOURCES__LOCAL_FILES=[/etc/lakekeeper/cedar/entities.json]
       - LAKEKEEPER__LICENSE__KEY
       - LAKEKEEPER__OPENID_PROVIDER_URI=http://keycloak:8080/realms/iceberg
       - LAKEKEEPER__OPENID_ADDITIONAL_ISSUERS=http://localhost:30080/realms/iceberg
