@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -70,6 +71,35 @@ func capabilitiesFromServerInfo(info *managementv1.ServerInfo) *Capabilities {
 	return caps
 }
 
+// capabilitiesFromBody reads the capabilities from a server info body the
+// generated model could not decode. It returns nil when the body names no
+// Lakekeeper version.
+func capabilitiesFromBody(body []byte) *Capabilities {
+	var info struct {
+		LakekeeperVersion           string   `json:"lakekeeper-version"`
+		LakekeeperEnterpriseVersion *string  `json:"lakekeeper-enterprise-version"`
+		AuthzBackend                string   `json:"authz-backend"`
+		Queues                      []string `json:"queues"`
+	}
+	if json.Unmarshal(body, &info) != nil {
+		return nil
+	}
+	if info.LakekeeperVersion == "" {
+		return nil
+	}
+	caps := &Capabilities{
+		Edition:           EditionLakekeeper,
+		LakekeeperVersion: info.LakekeeperVersion,
+		AuthzBackend:      info.AuthzBackend,
+		Queues:            info.Queues,
+	}
+	if v := info.LakekeeperEnterpriseVersion; v != nil && *v != "" {
+		caps.Edition = EditionLakekeeperPlus
+		caps.LakekeeperPlusVersion = *v
+	}
+	return caps
+}
+
 // Capabilities returns what the server can do. The server info behind it is
 // fetched on the first call (or the first diagnosed failure of a gated
 // façade) and cached for the life of the Client; a failed fetch is not
@@ -79,9 +109,12 @@ func (c *Client) Capabilities(ctx context.Context) (*Capabilities, error) {
 }
 
 // capabilityCache fetches the server's capabilities once per Client. The
-// façades that gate operations on a capability share it.
+// façades that gate operations on a capability share it, and Server.Info
+// fills it on every fetch.
 type capabilityCache struct {
 	server *Server
+	// observe is the WithCapabilitiesObserver callback; nil when not set.
+	observe func(Capabilities)
 
 	mu   sync.Mutex
 	caps *Capabilities
@@ -92,15 +125,31 @@ func (cc *capabilityCache) get(ctx context.Context) (*Capabilities, error) {
 	cc.mu.Lock()
 	defer cc.mu.Unlock()
 	if cc.caps == nil {
-		info, err := cc.server.Info(ctx)
-		if err != nil {
+		_, caps, err := cc.server.fetchInfo(ctx)
+		if caps == nil {
 			return nil, fmt.Errorf("capabilities: %w", err)
 		}
-		cc.caps = capabilitiesFromServerInfo(info)
+		cc.setLocked(caps)
 	}
 	caps := *cc.caps
 	caps.Queues = slices.Clone(cc.caps.Queues)
 	return &caps, nil
+}
+
+// record stores caps read by a server info fetch outside the cache.
+func (cc *capabilityCache) record(caps *Capabilities) {
+	cc.mu.Lock()
+	defer cc.mu.Unlock()
+	cc.setLocked(caps)
+}
+
+func (cc *capabilityCache) setLocked(caps *Capabilities) {
+	cc.caps = caps
+	if cc.observe != nil {
+		observed := *caps
+		observed.Queues = slices.Clone(caps.Queues)
+		cc.observe(observed)
+	}
 }
 
 // requirement is what a capability-gated façade operation needs from the
@@ -118,8 +167,10 @@ type requirement struct {
 	queue string
 }
 
-// unmet returns why caps do not meet r, or "" when they do.
-func (r requirement) unmet(caps *Capabilities) (UnsupportedReason, string) {
+// unmet returns why caps do not meet r, or "" when they do. apiErr is the
+// server's failed answer, nil for a successful one; it decides whether an
+// older server counts as too old.
+func (r requirement) unmet(caps *Capabilities, apiErr *APIError) (UnsupportedReason, string) {
 	if r.lakekeeperPlus && caps.Edition != EditionLakekeeperPlus {
 		return ReasonNotLakekeeperPlus, "requires Lakekeeper+; server is " + caps.String()
 	}
@@ -132,7 +183,41 @@ func (r requirement) unmet(caps *Capabilities) (UnsupportedReason, string) {
 		return ReasonQueueNotConfigured, fmt.Sprintf(
 			"requires the %s task queue; server is %s without it", r.queue, caps)
 	}
+	if release, ok := r.newerThan(caps, apiErr); ok {
+		return ReasonServerTooOld, fmt.Sprintf("requires %s %s or later; server is %s", r.specEdition(), release, caps)
+	}
 	return "", ""
+}
+
+// specEdition is the edition whose spec the operation came from: a
+// Lakekeeper+-only operation came from the Lakekeeper+ spec.
+func (r requirement) specEdition() Edition {
+	if r.lakekeeperPlus {
+		return EditionLakekeeperPlus
+	}
+	return EditionLakekeeper
+}
+
+// newerThan reports whether the release of the spec the operation came from
+// is newer than the server's version for that edition, and returns the
+// release. Only an answer without a Lakekeeper error body counts: that is
+// how a server answers a route it does not know, while a 404 with an error
+// body is a genuine not-found, which an older server sends too.
+func (r requirement) newerThan(caps *Capabilities, apiErr *APIError) (string, bool) {
+	if apiErr == nil || apiErr.Model != nil {
+		return "", false
+	}
+	serverVersion := caps.LakekeeperVersion
+	if r.specEdition() == EditionLakekeeperPlus {
+		serverVersion = caps.LakekeeperPlusVersion
+	}
+	release := specRelease(r.specEdition())
+	have, ok := parseVersion(serverVersion)
+	want, wantOK := parseVersion(release)
+	if !ok || !wantOK || !have.less(want) {
+		return "", false
+	}
+	return release, true
 }
 
 // mayExplain reports whether the server's answer is one the capabilities
@@ -164,7 +249,7 @@ func (cc *capabilityCache) diagnose(ctx context.Context, req requirement, op str
 	if capsErr != nil {
 		return err
 	}
-	reason, sentence := req.unmet(caps)
+	reason, sentence := req.unmet(caps, apiErr)
 	if reason == "" {
 		return err
 	}
@@ -195,10 +280,15 @@ const (
 	// ReasonQueueNotConfigured: the operation needs a task queue the
 	// server does not run.
 	ReasonQueueNotConfigured UnsupportedReason = "queue-not-configured"
+	// ReasonServerTooOld: the server answers the operation as an unknown
+	// route and its version, for the edition whose spec the operation came
+	// from, is older than that spec's release.
+	ReasonServerTooOld UnsupportedReason = "server-too-old"
 )
 
 // UnsupportedError is the error a capability-gated façade returns when the
-// server rejects the operation as unknown (404 or 405) and the server's
+// server rejects the operation as unknown (404 or 405, or a task queue's
+// 400 QueueNotFound or empty configuration) and the server's
 // capabilities explain why. Match it with errors.Is(err, ErrUnsupported)
 // or errors.As(err, &unsupported).
 //
@@ -213,7 +303,9 @@ type UnsupportedError struct {
 	Reason UnsupportedReason
 	// Server is the server's capabilities.
 	Server Capabilities
-	// APIError is the server's original answer.
+	// APIError is the server's original answer; nil when the server
+	// answered with success, as Lakekeeper 0.15.0 does to a Lakekeeper+
+	// queue configuration read (see TaskQueues).
 	APIError *APIError
 
 	op       string

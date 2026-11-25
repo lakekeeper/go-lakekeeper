@@ -38,6 +38,10 @@ type settings struct {
 	bootstrap           bool
 	bootstrapAsOperator bool
 	bootstrapUserType   *managementv1.UserType
+
+	// observeCapabilities, if set, is called with the capabilities read
+	// from every server info fetch.
+	observeCapabilities func(Capabilities)
 }
 
 func defaultSettings() settings {
@@ -149,6 +153,25 @@ func WithInitialBootstrap(acceptTermsOfUse, isOperator bool, userType *managemen
 		s.bootstrap = true
 		s.bootstrapAsOperator = isOperator
 		s.bootstrapUserType = userType
+		return nil
+	}
+}
+
+// WithCapabilitiesObserver registers observe, called with the server's
+// capabilities each time the client reads the server info: Server.Info,
+// WithInitialBootstrap, and the first Capabilities call or diagnosed failure
+// of a gated façade. It sends no request of its own, so tooling can, for
+// example, warn about a server outside SupportedVersions without an extra
+// round trip, as lkctl does. A nil observe fails construction.
+//
+// observe runs on the goroutine that made the call, before that call
+// returns; it must not call back into the Client.
+func WithCapabilitiesObserver(observe func(Capabilities)) Option {
+	return func(s *settings) error {
+		if observe == nil {
+			return errors.New("capabilities observer must not be nil")
+		}
+		s.observeCapabilities = observe
 		return nil
 	}
 }

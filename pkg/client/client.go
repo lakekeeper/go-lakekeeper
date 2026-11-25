@@ -121,7 +121,8 @@ func NewWithAuthSource(ctx context.Context, baseURL string, as core.AuthSource, 
 
 	api := managementv1.NewAPIClient(cfg)
 	server := &Server{api: api.ServerAPI}
-	caps := &capabilityCache{server: server}
+	caps := &capabilityCache{server: server, observe: settings.observeCapabilities}
+	server.caps = caps
 	c := &Client{
 		APIClient:  api,
 		Warehouses: &Warehouses{api: api.WarehouseAPI},

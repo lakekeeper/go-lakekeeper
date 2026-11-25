@@ -105,3 +105,81 @@ func TestCapabilities_FailedFetchIsNotCached(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, client.EditionLakekeeper, got.Edition)
 }
+
+// An older server's info can lack a field the generated model requires. The
+// capabilities do not need it, so they are still read.
+func TestCapabilities_FromServerInfoTheModelCannotDecode(t *testing.T) {
+	t.Parallel()
+	mux, c := testutil.ServerMux(t)
+	info := testutil.Respond(t, mux, "GET /management/v1/info", http.StatusOK,
+		`{"version":"0.13.9","lakekeeper-version":"0.13.9","authz-backend":"openfga","queues":["tabular_purge"]}`)
+
+	_, infoErr := c.Server.Info(t.Context())
+	got, err := c.Capabilities(t.Context())
+
+	require.Error(t, infoErr, "the model still rejects the info")
+	require.NoError(t, err)
+	assert.Equal(t, &client.Capabilities{
+		Edition:           client.EditionLakekeeper,
+		LakekeeperVersion: "0.13.9",
+		AuthzBackend:      "openfga",
+		Queues:            []string{"tabular_purge"},
+	}, got)
+	assert.Equal(t, 1, info.Len(), "Server.Info fills the capabilities; no second request")
+}
+
+// Server.Info fills the capabilities, so a later Capabilities call or
+// diagnosis costs no request.
+func TestCapabilities_AfterServerInfoCostNoRequest(t *testing.T) {
+	t.Parallel()
+	mux, c := testutil.ServerMux(t)
+	info := testutil.Respond(t, mux, "GET /management/v1/info", http.StatusOK, lakekeeperInfo())
+
+	_, err := c.Server.Info(t.Context())
+	require.NoError(t, err)
+	got, err := c.Capabilities(t.Context())
+
+	require.NoError(t, err)
+	assert.Equal(t, "Lakekeeper 0.15.1", got.String())
+	assert.Equal(t, 1, info.Len(), "server info requests")
+}
+
+func TestWithCapabilitiesObserver_SeesEveryServerInfoFetch(t *testing.T) {
+	t.Parallel()
+	var seen []string
+	mux, c := observedClient(t, func(caps client.Capabilities) { seen = append(seen, caps.String()) })
+	testutil.Respond(t, mux, "GET /management/v1/info", http.StatusOK, lakekeeperInfo())
+	testutil.Respond(t, mux, cedarSchemaPath, http.StatusNotFound, nil)
+
+	_, err := c.Server.Info(t.Context())
+	require.NoError(t, err)
+	_, err = c.Server.Info(t.Context())
+	require.NoError(t, err)
+	_, err = c.Cedar.Schema(t.Context())
+	require.ErrorIs(t, err, client.ErrUnsupported)
+
+	assert.Equal(t, []string{"Lakekeeper 0.15.1", "Lakekeeper 0.15.1"}, seen,
+		"one call per fetch; the diagnosis reuses the cached capabilities")
+}
+
+func TestWithCapabilitiesObserver_NotCalledWithoutServerInfo(t *testing.T) {
+	t.Parallel()
+	called := false
+	mux, c := observedClient(t, func(client.Capabilities) { called = true })
+	testutil.Respond(t, mux, "GET /management/v1/project-list", http.StatusOK, `{"projects":[]}`)
+
+	_, err := c.Projects.List(t.Context())
+
+	require.NoError(t, err)
+	assert.False(t, called)
+}
+
+// observedClient is testutil.ServerMux with a capabilities observer.
+func observedClient(t *testing.T, observe func(client.Capabilities)) (*http.ServeMux, *client.Client) {
+	t.Helper()
+	mux, baseURL := testutil.NewServer(t)
+	c, err := client.New(t.Context(), baseURL, "test-token",
+		client.WithoutRetries(), client.WithCapabilitiesObserver(observe))
+	require.NoError(t, err)
+	return mux, c
+}

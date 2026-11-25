@@ -140,6 +140,9 @@ type (
 	UnsupportedError = client.UnsupportedError
 	// UnsupportedReason says why the server does not offer an operation.
 	UnsupportedReason = client.UnsupportedReason
+	// VersionRange is the server versions of one edition the SDK supports
+	// (SupportedVersions, Capabilities.SupportedVersions).
+	VersionRange = client.VersionRange
 )
 
 // Editions, authorization backends and unsupported reasons.
@@ -154,6 +157,9 @@ const (
 	ReasonAuthzBackend      = client.ReasonAuthzBackend
 	// ReasonQueueNotConfigured: the server does not run the task queue.
 	ReasonQueueNotConfigured = client.ReasonQueueNotConfigured
+	// ReasonServerTooOld: the server is older than the release of the spec
+	// the operation came from.
+	ReasonServerTooOld = client.ReasonServerTooOld
 
 	// Lakekeeper+ task queues, as the server info names them.
 	QueueExpireSnapshots   = client.QueueExpireSnapshots
@@ -176,6 +182,9 @@ var (
 	WithBackoff          = client.WithBackoff
 	WithErrorHandler     = client.WithErrorHandler
 	WithInitialBootstrap = client.WithInitialBootstrap
+
+	WithCapabilitiesObserver = client.WithCapabilitiesObserver
+	SupportedVersions        = client.SupportedVersions
 
 	WrapAPIError = client.WrapAPIError
 
