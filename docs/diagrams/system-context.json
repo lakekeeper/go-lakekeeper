@@ -3,14 +3,14 @@
   "diagram_type": "architecture",
   "meta": {
     "title": "System context: go-lakekeeper",
-    "output": ".archify/architecture-system-context-20261125-132044/system-context.html",
+    "output": ".archify/architecture-system-context-20261125-134517/system-context.html",
     "quality_profile": "showcase",
     "locale": "en",
     "repository": {
       "url": "git@github.com:lakekeeper/go-lakekeeper.git",
       "provider": "github",
       "link_mode": "local-only",
-      "revision": "b3fb0e39dc74aa8a6487ad81e32b147ec12098c5"
+      "revision": "ba562aa91fcec34dad0b356e9b46d1188be748f9"
     },
     "legend": {
       "entries": {
@@ -33,7 +33,7 @@
       "pos": [625, 40],
       "size": [150, 64],
       "sources": [
-        { "path": "cmd/lkctl/commands/client.go", "line": 95, "end_line": 114, "label": "newClient builds a *client.Client" },
+        { "path": "cmd/lkctl/commands/client.go", "line": 93, "end_line": 117, "label": "newClient builds a *client.Client" },
         { "path": ".golangci.yml", "line": 46, "end_line": 64, "label": "forbidigo: cmd/ calls façades only" }
       ]
     },
@@ -56,8 +56,8 @@
       "pos": [280, 200],
       "size": [150, 64],
       "sources": [
-        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 16, "end_line": 35, "label": "what it re-exports" },
-        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 50, "end_line": 87, "label": "constructors and Client alias" }
+        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 16, "end_line": 44, "label": "what it re-exports" },
+        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 59, "end_line": 96, "label": "constructors and Client alias" }
       ]
     },
     {
@@ -108,7 +108,7 @@
       "size": [150, 64],
       "sources": [
         { "path": "pkg/core/auth.go", "line": 84, "end_line": 105, "label": "client credentials token source" },
-        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 50, "end_line": 65, "label": "NewOAuthClientCredentials" },
+        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 59, "end_line": 74, "label": "NewOAuthClientCredentials" },
         { "path": "docker-compose.yml", "line": 274, "end_line": 288, "label": "Keycloak in the compose stack" }
       ]
     },

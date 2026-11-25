@@ -3,14 +3,14 @@
   "diagram_type": "architecture",
   "meta": {
     "title": "Authentication: auth sources, construction and requests",
-    "output": ".archify/architecture-authentication-20261125-132054/authentication.html",
+    "output": ".archify/architecture-authentication-20261125-134521/authentication.html",
     "quality_profile": "showcase",
     "locale": "en",
     "repository": {
       "url": "git@github.com:lakekeeper/go-lakekeeper.git",
       "provider": "github",
       "link_mode": "local-only",
-      "revision": "b3fb0e39dc74aa8a6487ad81e32b147ec12098c5"
+      "revision": "ba562aa91fcec34dad0b356e9b46d1188be748f9"
     },
     "legend": {
       "entries": {
@@ -32,9 +32,9 @@
       "pos": [40, 200],
       "size": [200, 64],
       "sources": [
-        { "path": "cmd/lkctl/commands/root.go", "line": 52, "end_line": 54, "label": "--auth-mode flag" },
-        { "path": "cmd/lkctl/commands/client.go", "line": 98, "end_line": 114, "label": "newClient" },
-        { "path": "cmd/lkctl/commands/client.go", "line": 116, "end_line": 137, "label": "buildAuthSource" }
+        { "path": "cmd/lkctl/commands/root.go", "line": 51, "end_line": 53, "label": "--auth-mode flag" },
+        { "path": "cmd/lkctl/commands/client.go", "line": 96, "end_line": 135, "label": "newClient, then --bootstrap" },
+        { "path": "cmd/lkctl/commands/client.go", "line": 137, "end_line": 158, "label": "buildAuthSource" }
       ]
     },
     {
@@ -45,9 +45,9 @@
       "pos": [40, 340],
       "size": [200, 64],
       "sources": [
-        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 56, "end_line": 65, "label": "NewOAuthClientCredentials" },
-        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 73, "end_line": 79, "label": "NewK8sServiceAccount" },
-        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 174, "end_line": 175, "label": "New, NewWithAuthSource" }
+        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 65, "end_line": 74, "label": "NewOAuthClientCredentials" },
+        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 82, "end_line": 88, "label": "NewK8sServiceAccount" },
+        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 190, "end_line": 191, "label": "New, NewWithAuthSource" }
       ]
     },
     {
@@ -83,7 +83,7 @@
       "pos": [800, 40],
       "size": [220, 64],
       "sources": [
-        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 57, "end_line": 63, "label": "client-credentials config" }
+        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 66, "end_line": 72, "label": "client-credentials config" }
       ]
     },
     {
@@ -149,7 +149,7 @@
       "pos": [380, 640],
       "size": [200, 64],
       "sources": [
-        { "path": "pkg/client/client_options.go", "line": 148, "end_line": 158, "label": "no-op without terms" },
+        { "path": "pkg/client/client_options.go", "line": 144, "end_line": 154, "label": "no-op without terms" },
         { "path": "pkg/client/client.go", "line": 149, "end_line": 154, "label": "runs after wiring" },
         { "path": "pkg/client/client.go", "line": 219, "end_line": 236, "label": "runBootstrap" }
       ]

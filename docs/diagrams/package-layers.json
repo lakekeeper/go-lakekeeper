@@ -3,14 +3,14 @@
   "diagram_type": "architecture",
   "meta": {
     "title": "Package layers: go-lakekeeper",
-    "output": ".archify/architecture-package-layers-20261125-132058/package-layers.html",
+    "output": ".archify/architecture-package-layers-20261125-134525/package-layers.html",
     "quality_profile": "showcase",
     "locale": "en",
     "repository": {
       "url": "git@github.com:lakekeeper/go-lakekeeper.git",
       "provider": "github",
       "link_mode": "local-only",
-      "revision": "b3fb0e39dc74aa8a6487ad81e32b147ec12098c5"
+      "revision": "ba562aa91fcec34dad0b356e9b46d1188be748f9"
     },
     "legend": {
       "entries": {
@@ -43,8 +43,8 @@
       "pos": [40, 200],
       "size": [200, 324],
       "sources": [
-        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 16, "end_line": 35, "label": "what it re-exports" },
-        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 37, "end_line": 48, "label": "imports" }
+        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 16, "end_line": 44, "label": "what it re-exports" },
+        { "path": "pkg/lakekeeper/lakekeeper.go", "line": 46, "end_line": 57, "label": "imports" }
       ]
     },
     {
