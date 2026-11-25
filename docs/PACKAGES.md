@@ -109,6 +109,9 @@ wh, err := c.Warehouses.Create(ctx, req, lakekeeper.WithProject(projectID))
 
 What it re-exports:
 - `Client`, `Option`, and every constructor from [`pkg/client`](#pkgclient).
+- `Capabilities`, `Edition`, `ErrUnsupported`, `UnsupportedError`,
+  `UnsupportedReason` and their constants (`EditionLakekeeperPlus`,
+  `AuthzBackendCedar`, `ReasonNotLakekeeperPlus`, …).
 - All storage profile, delete profile and credential builders from
   `pkg/storage/{profile,credential}`, and the profiles' discriminator
   constants (`StorageProfileTypeS3`, `DeleteProfileTypeSoft`, …).
@@ -139,7 +142,7 @@ provides no behaviour of its own — every symbol resolves through
 
 The top-level facade and the public SDK interface. `Client` carries the
 resource façades (`Warehouses`, `Projects`, `Roles`, `Users`, `Server`,
-`Permissions`), auth wiring (via `core.AuthSource` and a custom
+`Permissions`, `Cedar`), auth wiring (via `core.AuthSource` and a custom
 `http.RoundTripper`), optional retry behaviour, optional bootstrap on
 construction, and a `CatalogV1` helper that delegates to
 `apache/iceberg-go`. It also embeds the generated
@@ -180,6 +183,7 @@ generator's `(value, *http.Response, error)` triple.
 | `c.Users` | Create / Get / Delete / List (paged, server-side name filter) / Update / Whoami / Search / Actions; not project-scoped. Roles / TransitiveRoles (paged, take `client.ListUserRolesOptions`) list the user's role assignments and are project-scoped |
 | `c.Server` | Info / Bootstrap (takes `*managementv1.BootstrapRequest`); not project-scoped. `WithInitialBootstrap` uses the same two calls |
 | `c.Permissions` | Access / Assignments / Grant / Revoke, per resource kind: `.Warehouses`, `.Roles`, `.Projects` (project-scoped), `.Server` |
+| `c.Cedar` | Schema. Lakekeeper+ with the Cedar authorization backend; see [Capabilities and `ErrUnsupported`](#capabilities-and-errunsupported) |
 
 ```go
 wh, err := c.Warehouses.Get(ctx, id)                // façade — one call
@@ -315,6 +319,52 @@ if err != nil {
 ```
 
 `resp` may be `nil`; the status is then unknown.
+
+### Capabilities and `ErrUnsupported`
+
+`c.Capabilities(ctx)` returns a `*client.Capabilities`: the server's
+edition (`client.EditionLakekeeper` or `client.EditionLakekeeperPlus`),
+Lakekeeper version, Lakekeeper+ version (empty on Lakekeeper),
+authorization backend and task queues. It is fetched once per client and
+cached. [ARCHITECTURE.md](ARCHITECTURE.md#editions-and-capabilities)
+describes editions, capabilities and the lazy diagnosis.
+
+A capability-gated façade (`c.Cedar`) that the server rejects with 404 or
+405 returns an `*client.UnsupportedError` when the capabilities explain
+why, and the original `*APIError` otherwise:
+
+| Field | Meaning |
+|---|---|
+| `Feature` | What the operation belongs to, for example `"Cedar"` |
+| `Reason` | `client.ReasonNotLakekeeperPlus` (`not-lakekeeper-plus`) or `client.ReasonAuthzBackend` (`authz-backend`) |
+| `Server` | The server's `Capabilities` |
+| `APIError` | The server's original answer; not unwrapped, so `errors.As(err, &apiErr)` does not match |
+
+```go
+schema, err := c.Cedar.Schema(ctx)
+var unsupported *client.UnsupportedError
+switch {
+case errors.As(err, &unsupported):
+    // e.g. "get cedar schema: requires Lakekeeper+; server is Lakekeeper 0.15.1"
+    log.Printf("skipping %s: %s", unsupported.Feature, unsupported.Reason)
+case err != nil:
+    return err
+}
+```
+
+`errors.Is(err, client.ErrUnsupported)` matches every `UnsupportedError`.
+
+**Adding a gated façade.** What an operation needs is declared once, as a
+`requirement` value next to the façade type (`cedarRequirement` in
+`pkg/client/cedar.go`: Lakekeeper+ and the `cedar` backend). The façade
+holds the client's shared capability cache, sends its request, and passes
+the wrapped error through `caps.diagnose(ctx, requirement, op, err)`:
+
+```go
+out, resp, err := c.api.GetCedarSchema(ctx).Execute()
+out, err = entityResult(op, out, resp, err)
+return out, c.caps.diagnose(ctx, cedarRequirement, op, err)
+```
 
 ### Escape hatch: embedded generated services
 

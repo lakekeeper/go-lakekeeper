@@ -126,7 +126,32 @@ type (
 
 	// ListRolesOptions holds the query parameters of Roles.List.
 	ListRolesOptions = client.ListRolesOptions
+
+	// Capabilities describes what one server can do (Client.Capabilities).
+	Capabilities = client.Capabilities
+	// Edition is Lakekeeper or Lakekeeper+.
+	Edition = client.Edition
+	// UnsupportedError is the error a capability-gated façade returns when
+	// the server's capabilities explain why it rejected the operation.
+	UnsupportedError = client.UnsupportedError
+	// UnsupportedReason says why the server does not offer an operation.
+	UnsupportedReason = client.UnsupportedReason
 )
+
+// Editions, authorization backends and unsupported reasons.
+const (
+	EditionLakekeeper     = client.EditionLakekeeper
+	EditionLakekeeperPlus = client.EditionLakekeeperPlus
+
+	AuthzBackendCedar   = client.AuthzBackendCedar
+	AuthzBackendOpenFGA = client.AuthzBackendOpenFGA
+
+	ReasonNotLakekeeperPlus = client.ReasonNotLakekeeperPlus
+	ReasonAuthzBackend      = client.ReasonAuthzBackend
+)
+
+// ErrUnsupported matches every *UnsupportedError with errors.Is.
+var ErrUnsupported = client.ErrUnsupported
 
 var (
 	New                  = client.New

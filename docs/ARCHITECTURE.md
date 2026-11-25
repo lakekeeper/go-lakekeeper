@@ -35,8 +35,9 @@ The diagram uses these terms:
   from `pkg/core`. It holds the resource façades, the auth wiring, the
   retries and the `CatalogV1` helper.
 - **Resource façade**: one of the client's fields `Warehouses`, `Projects`,
-  `Roles`, `Users`, `Server` and `Permissions`: one method call per
-  operation, returning `(value, error)`.
+  `Roles`, `Users`, `Server`, `Permissions` and `Cedar`: one method call
+  per operation, returning `(value, error)`. `Cedar` needs Lakekeeper+
+  (see [Editions and Capabilities](#editions-and-capabilities)).
 - **Generated SDK**: `pkg/apis/management/v1`, generated from the
   Management API's OpenAPI spec (see [GENERATION.md](GENERATION.md)).
   The client embeds its `APIClient`.
@@ -277,3 +278,50 @@ and should leave the deprecated `ProjectId(...)` query builder and
 `project-id` body field unset, for the reason above. Project-independent
 operations (server, users, project create and list) do not need the
 header.
+
+## Editions and Capabilities
+
+A server runs one of two **editions**: **Lakekeeper** (open source) or
+**Lakekeeper+** (commercial, a superset of Lakekeeper's API). One SDK and
+one `lkctl` binary serve both: the generated package holds the operations
+of both editions (see [GENERATION.md](GENERATION.md)), and every façade
+and command exists whichever server the client talks to.
+
+A **capability** is something a particular server can do, decided by its
+edition, its version, its authorization backend and the task queues it
+runs. Cedar policies, for example, need Lakekeeper+ running the Cedar
+authorization backend. `client.Capabilities` describes one server:
+
+| Field | From the server info |
+|---|---|
+| `Edition` | `EditionLakekeeperPlus` when `lakekeeper-enterprise-version` is set, else `EditionLakekeeper` |
+| `LakekeeperVersion` | `lakekeeper-version` |
+| `LakekeeperPlusVersion` | `lakekeeper-enterprise-version`; empty on Lakekeeper |
+| `AuthzBackend` | `authz-backend` (`cedar`, `openfga`, …) |
+| `Queues` | `queues` |
+
+`c.Capabilities(ctx)` returns it. The client fetches the server info for
+it once and keeps it for its lifetime; a failed fetch is not kept.
+
+**Diagnosis is lazy.** A capability-gated façade, such as `c.Cedar`, sends
+its request without checking anything first, so a successful call costs
+exactly one request. Only when the server answers 404 or 405 does the
+client consult the capabilities (fetching them on first use):
+
+- If they explain the failure, the façade returns an
+  `*client.UnsupportedError` that names the feature and the reason, and
+  matches `errors.Is(err, client.ErrUnsupported)`.
+- Otherwise the server has what the operation needs, so the 404 is a
+  genuine not-found (a missing warehouse, say), and the façade returns the
+  original `APIError` unchanged. It does the same when the capabilities
+  cannot be fetched.
+
+| Reason | When | Message, after the operation name |
+|---|---|---|
+| `not-lakekeeper-plus` | the operation needs Lakekeeper+ and the server runs Lakekeeper | `requires Lakekeeper+; server is Lakekeeper 0.15.1` |
+| `authz-backend` | the operation needs another authorization backend | `requires the cedar authorization backend; server is Lakekeeper+ 0.15.1 with the openfga authorization backend` |
+
+An `UnsupportedError` does not unwrap to the server's `APIError`, so code
+that treats a 404 as "resource gone" never reads an unsupported operation
+as a missing resource. Each gated façade declares what it needs once, next
+to its type; see [PACKAGES.md](PACKAGES.md#capabilities-and-errunsupported).
