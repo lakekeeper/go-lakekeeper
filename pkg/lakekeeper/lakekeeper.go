@@ -17,7 +17,7 @@
 //
 //   - Client + constructors and client Options, APIError and WrapAPIError
 //     from pkg/client
-//   - CallOption and WithProject, and every façade …Options type (e.g.
+//   - CallOption, WithProject and WithBreakGlass, and every façade …Options type (e.g.
 //     ListWarehousesOptions, ListRolesOptions, GetServerAccessOptions)
 //   - Storage profile, delete profile and credential builders from
 //     pkg/storage/{profile,credential}
@@ -175,7 +175,8 @@ var (
 
 	WrapAPIError = client.WrapAPIError
 
-	WithProject = client.WithProject
+	WithProject    = client.WithProject
+	WithBreakGlass = client.WithBreakGlass
 )
 
 // Storage profile builders + option types.

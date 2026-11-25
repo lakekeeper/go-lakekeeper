@@ -183,7 +183,7 @@ generator's `(value, *http.Response, error)` triple.
 | `c.Users` | Create / Get / Delete / List (paged, server-side name filter) / Update / Whoami / Search / Actions; not project-scoped. Roles / TransitiveRoles (paged, take `client.ListUserRolesOptions`) list the user's role assignments and are project-scoped |
 | `c.Server` | Info / Bootstrap (takes `*managementv1.BootstrapRequest`); not project-scoped. `WithInitialBootstrap` uses the same two calls |
 | `c.Permissions` | Access / Assignments / Grant / Revoke, per resource kind: `.Warehouses`, `.Roles`, `.Projects` (project-scoped), `.Server` |
-| `c.Cedar` | Schema. Lakekeeper+ with the Cedar authorization backend; see [Capabilities and `ErrUnsupported`](#capabilities-and-errunsupported) |
+| `c.Cedar` | Schema; ListProjectPolicies / GetProjectPolicy / ApplyProjectPolicies (`WithProject`); ListWarehousePolicies / GetWarehousePolicy / ApplyWarehousePolicies; BreakGlassStatus (`WithProject`, sent as the `project-id` query parameter). List and Apply accept `WithBreakGlass`. Lakekeeper+ with the Cedar authorization backend; see [Capabilities and `ErrUnsupported`](#capabilities-and-errunsupported) |
 | `c.TaskQueues` | `<Queue>Config` / `Set<Queue>Config` per task queue: TabularPurge, SoftDeletion (by warehouse id), TaskLogCleanup (project-scoped); ExpireSnapshots, Optimize, RemoveOrphanFiles (by warehouse id; Lakekeeper+ running the queue). See [Task-queue configuration](#task-queue-configuration) |
 
 ```go
@@ -197,7 +197,7 @@ warehouses, projects, roles, users, and the server, plus access,
 assignments, grant, and revoke for warehouse, role, project, and server
 permissions. `lkctl` commands call only the façades. Not covered, and
 reachable only through the [embedded generated
-services](#escape-hatch-embedded-generated-services): tags, tasks, grants,
+services](#escape-hatch-embedded-generated-services): tags, task listing and control, grants,
 authorization checks, namespace and tabular protections, warehouse managed
 access, and the less common warehouse operations (storage credential and
 profile updates, undrop, tabular search, …). For those, custom request
@@ -221,6 +221,13 @@ options, or the raw `*http.Response`, use the escape hatch.
   (`Projects.Delete`, `Permissions.Projects.Grant` / `Revoke`) require
   the option and fail with `client.ErrProjectRequired` without it. See
   [ARCHITECTURE.md](ARCHITECTURE.md#project-scoping).
+- **Break-glass** is the call option `client.WithBreakGlass(reason)`, sent
+  as `x-break-glass`. Only the operations whose spec accepts that header
+  take it (listing and applying Cedar scope policies). A call option an
+  operation cannot send (`WithBreakGlass` elsewhere, `WithProject` on a
+  warehouse-scoped Cedar operation) fails with
+  `client.ErrCallOptionNotAccepted` before any request, and
+  `WithBreakGlass("")` with `client.ErrEmptyBreakGlassReason`.
 
 ```go
 resp, err := c.Warehouses.List(ctx,

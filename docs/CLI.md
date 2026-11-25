@@ -337,7 +337,38 @@ lkctl cedar schema
 
 # The fragments as JSON ({"schema-fragments": {"<file>": "<content>"}})
 lkctl cedar schema -o json
+
+# A project's stored policies (-p as elsewhere; default project without it),
+# then one by name; -o json includes the policy in Cedar's JSON format
+lkctl cedar project-policies list -p <project-id>
+lkctl cedar project-policies get readers -o json
+
+# Create, update and delete policies in one transaction, from a file or stdin
+lkctl cedar project-policies apply -f policies.json
+cat policies.json | lkctl cedar project-policies apply -f -
+
+# The same for a warehouse; the warehouse names its project, so no -p
+lkctl cedar warehouse-policies list <warehouse-id>
+lkctl cedar warehouse-policies get <warehouse-id> readers
+lkctl cedar warehouse-policies apply <warehouse-id> -f policies.json
+
+# Whether break-glass is available to you for a project (project-id query parameter)
+lkctl cedar break-glass-status -p <project-id>
+
+# Emergency access, with the reason the server records
+lkctl cedar project-policies apply -f fix.json --break-glass "INC-42: locked out"
 ```
+
+The apply file is the Management API's apply request: `writes` (each a
+`name`, optional `description`, and a `policy` in Cedar's JSON policy
+format), `deletes`, `replace`, `dry-run` and `if-scope-version`. Text output
+lists the changes (`OP NAME ID`) and the scope version after the apply.
+`list` ends with the scope version, the project's scope version on a
+warehouse, and whether you can change the policies (`Can write`).
+
+`--break-glass REASON` sends the `x-break-glass` header. Only `list` and
+`apply` of `project-policies` and `warehouse-policies` have it: those are
+the operations that accept the header.
 
 ### `lkctl task-queue`
 
@@ -366,8 +397,10 @@ lkctl task-queue expire-snapshots set <warehouse-id> --max-snapshot-age-ms 60480
 lkctl task-queue expire-snapshots get <warehouse-id>
 
 # Keep task logs for 30 days in a project
-lkctl task-queue task-log-cleanup set -p <project-id> --retention-period P30D
+lkctl task-queue task-log-cleanup set -p <project-id> --cleanup-period P1D --retention-period P30D
 ```
+
+Lakekeeper 0.15 rejects a `task-log-cleanup set` without `--cleanup-period`.
 
 ### `lkctl version` / `lkctl whoami`
 

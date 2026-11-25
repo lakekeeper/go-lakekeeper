@@ -29,6 +29,9 @@ func newCedarCmd(opts *clientOptions) *cobra.Command {
 	}
 
 	cmd.AddCommand(newCedarSchemaCmd(opts))
+	cmd.AddCommand(newCedarScopeCmd(opts, projectCedarScope))
+	cmd.AddCommand(newCedarScopeCmd(opts, warehouseCedarScope))
+	cmd.AddCommand(newCedarBreakGlassStatusCmd(opts))
 
 	return cmd
 }
