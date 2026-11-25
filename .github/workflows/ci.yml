@@ -70,6 +70,12 @@ jobs:
       - name: coverage summary
         run: cat coverage.md >> "$GITHUB_STEP_SUMMARY"
 
+      # The breaking-change report's own tests, against fixture specs; they
+      # fail CI like any test. The report itself runs in
+      # spec-breaking-changes.
+      - name: test the breaking-change report
+        run: make test-spec-breaking-changes
+
   integration-test:
     needs: lint
     runs-on: ubuntu-26.04
@@ -185,10 +191,12 @@ jobs:
         env:
           GIT_TREE_STATE: ${{ env.GIT_TREE_STATE }}
 
-  # The single check the main ruleset requires; add every new job to `needs`.
+  # The single check the main ruleset requires; add every new job that gates
+  # merging to `needs` (not the report-only spec-breaking-changes, nor
+  # e2e-plus, which runs on main only).
   ci-ok:
     if: always()
-    needs: [lint, drift, spec-breaking-changes, unit-tests, integration-test, e2e-compose, e2e-kind, build]
+    needs: [lint, drift, unit-tests, integration-test, e2e-compose, e2e-kind, build]
     runs-on: ubuntu-latest
     steps:
       - name: all jobs succeeded
@@ -237,10 +245,11 @@ jobs:
             quay.io/lakekeeper/lkctl:sha-${{ steps.meta.outputs.short_sha }}
 
   # Reports the breaking changes a PR makes to either spec in the job summary,
-  # for the PR body and the release notes. It reports; breaking changes never
-  # fail the job.
+  # for the PR body and the release notes. It only reports: it runs the
+  # report only when a spec changed, never fails, and is not in ci-ok's needs.
   spec-breaking-changes:
     name: spec breaking changes
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -249,10 +258,7 @@ jobs:
       - uses: actions/setup-go@d8cbb8045d7f43706b9177cceb36c1f91a6644d5 # v7.1.0
         with:
           go-version-file: go.mod
-      - name: test the report
-        run: make test-spec-breaking-changes
       - name: report
-        if: github.event_name == 'pull_request'
         continue-on-error: true
         env:
           BASE: ${{ github.event.pull_request.base.sha }}

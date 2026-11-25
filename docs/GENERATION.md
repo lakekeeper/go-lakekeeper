@@ -171,8 +171,10 @@ tree, and prints a Markdown section per spec: its breaking changes, "no
 breaking changes", or "new" when the spec is not on `BASE`. Paste the report
 into the PR body, so the breaking changes reach the release notes. On a PR
 that changes a spec, the `spec breaking changes` CI job writes the same report
-to its job summary; breaking changes never fail the job.
-`make test-spec-breaking-changes` tests the report against fixture specs.
+to its job summary. It only reports: neither breaking changes nor a failed
+report fail the job, and `ci-ok` does not wait for it.
+`make test-spec-breaking-changes` tests the report against fixture specs; the
+`unit-tests` CI job runs it.
 
 If prepare stops with a merge conflict, the two specs disagree on a shared
 path or schema beyond what the [merge rules](#merge-rules) accept; see there.
