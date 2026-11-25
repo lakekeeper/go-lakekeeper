@@ -213,7 +213,7 @@
       "items": [
         "WithInitialBootstrap(false, …) does nothing.",
         "Otherwise construction calls Server.Info and calls Server.Bootstrap only on a server that is not bootstrapped yet; both requests carry the header.",
-        "lkctl --bootstrap passes WithInitialBootstrap as an operator of user type application."
+        "lkctl --bootstrap makes the same two calls right after construction, as an operator of user type application."
       ]
     }
   ]

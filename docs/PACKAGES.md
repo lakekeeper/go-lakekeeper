@@ -368,10 +368,10 @@ case err != nil:
 edition's spec release and the minor before it (`String()`:
 `"Lakekeeper 0.14.x and 0.15.x"`). `caps.InSupportedVersions()` checks one
 server; the SDK never refuses a call because of it.
-`client.WithCapabilitiesObserver(observe)` calls `observe` with the
-capabilities of every server info fetch (`Server.Info`,
-`WithInitialBootstrap`, the first `Capabilities` call or diagnosis), so a
-tool can warn without a request of its own. See
+`c.CachedCapabilities()` returns the capabilities an earlier server info
+fetch read (`Server.Info`, `WithInitialBootstrap`, `Capabilities` or a
+diagnosis), and false when none has, so a tool can warn without a request
+of its own. See
 [ARCHITECTURE.md](ARCHITECTURE.md#supported-versions).
 
 **Adding a gated façade.** What an operation needs is declared once, as a

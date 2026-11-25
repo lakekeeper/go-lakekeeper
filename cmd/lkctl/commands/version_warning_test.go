@@ -103,6 +103,20 @@ func TestVersionWarning_BeforeTheErrorOfAnUndecodableServerInfo(t *testing.T) {
 	assert.Equal(t, outsideRangeWarning("0.13.9"), errOut)
 }
 
+// --bootstrap against a server whose info the SDK cannot decode fails, and
+// still warns first.
+func TestVersionWarning_BeforeAFailedBootstrap(t *testing.T) {
+	t.Parallel()
+	mux, baseURL := testutil.NewServer(t)
+	testutil.Respond(t, mux, "GET /management/v1/info", http.StatusOK,
+		`{"version":"0.13.9","lakekeeper-version":"0.13.9","bootstrapped":true}`)
+
+	_, errOut, err := runLkctlSplit(t, baseURL, "--bootstrap", "project", "list")
+
+	require.ErrorContains(t, err, "bootstrap: get server info: decode 200 OK response")
+	assert.Equal(t, outsideRangeWarning("0.13.9"), errOut)
+}
+
 // The check adds no request: a command that reads no server info does not
 // warn.
 func TestVersionWarning_NoServerInfoRequestOfItsOwn(t *testing.T) {

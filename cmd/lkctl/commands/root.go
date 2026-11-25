@@ -4,7 +4,6 @@ package commands
 
 import (
 	"os"
-	"sync"
 
 	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
@@ -25,7 +24,7 @@ func init() {
 
 // NewCommand returns the lkctl root command with all subcommands registered.
 func NewCommand() *cobra.Command {
-	opts := clientOptions{versionChecked: &sync.Once{}}
+	opts := clientOptions{}
 
 	cmd := &cobra.Command{
 		Use:               cliName,
@@ -86,5 +85,24 @@ func NewCommand() *cobra.Command {
 	cmd.AddCommand(newWarehouseCmd(&opts))
 	cmd.AddCommand(newWhoamiCmd(&opts))
 
+	checkSupportedVersionsAfter(cmd, &opts)
 	return cmd
+}
+
+// checkSupportedVersionsAfter makes every command in the tree run the
+// supported-version check after its own work, whether that succeeded or
+// failed, so the warning comes before main prints the error.
+func checkSupportedVersionsAfter(cmd *cobra.Command, opts *clientOptions) {
+	for _, sub := range cmd.Commands() {
+		checkSupportedVersionsAfter(sub, opts)
+	}
+	run := cmd.RunE
+	if run == nil {
+		return
+	}
+	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		err := run(cmd, args)
+		opts.checkSupportedVersions()
+		return err
+	}
 }

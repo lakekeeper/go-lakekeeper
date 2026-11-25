@@ -108,13 +108,21 @@ func (c *Client) Capabilities(ctx context.Context) (*Capabilities, error) {
 	return c.capabilities.get(ctx)
 }
 
+// CachedCapabilities returns the capabilities an earlier server info fetch
+// read (Server.Info, WithInitialBootstrap, Capabilities, or the diagnosis of
+// a gated façade's failure), and false when none has. It sends no request,
+// so tooling can, for example, warn about a server outside
+// SupportedVersions without an extra round trip, as lkctl does. It returns
+// a fresh copy.
+func (c *Client) CachedCapabilities() (*Capabilities, bool) {
+	return c.capabilities.cached()
+}
+
 // capabilityCache fetches the server's capabilities once per Client. The
 // façades that gate operations on a capability share it, and Server.Info
 // fills it on every fetch.
 type capabilityCache struct {
 	server *Server
-	// observe is the WithCapabilitiesObserver callback; nil when not set.
-	observe func(Capabilities)
 
 	mu   sync.Mutex
 	caps *Capabilities
@@ -129,27 +137,31 @@ func (cc *capabilityCache) get(ctx context.Context) (*Capabilities, error) {
 		if caps == nil {
 			return nil, fmt.Errorf("capabilities: %w", err)
 		}
-		cc.setLocked(caps)
+		cc.caps = caps
 	}
-	caps := *cc.caps
-	caps.Queues = slices.Clone(cc.caps.Queues)
-	return &caps, nil
+	return cc.caps.clone(), nil
+}
+
+func (cc *capabilityCache) cached() (*Capabilities, bool) {
+	cc.mu.Lock()
+	defer cc.mu.Unlock()
+	if cc.caps == nil {
+		return nil, false
+	}
+	return cc.caps.clone(), true
 }
 
 // record stores caps read by a server info fetch outside the cache.
 func (cc *capabilityCache) record(caps *Capabilities) {
 	cc.mu.Lock()
 	defer cc.mu.Unlock()
-	cc.setLocked(caps)
+	cc.caps = caps
 }
 
-func (cc *capabilityCache) setLocked(caps *Capabilities) {
-	cc.caps = caps
-	if cc.observe != nil {
-		observed := *caps
-		observed.Queues = slices.Clone(caps.Queues)
-		cc.observe(observed)
-	}
+func (c *Capabilities) clone() *Capabilities {
+	out := *c
+	out.Queues = slices.Clone(c.Queues)
+	return &out
 }
 
 // requirement is what a capability-gated façade operation needs from the

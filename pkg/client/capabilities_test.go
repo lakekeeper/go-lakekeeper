@@ -144,42 +144,48 @@ func TestCapabilities_AfterServerInfoCostNoRequest(t *testing.T) {
 	assert.Equal(t, 1, info.Len(), "server info requests")
 }
 
-func TestWithCapabilitiesObserver_SeesEveryServerInfoFetch(t *testing.T) {
+// CachedCapabilities returns what an earlier server info fetch read, and
+// sends no request of its own.
+func TestCachedCapabilities_AfterServerInfoWithoutARequest(t *testing.T) {
 	t.Parallel()
-	var seen []string
-	mux, c := observedClient(t, func(caps client.Capabilities) { seen = append(seen, caps.String()) })
-	testutil.Respond(t, mux, "GET /management/v1/info", http.StatusOK, lakekeeperInfo())
-	testutil.Respond(t, mux, cedarSchemaPath, http.StatusNotFound, nil)
+	mux, c := testutil.ServerMux(t)
+	info := testutil.Respond(t, mux, "GET /management/v1/info", http.StatusOK, lakekeeperInfo())
 
 	_, err := c.Server.Info(t.Context())
 	require.NoError(t, err)
-	_, err = c.Server.Info(t.Context())
-	require.NoError(t, err)
-	_, err = c.Cedar.Schema(t.Context())
-	require.ErrorIs(t, err, client.ErrUnsupported)
+	got, ok := c.CachedCapabilities()
 
-	assert.Equal(t, []string{"Lakekeeper 0.15.1", "Lakekeeper 0.15.1"}, seen,
-		"one call per fetch; the diagnosis reuses the cached capabilities")
+	require.True(t, ok)
+	assert.Equal(t, "Lakekeeper 0.15.1", got.String())
+	assert.Equal(t, 1, info.Len(), "server info requests")
 }
 
-func TestWithCapabilitiesObserver_NotCalledWithoutServerInfo(t *testing.T) {
+func TestCachedCapabilities_NoneBeforeAServerInfoFetch(t *testing.T) {
 	t.Parallel()
-	called := false
-	mux, c := observedClient(t, func(client.Capabilities) { called = true })
+	mux, c := testutil.ServerMux(t)
+	info := testutil.Respond(t, mux, "GET /management/v1/info", http.StatusOK, lakekeeperInfo())
 	testutil.Respond(t, mux, "GET /management/v1/project-list", http.StatusOK, `{"projects":[]}`)
 
 	_, err := c.Projects.List(t.Context())
-
 	require.NoError(t, err)
-	assert.False(t, called)
+	got, ok := c.CachedCapabilities()
+
+	assert.False(t, ok)
+	assert.Nil(t, got)
+	assert.Zero(t, info.Len(), "server info requests")
 }
 
-// observedClient is testutil.ServerMux with a capabilities observer.
-func observedClient(t *testing.T, observe func(client.Capabilities)) (*http.ServeMux, *client.Client) {
-	t.Helper()
-	mux, baseURL := testutil.NewServer(t)
-	c, err := client.New(t.Context(), baseURL, "test-token",
-		client.WithoutRetries(), client.WithCapabilitiesObserver(observe))
-	require.NoError(t, err)
-	return mux, c
+// A server info body the SDK cannot decode still names the server.
+func TestCachedCapabilities_FromAnUndecodableServerInfo(t *testing.T) {
+	t.Parallel()
+	mux, c := testutil.ServerMux(t)
+	testutil.Respond(t, mux, "GET /management/v1/info", http.StatusOK,
+		`{"version":"0.13.9","lakekeeper-version":"0.13.9","bootstrapped":true}`)
+
+	_, err := c.Server.Info(t.Context())
+	require.Error(t, err)
+	got, ok := c.CachedCapabilities()
+
+	require.True(t, ok)
+	assert.Equal(t, "Lakekeeper 0.13.9", got.String())
 }

@@ -183,8 +183,7 @@ var (
 	WithErrorHandler     = client.WithErrorHandler
 	WithInitialBootstrap = client.WithInitialBootstrap
 
-	WithCapabilitiesObserver = client.WithCapabilitiesObserver
-	SupportedVersions        = client.SupportedVersions
+	SupportedVersions = client.SupportedVersions
 
 	WrapAPIError = client.WrapAPIError
 

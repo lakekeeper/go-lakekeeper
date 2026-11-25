@@ -359,10 +359,10 @@ see [GENERATION.md](GENERATION.md#updating-the-specs)), never kept by hand.
 `caps.InSupportedVersions()` judge one server by its edition's version (the
 Lakekeeper+ version on Lakekeeper+). A version that is missing or does not
 parse counts as supported. The SDK never refuses a call because of the
-range. `client.WithCapabilitiesObserver(func(client.Capabilities))` hands
-the capabilities of every server info fetch to the caller without a request
-of its own; `lkctl` uses it to warn once per run about a server outside the
-range (see [CLI.md](CLI.md#supported-server-versions)).
+range. `c.CachedCapabilities()` returns the capabilities an earlier server
+info fetch read, without a request of its own; `lkctl` calls it after each
+command to warn once per run about a server outside the range (see
+[CLI.md](CLI.md#supported-server-versions)).
 
 An `UnsupportedError` does not unwrap to the server's `APIError`, so code
 that treats a 404 as "resource gone" never reads an unsupported operation
