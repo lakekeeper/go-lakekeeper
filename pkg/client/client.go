@@ -27,8 +27,11 @@ const managementPathPrefix = "/management/v1"
 // Client is the SDK entry point for the Lakekeeper Management API.
 //
 // Use the resource façades (Warehouses, Projects, Roles, Users, Server,
-// Permissions): one method call per operation, with project scoping via
-// WithProject and errors as *APIError. Client also adds auth wiring (via
+// Permissions, Cedar, TaskQueues): one method call per operation, with
+// project scoping via WithProject and errors as *APIError. Lakekeeper+
+// façades (Cedar, the Lakekeeper+ queues of TaskQueues) return
+// *UnsupportedError when the server's Capabilities explain why it
+// rejected the operation. Client also adds auth wiring (via
 // core.AuthSource and a custom http.RoundTripper), optional retry
 // behaviour, optional bootstrap on construction, and a CatalogV1 helper
 // that delegates to apache/iceberg-go.
@@ -51,6 +54,16 @@ type Client struct {
 
 	// Permissions manages access and assignments per resource kind.
 	Permissions *Permissions
+
+	// Cedar manages Cedar policies (Lakekeeper+ with the Cedar
+	// authorization backend).
+	Cedar *Cedar
+
+	// TaskQueues reads and sets task-queue configuration, for the
+	// Lakekeeper and the Lakekeeper+ queues.
+	TaskQueues *TaskQueues
+
+	capabilities *capabilityCache
 
 	baseURL    *url.URL
 	authSource core.AuthSource
@@ -107,21 +120,27 @@ func NewWithAuthSource(ctx context.Context, baseURL string, as core.AuthSource, 
 	cfg.HTTPClient = newHTTPClient(as, settings)
 
 	api := managementv1.NewAPIClient(cfg)
+	server := &Server{api: api.ServerAPI}
+	caps := &capabilityCache{server: server}
+	server.caps = caps
 	c := &Client{
 		APIClient:  api,
 		Warehouses: &Warehouses{api: api.WarehouseAPI},
 		Projects:   &Projects{api: api.ProjectAPI},
 		Roles:      &Roles{api: api.RoleAPI},
 		Users:      &Users{api: api.UserAPI},
-		Server:     &Server{api: api.ServerAPI},
+		Server:     server,
 		Permissions: &Permissions{
 			Warehouses: &WarehousePermissions{api: api.PermissionsOpenfgaAPI},
 			Roles:      &RolePermissions{api: api.PermissionsOpenfgaAPI},
 			Projects:   &ProjectPermissions{api: api.PermissionsOpenfgaAPI},
 			Server:     &ServerPermissions{api: api.PermissionsOpenfgaAPI},
 		},
-		baseURL:    parsed,
-		authSource: as,
+		Cedar:        &Cedar{api: api.PermissionsCedarAPI, caps: caps},
+		TaskQueues:   &TaskQueues{api: api.TasksAPI, caps: caps},
+		capabilities: caps,
+		baseURL:      parsed,
+		authSource:   as,
 	}
 	if settings.httpClient != nil {
 		c.catalogTransport = settings.httpClient.Transport

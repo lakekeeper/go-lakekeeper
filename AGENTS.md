@@ -11,7 +11,7 @@ Go client library plus `lkctl` CLI for the Lakekeeper Iceberg catalog.
 - `pkg/storage/`, `pkg/permissions/` — hand-written helpers / builders
 - `pkg/common/`, `pkg/testutil/`, `pkg/version/` — small shared helpers (defaults, test client, build-time version)
 - `cmd/` — Cobra-based CLI; entry at `cmd/main.go`, commands tree under `cmd/lkctl/commands/`
-- `api/openapi/` — spec + postprocessor + generator config
+- `api/openapi/` — Lakekeeper and Lakekeeper+ specs + prepare (patch and merge) + postprocessor + generator config
 - `e2e/`, `integration/` — test suites, run through `make` (see Commands)
 - `examples/` — runnable docker-compose stack for SDK users (separate from `e2e/compose/`)
 - `tests/` — fixtures for the compose stack (Keycloak realm); not Go test code
@@ -39,6 +39,9 @@ Every workflow has a `make` target; use it rather than the raw tool, because the
 - `make test-integration` — starts Lakekeeper + Keycloak + MinIO + OpenFGA via compose and runs the `integration`-tagged tests.
 - `make test-e2e-compose` — runs the `e2e_cli` suite against the host-built `lkctl` on the compose stack. Run it before calling any `e2e/` change done.
 - `make test-e2e-kind` — runs the auth-only subset of `e2e_cli` against a kind cluster; other tests skip via `requireBackend`.
+- `make test-e2e-versions` — runs the `e2e_versions` lkctl tests against Lakekeeper pinned to the two minors before the Lakekeeper spec release (`api/openapi/spec-releases.yaml`): the oldest supported one, and one outside the supported range. Local only; CI does not run it.
+- `make test-plus` — runs the Lakekeeper+ tests (`e2e_plus`, `integration_plus`) against the public Lakekeeper+ image on the compose stack (profiles `plus` for Cedar, `plus-openfga` for OpenFGA). `LAKEKEEPER__LICENSE__KEY` is passed to the server when set; it is optional for local runs. CI runs the target on `main` with a license.
+- `make spec-breaking-changes` — prints a Markdown report of the breaking changes in each spec between `BASE` (default `origin/main`) and the working tree, via a pinned oasdiff run with `go run`. Paste it into the PR body of a spec bump; CI writes it to the job summary of PRs that change a spec. `make test-spec-breaking-changes` tests it.
 - `make clean` — tears down the compose stack (`down --volumes`), removes `bin/`, the coverage files, `.env`.
 
 `KEEP_STACK=1` leaves the compose stack running after integration/e2e tests, for iterative debugging; tear down with `make clean`.
@@ -56,7 +59,7 @@ Import aliases are enforced by `importas`; use exactly these:
 
 ## Generation
 
-`make generate` regenerates `pkg/apis/management/v1/` from `api/openapi/management-open-api.yaml` (`openapi-generator-cli` → postprocess). To change generated code, change the spec, the postprocessor, or the generator config, then regenerate.
+`make generate` regenerates `pkg/apis/management/v1/` from the Lakekeeper spec `api/openapi/management-open-api.yaml` and the Lakekeeper+ spec `api/openapi/management-plus-open-api.yaml` (prepare → `openapi-generator-cli` → postprocess). prepare patches both specs and merges them into a git-ignored spec under `api/openapi/build/`. To change generated code, change a spec, a prepare patch, the postprocessor, or the generator config, then regenerate. Copy specs unmodified; fix their defects with a prepare patch.
 
 `api/openapi/*-config.yaml` lists only deviations from generator defaults; set an option there only when its value differs from the default.
 

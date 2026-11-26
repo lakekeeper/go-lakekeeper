@@ -19,6 +19,7 @@ import (
 type StorageProfile struct {
 	StorageProfileAdls    *StorageProfileAdls
 	StorageProfileGcs     *StorageProfileGcs
+	StorageProfileMemory  *StorageProfileMemory
 	StorageProfileOneLake *StorageProfileOneLake
 	StorageProfileS3      *StorageProfileS3
 	StorageProfileStackit *StorageProfileStackit
@@ -35,6 +36,13 @@ func StorageProfileAdlsAsStorageProfile(v *StorageProfileAdls) StorageProfile {
 func StorageProfileGcsAsStorageProfile(v *StorageProfileGcs) StorageProfile {
 	return StorageProfile{
 		StorageProfileGcs: v,
+	}
+}
+
+// StorageProfileMemoryAsStorageProfile is a convenience function that returns StorageProfileMemory wrapped in StorageProfile
+func StorageProfileMemoryAsStorageProfile(v *StorageProfileMemory) StorageProfile {
+	return StorageProfile{
+		StorageProfileMemory: v,
 	}
 }
 
@@ -93,6 +101,18 @@ func (dst *StorageProfile) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	// check if the discriminator value is 'memory'
+	if jsonDict["type"] == "memory" {
+		// try to unmarshal JSON data into StorageProfileMemory
+		err = json.Unmarshal(data, &dst.StorageProfileMemory)
+		if err == nil {
+			return nil // data stored in dst.StorageProfileMemory, return on the first match
+		} else {
+			dst.StorageProfileMemory = nil
+			return fmt.Errorf("failed to unmarshal StorageProfile as StorageProfileMemory: %s", err.Error())
+		}
+	}
+
 	// check if the discriminator value is 'onelake'
 	if jsonDict["type"] == "onelake" {
 		// try to unmarshal JSON data into StorageProfileOneLake
@@ -142,6 +162,10 @@ func (src StorageProfile) MarshalJSON() ([]byte, error) {
 		return json.Marshal(&src.StorageProfileGcs)
 	}
 
+	if src.StorageProfileMemory != nil {
+		return json.Marshal(&src.StorageProfileMemory)
+	}
+
 	if src.StorageProfileOneLake != nil {
 		return json.Marshal(&src.StorageProfileOneLake)
 	}
@@ -170,6 +194,10 @@ func (obj *StorageProfile) GetActualInstance() interface{} {
 		return obj.StorageProfileGcs
 	}
 
+	if obj.StorageProfileMemory != nil {
+		return obj.StorageProfileMemory
+	}
+
 	if obj.StorageProfileOneLake != nil {
 		return obj.StorageProfileOneLake
 	}
@@ -194,6 +222,10 @@ func (obj StorageProfile) GetActualInstanceValue() interface{} {
 
 	if obj.StorageProfileGcs != nil {
 		return *obj.StorageProfileGcs
+	}
+
+	if obj.StorageProfileMemory != nil {
+		return *obj.StorageProfileMemory
 	}
 
 	if obj.StorageProfileOneLake != nil {

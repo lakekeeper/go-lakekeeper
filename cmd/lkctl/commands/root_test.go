@@ -17,7 +17,7 @@ func TestNewCommandRegistersSubcommands(t *testing.T) {
 		got = append(got, sub.Name())
 	}
 	sort.Strings(got)
-	want := []string{"catalog", "project", "role", "server", "user", "version", "warehouse", "whoami"}
+	want := []string{"catalog", "cedar", "project", "role", "server", "task-queue", "user", "version", "warehouse", "whoami"}
 	assert.Equal(t, want, got)
 }
 

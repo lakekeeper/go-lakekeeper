@@ -1,19 +1,20 @@
 # Generated API client
 
 The Management API client (`pkg/apis/management/v1/`) is generated from the
-upstream Lakekeeper OpenAPI spec. Everything else in the repo — including the
-`pkg/client` facade, the `lkctl` CLI, and the storage / permissions builder
-packages — is hand-written.
+Lakekeeper and Lakekeeper+ OpenAPI specs, merged into one spec at generate
+time. Everything else in the repo — including the `pkg/client` facade, the
+`lkctl` CLI, and the storage / permissions builder packages — is hand-written.
 
 This document is the single source of truth for **what is generated**, **how
-to regenerate it**, and **why a postprocessor is involved**.
+to regenerate it**, **how the two specs are patched and merged**, and **why a
+postprocessor is involved**.
 
 ## What is generated
 
 Everything under [`pkg/apis/management/v1/`](../pkg/apis/management/v1/) is
 regenerated wholesale on every `make generate` run. The Makefile `rm -rf`s
 the directory before invoking the generator (see
-[Makefile:138](../Makefile#L138)), so any hand-edits there are silently
+[Makefile:167](../Makefile#L167)), so any hand-edits there are silently
 discarded the next time someone regenerates.
 
 Files carrying this header are generator output and **must not be
@@ -54,25 +55,38 @@ make generate
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="diagrams/generation-pipeline-dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="diagrams/generation-pipeline-light.svg">
-  <img alt="Generation pipeline: the OpenAPI spec is copied by hand from the Lakekeeper repository; make generate wipes the output directory, copies the ignore file into it and runs openapi-generator with the spec (-i, unmodified) and the generator config (-c); the raw Go tree goes through the postprocessor, then format and tidy, and is written as the generated SDK; a hand edit of the generated SDK is wiped by the next run" src="diagrams/generation-pipeline-light.svg">
+  <img alt="Generation pipeline: the Lakekeeper spec and the Lakekeeper+ spec are copied by hand from their repositories; make generate runs prepare, which patches both specs and merges them into the git-ignored merged spec; it wipes the output directory, copies the ignore file into it and runs openapi-generator with the merged spec (-i) and the generator config (-c); the raw Go tree goes through the postprocessor, then format and tidy, and is written as the generated SDK; a hand edit of the generated SDK is wiped by the next run" src="diagrams/generation-pipeline-light.svg">
 </picture>
 
 Explorable version: [`diagrams/generation-pipeline.html`](diagrams/generation-pipeline.html)
 (GitHub shows its source: download or clone and open it locally). See the
 [diagram index](diagrams/README.md) for the other diagrams.
 
-Generated code changes only through the three inputs you edit: the OpenAPI
-spec, the postprocessor and the generator config (plus the ignore file, for
-which files are emitted at all). The diagram uses the term generated SDK as
-defined under [ARCHITECTURE.md System Context](ARCHITECTURE.md#system-context),
-and these:
+Generated code changes only through the inputs you edit: the two OpenAPI
+specs, the spec patches in prepare, the postprocessor and the generator config
+(plus the ignore file, for which files are emitted at all). The diagram uses
+the term generated SDK as defined under
+[ARCHITECTURE.md System Context](ARCHITECTURE.md#system-context), and these:
 
 - **`make generate`**: the make target that runs every step below, in order.
-- **OpenAPI spec**: the committed
+- **Lakekeeper spec**: the committed
   [`api/openapi/management-open-api.yaml`](../api/openapi/management-open-api.yaml),
   copied by hand from the **Lakekeeper repository** (the upstream
   [lakekeeper/lakekeeper](https://github.com/lakekeeper/lakekeeper)); see
-  [Updating the spec](#updating-the-spec).
+  [Updating the specs](#updating-the-specs).
+- **Lakekeeper+ spec**: the committed
+  [`api/openapi/management-plus-open-api.yaml`](../api/openapi/management-plus-open-api.yaml),
+  copied by hand from the **Lakekeeper+ repository** (`lakekeeper-enterprise`);
+  see [Updating the specs](#updating-the-specs).
+- **prepare**: [`api/openapi/prepare/`](../api/openapi/prepare/), which patches
+  both specs and merges them; see [The prepare step](#the-prepare-step).
+- **Spec releases**: [`api/openapi/spec-releases.yaml`](../api/openapi/spec-releases.yaml),
+  the release tag each spec was copied from. prepare writes it into the
+  generated package as `spec_releases.go`; see
+  [Updating the specs](#updating-the-specs).
+- **Merged spec**: `api/openapi/build/management-merged-open-api.yaml`, written
+  by prepare on every run and git-ignored. It is the only spec the generator
+  reads.
 - **openapi-generator**: the `openapitools/openapi-generator-cli` container
   image with the `go` generator, pinned by `OPENAPI_GENERATOR_VERSION` in the
   Makefile.
@@ -85,18 +99,21 @@ and these:
 - **Hand edit**: any edit under `pkg/apis/management/v1/`. The next
   `make generate` deletes it (see [What is generated](#what-is-generated)).
 
-The pipeline (see [Makefile:135-155](../Makefile#L135-L155)):
+The pipeline (see [Makefile:165-192](../Makefile#L165-L192)):
 
 1. `rm -rf pkg/apis/management/v1` and recreate the directory.
 2. Copy the top-level [`.openapi-generator-ignore`](../api/openapi/.openapi-generator-ignore)
    into the output directory.
-3. Run `openapitools/openapi-generator-cli:v7.27.0 generate` in a container.
-   Input spec (`-i`): the committed
-   [`api/openapi/management-open-api.yaml`](../api/openapi/management-open-api.yaml),
-   unmodified. Generator config (`-c`):
+3. `go run ./api/openapi/prepare`: patch both specs, merge them and write the
+   merged spec; write `spec_releases.go` into the output directory from
+   [`spec-releases.yaml`](../api/openapi/spec-releases.yaml). See
+   [The prepare step](#the-prepare-step) below.
+4. Run `openapitools/openapi-generator-cli:v7.27.0 generate` in a container,
+   with spec validation on. Input spec (`-i`): the merged spec. Generator
+   config (`-c`):
    [`api/openapi/management-config.yaml`](../api/openapi/management-config.yaml).
-4. `go run ./api/openapi/postprocess`. See [The postprocessor](#the-postprocessor) below.
-5. `goimports -w` + `go mod tidy` + `make fmt`.
+5. `go run ./api/openapi/postprocess`. See [The postprocessor](#the-postprocessor) below.
+6. `goimports -w` + `go mod tidy` + `make fmt`.
 
 The container engine resolves to `docker` or `podman` depending on what's on
 PATH (see [Makefile:45](../Makefile#L45)), so `make generate` works on either.
@@ -106,23 +123,133 @@ The generator config is intentionally minimal —
 the options that deviate from upstream defaults, with an inline comment
 explaining each.
 
-## Updating the spec
+## Updating the specs
 
-The committed [`management-open-api.yaml`](../api/openapi/management-open-api.yaml)
-is the source of truth. Update it by copying
-[`docs/docs/api/management-open-api.yaml`](https://github.com/lakekeeper/lakekeeper/tree/main/docs/docs/api)
-from the Lakekeeper repository at the release tag (or commit) the client
-targets, then run `make generate` and commit the spec and the regenerated tree in the
-**same commit** so the diff stays reviewable. Name the Lakekeeper tag or
-commit in the commit message.
+The two committed specs are the source of truth, and each is updated on its
+own, from its own latest release:
 
-The spec goes into the generator unmodified: unions, enum names, nullable
-fields and query-parameter encoding all come straight from the spec and the
-generator config. Array query parameters such as `relations` use the OpenAPI
-default (`form`, exploded), so the client sends `?relations=a&relations=b`,
-which is the form Lakekeeper (v0.15.0 and later) parses. It silently ignores
-bracket notation (`relations[0]=a`), so a filter sent that way returns
-unfiltered results instead of failing.
+- **Lakekeeper**: copy
+  [`docs/docs/api/management-open-api.yaml`](https://github.com/lakekeeper/lakekeeper/tree/main/docs/docs/api)
+  from the Lakekeeper repository at the release tag (or commit) the client
+  targets over [`management-open-api.yaml`](../api/openapi/management-open-api.yaml).
+- **Lakekeeper+**: copy `api/management-open-api.yaml` from the
+  `lakekeeper-enterprise` repository at the Lakekeeper+ release tag (or
+  commit) over
+  [`management-plus-open-api.yaml`](../api/openapi/management-plus-open-api.yaml).
+
+Then record the release tag (`vX.Y.Z`) the spec came from under
+`lakekeeper` or `lakekeeper-plus` in
+[`spec-releases.yaml`](../api/openapi/spec-releases.yaml), the one place
+that records it. The specs themselves carry no release (`info.version` is
+`0.0.0`). From that file:
+
+- `make generate` (prepare) writes `pkg/apis/management/v1/spec_releases.go`
+  with `LakekeeperSpecRelease` and `LakekeeperPlusSpecRelease`. The SDK
+  derives its supported server versions (the release's minor and the one
+  before) and the `server-too-old` diagnosis from them; see
+  [ARCHITECTURE.md](ARCHITECTURE.md#supported-versions).
+- `make test-plus` and `e2e/plus/run.sh` pin the Lakekeeper+ test image to
+  the `lakekeeper-plus` release, so they run against the server the spec
+  came from. Also set the fallback default in `docker-compose.yml`, used by
+  plain compose runs, to the same release.
+- `make test-e2e-versions` pins Lakekeeper to the two minors before the
+  `lakekeeper` release (the oldest supported one and the one before it).
+  For a release whose minor is below 2 those minors are not on its major,
+  and `e2e/versions/run.sh` stops and asks you to pin them by hand.
+
+Copy the file unmodified; fix its defects with a patch in prepare instead (see
+[Patches](#patches)). Then run `make generate` and commit the spec and the
+regenerated tree in the **same commit** so the diff stays reviewable. Name the
+tag or commit of the spec you updated in the commit message.
+
+Lakekeeper releases, minors included, can make breaking changes to the
+Management API, so report them: `make spec-breaking-changes` runs
+[oasdiff](https://github.com/oasdiff/oasdiff) `breaking` (pinned by
+`OASDIFF_VERSION` in the Makefile, run with `go run`) on each spec, comparing
+the version on `BASE` (default `origin/main`, the PR's base) with the working
+tree, and prints a Markdown section per spec: its breaking changes, "no
+breaking changes", or "new" when the spec is not on `BASE`. Paste the report
+into the PR body, so the breaking changes reach the release notes. On a PR
+that changes a spec, the `spec breaking changes` CI job writes the same report
+to its job summary. It only reports: neither breaking changes nor a failed
+report fail the job, and `ci-ok` does not wait for it.
+`make test-spec-breaking-changes` tests the report against fixture specs; the
+`unit-tests` CI job runs it.
+
+If prepare stops with a merge conflict, the two specs disagree on a shared
+path or schema beyond what the [merge rules](#merge-rules) accept; see there.
+
+Apart from the patches and the merge, the specs go into the generator as they
+are: unions, enum names, nullable fields and query-parameter encoding all come
+straight from the specs and the generator config. Array query parameters such
+as `relations` use the OpenAPI default (`form`, exploded), so the client sends
+`?relations=a&relations=b`, which is the form Lakekeeper (v0.15.0 and later)
+parses. It silently ignores bracket notation (`relations[0]=a`), so a filter
+sent that way returns unfiltered results instead of failing.
+
+## The prepare step
+
+Located at [`api/openapi/prepare/`](../api/openapi/prepare/); runs first in
+`make generate`. Lakekeeper+ does not only add endpoints, it also extends
+Lakekeeper models (`StorageProfile` gains `memory`), so its operations are
+generated into the same `managementv1` package from one merged spec rather
+than into a package of their own. prepare reads both specs, applies each
+spec's patches, merges the Lakekeeper+ spec into the Lakekeeper spec, and
+writes the merged spec. It logs one line per patch to stderr.
+
+### Patches
+
+A patch fixes one defect in one spec until the spec is fixed upstream. Each
+patch is named after its defect, checks for the defect first, and is
+idempotent. When the defect is absent, the patch is skipped and logs:
+
+```
+patch <name>: not needed, skipped
+```
+
+That line in the `make generate` output means the spec was fixed upstream:
+delete the patch. Patches live in
+[`patches.go`](../api/openapi/prepare/patches.go) as `patch` values (`name`,
+`defect`, `fix`) listed in `lakekeeperPatches` or `lakekeeperPlusPatches`. To
+add one, write the value, add it to its spec's list, and test it in
+[`patches_test.go`](../api/openapi/prepare/patches_test.go): it fixes its
+defect, a second run is skipped and leaves the spec unchanged, and it is
+skipped when the defect is absent.
+
+The Lakekeeper spec has no patches. The Lakekeeper+ spec has the patches
+below, applied in this order. The table is also the list of fixes to make
+upstream in the Lakekeeper+ spec: each fix that lands there retires its patch.
+
+| Patch | Defect |
+|---|---|
+| `license-identifier` | `info.license` has a name but neither `identifier` nor `url`, so spec validation fails. Adds the SPDX `LicenseRef-Vakamo-Enterprise-License` identifier. |
+| `boolean-default` | `ExpireSnapshotsQueueConfig.enable-expire-snapshots` declares `default: 'false'`, a string on a boolean. Turns any such string default on a boolean into the boolean. |
+| `typed-cedar-lists` | `GetCedarPoliciesResponse.policies` and `ResolveCedarEntitiesResponse.entities` declare `items: {}`, so they generate as `[]interface{}`. Adds item schemas after Cedar's JSON policy and entity formats (`CedarPolicy`, `CedarEntity` and their parts), so they generate as `[]CedarPolicy` and `[]CedarEntity`. |
+| `named-inline-enums` | The `server` variant of `CedarResolveResource` and the items of `ScheduleOptimizeTaskRequest.payload.steps` are inline enums, which generate as plain strings without constants. Moves them to the named schemas `CedarResolveResourceServer` and `OptimizeStep`. |
+| `no-inherit-defaults` | Nullable fields of the `*QueueConfig` schemas, unset to inherit the server's value, declare that value as `default`, so the generated constructors set and send every one. Drops `default` from them. Runs after `boolean-default`. |
+
+### Merge rules
+
+- The Lakekeeper spec is the base. For any path, operation or schema present
+  in both specs, the Lakekeeper definition is kept.
+- Lakekeeper+ adds the paths, operations and component entries (schemas)
+  absent from the Lakekeeper spec.
+- For a discriminated union present in both, the Lakekeeper+ variants that
+  the Lakekeeper union lacks are added to its `oneOf` and discriminator
+  `mapping` (today: `memory` on `StorageProfile`).
+- Any other difference on a shared schema or operation, or an `operationId`
+  that a Lakekeeper+ operation reuses from a different operation, stops
+  prepare with an error naming the item. Descriptive differences
+  (`description`, `summary`, `title`, `example(s)`, `externalDocs`,
+  `maxLength`, and response codes only Lakekeeper+ documents) are not
+  conflicts; the Lakekeeper side is kept.
+- `info`, `servers`, `security` and the security schemes come from the
+  Lakekeeper spec, so generated file headers keep reading "Lakekeeper
+  Management API". Tags only Lakekeeper+ declares (`permissions-cedar`) are
+  appended.
+
+When prepare stops on a conflict, the fix belongs in one of the specs: wait
+for the specs to agree, or patch the Lakekeeper+ spec until they do.
 
 ## The postprocessor
 

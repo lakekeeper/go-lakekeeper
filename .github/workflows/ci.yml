@@ -70,15 +70,19 @@ jobs:
       - name: coverage summary
         run: cat coverage.md >> "$GITHUB_STEP_SUMMARY"
 
+      # The breaking-change report's own tests, against fixture specs; they
+      # fail CI like any test. The report itself runs in
+      # spec-breaking-changes.
+      - name: test the breaking-change report
+        run: make test-spec-breaking-changes
+
   integration-test:
     needs: lint
     runs-on: ubuntu-26.04
     strategy:
       matrix:
-        # When you raise the minimum entry below (i.e. drop the oldest
-        # supported Lakekeeper version), append a new row to the
-        # compatibility matrix in README.md and bound the previous row at
-        # the last client version that supported it.
+        # The supported range comes from api/openapi/spec-releases.yaml;
+        # when it moves, update the compatibility matrix in README.md.
         lakekeeper_version:
           - latest-main
           - v0.15.0
@@ -142,6 +146,20 @@ jobs:
       - run: GOPATH=$(go env GOPATH) make test-e2e-kind
         timeout-minutes: 20
 
+  # Lakekeeper+ suites (make test-plus) with the CI test license. Runs only on
+  # pushes to main: the license lives in the `lakekeeper-plus` environment,
+  # whose deployment branches are limited to main, so pull requests (forks
+  # included) never get the secret. Not in ci-ok's needs, since it cannot run
+  # on pull requests.
+  e2e-plus:
+    needs: lint
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/plus.yml
+    secrets: inherit
+    permissions:
+      contents: read
+      issues: write
+
   build:
     needs: lint
     runs-on: ubuntu-latest
@@ -171,7 +189,9 @@ jobs:
         env:
           GIT_TREE_STATE: ${{ env.GIT_TREE_STATE }}
 
-  # The single check the main ruleset requires; add every new job to `needs`.
+  # The single check the main ruleset requires; add every new job that gates
+  # merging to `needs` (not the report-only spec-breaking-changes, nor
+  # e2e-plus, which runs on main only).
   ci-ok:
     if: always()
     needs: [lint, drift, unit-tests, integration-test, e2e-compose, e2e-kind, build]
@@ -221,3 +241,41 @@ jobs:
           tags: |
             quay.io/lakekeeper/lkctl:latest-main
             quay.io/lakekeeper/lkctl:sha-${{ steps.meta.outputs.short_sha }}
+
+  # Reports the breaking changes a PR makes to either spec in the job summary,
+  # for the PR body and the release notes. It only reports: it runs the
+  # report only when a spec changed, never fails, and is not in ci-ok's needs.
+  spec-breaking-changes:
+    name: spec breaking changes
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@d8cbb8045d7f43706b9177cceb36c1f91a6644d5 # v7.1.0
+        with:
+          go-version-file: go.mod
+      - name: report
+        continue-on-error: true
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          specs="api/openapi/management-open-api.yaml api/openapi/management-plus-open-api.yaml"
+          # shellcheck disable=SC2086
+          if git diff --quiet "$BASE" HEAD -- $specs; then
+            echo "No spec changed; nothing to report."
+            exit 0
+          fi
+          {
+            echo "## Breaking changes in the specs"
+            echo
+            echo "Paste this report into the PR body."
+            echo
+          } >> "$GITHUB_STEP_SUMMARY"
+          if ! make --no-print-directory spec-breaking-changes BASE="$BASE" > report.md; then
+            echo "The breaking-change report failed; see the job log." >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          cat report.md
+          cat report.md >> "$GITHUB_STEP_SUMMARY"

@@ -31,6 +31,7 @@ Other useful make targets:
 | `make test-integration` | Spin up Lakekeeper + Keycloak + MinIO + OpenFGA via docker-compose and run integration tests |
 | `make test-e2e-compose` | E2E suite for `lkctl` itself, against the docker-compose stack (build tag `e2e_cli`). See [`e2e/`](../e2e/) |
 | `make test-e2e-kind` | E2E suite for `lkctl --auth-mode k8s` against a real kind cluster. See [`e2e/kind/`](../e2e/kind/) |
+| `make test-plus` | Lakekeeper+ E2E and integration tests (build tags `e2e_plus`, `integration_plus`) against the public Lakekeeper+ image, with Cedar and with OpenFGA. `LAKEKEEPER__LICENSE__KEY` is passed through when set; optional for local runs, CI uses one. See [`e2e/plus/run.sh`](../e2e/plus/run.sh) |
 | `make generate` | Regenerate the Management API client from the OpenAPI spec — see [GENERATION.md](GENERATION.md) |
 | `make snapshot` | goreleaser snapshot (multi-arch, no publish) |
 | `make clean` | Tear down compose stack and remove build artefacts |
@@ -106,12 +107,62 @@ Top-level commands (and their aliases):
 | `whoami` | _(none)_ | Print the authenticated principal |
 | `version` | _(none)_ | Print version, commit, build date |
 | `catalog` | _(none)_ | Placeholder — not yet implemented; use `client.CatalogV1` from the SDK |
+| `cedar` | _(none)_ | Cedar policies (Lakekeeper+, Cedar authorization backend) |
+| `task-queue` | `tq` | Show and set task-queue configuration, schedule maintenance tasks; some queues need Lakekeeper+ |
 
 The grant / revoke / access / assignments verbs follow the same shape
 across `server`, `project`, `warehouse`, and `role`. Read this section
 once for `project` and the others should feel familiar. For the
 underlying authorization model, the assignment-value reference, and an
 end-to-end CLI ↔ SDK workflow, see [AUTHORIZATION.md](AUTHORIZATION.md).
+
+### Lakekeeper+ commands
+
+One `lkctl` binary works against both editions, Lakekeeper and
+Lakekeeper+. Commands that need Lakekeeper+ are always listed, and their
+help says "(Lakekeeper+)"; `--help` never contacts a server.
+
+Run against a server that lacks what a command needs, the command exits
+non-zero with one sentence naming the requirement and what the server is:
+
+```text
+Error: get cedar schema: requires Lakekeeper+; server is Lakekeeper 0.15.1
+Error: get cedar schema: requires the cedar authorization backend; server is Lakekeeper+ 0.15.1 with the openfga authorization backend
+Error: get optimize queue config: requires the optimize task queue; server is Lakekeeper+ 0.15.1 without it
+```
+
+A server older than the release of the spec an operation came from says
+so, with its version:
+
+```text
+Error: get cedar schema: requires Lakekeeper+ 0.15.1 or later; server is Lakekeeper+ 0.14.2
+```
+
+`lkctl` reads the server info for this only after the server rejects a
+request as unknown (404 or 405); a genuine not-found is still reported as
+the server's error. See
+[ARCHITECTURE.md](ARCHITECTURE.md#editions-and-capabilities).
+
+### Supported server versions
+
+`lkctl` supports, per edition, the minor of the spec it was built from and
+the minor before it, for example Lakekeeper 0.14.x and 0.15.x, and
+Lakekeeper+ 0.14.x and 0.15.x. The range comes from the specs `lkctl` was
+generated from (see [ARCHITECTURE.md](ARCHITECTURE.md#supported-versions)).
+
+When a command reads the server info anyway (`server info`, `version`,
+`--bootstrap`, or the diagnosis of a rejected request) and the server is
+outside that range, `lkctl` prints one warning to stderr and carries on:
+
+```text
+Warning: server is Lakekeeper 0.13.9; this lkctl supports Lakekeeper 0.14.x and 0.15.x
+```
+
+It prints the warning at most once per run, adds no request of its own (a
+command that does not read the server info does not check), and leaves the
+command's output and exit code as they are. Against a server outside the
+range, commands can still fail; the warning says why that is to be
+expected.
 
 ### `lkctl server`
 
@@ -180,6 +231,11 @@ UUID from `--project` / `-p`. When omitted, no project is sent and the
 server's default project is used (the nil UUID unless the operator
 configured another; an error if the operator disabled it). The other
 subcommands address a warehouse by its id and ignore `-p`.
+
+`list` and `get` print each warehouse's storage family in the `STORAGE`
+column: the `type` of its storage profile, one of `s3`, `gcs`, `adls`,
+`onelake`, `stackit` or `memory` (Lakekeeper+ only), and `unknown` for any
+other.
 
 ```sh
 # List warehouses in a project (filter with --status active|inactive, repeatable)
@@ -298,6 +354,150 @@ when the user already exists.
 name filter use `user list --name`. `user roles --transitive` works only when
 role assignments are catalog-managed; with OpenFGA the server answers
 `501 Not Implemented`.
+
+### `lkctl cedar` (Lakekeeper+)
+
+Needs Lakekeeper+ with the Cedar authorization backend.
+
+```sh
+# Print the active Cedar schema: each fragment under a "// <file>" comment
+lkctl cedar schema
+
+# The fragments as JSON ({"schema-fragments": {"<file>": "<content>"}})
+lkctl cedar schema -o json
+
+# A project's stored policies (-p as elsewhere; default project without it),
+# then one by name; -o json includes the policy in Cedar's JSON format
+lkctl cedar project-policies list -p <project-id>
+lkctl cedar project-policies get readers -o json
+
+# Create, update and delete policies in one transaction, from a file or stdin
+lkctl cedar project-policies apply -f policies.json
+cat policies.json | lkctl cedar project-policies apply -f -
+
+# The same for a warehouse; the warehouse names its project, so no -p
+lkctl cedar warehouse-policies list <warehouse-id>
+lkctl cedar warehouse-policies get <warehouse-id> readers
+lkctl cedar warehouse-policies apply <warehouse-id> -f policies.json
+
+# Whether break-glass is available to you for a project (project-id query parameter)
+lkctl cedar break-glass-status -p <project-id>
+
+# Emergency access, with the reason the server records
+lkctl cedar project-policies apply -f fix.json --break-glass "INC-42: locked out"
+
+# Where the server loads its Cedar policies and entities from (files, ConfigMaps)
+lkctl cedar policy-sources
+lkctl cedar entity-sources
+
+# The server's active policies (EFFECT PRINCIPAL ACTION RESOURCE); -o json
+# prints them in Cedar's JSON policy format, conditions included
+lkctl cedar server-policies list
+lkctl cedar server-policies list --source <source-id> --effect forbid
+lkctl cedar server-policies list --page-size 50 --page-token <token>
+
+# The Cedar entities the server derives for a resource, for you or another principal
+lkctl cedar resolve-entities server
+lkctl cedar resolve-entities project <project-id>
+lkctl cedar resolve-entities warehouse <warehouse-id> --user <user-id>
+```
+
+`server-policies list` without `--source` includes the predefined
+policies; it never includes the policies stored for projects and
+warehouses. When more policies follow, text output ends with
+`Next page token`. `resolve-entities` text output (`TYPE ID PARENTS`)
+leaves out the action entities that every result carries; `-o wide`
+shows them, `-o json` adds the attributes. It takes no `-p`: the API
+gives the operation no project header, so `project` without an id
+leaves the choice of project to the server.
+
+The apply file is the Management API's apply request: `writes` (each a
+`name`, optional `description`, and a `policy` in Cedar's JSON policy
+format), `deletes`, `replace`, `dry-run` and `if-scope-version`. Text output
+lists the changes (`OP NAME ID`) and the scope version after the apply.
+`list` ends with the scope version, the project's scope version on a
+warehouse, and whether you can change the policies (`Can write`).
+
+`--break-glass REASON` sends the `x-break-glass` header. Only `list` and
+`apply` of `project-policies` and `warehouse-policies` have it: those are
+the operations that accept the header.
+
+#### Predefined policies
+
+Lakekeeper+ provides predefined Cedar policies that a project or a warehouse
+switches on or off; they are never edited.
+
+```sh
+# The predefined policies with their enablement (-p as elsewhere)
+lkctl cedar project-predefined-policies list -p <project-id>
+lkctl cedar project-predefined-policies list -o json --include-policy   # with each rule
+
+# Switch policies in one request; prints the listing as of the write
+lkctl cedar project-predefined-policies set --disable predefined-grants-table-select
+lkctl cedar project-predefined-policies set --enable predefined-a,predefined-b --break-glass "INC-42"
+
+# Drop every decision: the project follows the provided defaults again
+lkctl cedar project-predefined-policies reset
+
+# The same for a warehouse; reset makes it follow its project again
+lkctl cedar warehouse-predefined-policies list <warehouse-id>
+lkctl cedar warehouse-predefined-policies set <warehouse-id> --disable predefined-grants-table-select
+lkctl cedar warehouse-predefined-policies reset <warehouse-id>
+```
+
+`list` and `set` print `ID ENABLED DISABLED BY CAN TOGGLE` (`-o wide` adds
+`UPDATED AT`, `UPDATED BY` and `DESCRIPTION`), then whether the scope has
+decided anything itself (`Curated`) and whether the server evaluates
+predefined policies at all. `DISABLED BY` is `project`, `warehouse` or
+`new-since-curated`, `(retired)` for a policy the server no longer provides,
+and `-` for a policy in force. `list` and `set` take `--break-glass`;
+`reset` does not, as its operation does not accept the header.
+
+### `lkctl task-queue`
+
+One subcommand per task queue, each with `get` and `set`; the Lakekeeper+
+queues also have `schedule`. The subcommand also accepts the server's queue name (`expire_snapshots`) as an alias.
+
+| Queue | Scope | Needs |
+|---|---|---|
+| `tabular-purge` | warehouse | |
+| `soft-deletion` | warehouse | |
+| `task-log-cleanup` | project (`-p`, else the server's default project) | |
+| `expire-snapshots` | warehouse | Lakekeeper+ running the queue |
+| `optimize` | warehouse | Lakekeeper+ running the queue |
+| `remove-orphan-files` | warehouse | Lakekeeper+ running the queue |
+
+`set` sends only the flags given: every other field is left unset and
+inherits the server default, and the configuration replaces the stored
+one. Each queue-config field is a flag of the same name (see
+`lkctl task-queue <queue> set --help`); `--max-seconds-since-last-heartbeat`
+applies to every queue. `get` prints every field, `unset` for one that
+inherits the default; `-o json` prints the server's response.
+
+```sh
+# Expire snapshots older than 7 days; the other fields keep the server defaults
+lkctl task-queue expire-snapshots set <warehouse-id> --max-snapshot-age-ms 604800000
+lkctl task-queue expire-snapshots get <warehouse-id>
+
+# Keep task logs for 30 days in a project
+lkctl task-queue task-log-cleanup set -p <project-id> --cleanup-period P1D --retention-period P30D
+```
+
+Lakekeeper 0.15 rejects a `task-log-cleanup set` without `--cleanup-period`.
+
+`schedule <warehouse-id> <table-id>` (Lakekeeper+) schedules a task of the
+queue for one table and prints its task id; `-o json` prints the server's
+response. The task runs on the next worker poll, or at `--scheduled-for`
+(RFC 3339). `optimize schedule` takes `--step` once per step to run
+(`compaction`, `rewrite-position-deletes`, `remove-dangling-deletes`,
+`rewrite-manifests`); without it the server runs its default steps. A
+missing warehouse or table is reported as not found.
+
+```sh
+lkctl task-queue expire-snapshots schedule <warehouse-id> <table-id>
+lkctl task-queue optimize schedule <warehouse-id> <table-id> --step compaction --step rewrite-manifests
+lkctl task-queue remove-orphan-files schedule <warehouse-id> <table-id> --scheduled-for 2030-01-02T03:00:00Z
+```
 
 ### `lkctl version` / `lkctl whoami`
 

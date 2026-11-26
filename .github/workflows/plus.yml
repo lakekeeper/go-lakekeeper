@@ -1,0 +1,84 @@
+name: lakekeeper-plus
+
+# Runs the Lakekeeper+ suites (make test-plus) with the CI test license.
+# Called from ci.yml (pushes to main) and nightly.yml (schedule); both run on
+# main only. The license is the LAKEKEEPER_PLUS_LICENSE_KEY secret of the
+# `lakekeeper-plus` environment, whose deployment branches are limited to
+# main. Never call this workflow from a pull_request_target trigger.
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  # A job-level `if` cannot read secrets, so this job reports whether the
+  # license secret is there; without it, test-plus shows as skipped.
+  license:
+    runs-on: ubuntu-latest
+    environment: lakekeeper-plus
+    outputs:
+      present: ${{ steps.license.outputs.present }}
+    steps:
+      - name: check for the license secret
+        id: license
+        env:
+          LICENSE_KEY: ${{ secrets.LAKEKEEPER_PLUS_LICENSE_KEY }}
+        run: |
+          if [ -n "$LICENSE_KEY" ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::LAKEKEEPER_PLUS_LICENSE_KEY is not available; Lakekeeper+ tests skipped"
+          fi
+
+  test-plus:
+    needs: license
+    if: needs.license.outputs.present == 'true'
+    runs-on: ubuntu-26.04
+    environment: lakekeeper-plus
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-go@d8cbb8045d7f43706b9177cceb36c1f91a6644d5 # v7.1.0
+        with:
+          go-version-file: go.mod
+
+      # Only this step sees the license. The expiry check inside run.sh writes
+      # the issue body (expiry date, days left, license type, customer) to
+      # LICENSE_EXPIRY_NOTICE, or leaves it empty when no notice is due.
+      - name: make test-plus
+        env:
+          LAKEKEEPER__LICENSE__KEY: ${{ secrets.LAKEKEEPER_PLUS_LICENSE_KEY }}
+          LICENSE_EXPIRY_NOTICE: ${{ runner.temp }}/license-expiry.md
+        run: GOPATH=$(go env GOPATH) make test-plus
+        timeout-minutes: 20
+
+      # Opens one issue when fewer than 30 days remain, or updates the open
+      # one. Never fails the job: only the tests decide its result.
+      - name: open or update license-expiry issue
+        if: always()
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          NOTICE: ${{ runner.temp }}/license-expiry.md
+        run: |
+          if [ ! -s "$NOTICE" ]; then
+            echo "no license expiry notice due"
+            exit 0
+          fi
+          gh label create license-expiry --color D93F0B \
+            --description "The Lakekeeper+ CI test license expires soon" 2>/dev/null || true
+          issue=$(gh issue list --label license-expiry --state open --limit 1 --json number --jq '.[0].number')
+          if [ -n "$issue" ]; then
+            gh issue edit "$issue" --body-file "$NOTICE"
+          else
+            gh issue create --title "Lakekeeper+ CI test license expires soon" \
+              --label license-expiry --body-file "$NOTICE"
+          fi

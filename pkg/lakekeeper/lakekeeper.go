@@ -16,13 +16,22 @@
 // What it re-exports:
 //
 //   - Client + constructors and client Options, APIError and WrapAPIError
-//     from pkg/client
-//   - CallOption and WithProject, and every façade …Options type (e.g.
-//     ListWarehousesOptions, ListRolesOptions, GetServerAccessOptions)
+//     from pkg/client, plus two convenience constructors of its own
+//     (NewOAuthClientCredentials, NewK8sServiceAccount)
+//   - CallOption, WithProject and WithBreakGlass, and every façade
+//     …Options type (e.g. ListWarehousesOptions, ListRolesOptions,
+//     GetServerAccessOptions, PredefinedPoliciesOptions)
+//   - Capabilities, Edition, AuthzBackend and Queue with their constants
+//     (EditionLakekeeperPlus, AuthzBackendCedar, QueueOptimize, …),
+//     ErrUnsupported, UnsupportedError, UnsupportedReason and the Reason…
+//     constants, and VersionRange and SupportedVersions
 //   - Storage profile, delete profile and credential builders from
-//     pkg/storage/{profile,credential}
-//   - Permission builders from pkg/permissions
-//   - The most common Management API request/response types
+//     pkg/storage/{profile,credential}, their read-side accessors
+//     (AsS3Profile, AsSoftDeleteProfile, AsS3AccessKey, …) and the
+//     profile discriminator constants
+//   - Permission builders and principal constants from pkg/permissions
+//   - The most common Management API request/response types and their
+//     constructors
 //
 // What it does NOT re-export:
 //
@@ -126,7 +135,56 @@ type (
 
 	// ListRolesOptions holds the query parameters of Roles.List.
 	ListRolesOptions = client.ListRolesOptions
+
+	// PredefinedPoliciesOptions holds the query parameters of listing and
+	// setting predefined Cedar policies (Cedar.List…/Set…PredefinedPolicies).
+	PredefinedPoliciesOptions = client.PredefinedPoliciesOptions
+
+	// Capabilities describes what one server can do (Client.Capabilities).
+	Capabilities = client.Capabilities
+	// Edition is Lakekeeper or Lakekeeper+.
+	Edition = client.Edition
+	// AuthzBackend is a server's authorization backend.
+	AuthzBackend = client.AuthzBackend
+	// Queue is a task queue, by its server name.
+	Queue = client.Queue
+	// UnsupportedError is the error a capability-gated façade returns when
+	// the server's capabilities explain why it rejected the operation.
+	UnsupportedError = client.UnsupportedError
+	// UnsupportedReason says why the server does not offer an operation.
+	UnsupportedReason = client.UnsupportedReason
+	// VersionRange is the server versions of one edition the SDK supports
+	// (SupportedVersions, Capabilities.SupportedVersions).
+	VersionRange = client.VersionRange
 )
+
+// Editions, authorization backends and unsupported reasons.
+const (
+	EditionLakekeeper     = client.EditionLakekeeper
+	EditionLakekeeperPlus = client.EditionLakekeeperPlus
+
+	AuthzBackendCedar   = client.AuthzBackendCedar
+	AuthzBackendOpenFGA = client.AuthzBackendOpenFGA
+
+	ReasonNotLakekeeperPlus = client.ReasonNotLakekeeperPlus
+	ReasonAuthzBackend      = client.ReasonAuthzBackend
+	// ReasonQueueNotConfigured: the server does not run the task queue.
+	ReasonQueueNotConfigured = client.ReasonQueueNotConfigured
+	// ReasonServerTooOld: the server is older than the release of the spec
+	// the operation came from.
+	ReasonServerTooOld = client.ReasonServerTooOld
+
+	// Task queues, as the server info names them.
+	QueueTabularPurge      = client.QueueTabularPurge
+	QueueSoftDeletion      = client.QueueSoftDeletion
+	QueueTaskLogCleanup    = client.QueueTaskLogCleanup
+	QueueExpireSnapshots   = client.QueueExpireSnapshots
+	QueueOptimize          = client.QueueOptimize
+	QueueRemoveOrphanFiles = client.QueueRemoveOrphanFiles
+)
+
+// ErrUnsupported matches every *UnsupportedError with errors.Is.
+var ErrUnsupported = client.ErrUnsupported
 
 var (
 	New                  = client.New
@@ -141,9 +199,12 @@ var (
 	WithErrorHandler     = client.WithErrorHandler
 	WithInitialBootstrap = client.WithInitialBootstrap
 
+	SupportedVersions = client.SupportedVersions
+
 	WrapAPIError = client.WrapAPIError
 
-	WithProject = client.WithProject
+	WithProject    = client.WithProject
+	WithBreakGlass = client.WithBreakGlass
 )
 
 // Storage profile builders + option types.
@@ -163,9 +224,12 @@ var (
 	// Read-side oneOf accessors — symmetric with the New*Profile
 	// builders, so calling code does not have to navigate the union
 	// struct (`if sp.StorageProfileS3 != nil { … }`).
-	AsS3Profile   = profile.AsS3
-	AsGCSProfile  = profile.AsGCS
-	AsADLSProfile = profile.AsADLS
+	AsS3Profile      = profile.AsS3
+	AsGCSProfile     = profile.AsGCS
+	AsADLSProfile    = profile.AsADLS
+	AsMemoryProfile  = profile.AsMemory
+	AsOneLakeProfile = profile.AsOneLake
+	AsStackitProfile = profile.AsStackit
 
 	WithS3Endpoint              = profile.WithS3Endpoint
 	WithS3KeyPrefix             = profile.WithS3KeyPrefix
@@ -203,6 +267,10 @@ const (
 	StorageProfileTypeS3   = profile.StorageProfileTypeS3
 	StorageProfileTypeGCS  = profile.StorageProfileTypeGCS
 	StorageProfileTypeADLS = profile.StorageProfileTypeADLS
+
+	StorageProfileTypeMemory  = profile.StorageProfileTypeMemory
+	StorageProfileTypeOneLake = profile.StorageProfileTypeOneLake
+	StorageProfileTypeStackit = profile.StorageProfileTypeStackit
 )
 
 // Tabular delete profile builders, accessors and discriminator values.

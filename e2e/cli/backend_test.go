@@ -17,6 +17,20 @@ import (
 const (
 	BackendCompose = "compose"
 	BackendKind    = "kind"
+	// BackendComposePlus runs the host-built lkctl against Lakekeeper+ with
+	// the Cedar authorization backend (compose profile plus, started by
+	// e2e/plus/run.sh).
+	BackendComposePlus = "compose-plus"
+	// BackendComposePlusOpenFGA runs it against Lakekeeper+ with the OpenFGA
+	// authorization backend (compose profile plus-openfga).
+	BackendComposePlusOpenFGA = "compose-plus-openfga"
+	// BackendComposePreviousMinor runs it against Lakekeeper pinned to the
+	// minor before the Lakekeeper spec release, the oldest supported minor
+	// (started by e2e/versions/run.sh).
+	BackendComposePreviousMinor = "compose-previous-minor"
+	// BackendComposeOlderMinor runs it against Lakekeeper pinned to the
+	// minor before that, outside the supported range.
+	BackendComposeOlderMinor = "compose-older-minor"
 )
 
 // Backend abstracts how lkctl is invoked. Compose runs the binary on the host
@@ -38,18 +52,22 @@ type Backend interface {
 	Close()
 }
 
-// composeBackend invokes a host-built lkctl binary directly.
+// composeBackend invokes a host-built lkctl binary directly. name is the
+// backend it stands for: BackendCompose, or one of the Lakekeeper+ backends,
+// which differ only in the compose stack they run against.
 type composeBackend struct {
+	name     string
 	binPath  string
 	buildDir string
 }
 
 // newComposeBackend resolves the lkctl binary. Honours LKCTL_BIN if set
-// (canonical when invoked from e2e/compose/run.sh, which builds once before
-// driving the suite); otherwise builds cmd/lkctl into a temp dir.
-func newComposeBackend() (Backend, error) {
+// (canonical when invoked from e2e/compose/run.sh or e2e/plus/run.sh, which
+// build once before driving the suite); otherwise builds cmd/lkctl into a
+// temp dir.
+func newComposeBackend(name string) (Backend, error) {
 	if bin := os.Getenv("LKCTL_BIN"); bin != "" {
-		return &composeBackend{binPath: bin}, nil
+		return &composeBackend{name: name, binPath: bin}, nil
 	}
 
 	dir, err := os.MkdirTemp("", "lkctl-e2e-")
@@ -62,10 +80,10 @@ func newComposeBackend() (Backend, error) {
 		_ = os.RemoveAll(dir)
 		return nil, fmt.Errorf("build lkctl: %w\n%s", err, out)
 	}
-	return &composeBackend{binPath: bin, buildDir: dir}, nil
+	return &composeBackend{name: name, binPath: bin, buildDir: dir}, nil
 }
 
-func (b *composeBackend) Name() string { return BackendCompose }
+func (b *composeBackend) Name() string { return b.name }
 
 func (b *composeBackend) Exec(ctx context.Context, stdin []byte, args ...string) ([]byte, []byte, int, error) {
 	cmd := exec.CommandContext(ctx, b.binPath, args...)

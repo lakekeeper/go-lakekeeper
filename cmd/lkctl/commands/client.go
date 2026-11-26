@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 
 	"golang.org/x/oauth2/clientcredentials"
 
@@ -32,6 +33,29 @@ type clientOptions struct {
 	k8sTokenPath string
 	bootstrap    bool
 	debug        bool
+
+	// stderr receives the supported-version warning; the root command sets
+	// it to its own stderr.
+	stderr io.Writer
+	// client is the client newClient built for this run, for the
+	// supported-version check.
+	client *client.Client
+}
+
+// checkSupportedVersions warns on stderr when the server is outside the
+// versions this lkctl supports. NewCommand runs it once per run, after the
+// command. It reads only the capabilities of a server info the command
+// fetched anyway, so it adds no request, and it never fails the command.
+func (o *clientOptions) checkSupportedVersions() {
+	if o.client == nil || o.stderr == nil {
+		return
+	}
+	caps, ok := o.client.CachedCapabilities()
+	if !ok || caps.InSupportedVersions() {
+		return
+	}
+	fmt.Fprintf(o.stderr, "Warning: server is %s; this %s supports %s\n",
+		caps, cliName, caps.SupportedVersions())
 }
 
 // validate returns an error if any of the required connection fields are
@@ -68,7 +92,7 @@ func (o *clientOptions) validate() error {
 
 // newClient validates opts, builds an AuthSource for the selected auth mode,
 // and constructs an authenticated *client.Client. If the bootstrap flag is
-// set, the server is bootstrapped during construction.
+// set, it bootstraps the server.
 func newClient(ctx context.Context, opts *clientOptions) (*client.Client, error) {
 	if err := opts.validate(); err != nil {
 		return nil, err
@@ -79,12 +103,35 @@ func newClient(ctx context.Context, opts *clientOptions) (*client.Client, error)
 		return nil, err
 	}
 
-	var clientOpts []client.Option
-	if opts.bootstrap {
-		clientOpts = append(clientOpts, client.WithInitialBootstrap(true, true, core.Ptr(managementv1.USERTYPE_APPLICATION)))
+	c, err := client.NewWithAuthSource(ctx, opts.baseURL, authSource)
+	if err != nil {
+		return nil, err
 	}
+	opts.client = c
+	if opts.bootstrap {
+		if err := bootstrap(ctx, c); err != nil {
+			return nil, err
+		}
+	}
+	return c, nil
+}
 
-	return client.NewWithAuthSource(ctx, opts.baseURL, authSource, clientOpts...)
+// bootstrap bootstraps the server as an operator application, unless it is
+// bootstrapped already: what client.WithInitialBootstrap does, but after
+// construction, so the supported-version check sees the server info even
+// when bootstrapping fails.
+func bootstrap(ctx context.Context, c *client.Client) error {
+	info, err := c.Server.Info(ctx)
+	if err != nil {
+		return fmt.Errorf("bootstrap: %w", err)
+	}
+	if info.GetBootstrapped() {
+		return nil
+	}
+	req := managementv1.NewBootstrapRequest(true)
+	req.SetIsOperator(true)
+	req.SetUserType(managementv1.USERTYPE_APPLICATION)
+	return c.Server.Bootstrap(ctx, req)
 }
 
 func buildAuthSource(ctx context.Context, opts *clientOptions) (core.AuthSource, error) {

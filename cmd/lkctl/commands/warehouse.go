@@ -572,17 +572,23 @@ func printWarehouseStatistics(w io.Writer, stats ...managementv1.WarehouseStatis
 	return tw.Flush()
 }
 
-// storageFamily returns "s3", "gcs", or "adls" depending on which variant of
-// the StorageProfile union is populated. Falls back to "unknown".
+// storageFamily returns the type discriminator ("s3", "gcs", "adls",
+// "memory", "onelake" or "stackit") of the populated StorageProfile variant.
+// Falls back to "unknown".
 func storageFamily(sp managementv1.StorageProfile) string {
-	if _, ok := profile.AsS3(sp); ok {
-		return "s3"
-	}
-	if _, ok := profile.AsGCS(sp); ok {
-		return "gcs"
-	}
-	if _, ok := profile.AsADLS(sp); ok {
-		return "adls"
+	switch {
+	case sp.StorageProfileS3 != nil:
+		return profile.StorageProfileTypeS3
+	case sp.StorageProfileGcs != nil:
+		return profile.StorageProfileTypeGCS
+	case sp.StorageProfileAdls != nil:
+		return profile.StorageProfileTypeADLS
+	case sp.StorageProfileMemory != nil:
+		return profile.StorageProfileTypeMemory
+	case sp.StorageProfileOneLake != nil:
+		return profile.StorageProfileTypeOneLake
+	case sp.StorageProfileStackit != nil:
+		return profile.StorageProfileTypeStackit
 	}
 	return "unknown"
 }

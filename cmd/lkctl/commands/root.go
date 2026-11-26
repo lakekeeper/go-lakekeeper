@@ -24,7 +24,7 @@ func init() {
 
 // NewCommand returns the lkctl root command with all subcommands registered.
 func NewCommand() *cobra.Command {
-	var opts clientOptions
+	opts := clientOptions{}
 
 	cmd := &cobra.Command{
 		Use:               cliName,
@@ -33,7 +33,8 @@ func NewCommand() *cobra.Command {
 		SilenceErrors:     true,
 		SilenceUsage:      true,
 		DisableAutoGenTag: true,
-		PersistentPreRun: func(*cobra.Command, []string) {
+		PersistentPreRun: func(cmd *cobra.Command, _ []string) {
+			opts.stderr = cmd.ErrOrStderr()
 			log.SetFormatter(&log.TextFormatter{DisableColors: true, FullTimestamp: true})
 			if opts.debug {
 				log.SetLevel(log.DebugLevel)
@@ -74,13 +75,34 @@ func NewCommand() *cobra.Command {
 	cmd.PersistentFlags().BoolVar(&opts.debug, "debug", false, "Enable debug logging")
 
 	cmd.AddCommand(newCatalogCmd())
+	cmd.AddCommand(newCedarCmd(&opts))
 	cmd.AddCommand(newProjectCmd(&opts))
 	cmd.AddCommand(newRoleCmd(&opts))
 	cmd.AddCommand(newServerCmd(&opts))
+	cmd.AddCommand(newTaskQueueCmd(&opts))
 	cmd.AddCommand(newUserCmd(&opts))
 	cmd.AddCommand(newVersionCmd(&opts))
 	cmd.AddCommand(newWarehouseCmd(&opts))
 	cmd.AddCommand(newWhoamiCmd(&opts))
 
+	checkSupportedVersionsAfter(cmd, &opts)
 	return cmd
+}
+
+// checkSupportedVersionsAfter makes every command in the tree run the
+// supported-version check after its own work, whether that succeeded or
+// failed, so the warning comes before main prints the error.
+func checkSupportedVersionsAfter(cmd *cobra.Command, opts *clientOptions) {
+	for _, sub := range cmd.Commands() {
+		checkSupportedVersionsAfter(sub, opts)
+	}
+	run := cmd.RunE
+	if run == nil {
+		return
+	}
+	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		err := run(cmd, args)
+		opts.checkSupportedVersions()
+		return err
+	}
 }

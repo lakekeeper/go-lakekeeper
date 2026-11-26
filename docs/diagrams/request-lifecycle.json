@@ -3,14 +3,14 @@
   "diagram_type": "sequence",
   "meta": {
     "title": "Request lifecycle: one façade call",
-    "output": ".archify/sequence-request-lifecycle-20261111-122427/request-lifecycle.html",
+    "output": ".archify/sequence-request-lifecycle-20261125-134529/request-lifecycle.html",
     "quality_profile": "showcase",
     "locale": "en",
     "repository": {
       "url": "git@github.com:lakekeeper/go-lakekeeper.git",
       "provider": "github",
       "link_mode": "local-only",
-      "revision": "fb689d0edce8a3b59c22af0bf856f9d14c60bbb3"
+      "revision": "ba562aa91fcec34dad0b356e9b46d1188be748f9"
     },
     "legend": {
       "entries": {
@@ -76,8 +76,8 @@
         },
         {
           "path": "pkg/client/client.go",
-          "line": 109,
-          "end_line": 113,
+          "line": 122,
+          "end_line": 129,
           "label": "façade wraps service"
         }
       ]
@@ -96,8 +96,8 @@
         },
         {
           "path": "pkg/client/client.go",
-          "line": 101,
-          "end_line": 109,
+          "line": 114,
+          "end_line": 122,
           "label": "base URL and HTTP client"
         }
       ]
@@ -110,8 +110,8 @@
       "sources": [
         {
           "path": "pkg/client/client.go",
-          "line": 219,
-          "end_line": 263,
+          "line": 238,
+          "end_line": 282,
           "label": "newHTTPClient"
         },
         {
@@ -136,8 +136,8 @@
         },
         {
           "path": "pkg/client/client.go",
-          "line": 87,
-          "end_line": 89,
+          "line": 100,
+          "end_line": 102,
           "label": "AuthSource.Init once"
         }
       ]

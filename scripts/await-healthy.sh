@@ -25,7 +25,10 @@ TOKEN=$(curl --silent --show-error --fail \
   --data "scope=$LAKEKEEPER_SCOPE&grant_type=client_credentials&client_id=$LAKEKEEPER_CLIENT_ID&client_secret=$LAKEKEEPER_CLIENT_SECRET" \
   "$LAKEKEEPER_TOKEN_URL" | jq -r '.access_token')
 
-# Print the server info, since it is useful debugging information.
+# Print the server info, since it is useful debugging information. Of the
+# license status only the type and validity are printed: CI logs must not
+# carry license details.
 echo "Lakekeeper server info:"
-curl --fail --show-error --silent -H "Authorization: Bearer $TOKEN" "$LAKEKEEPER_BASE_URL/management/v1/info"
-echo
+curl --fail --show-error --silent -H "Authorization: Bearer $TOKEN" "$LAKEKEEPER_BASE_URL/management/v1/info" \
+  | jq -c 'if has("license-status") and ."license-status" != null
+           then ."license-status" |= {"license-type", valid} else . end'

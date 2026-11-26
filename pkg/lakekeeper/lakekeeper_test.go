@@ -118,3 +118,42 @@ func TestUmbrellaListRolesOptions(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "5", reqs.Last(t).Query.Get("pageSize"))
 }
+
+// TestUmbrellaPredefinedPoliciesOptions confirms umbrella-only callers can
+// ask for the predefined Cedar policies' rules.
+func TestUmbrellaPredefinedPoliciesOptions(t *testing.T) {
+	t.Parallel()
+
+	mux, c := testutil.ServerMux(t)
+	reqs := testutil.Respond(t, mux, "GET /management/v1/permissions/cedar/project/predefined-policies", http.StatusOK,
+		map[string]any{"curated": false, "predefined-policies-enabled": true, "policies": []any{}})
+
+	_, err := c.Cedar.ListProjectPredefinedPolicies(t.Context(), &lakekeeper.PredefinedPoliciesOptions{IncludePolicy: true})
+
+	require.NoError(t, err)
+	assert.Equal(t, "true", reqs.Last(t).Query.Get("include-policy"))
+}
+
+// TestUmbrellaErrUnsupported confirms umbrella-only callers can match an
+// unsupported operation and read why.
+func TestUmbrellaErrUnsupported(t *testing.T) {
+	t.Parallel()
+
+	mux, c := testutil.ServerMux(t)
+	testutil.Respond(t, mux, "GET /management/v1/permissions/cedar/schema", http.StatusNotFound, nil)
+	testutil.Respond(t, mux, "GET /management/v1/info", http.StatusOK, `{
+  "authz-backend": "openfga", "aws-system-identities-enabled": false,
+  "azure-system-identities-enabled": false, "bootstrapped": true,
+  "default-project-id": "00000000-0000-0000-0000-000000000000",
+  "gcp-system-identities-enabled": false, "lakekeeper-version": "0.15.1",
+  "license-status": {"license-type": "none", "valid": true},
+  "managed-role-providers": [], "queues": [], "server-id": "srv", "version": "0.15.1"}`)
+
+	_, err := c.Cedar.Schema(t.Context())
+
+	require.ErrorIs(t, err, lakekeeper.ErrUnsupported)
+	var unsupported *lakekeeper.UnsupportedError
+	require.ErrorAs(t, err, &unsupported)
+	assert.Equal(t, lakekeeper.ReasonNotLakekeeperPlus, unsupported.Reason)
+	assert.Equal(t, lakekeeper.EditionLakekeeper, unsupported.Server.Edition)
+}

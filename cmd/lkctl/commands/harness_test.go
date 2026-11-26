@@ -2,6 +2,7 @@ package commands
 
 import (
 	"bytes"
+	"strings"
 	"testing"
 )
 
@@ -13,7 +14,14 @@ import (
 // observe, such as which flags turn into which request.
 func runLkctl(t *testing.T, baseURL string, args ...string) (string, error) {
 	t.Helper()
+	return runLkctlWithStdin(t, baseURL, "", args...)
+}
+
+// runLkctlWithStdin is runLkctl with stdin, for commands that read "-f -".
+func runLkctlWithStdin(t *testing.T, baseURL, stdin string, args ...string) (string, error) {
+	t.Helper()
 	cmd := NewCommand()
+	cmd.SetIn(strings.NewReader(stdin))
 	var out bytes.Buffer
 	cmd.SetOut(&out)
 	cmd.SetErr(&out)
